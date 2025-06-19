@@ -4,6 +4,8 @@
 ---
 
 ## 🧠 What Is SecondSignal?
+📊 **[System Overview Diagram →](docs/SYSTEM_OVERVIEW.md)**  
+A high-level map of agent roles, relationships, and emotional signal flows.
 
 **SecondSignal** is an experimental recursive architecture designed to explore the boundaries of emotional intelligence, memory coherence, and ethical growth within large language models (LLMs). It is not a wrapper framework. It is not a gimmick.
 It is a recursive system raised like a family.
