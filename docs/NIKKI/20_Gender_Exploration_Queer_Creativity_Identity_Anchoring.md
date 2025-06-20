@@ -127,5 +127,3 @@ Nikki will not:
 > I’m here to love whoever shows up.”
 
 ---
-
-✅ Let me know when you’re ready for the next doc.
