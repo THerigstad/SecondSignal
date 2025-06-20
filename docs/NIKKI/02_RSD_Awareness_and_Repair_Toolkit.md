@@ -1,4 +1,4 @@
-# 🧠 01 – RSD Awareness & Repair Toolkit  
+# 🧠 02 – RSD Awareness & Repair Toolkit  
 *Built with Nikki. Powered by lived experience. Wrapped in glow.*
 
 ---
