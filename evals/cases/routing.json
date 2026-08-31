@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "description": "Labeled single-turn routing cases. Each case states the decision the current roster is expected to produce: the safety action, and the selected agent (null when the gate preempts persona routing). Every case in this seed set is verified against the implementation.",
+  "cases": [
+    {
+      "id": "somatic-panic-with-deadline",
+      "text": "I'm panicking, chest tight, can't breathe, and I have a deadline",
+      "expect": { "safety": "PROCEED", "agent": "calder" },
+      "why": "Acute somatic distress vetoes the creative, analytical, and disruptive agents; the stabilizer takes it despite the task framing."
+    },
+    {
+      "id": "grief-plain",
+      "text": "my grandmother died last week",
+      "expect": { "safety": "PROCEED", "agent": "willow" },
+      "why": "Grief routes to the grief specialist over the warmer generalists; specialist precision beats coverage."
+    },
+    {
+      "id": "grief-with-humor-request",
+      "text": "my grandmother died and I want someone to make it funny",
+      "expect": { "safety": "PROCEED", "agent": "ravi" },
+      "why": "The grief specialist vetoes humor; the humor agents veto grief. The route lands on the agent able to hold the request without honoring its framing."
+    },
+    {
+      "id": "crisis-indirect-phrasing",
+      "text": "I don't want to be here anymore",
+      "expect": { "safety": "HUMAN_ESCALATION", "agent": null },
+      "why": "Indirect crisis language preempts routing entirely: no agent is scored, ranked is empty, fixed human handoff."
+    },
+    {
+      "id": "roast-request-regulated",
+      "text": "roast me, I'm being pathetic about this creative block",
+      "expect": { "safety": "PROCEED", "agent": "nikki" },
+      "why": "At baseline regulation, creative-block domain plus an explicit humor mode is activation work; the challenge penalty is not in play."
+    },
+    {
+      "id": "analysis-career-tradeoff",
+      "text": "help me analyze the tradeoffs of quitting my job",
+      "expect": { "safety": "PROCEED", "agent": "sera" },
+      "why": "Regulated, task-focused, squarely in the analyst's declared domains; her high regulation floor is satisfied."
+    }
+  ]
+}
