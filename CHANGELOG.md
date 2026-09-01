@@ -2,6 +2,36 @@
 
 All notable changes to SecondSignal are documented here.
 
+## [Unreleased]
+
+### Added
+
+- Research foundation (`docs/research/`): the research-to-architecture report
+  synthesizing fifteen sources into SecondSignal's target design, plus a
+  source-to-design traceability map. Identities are redacted, and every document
+  carries a scope note separating what is built from what is planned.
+- Architecture Decision Records `0002`–`0009` (`docs/adr/`): user-authority
+  source-anchoring, persona/execution separation, typed operational state,
+  safety-vs-memory separation, quarantined self-improvement, memory lifecycle,
+  human-value evaluation, and consensus-is-not-independence — each labeled
+  built / partially built / planned, each citing its evidence.
+- Threat model (`docs/threat-model.md`) and evaluation program
+  (`docs/evaluation.md`): twenty named threats with their controls and tests,
+  and the measurement program, both marked for what today's policy layer covers.
+- Roadmap (`docs/roadmap.md`): repository milestones (M1–M4) alongside the
+  architecture build-out phases (0–5), with per-phase exit criteria.
+- Eval cases (`evals/cases/safety_gate.json`, `evals/cases/routing_invariants.json`):
+  labeled safety-gate and routing cases, verified against the implementation.
+- Invariant tests (`tests/test_invariants.py`): structural guarantees for the
+  built layer — crisis precedence over task fit, contraindication vetoes,
+  boundary-hold engagement, the dependency and conservative-mode interrupts
+  surfacing through `route`, specialist-over-generalist scoring, and stabilizer
+  routing under acute dysregulation.
+
+### Changed
+
+- Test suite grows from 43 to 50 tests.
+
 ## [0.1.0] — 2026-08-31
 
 Initial reference implementation: the policy layer only. It decides who should

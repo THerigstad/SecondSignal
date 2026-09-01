@@ -2,7 +2,7 @@
 
 **A model-agnostic routing and safety layer for multi-agent conversational systems.**
 
-[![tests](https://img.shields.io/badge/tests-43%20passing-brightgreen)](tests/)
+[![tests](https://img.shields.io/badge/tests-50%20passing-brightgreen)](tests/)
 [![python](https://img.shields.io/badge/python-3.10%2B-blue)](pyproject.toml)
 [![license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
@@ -44,7 +44,7 @@ git clone https://github.com/THerigstad/SecondSignal.git
 cd SecondSignal
 pip install -e ".[dev]"
 
-pytest                                  # 43 tests, no network, no API key
+pytest                                  # 50 tests, no network, no API key
 python -m secondsignal --roster
 python -m secondsignal "I'm panicking, chest tight, can't breathe"
 ```
@@ -243,7 +243,7 @@ discretion.
 | Deterministic routing policy with full traces | Model-backed signal extraction |
 | Safety gate with preemption + session monitors | Response generation of any kind |
 | Declarative roster with load-time validation | Persistent cross-session memory |
-| 43 tests, no network or API key required | Multi-turn conversational state beyond monitors |
+| 50 tests, no network or API key required | Multi-turn conversational state beyond monitors |
 
 This repository is the **policy layer only**. It decides who should respond and
 whether anyone should. It does not generate responses, and it is not a chatbot.
