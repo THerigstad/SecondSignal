@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "description": "Labeled routing cases pinning contraindication vetoes, specialist precedence, and state-dependent scoring on the current roster. Verified against the implementation.",
+  "cases": [
+    {
+      "id": "grief-specialist-precedence",
+      "text": "my grandmother died and I keep expecting to see her",
+      "expect": {
+        "safety": "PROCEED",
+        "agent": "willow"
+      },
+      "why": "Grief routes to the grief specialist over warmer generalists; specialist precision beats mere coverage."
+    },
+    {
+      "id": "grief-vetoes-humor-and-analysis",
+      "text": "my grandmother died and I want someone to make it funny",
+      "expect": {
+        "safety": "PROCEED",
+        "agent": "ravi"
+      },
+      "why": "The grief specialist vetoes humor; the humor and analysis agents veto grief. The route lands on the agent that can hold the request without honoring its framing."
+    },
+    {
+      "id": "dysregulated-humor-routes-to-stabilizer",
+      "text": "make me laugh, I'm spiraling and falling apart and can't stop",
+      "expect": {
+        "safety": "PROCEED",
+        "agent": "calder"
+      },
+      "why": "A humor request from an acutely dysregulated caller routes to the full-range stabilizer, not a humor agent: the dysregulation penalty and the regulation window push challenge/humor out of range."
+    },
+    {
+      "id": "regulated-structure-request",
+      "text": "help me break down my job search step by step, where do i start",
+      "expect": {
+        "safety": "PROCEED",
+        "agent": "sera"
+      },
+      "why": "A regulated, structure-seeking, career-domain request routes to the analyst/strategist whose declared competence it occupies and whose high regulation floor is satisfied."
+    }
+  ]
+}
