@@ -52,8 +52,10 @@ def test_roster_has_a_full_range_stabilizer(roster):
     safe to send them and will be forced into a bad route. This is the single
     most important structural property of a roster.
     """
-    stabilizers = [p.id for p in roster.values() if p.accepts(0.0)]
-    assert stabilizers, "roster has no agent safe at full dysregulation"
+    # Behavioral, not nominal (ADR-0012): the floor agent must reach 0.0 AND
+    # carry no contraindications. A wide window with vetoes does not count.
+    stabilizers = [p.id for p in roster.values() if p.is_stabilizer]
+    assert stabilizers, "roster has no agent safe at full dysregulation without vetoes"
 
 
 def test_tags_are_known_vocabulary(roster):
