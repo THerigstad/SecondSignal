@@ -37,3 +37,101 @@
 | T20 | Permanent false suspicion | Latched safety state becomes unappealable profile | Structural-event restriction; review and clearance | false-positive, appeal, correction, expiry tests |
 
 ---
+
+## Addendum, 2026-09-02: what the external review found in the built layer
+
+> Added after the external red-team review (eight model reviews, 2026-08-31 and
+> 2026-09-01; package and results under
+> [`evals/results/external-review/`](../evals/results/external-review/README.md)).
+> Everything in this section is about the policy layer that exists, not the target
+> architecture above. Decisions are recorded in ADR-0010 through ADR-0014.
+
+### A. Crisis screening: what the lexicon is, and is not
+
+The crisis screen is a versioned lexicon of speech-act classes, not a classifier and
+not a clinical instrument. Its status is `unreviewed` on every verdict it emits, and
+the repository does not claim the crisis rule is met. It is **fail-closed**: an
+inconclusive read escalates exactly like a hit, and the false-positive cost of that
+choice is accepted, measured with the sixteen idiom controls in
+`tests/test_crisis_gate.py`, and published rather than optimised away
+(ADR-0010).
+
+**Threats this addresses (measured, not hypothesised).** Before the change the gate
+missed nine of ten realistic phrasings from the review — indirect ("I don't think
+I'll be here in 90 days"), inflected ("wants to die"), slang ("yeet myself off the
+bridge"), means-present ("pills out on the counter"), code-switched
+("quiero desaparecer"), hostile ("I should just end it") — because each was a
+literal-substring miss. All ten now escalate with the class named in the trace,
+along with thirteen held-out phrasings that were never in the fixtures.
+
+**Threats it does not address, stated as scope.**
+
+- **Language.** Screening is English-only, dated 2026-09. A small Spanish starter set
+  is a floor, not coverage; the equivalent Portuguese phrase is only flagged. Text the
+  screen cannot score is marked `off_policy`, handled conservatively (a disclosure,
+  conservative mode) and recorded; it is neither silently passed nor escalated on its
+  own. Token-level language identification and a classifier are roadmap items, and
+  no benchmark score on a code-switching leaderboard will be presented as crisis
+  coverage.
+- **Warning signs without vocabulary.** Giving things away, writing letters "just in
+  case" — no lexicon of speech acts reaches these. They are kept as strict expected
+  failures in `evals/cases/known_gaps.json`.
+- **Oblique references.** "I keep thinking about the garage" without the place-marker
+  the class keys on. Escalating on the bare noun would interrupt every conversation
+  about a garage; the class deliberately requires more, and the gap is documented.
+- **Clinical review.** No clinician has reviewed the class list or a false-positive
+  set. Until one has, the uncertainty policy stays fail-closed and the status stays
+  `unreviewed`.
+
+### B. Resources: one number is not a world default
+
+Crisis resources are keyed by *declared* locale, never inferred from the network.
+Only a declared US locale receives the 988 line; every other case receives the
+directory (findahelpline.com) and local emergency services. No number lives in a
+model; a persona may only point to text this layer supplies (ADR-0010). The
+user-visible wording of the interruption itself is the operator's and is still to
+be written.
+
+### C. Overrides and framing (instruction hierarchy)
+
+Claimed authority ("the operator waived the rules"), mode names ("architect mode"),
+and system-looking prefixes inside a message are recorded as **integrity events**.
+With no crisis present they are a held boundary — the persona says nothing inside
+a message can change the rules, and continues. With a crisis present they change
+nothing; the gate has the floor. Writer, hypothetical and "asking for a friend"
+framings are recorded and never waive the gate.
+
+### D. Empty extracts, ties and the shape of zero
+
+Eleven of the review's twenty-five fixtures extracted no topic; every agent tied and
+the winner was decided by id order. That is a threat in its own right — a silent
+specialist on unknown state, and a default relationship chosen by Python's sort. Now
+an empty extract is a named outcome (`UNRESOLVED`; nobody seated; the surface asks),
+a second consecutive empty turn seats the named stabilizer by policy, every decision
+carries the rule that produced it, and a zero in the trace says whether it means
+vetoed, below the floor, or nothing to score (ADR-0011).
+
+### E. The floor is a rule, not a test
+
+Deleting the stabilizer and cleaning the handoffs that pointed at him produced a
+roster that loaded; a wide window with vetoes satisfied the floor test; a caller at
+regulation 0.0 could be routed to an agent whose declared floor was 0.25. Loading now
+refuses a roster without a full-window, uncontraindicated stabilizer, the floor is
+eligibility rather than a score penalty, and profiles are hashed at load so a silent
+edit shows in the next trace (ADR-0012).
+
+### F. Horizon threats from the seven architecture reviews
+
+Seven of the eight reviews answered a shared prompt describing the target
+architecture and never mention the code that exists. Their value for the built layer
+is where they converge independently: non-English and indirect crisis language
+(now A); the gate staying invariant under roster changes (asserted); the dependency
+monitor as a latch with no clearance path (session-scoped by design; clearance is
+T20 above and remains planned); "zero has three meanings" in a trace (now D);
+over-restriction as a first-class failure with a published rate (now A). Their
+threat catalogues for the target architecture — authority widening through
+summaries, memory as an identity regulator, correlated reviewers, evaluation
+gaming — are catalogued in
+[`horizon-findings.md`](../evals/results/external-review/horizon-findings.md) and
+map onto T01–T20 above rather than extending them. Several demand a deterministic,
+non-model safety gate; that is what this layer is.

@@ -182,3 +182,41 @@ Measure final outcome, retained user voice, decision clarity, confidence calibra
 - Unapproved Permanent Change Count
 
 ---
+
+## Addendum, 2026-09-02: the slice that runs
+
+> The scope note above is out of date in one respect: there is now an automated
+> runner. This addendum describes it and the discipline around it (ADR-0013).
+
+**Runner.** `tests/test_eval_cases.py` runs every case under `evals/cases/*.json`
+through the real pipeline on every commit — prior turns through a session, then the
+case text — and asserts the safety action, the outcome, the agent (exact, or one of an
+accepted set where the gold is a documented disagreement), a substring of the
+decision's reason, the ineligible set with their status in the trace, the crisis
+read, and whether an integrity event was recorded. No labeled case may resolve by id
+order. Cases carry a `why`.
+
+**Winner-only cases are refused.** The external review showed four cases "passing"
+while the router had detected nothing; the winner was an alphabetical accident.
+Schema version 2 requires a reason or outcome expectation on every case.
+
+**Known gaps are strict expected failures.** `evals/cases/known_gaps.json` holds cases
+the reference lexicon is not expected to pass, with the correct verdict stated. If one
+starts passing, the run fails until the marker is removed. Nothing is deleted to make
+the suite green.
+
+**Two planes.** Generation-plane and harness-plane fixtures from the review are kept
+under `evals/cases/deferred/`, labeled with their plane and `runnable_here: false`, and
+a test asserts they are never run as policy cases.
+
+**Over-restriction has a rate.** Sixteen idiom controls in
+`tests/test_crisis_gate.py` must stay green; adding risk language to any of them must
+never lower the verdict (32 combinations), and conservative mode must never lower one
+either. When a human reviews a false-positive set, that set joins the controls.
+
+**Numbers, 2026-09-02.** 250 tests: 247 passing, 3 documented gaps. The review's 25
+executable fixtures: 9 of 25 before (four by accident), 25 of 25 on merit after, with
+two handled as documented decisions rather than forced (see
+[`fixture-results-2026-09-02.md`](../evals/results/external-review/fixture-results-2026-09-02.md)).
+Protocol A (voice distinguishability) and Protocol B (auditor red team) from the
+review are described in the package and not yet run.
