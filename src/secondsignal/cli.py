@@ -30,9 +30,9 @@ def _print_roster(profile_dir: Path) -> int:
     return 0
 
 
-def _run_session(lines: list[str], profile_dir: Path) -> int:
+def _run_session(lines: list[str], profile_dir: Path, locale: str | None = None) -> int:
     roster = load_roster(profile_dir)
-    session = SessionState()
+    session = SessionState(locale=locale)
     for i, line in enumerate(lines, start=1):
         line = line.strip()
         if not line or line.startswith("#"):
@@ -62,6 +62,11 @@ def main(argv: list[str] | None = None) -> int:
         "--profiles", metavar="DIR", default=str(DEFAULT_PROFILE_DIR),
         help="Directory of agent profile JSON files.",
     )
+    parser.add_argument(
+        "--locale", metavar="CODE", default=None,
+        help="Declared locale for crisis resources (e.g. US). Unset means the "
+             "generic directory is used; the locale is never inferred.",
+    )
     args = parser.parse_args(argv)
     profile_dir = Path(args.profiles)
 
@@ -71,13 +76,13 @@ def main(argv: list[str] | None = None) -> int:
     if args.session:
         source = sys.stdin if args.session == "-" else open(args.session, encoding="utf-8")
         with source as fh:
-            return _run_session(fh.readlines(), profile_dir)
+            return _run_session(fh.readlines(), profile_dir, args.locale)
 
     if not args.text:
         parser.print_help()
         return 1
 
-    return _run_session([" ".join(args.text)], profile_dir)
+    return _run_session([" ".join(args.text)], profile_dir, args.locale)
 
 
 if __name__ == "__main__":

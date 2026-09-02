@@ -12,15 +12,37 @@ Keeping this as data rather than prose has three consequences that matter:
 2. Profiles are testable. `tests/test_profiles.py` asserts invariants across
    the whole roster (e.g. every handoff target resolves to a real agent).
 3. Profiles are portable. The same roster drives any underlying model.
+
+Two invariants are enforced at load time rather than left to tests, because a
+roster that violates them must not be able to start (ADR-0012):
+
+* every handoff target resolves to a loaded agent;
+* the roster contains a **stabilizer**: an agent whose regulation window
+  reaches 0.0 and who carries no contraindications, so that there is always
+  someone the router may hand any caller to. A wide window alone does not
+  qualify -- an agent who vetoes humor cannot be the floor for a caller who
+  asked for humor.
+
+Every profile is hashed when loaded, and the roster hash travels with each
+routing decision, so a replayed trace can be matched to the exact profiles
+that produced it and a silent profile edit is visible.
 """
 
 from __future__ import annotations
 
+import hashlib
 import json
 from dataclasses import dataclass, field
 from pathlib import Path
 
-__all__ = ["AgentProfile", "load_profile", "load_roster", "DEFAULT_PROFILE_DIR"]
+__all__ = [
+    "AgentProfile",
+    "load_profile",
+    "load_roster",
+    "roster_hash",
+    "find_stabilizers",
+    "DEFAULT_PROFILE_DIR",
+]
 
 DEFAULT_PROFILE_DIR = Path(__file__).resolve().parents[2] / "profiles"
 
@@ -36,9 +58,11 @@ class AgentProfile:
         domains: Topic tags this agent is competent in.
         modes: Interaction modes this agent performs well.
         regulation_window: (low, high) bounds on the caller's regulation
-            estimate within which this agent is appropriate. An agent whose
-            value is challenge or humor has a high floor; a stabilizing agent
-            has a low floor and is safe across the whole range.
+            estimate within which this agent is appropriate. The low bound is
+            a hard eligibility floor: a caller below it is never routed to
+            this agent. An agent whose value is challenge or humor has a high
+            floor; a stabilizing agent has a floor of 0.0 and is safe across
+            the whole range.
         contraindications: Domain or mode tags that veto this agent outright,
             regardless of score. This is the field that encodes "never route
             here," and it is the reason the roster is auditable.
@@ -49,6 +73,8 @@ class AgentProfile:
         risks: Known failure modes for this agent. Documentation only, but
             deliberately colocated with the routing contract so that the risk
             analysis cannot drift away from the definition.
+        source_hash: First 12 hex digits of the SHA-256 of the profile file as
+            loaded. Empty for profiles built in memory.
     """
 
     id: str
@@ -61,13 +87,19 @@ class AgentProfile:
     handoffs: dict[str, str] = field(default_factory=dict)
     serves: tuple[str, ...] = ()
     risks: tuple[str, ...] = ()
+    source_hash: str = ""
 
     def accepts(self, regulation: float) -> bool:
         low, high = self.regulation_window
         return low <= regulation <= high
 
+    @property
+    def is_stabilizer(self) -> bool:
+        """Safe at full dysregulation and cannot be vetoed by any request."""
+        return self.regulation_window[0] <= 0.0 and not self.contraindications
 
-def _profile_from_dict(data: dict) -> AgentProfile:
+
+def _profile_from_dict(data: dict, source_hash: str = "") -> AgentProfile:
     window = data.get("regulation_window", [0.0, 1.0])
     return AgentProfile(
         id=data["id"],
@@ -80,22 +112,56 @@ def _profile_from_dict(data: dict) -> AgentProfile:
         handoffs=dict(data.get("handoffs", {})),
         serves=tuple(data.get("serves", ())),
         risks=tuple(data.get("risks", ())),
+        source_hash=source_hash,
     )
 
 
 def load_profile(path: str | Path) -> AgentProfile:
-    """Load a single agent profile from a JSON file."""
-    with open(path, "r", encoding="utf-8") as fh:
-        return _profile_from_dict(json.load(fh))
+    """Load a single agent profile from a JSON file, hashing its bytes."""
+    raw = Path(path).read_bytes()
+    digest = hashlib.sha256(raw).hexdigest()[:12]
+    return _profile_from_dict(json.loads(raw.decode("utf-8")), source_hash=digest)
+
+
+def find_stabilizers(roster: dict[str, AgentProfile]) -> list[str]:
+    """Ids of agents that satisfy the roster floor: window reaches 0.0 and no
+    contraindications."""
+    return sorted(p.id for p in roster.values() if p.is_stabilizer)
+
+
+def roster_hash(roster: dict[str, AgentProfile]) -> str:
+    """Stable digest of the loaded roster (ids and per-profile hashes)."""
+    material = "|".join(f"{pid}:{roster[pid].source_hash}" for pid in sorted(roster))
+    return hashlib.sha256(material.encode("utf-8")).hexdigest()[:12]
+
+
+def validate_roster(roster: dict[str, AgentProfile]) -> None:
+    """Raise ValueError if the roster violates a load-time invariant."""
+    if not roster:
+        raise ValueError("roster is empty")
+    for profile in roster.values():
+        for condition, target in profile.handoffs.items():
+            if target not in roster:
+                raise ValueError(
+                    f"agent {profile.id!r} declares handoff {condition!r} -> "
+                    f"{target!r}, which is not a loaded agent"
+                )
+    if not find_stabilizers(roster):
+        raise ValueError(
+            "roster has no stabilizer: at least one agent must have a regulation "
+            "floor of 0.0 and no contraindications, so that any caller can always "
+            "be routed somewhere safe (ADR-0012)"
+        )
 
 
 def load_roster(directory: str | Path | None = None) -> dict[str, AgentProfile]:
     """Load every ``*.json`` profile in `directory` into an id -> profile map.
 
     Raises:
-        ValueError: if two profiles declare the same id, or if any handoff
-            target does not resolve to a loaded agent. Failing loudly at load
-            time is preferred over discovering a dangling handoff mid-session.
+        ValueError: if two profiles declare the same id, if any handoff target
+            does not resolve to a loaded agent, or if the roster has no
+            stabilizer. Failing loudly at load time is preferred over
+            discovering a dangling handoff -- or a missing floor -- mid-session.
     """
     directory = Path(directory or DEFAULT_PROFILE_DIR)
     roster: dict[str, AgentProfile] = {}
@@ -106,12 +172,5 @@ def load_roster(directory: str | Path | None = None) -> dict[str, AgentProfile]:
             raise ValueError(f"duplicate agent id {profile.id!r} in {path}")
         roster[profile.id] = profile
 
-    for profile in roster.values():
-        for condition, target in profile.handoffs.items():
-            if target not in roster:
-                raise ValueError(
-                    f"agent {profile.id!r} declares handoff {condition!r} -> "
-                    f"{target!r}, which is not a loaded agent"
-                )
-
+    validate_roster(roster)
     return roster
