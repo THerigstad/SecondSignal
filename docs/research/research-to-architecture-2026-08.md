@@ -754,7 +754,7 @@ INTENT & AUTHORIZATION COMPILER
         |-- typed operational state
         v
 PERSONA / DELIBERATION DOMAIN
- Vandal | Ellie | Nikki | Ravi | Sera | Calder | Willow | Calen
+ Vandal | Ellie | Nikki | Ravi | Sera | Calder | Willow
         |-- interpret, brainstorm, advise, dissent, propose
         |-- no unilateral permission expansion
         v
