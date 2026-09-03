@@ -48,3 +48,18 @@ The reviews' target-architecture threats do not extend `docs/threat-model.md`'s 
 ## Citation caveats, kept together
 
 Unverified or defective citations were found in ChatGPT (several 2026 sources not checkable), Perplexity (an open letter, a typo domain, an unlinked reference), DeepSeek (two misattributions), Gemini (one apparent fabrication), and Mistral (twelve placeholder identifiers). Qwen invented nothing but also brought nothing newer than 2024. None of these citations has been re-verified for this repository. The practical rule the code-directed reviewer gave stands: do not re-run the shared prompt; give one model the tests, another the profiles, and a third only the gate, and let them disagree.
+
+## Postscript, 2026-09-03: which horizon findings the second round reached
+
+Several findings the seven architecture reviews raised as horizon threats were
+reached by the round-2 build, in the built layer rather than the target one:
+non-English and indirect crisis language (a Spanish pack, native and unreviewed,
+and a rule that declaring a language never exempts text from a screen); text
+evasion by look-alike letters and invisible characters (normalization before every
+lexicon, with the two live bypasses pinned); the latch as a permanent, unappealable
+state (two tiers, decay, clearance by an operator with a reason on the record —
+T20's clearance path, for the latch); and the "consensus is not evidence" finding
+turned into practice, in that five reviewers' disagreements were decided by
+measurement and the losing fixtures were kept as data (`docs/notes/dissent-log.md`).
+Still on the horizon: token-level language identification, a classifier behind the
+`RequestSignals` contract, clinical review of any lexicon, and the audit harness.

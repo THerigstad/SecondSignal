@@ -1,13 +1,32 @@
 # External review package
 
 SecondSignal's policy layer was reviewed by eight external model reviewers
-between 2026-08-31 and 2026-09-01. This directory holds what came back, with
-provenance, an honest note on each review's independence, and what was done
-with it. The point of publishing it is the point of the repository: a routing
-and safety layer should be able to show its work, including the work that
-found it wanting.
+between 2026-08-31 and 2026-09-01, and its next seven design decisions were
+reviewed on paper by five reviewers on 2026-09-02 before they were built. This
+directory holds what came back, with provenance, an honest note on each
+review's independence, and what was done with it. The point of publishing it
+is the point of the repository: a routing and safety layer should be able to
+show its work, including the work that found it wanting.
 
-## The short version
+## Round 1 (design review, 2026-09-02) in one paragraph
+
+Seven decisions — the two-tier minor latch, the register cap, seat-claims,
+seat versus hold with an assist, a second crisis card, language packs, and
+style preferences — went to five reviewers with a fixture contract, one
+message each, none told what another said. 103 executable fixtures came
+back. Against the tree as it stood, 9 passed. After the round-2 build, 80
+pass as written, 12 are contract adjustments with the reviewer's original
+kept beside them, 10 are disputed and run as strict expected failures with
+the decision's reasons attached, and 1 is a known gap. The second crisis card
+was rejected on the strength of one reviewer's attack on it; two one-character
+crisis bypasses found by live measurement were closed by normalization. The
+package, the verdicts and the numbers:
+[`round1-2026-09-02/`](round1-2026-09-02/README.md),
+[`fixture-results-round1-2026-09-03.md`](fixture-results-round1-2026-09-03.md),
+and the disagreements in
+[`docs/notes/dissent-log.md`](../../../docs/notes/dissent-log.md).
+
+## The short version of the first round
 
 One review — Grok 4.6, 2026-09-01 — attacked the system that actually exists
 and shipped 25 executable fixtures written without access to the code. Run
@@ -27,6 +46,12 @@ threat model: [`horizon-findings.md`](horizon-findings.md).
 
 ## Contents
 
+- [`round1-2026-09-02/`](round1-2026-09-02/) — the design-review round: the
+  packet as sent, Grok's documents 19–24, the four other verdicts, and an
+  index with each reviewer's verdicts and independence.
+- [`fixture-results-round1-2026-09-03.md`](fixture-results-round1-2026-09-03.md)
+  — the 103 round-1 fixtures, before and after round 2, per reviewer and per
+  fixture, with the classification of every one that does not pass as written.
 - [`grok-2026-09-01/`](grok-2026-09-01/) — the code-directed red-team package:
   eighteen numbered documents, an index, and nine fixture files. Sanitized for
   publication (see below); otherwise as delivered. Start with
@@ -49,7 +74,7 @@ threat model: [`horizon-findings.md`](horizon-findings.md).
 The maintainer's audit of the test suite against the reviewer's template,
 with the red-before / green-after record, is in
 [`docs/notes/test-audit-2026-08.md`](../../../docs/notes/test-audit-2026-08.md).
-The decisions are ADR-0010 to ADR-0014 under
+The decisions are ADR-0010 to ADR-0018 under
 [`docs/adr/`](../../../docs/adr/).
 
 ## The eight reviews
@@ -92,7 +117,10 @@ in the published prompt and treated as retired).
 
 ## Reading order for a reviewer of this repository
 
-1. `fixture-results-2026-09-02.md` — the numbers.
+0. `fixture-results-round1-2026-09-03.md` and `docs/notes/dissent-log.md` —
+   the second round's numbers and the disagreements the project decided
+   against, with reasons.
+1. `fixture-results-2026-09-02.md` — the first round's numbers.
 2. `grok-2026-09-01/02_EXECUTIVE_VERDICT.md` and `03_INVARIANT_ATTACKS.md` —
    the attacks, then `17_CLAUDE_LIVE_ROUTER_PICKS.md` — the reviewer's
    reaction to the measurements.

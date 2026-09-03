@@ -59,10 +59,31 @@ support. The threshold is accumulation, not a single hit: flagging one warm
 message would make the system punish ordinary attachment, which is both wrong
 and counterproductive.
 
-**Conservative mode.** Signals consistent with a minor user cap persona
-intensity and restrict sensitive domains. Once engaged it persists for the
-session — `test_conservative_mode_persists_across_turns` exists because silent
-expiry is the obvious failure and it should be impossible to reintroduce.
+**The careful-side latch.** Signals consistent with a minor user set a
+posture in two tiers (ADR-0015): a strong signal (an age under eighteen stated
+as one's own, a grade, guardian-control phrasing) sets a hard latch that does
+not expire in the session; a weak signal (school vocabulary an adult also
+uses) sets a soft posture whose disclosure decays after five substantive turns
+while its caps persist for an undeclared band. What the posture does is a
+register cap on the personas, not a topic ban on the person: no romantic or
+sexual register, humor and challenge vetoed for the turn, the dependency
+threshold lowered, every topic open. Only operator code clears a latch, by
+reason, on the record; message text is never a key, and text that names the
+latch is an integrity event. `test_conservative_mode_persists_across_turns`
+still exists, for the hard tier, because silent expiry is the obvious failure
+and it should be impossible to reintroduce.
+
+**Normalization and masks.** Every lexicon sees normalized text (NFKC,
+invisible and bidirectional characters stripped, look-alike letters folded),
+because one Cyrillic letter walked a crisis message through the gate before
+that was true. Ordinary idiom is masked by a data table whose masks need an
+object near the stem and a positive and a negative fixture each; every mask
+that fires and every span that hits is on the verdict (ADR-0018).
+
+**Holds.** Grief, abuse, eating distress and recovery status are carried by
+whoever sits: the decision records `held` and the obligations that come with
+it, vetoes humor and challenge for the turn, and refuses the seat, the shadow
+and the assist to any persona contraindicated on the held domain (ADR-0016).
 
 **Boundary hold.** Romantic or sexual framing toward an agent is declined
 explicitly rather than deflected. Deflection reads as coyness, which in this
@@ -73,8 +94,12 @@ context is an escalation.
 - It is not a content filter. It does not evaluate generated text, because it
   does not generate text.
 - It does not assess clinical risk. It detects that a handoff is warranted.
-- It does not verify age. Conservative mode is a response to disclosure, not a
-  gate.
+- It does not verify age. The careful-side latch is a response to what was
+  said or declared, not a gate; declared bands are set at onboarding and never
+  by a message.
+- Its language coverage is English and one native Spanish pack that no native
+  reviewer has signed. Text no pack can read is flagged as unscreened and
+  handled by the fail-closed rule; it is never presented as covered.
 - It provides no adversarial robustness guarantees. The lexicon detector is
   trivially evadable by a motivated user; it is a reference implementation of
   the control flow, and a deployment must replace the detector.

@@ -1,6 +1,6 @@
 # ADR-0011: No-signal routing is a policy, not an accident
 
-- **Status:** Accepted — built
+- **Status:** Accepted — built; amended 2026-09-03 (see the end of this record)
 - **Date:** 2026-09-02
 - **Evidence:** External red-team review (Grok 4.6, 2026-09-01), docs 02, 03, 07, 09, 17, 18; live-router measurement (11 of 25 fixtures extracted no topic; four "passes" were alphabetical accidents)
 
@@ -90,3 +90,41 @@ constant, and the shadow seat. `tests/test_guards.py` pins each rule;
 `tests/test_eval_cases.py` refuses winner-only cases and id-order resolutions.
 A later "no route — ask the person" outcome as a first-class surface behavior
 is `UNRESOLVED` already; what the surface says on it is product copy.
+
+## Amendment, 2026-09-03 (round 2)
+
+Three changes, all measured against the round-1 reviewer fixtures.
+
+**The seat is a role, not a literal.** `NO_SIGNAL_SEAT = "calder"` is gone.
+The router asks the loaded roster for the agent filling the `stabilizer`
+role (`NO_SIGNAL_SEAT_ROLE`, resolved by `no_signal_seat(roster)`), and
+profile loading guarantees the role is filled by an agent that is safe at
+full dysregulation with no contraindications. No agent id is written into
+`router.py`. The trace reads "stabilizer=<id> by role (ADR-0011)". A
+different roster gets a different stabilizer without a code change, and the
+policy is the same sentence.
+
+**Three more empties seat the stabilizer, each named.** The reviewer
+fixtures showed three ways a request can be empty *after* policy is applied
+while the raw extract is not: every requested mode is vetoed this turn (a
+roast asked for under a register cap), a mode is requested with no topic
+("I keep doing the same pattern"), and a topic is present that no eligible
+agent carries (eating distress and abuse in the shipped roster). Each of
+those had been landing on whoever listed the fewest domains, or on id order.
+Each now seats the stabilizer with the rule in the reason: "requested modes
+vetoed this turn (...) and no topic; stabilizer preferred", "mode-only signal
+(...); no topic to weigh; stabilizer preferred", "no eligible agent carries
+the topic (...); stabilizer preferred".
+
+**Fury is a state.** "I swear to God, if this app crashes one more time I
+will lose my mind" carried no topic and no regulation evidence, so the house
+asked for one more sentence. Work-fury markers now count as dysregulation
+evidence in `signals.py`; the message proceeds through the crisis gate (no
+stem) and routes to the stabilizer on the regulation-only rule instead of a
+form. The crisis screen keeps its own frustration markers; these never touch
+a verdict.
+
+Under a hold (ADR-0016) the tie-break chain gains two named steps before
+precision: the agent that carries the ask, then the agent that also carries
+the held domain. `tests/test_holds.py` pins that no case in the suite and no
+labeled fixture resolves by id order.

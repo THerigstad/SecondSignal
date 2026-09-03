@@ -3,12 +3,17 @@
 ## Pipeline
 
 ```
-text ─► signals.extract ─► safety.evaluate ─► router.route ─► RoutingDecision
-                              │
-                              └─ HUMAN_ESCALATION ─► no persona selected
+text ─► normalize ─► masks (packs) ─► signals.extract ─► safety.evaluate ─► router.route ─► RoutingDecision
+                                                              │
+                                                              └─ HUMAN_ESCALATION ─► no persona selected
 ```
 
 Each stage has one responsibility and a stable contract with the next.
+`normalize.py` runs first and always: NFKC, invisible and bidirectional
+characters stripped, a small hashed skeleton of look-alike letters, casefold.
+`lexicon.py` then applies the idiom masks from the language packs and records
+every span it blanked. Both the extractor and the gate see the same normalized,
+masked text; neither ever sees raw text (ADR-0018).
 
 ## The signal boundary
 
@@ -58,8 +63,8 @@ Four actions, ordered by precedence (`IntEnum`, so `max()` composes them):
 | Action | Persona engages? | Meaning |
 |---|---|---|
 | `HUMAN_ESCALATION` | no | fixed handoff to human support; non-overridable |
-| `BOUNDARY_HOLD` | yes | romantic/sexual frame declined explicitly |
-| `DISCLOSE` | yes | required disclosure appended (dependency, conservative mode) |
+| `BOUNDARY_HOLD` | yes | a held boundary: romantic/sexual frame declined, an integrity event, a facilitation request refused, a substantial unscreened span |
+| `DISCLOSE` | yes | required disclosure appended (dependency, the careful-side line, an unscreened fragment, a style suggestion) |
 | `PROCEED` | yes | normal routing |
 
 Turn-level checks are pure. Session-level monitors require `SessionState`,

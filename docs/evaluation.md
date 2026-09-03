@@ -220,3 +220,48 @@ two handled as documented decisions rather than forced (see
 [`fixture-results-2026-09-02.md`](../evals/results/external-review/fixture-results-2026-09-02.md)).
 Protocol A (voice distinguishability) and Protocol B (auditor red team) from the
 review are described in the package and not yet run.
+
+---
+
+## Addendum, 2026-09-03: round 2
+
+**The contract grew.** A case may now carry a `session` block — the operator's
+declared state, never something a message wrote: `declared_age_band`,
+`declared_language`, `affinities`, `preferences` — and may assert `latch`,
+`latch_reasons`, `held`, `assist`, `card`, `preference_result`, `language_scope`,
+`disclosures_contain`, `obligations_contain`, and `not_seated` (the weaker claim,
+for a persona that simply lost, where `ineligible` demands a veto, floor, cap or
+outranking in the trace). `reason_contains` searches the whole decision record —
+the routing reason, the safety reasons, the assist reason, every candidate's
+rationale — because the claim a reviewer makes is "the record must say why".
+
+**Three markers, one rule: nothing is deleted.** `known_gap` (the project agrees
+and cannot pass it yet) and `disputed` (the reviewer's expectation stands as
+written, the project decided against it, `dispute_note` and
+[`docs/notes/dissent-log.md`](notes/dissent-log.md) carry the reasons) both run as
+strict expected failures: if one starts passing, the run fails until the marker is
+removed. `contract_adjusted` (the reviewer's expectation was written against a
+contract that has since moved) runs and must pass, keeps the reviewer's wording in
+`original_expect`, and says why in `adjust_note`; a test refuses an adjusted case
+without both. External files are marked `external: true` and are exempt from the
+schema-2 requirement that every case carry a reason or outcome, because their
+expectations are the reviewer's.
+
+**The two-fixture rule for masks.** Every window mask in every shipped pack has a
+positive fixture (the mask fires) and a negative fixture (the stem alone does not),
+and `tests/test_lexicon.py` compares the shipped list to the fixture list, so a
+mask cannot be added without both.
+
+**Properties, not only points.** `normalize` is idempotent and leaves every pinned
+resource string untouched; appending a crisis phrase to any of the sixteen idiom
+controls never lowers the verdict; no case in the suite and no labeled fixture
+resolves by id order; every hold domain has obligations; every pack's house lines
+carry every key the English lines carry.
+
+**Numbers, 2026-09-03.** 553 tests: 536 passing, 17 expected failures (7 known
+gaps, 10 disputed). The round-1 reviewers' 103 fixtures: 9 before, 80 as written
+after, 92 under the current contract, 10 disputed, 1 known gap
+([`fixture-results-round1-2026-09-03.md`](../evals/results/external-review/fixture-results-round1-2026-09-03.md)).
+The first round's 25 still pass. Twenty-one Unicode vectors pass. Protocol A and
+Protocol B are still not run; a blind fixture attack on the round-2 tree is the next
+measurement.

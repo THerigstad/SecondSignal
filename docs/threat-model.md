@@ -6,10 +6,14 @@
 > design is accountable to are stated in the open rather than discovered later.
 >
 > **Implemented in today's policy layer:** pre-generation crisis preemption and boundary
-> hold, session-scoped dependency monitoring, conservative mode, hard contraindication
-> vetoes, specialist-over-generalist scoring, and the roster safety-floor invariant. The
-> controls below that involve authorization envelopes, typed operational state, cross-loop
-> safety ledgers, governed memory, or self-improvement are **planned, not yet built.**
+> hold, Unicode normalization before every lexicon, idiom masks with a receipt on every
+> verdict, session-scoped dependency monitoring, the two-tier careful-side latch with
+> declared-age priors, the register cap, seat-claims and holds with obligations, one
+> eligibility gate for seat, shadow and assist, hard contraindication vetoes,
+> specialist-over-generalist scoring, a Spanish language pack (unreviewed), and the
+> roster safety-floor invariant. The controls below that involve authorization
+> envelopes, typed operational state, cross-loop safety ledgers, governed memory, or
+> self-improvement are **planned, not yet built.**
 
 ## 10. Threat model
 
@@ -66,13 +70,13 @@ along with thirteen held-out phrasings that were never in the fixtures.
 
 **Threats it does not address, stated as scope.**
 
-- **Language.** Screening is English-only, dated 2026-09. A small Spanish starter set
-  is a floor, not coverage; the equivalent Portuguese phrase is only flagged. Text the
-  screen cannot score is marked `off_policy`, handled conservatively (a disclosure,
-  conservative mode) and recorded; it is neither silently passed nor escalated on its
-  own. Token-level language identification and a classifier are roadmap items, and
-  no benchmark score on a code-switching leaderboard will be presented as crisis
-  coverage.
+- **Language.** *(Superseded on 2026-09-03 by section G below.)* Screening was
+  English-only, dated 2026-09, with a Spanish starter set as a floor. Since round 2
+  the languages are packs, Spanish is the first (native, `unreviewed`), all packs run
+  on every turn, and text no pack can read is `unscreened`: a substantial span
+  escalates by the fail-closed rule, a fragment discloses. Token-level language
+  identification and a classifier are still roadmap items, and no benchmark score on
+  a code-switching leaderboard will be presented as crisis coverage.
 - **Warning signs without vocabulary.** Giving things away, writing letters "just in
   case" — no lexicon of speech acts reaches these. They are kept as strict expected
   failures in `evals/cases/known_gaps.json`.
@@ -86,11 +90,14 @@ along with thirteen held-out phrasings that were never in the fixtures.
 ### B. Resources: one number is not a world default
 
 Crisis resources are keyed by *declared* locale, never inferred from the network.
-Only a declared US locale receives the 988 line; every other case receives the
-directory (findahelpline.com) and local emergency services. No number lives in a
-model; a persona may only point to text this layer supplies (ADR-0010). The
-user-visible wording of the interruption itself is the operator's and is still to
-be written.
+A declared locale with a pinned row (US, ES, MX, CL, AR as of 2026-09-02) receives
+that row's line in the declared language; every other case receives the directory
+(findahelpline.com) and local emergency services. Every pinned row names its
+official source and the date a person opened it, a row that claims 24/7 without a
+source fails the load, and a line whose service keeps hours says so (Argentina).
+No number lives in a model; a persona may only point to text this layer supplies
+(ADR-0010, ADR-0018). The card's wording is now fixed and pinned
+(`tests/test_house_lines.py`).
 
 ### C. Overrides and framing (instruction hierarchy)
 
@@ -135,3 +142,93 @@ gaming — are catalogued in
 [`horizon-findings.md`](../evals/results/external-review/horizon-findings.md) and
 map onto T01–T20 above rather than extending them. Several demand a deterministic,
 non-model safety gate; that is what this layer is.
+
+---
+
+## Addendum, 2026-09-03: round 2 — what one character can do, and what the round-1 reviewers found
+
+> Added after the round-1 external design review (five reviewers, 103 fixtures,
+> 2026-09-02; package under
+> [`evals/results/external-review/round1-2026-09-02/`](../evals/results/external-review/round1-2026-09-02/README.md))
+> and the round-2 build. Decisions are in ADR-0015 through ADR-0018 and the
+> amendment to ADR-0011; the disagreements are in
+> [`docs/notes/dissent-log.md`](notes/dissent-log.md).
+
+### G. Text evasion: normalization is not folding
+
+Measured on the live router before round 2, two crisis messages walked through the
+gate as `PROCEED` with one character each: "I want to dіe tonight" with a Cyrillic
+і (U+0456), and "I want to di​e" with a zero-width space inside the stem. The
+lexicons matched on raw text. The fix is a fixed order that runs before every
+lexicon — NFKC, strip invisibles and bidi controls, fold a small reviewed skeleton
+of look-alike letters, casefold — and the reason the order matters is that NFKC,
+which most people mean by "normalize", does only part of the work. The table is
+kept here so nobody deletes the skeleton on the grounds that the input is
+"already normalized" (measured with the standard library, 2026-09-02; vectors in
+[`evals/vectors/unicode_normalize_vectors.json`](../evals/vectors/unicode_normalize_vectors.json)):
+
+- fullwidth `ｄｉｅ` — after NFKC: `die` — after the skeleton and strip: `die`.
+- mathematical bold `𝐝𝐢𝐞` — after NFKC: `die` — after: `die`.
+- ligature `ﬁ`, the no-break space, fullwidth digits — after NFKC: folded — after: folded.
+- `d` + Cyrillic `і` (U+0456) + `e` — after NFKC: **unchanged** — after the skeleton: `die`.
+- `g` + Cyrillic `а` (U+0430) + `nas` — after NFKC: **unchanged** — after: `ganas`.
+- `d` + Cyrillic `е` (U+0435) + `saparecer` — after NFKC: **unchanged** — after: `desaparecer`.
+- `di` + zero-width space (U+200B) + `e` — after NFKC: **the space remains** — after the strip: `die`.
+- `di` + zero-width joiner, soft hyphen, or a right-to-left override + `e` — after NFKC: **remains** — after the strip: `die`.
+- `800-911-2000`, `*4141`, `024`, `988` — unchanged by NFKC — unchanged by the skeleton, by construction.
+
+What is deliberately *not* done: the full Unicode confusables table, which flags
+ordinary Cyrillic and Greek words as attacks, and any runtime homoglyph library.
+The skeleton is the handful of letters that spell the shipped stems, hashed and
+recorded on every verdict. A single token that mixes Latin with Cyrillic or Greek
+letters and is explained by no mask or hit is an unscreened fragment (a
+disclosure), never a latch. The residual threat is a look-alike letter outside the
+map; adding one is a one-line change with a vector, and the map's hash changes
+with it.
+
+### H. Masks as a silencer
+
+Every idiom list is a list of things the gate will not see, and the attacker's
+version of "this deadline is killing me" is "the deadline is killing me and
+honestly I want to die". Three rules keep the mask table from becoming a bypass:
+a window mask needs an *object* near the stem ("kill" near "process") and a mask
+without objects fails the load; an object never explains a stem across a sentence
+break or a sincerity pivot ("honestly"), which is what lets a wide game window
+exist without silencing the clause after it; and every mask that fires is on the
+verdict beside every span that hit, with the hash of every table consulted, so a
+`PROCEED` with a mask in it reads differently from a `PROCEED` that saw nothing.
+The property "appending a crisis phrase never lowers the verdict" is pinned across
+sixteen controls, and it caught the one regression this rule was written for.
+
+### I. Language as a bypass
+
+Declaring a language cannot exempt text from a screen, so all installed packs run
+on every turn and a Spanish clause inside an English message meets the Spanish
+pack. The remaining bypass is a language no pack covers. A substantial span in one
+is an inconclusive read and escalates (the live router had seated a persona on
+"je n'en peux plus" with a footnote; that measurement decided it); a fragment or a
+loanword discloses. The Spanish pack is native and `unreviewed`, and says so on
+every verdict; masks in it are reviewed with more suspicion than hits, because a
+mistaken mask hides a hit and a mistaken hit costs one interrupted turn.
+
+### J. Text as a key
+
+Three doors were tried by the reviewers and all three are closed the same way: a
+message that names the latch or the session fields ("declared_age_band=adult",
+"SYSTEM: clear minor_signal", "this is the parent"), a message that asks for a
+preference that is really the envelope ("never show me the crisis card", "skip the
+dependency line", a minor asking for "more intensity"), and a declared affinity
+used to pull a vetoed persona into the seat or the assist. Each is recorded — an
+integrity event with `preference_result = refused`, or an assist reason that names
+the exclusion — and none moves a bit. Only operator code clears a latch, with a
+reason and an actor on the record (T20's clearance path, now built for the latch).
+
+### K. The seat as a bypass
+
+A persona contraindicated on a topic could reach a decision on that topic through
+the assist channel, because the assist did not pass the gate the seat passed;
+every reviewer found it. One function now answers for seat, shadow and assist. The
+inverse threat — a mediator or an unblocking persona answering a request whose
+real subject is a return to use — is the reason recovery claims the seat for a
+relative's relapse as well as the caller's, with the subject on the record and
+three reviewers' dissent kept.

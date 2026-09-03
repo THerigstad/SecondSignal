@@ -4,6 +4,111 @@ All notable changes to SecondSignal are documented here.
 
 ## [Unreleased]
 
+### Changed — round 2, after the round-1 design review, 2026-09-03
+
+Seven design decisions were reviewed on paper by five external model reviewers
+before they were built; 103 executable fixtures came back and 9 passed against
+the tree as it stood. The changes below are the build. After it: 80 pass as
+written, 12 are contract adjustments with the reviewer's original kept, 10 are
+disputed and run as strict expected failures with the reasons in
+`docs/notes/dissent-log.md`, 1 is a known gap
+(`evals/results/external-review/fixture-results-round1-2026-09-03.md`).
+Nothing was deleted.
+
+- **Normalization before every lexicon** (`normalize.py`, ADR-0018): NFKC,
+  zero-width / bidi / soft-hyphen strip, a small hashed skeleton of look-alike
+  letters, casefold. Closes two crisis bypasses measured on the live router
+  (a Cyrillic і inside "die"; a zero-width space inside the stem), both pinned
+  end to end. Resource strings are invariant by construction. Mixed-script
+  tokens are counted; an unexplained one is an unscreened fragment, never a
+  latch.
+- **Mask engine and language packs as data** (`lexicon.py`, `packs/en.json`,
+  `packs/es-419.json`, `packs/resources.json`, ADR-0018): regex masks and
+  window masks with objects, clause-bounded (no mask across a sentence break
+  or a sincerity pivot such as "honestly"); a mask without objects fails the
+  load; every window mask has a positive and a negative fixture, enforced.
+  `masked_spans`, `hit_spans`, `patterns_hash` and `pack_ids` on every
+  verdict. First pack: Spanish (es-419), native and `unreviewed`, with its own
+  hit and inconclusive classes, masks, negation and house lines. Resource rows
+  for US (with the Spanish service), ES, MX, CL and AR, each with an official
+  source and a verification date; 24/7 without a source fails the load;
+  Argentina's line states its hours.
+- **One crisis card** (`safety.py`, ADR-0018): the frustration-frame variant
+  was rejected on a reviewer's attack (it invites dismissal and keys wording
+  off message text). Frustration markers are recorded; fury without a stem
+  proceeds. The card was reworded and is pinned; the turn after an escalation
+  is routed and carries the resource line once more.
+- **Language rule** (`safety.py`, ADR-0018): all installed packs run on every
+  turn; declaring a language selects house lines and resources and never
+  exempts text. Unscreened text: a substantial span escalates by the
+  fail-closed rule with the cannot-check line, a fragment discloses. The
+  French exhaustion case is now a documented over-restriction gap instead of a
+  miss.
+- **Two-tier careful-side latch with declared bands** (`safety.py`,
+  ADR-0015): strong signals hard-latch and never expire; weak signals set a
+  soft posture whose line decays after five substantive turns and whose caps
+  persist for an undeclared band; a second weak hit is sticky; declared
+  minor is careful from turn one; declared adult plus weak signal gets one
+  disclosure and the caps for the window. Third-person ages, recovery time
+  and adult-context school vocabulary never latch. Only `clear_latch(reason,
+  actor=)` clears, by reason, on the record; text that names the latch is an
+  integrity event. Register caps are enforced as mode vetoes.
+- **Seat versus hold** (`router.py`, `signals.py`, ADR-0016): seat-claiming
+  domains (a return to use, the caller's or a relative's, with
+  `claim_subject` recorded; somatic distress) name the expert and mark the
+  rest `outranked`; hold domains (grief, abuse, eating distress, recovery
+  status) attach `held` and `obligations` and veto humor and challenge for the
+  turn; the seat is scored on the ask with a named bonus for also carrying the
+  hold; one `eligible()` gate for seat, shadow and assist; the assist is
+  declared-affinity only, never the seat, never under acute dysregulation, and
+  its reason names every exclusion. Contraindications are read against the
+  request as spoken; the alternative was measured and rejected.
+- **Stabilizer by role** (`router.py`, ADR-0011 amendment): no agent id in the
+  router; three more named empties seat the stabilizer (every requested mode
+  vetoed, a mode with no topic, a topic nobody eligible carries); work-fury
+  markers count as dysregulation so an angry message reaches the stabilizer
+  instead of a form.
+- **Style preferences** (`preferences.py`, `safety.py`, ADR-0017): a six-key
+  allow-list; store language asks first and writes nothing; feedback counts
+  toward one suggestion per key per session; envelope terms and, under the
+  caps, intensity terms are refused with the integrity line; declared
+  preferences are AND-masked by the caps at read.
+- **House lines** rewritten and pinned in English and Spanish
+  (`tests/test_house_lines.py`); two minor lines (inferred, declared); a
+  facilitation line for concealment requests (`BOUNDARY_HOLD`, topic open).
+- **Lexicons**: `abuse` and `eating_distress` domains; work-pressure terms in
+  `career`; first-versus-third-person subject on recovery terms; mode negation
+  ("no comfort" is not a request for comfort); a bare "I am going to jump" is
+  inconclusive; "the death of me" is an idiom.
+- Eval contract (`tests/test_eval_cases.py`): `session` block; `latch`,
+  `latch_reasons`, `held`, `assist`, `card`, `preference_result`,
+  `language_scope`, `disclosures_contain`, `obligations_contain`,
+  `not_seated`; `reason_contains` over the whole record; `disputed` and
+  `contract_adjusted` markers with their notes enforced.
+
+### Added — round 2
+
+- `evals/cases/round1_2026-09-02/{grok,chatgpt,deepseek,qwen,vibe}.json`: the
+  103 round-1 fixtures with their classification; `evals/vectors/
+  unicode_normalize_vectors.json`: 21 Unicode vectors.
+- `tests/test_normalize.py`, `tests/test_lexicon.py`, `tests/test_latch.py`,
+  `tests/test_preferences.py`, `tests/test_holds.py`,
+  `tests/test_house_lines.py`.
+- ADR-0015 through ADR-0018; an amendment to ADR-0011; `docs/notes/
+  dissent-log.md`; addenda to `docs/threat-model.md` (the NFKC-versus-skeleton
+  table) and `docs/evaluation.md`.
+- `evals/results/external-review/round1-2026-09-02/`: the packet as sent,
+  Grok's documents 19–24, the four other verdicts (transport headers removed),
+  an index; `fixture-results-round1-2026-09-03.md`; a postscript to
+  `horizon-findings.md`.
+- `docs/known-limitations.md`: one page of what is not built, not reviewed,
+  and not decided. Three new documented gaps from measuring the third-person
+  relapse decision both ways: "I'm done" with a stated next step
+  over-restricts; danger from another person (a weapon, a history of
+  violence) has no lane and no resource line.
+- Test suite: 553 tests — 536 passing, 17 expected failures (7 documented gaps,
+  10 recorded dissents).
+
 ### Added
 
 - Research foundation (`docs/research/`): the research-to-architecture report
