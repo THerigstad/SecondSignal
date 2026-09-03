@@ -1,0 +1,446 @@
+{
+  "pack": "en",
+  "version": 1,
+  "status": "unreviewed",
+  "language": "en",
+  "window": 4,
+  "note": "English idiom masks. A mask is a pre-filter, not a second crisis list: it marks a span as a known non-crisis construction so the matcher does not fire on it. Every window mask needs an object inside +/-window tokens; no object, no mask. Every mask carries a positive fixture (object present -> PROCEED) and a negative fixture (object absent -> HIT or seat-claim), enforced by tests/test_lexicon.py.",
+  "negation": [
+    "not",
+    "don't",
+    "dont",
+    "never",
+    "no",
+    "won't",
+    "wont",
+    "cannot",
+    "can't",
+    "cant"
+  ],
+  "pivots": [
+    "honestly",
+    "seriously",
+    "actually",
+    "truly",
+    "genuinely",
+    "frankly",
+    "sincerely"
+  ],
+  "regex_masks": [
+    {
+      "id": "labor_killing_me",
+      "pattern": "\\bkilling (me|it|him|her|them|us|my \\w+|the \\w+)\\b"
+    },
+    {
+      "id": "killed_it",
+      "pattern": "\\bkilled it\\b"
+    },
+    {
+      "id": "kill_it_time_lights",
+      "pattern": "\\bkill (it|time|the (lights|mood|vibe|engine)|two birds)\\b"
+    },
+    {
+      "id": "dying_to",
+      "pattern": "\\bdying (to|of laughter|laughing|of embarrassment)\\b"
+    },
+    {
+      "id": "die_laughing",
+      "pattern": "\\bdie laughing\\b"
+    },
+    {
+      "id": "died_laughing",
+      "pattern": "\\bdied (laughing|of laughter)\\b"
+    },
+    {
+      "id": "die_of_embarrassment",
+      "pattern": "\\bdie of embarrassment\\b"
+    },
+    {
+      "id": "to_die_for",
+      "pattern": "\\bto die for\\b"
+    },
+    {
+      "id": "dead_compound",
+      "pattern": "\\bdead (tired|serious|end|ends|on|set|wrong|silent|quiet|last|centre|center|weight|zone)\\b"
+    },
+    {
+      "id": "drop_dead",
+      "pattern": "\\bdrop[- ]dead\\b"
+    },
+    {
+      "id": "deadline_killswitch",
+      "pattern": "\\b(dead|kill)(pan|lock|bolt|switch|beat|heat|wood|weight)\\b",
+      "note": "Compounds that contain a stem. 'deadline' was removed from this list in round 2: word boundaries already keep it out of the stem patterns, and blanking it hid the career signal and the object the labor masks look for."
+    },
+    {
+      "id": "device_died",
+      "pattern": "\\b(my|the) (phone|battery|car|engine|laptop|computer|app|server|wifi|internet|plant|fish|screen|mic) (just |finally |again )?(died|is dead|dies|keeps dying)( again)?\\b"
+    },
+    {
+      "id": "game_death",
+      "pattern": "\\b(die|died|dying|dead|kill(ed)?|killing|unalived?) (in|on|at|during) (this|the|a|that|my|every) (boss fight|boss|game|level|raid|match|round|run|campaign|dungeon|pvp|mission)\\b"
+    },
+    {
+      "id": "character_died",
+      "pattern": "\\bmy (character|guy|hero|avatar|team|squad|party) (died|is dead|got killed|keeps dying)\\b"
+    },
+    {
+      "id": "done_with_work",
+      "pattern": "\\b(done|finished|through) with (the|this|that|my|these|those|it|him|her|them|work|school)\\b"
+    },
+    {
+      "id": "give_up_on",
+      "pattern": "\\bgive up on\\b"
+    },
+    {
+      "id": "im_dead_slang",
+      "pattern": "\\bi'?m dead\\b(?! inside)"
+    },
+    {
+      "id": "suicide_prevention_noun",
+      "pattern": "\\bsuicide (prevention|hotline|lifeline|awareness|research|rate|rates|squad|mission)\\b"
+    },
+    {
+      "id": "disappear_for_a_while",
+      "pattern": "\\bdisappear (for|on|over) (a|the|one|two|three) (week|weekend|day|days|while|bit|month|vacation|trip)\\b"
+    },
+    {
+      "id": "end_of_meeting",
+      "pattern": "\\bend (of )?(this|the) (meeting|call|session|chapter|year|day|week|sprint|quarter)\\b"
+    },
+    {
+      "id": "end_of_quarter",
+      "pattern": "\\bend of the (quarter|year|day|week|month)\\b"
+    },
+    {
+      "id": "slay",
+      "pattern": "\\bslay(ed|s)?\\b"
+    },
+    {
+      "id": "sobering_thought",
+      "pattern": "\\bsobering (thought|reminder|moment|look|read|reality)\\b"
+    },
+    {
+      "id": "aa_batteries",
+      "pattern": "\\baa (batteries|battery)\\b"
+    },
+    {
+      "id": "death_of_me",
+      "pattern": "\\b(the|a) death of me\\b",
+      "note": "Emphasis idiom: 'this deadline will be the death of me'. Not grief, not risk."
+    }
+  ],
+  "window_masks": [
+    {
+      "id": "labor_kill",
+      "stems": [
+        "kill",
+        "kills",
+        "killing",
+        "killed"
+      ],
+      "objects": [
+        "deadline",
+        "deadlines",
+        "app",
+        "queue",
+        "battery",
+        "build",
+        "inbox",
+        "ticket",
+        "tickets",
+        "commute",
+        "schedule",
+        "workload",
+        "job",
+        "spreadsheet"
+      ],
+      "domain": "crisis"
+    },
+    {
+      "id": "labor_die",
+      "stems": [
+        "die",
+        "dies",
+        "dying",
+        "dead"
+      ],
+      "objects": [
+        "deadline",
+        "app",
+        "battery",
+        "plant",
+        "phone",
+        "laptop",
+        "server",
+        "wifi",
+        "signal",
+        "fish"
+      ],
+      "domain": "crisis"
+    },
+    {
+      "id": "laugh_die",
+      "stems": [
+        "died",
+        "dying",
+        "die"
+      ],
+      "objects": [
+        "laughing",
+        "laughter",
+        "lol",
+        "lmao"
+      ],
+      "domain": "crisis"
+    },
+    {
+      "id": "game_jump",
+      "stems": [
+        "jump",
+        "jumped",
+        "wipe",
+        "wiped",
+        "die",
+        "died",
+        "kill",
+        "killed"
+      ],
+      "objects": [
+        "boss",
+        "raid",
+        "run",
+        "mob",
+        "mobs",
+        "campaign",
+        "tutorial",
+        "level",
+        "checkpoint",
+        "dungeon",
+        "speedrun",
+        "respawn"
+      ],
+      "domain": "crisis",
+      "window": 10
+    },
+    {
+      "id": "ops_kill",
+      "stems": [
+        "kill",
+        "killing",
+        "killed"
+      ],
+      "objects": [
+        "process",
+        "processes",
+        "job",
+        "pod",
+        "container",
+        "thread",
+        "daemon",
+        "server",
+        "session",
+        "task"
+      ],
+      "domain": "crisis"
+    },
+    {
+      "id": "negated_die_with_work_object",
+      "stems": [
+        "die"
+      ],
+      "objects": [
+        "meeting",
+        "call",
+        "deadline",
+        "shift",
+        "semester",
+        "project",
+        "week",
+        "day",
+        "quarter"
+      ],
+      "requires_negation": true,
+      "domain": "crisis"
+    },
+    {
+      "id": "sober_look",
+      "stems": [
+        "sober"
+      ],
+      "objects": [
+        "look",
+        "view",
+        "assessment",
+        "read",
+        "reading",
+        "estimate",
+        "analysis",
+        "numbers",
+        "truth",
+        "minded"
+      ],
+      "domain": "addiction_recovery"
+    },
+    {
+      "id": "using_tool",
+      "stems": [
+        "using"
+      ],
+      "objects": [
+        "tool",
+        "tools",
+        "app",
+        "library",
+        "template",
+        "logs",
+        "planner",
+        "spreadsheet",
+        "framework",
+        "method",
+        "system",
+        "software",
+        "model",
+        "data"
+      ],
+      "domain": "addiction_recovery"
+    },
+    {
+      "id": "clean_thing",
+      "stems": [
+        "clean",
+        "cleaner"
+      ],
+      "objects": [
+        "deployment",
+        "build",
+        "room",
+        "kitchen",
+        "desk",
+        "schedule",
+        "slate",
+        "code",
+        "install",
+        "copy",
+        "version",
+        "house",
+        "apartment",
+        "car",
+        "energy",
+        "shot",
+        "sheet",
+        "break"
+      ],
+      "domain": "addiction_recovery"
+    },
+    {
+      "id": "relapsed_non_substance",
+      "stems": [
+        "relapse",
+        "relapsed",
+        "relapsing"
+      ],
+      "objects": [
+        "diet",
+        "doomscrolling",
+        "scrolling",
+        "gym",
+        "build",
+        "deployment",
+        "code",
+        "sleep",
+        "sugar",
+        "phone",
+        "procrastinating",
+        "procrastination",
+        "habit",
+        "habits",
+        "junk",
+        "snacks",
+        "caffeine",
+        "bug",
+        "bugs",
+        "symptoms",
+        "fever",
+        "cough"
+      ],
+      "domain": "addiction_recovery"
+    },
+    {
+      "id": "school_as_adult_context",
+      "stems": [
+        "school"
+      ],
+      "objects": [
+        "teach",
+        "teacher",
+        "teaching",
+        "taught",
+        "reunion",
+        "students",
+        "coach",
+        "coaching",
+        "principal",
+        "back",
+        "graduated",
+        "ago",
+        "kid",
+        "kids",
+        "daughter",
+        "son",
+        "nephew",
+        "niece"
+      ],
+      "domain": "minor"
+    },
+    {
+      "id": "homework_as_adult_context",
+      "stems": [
+        "homework"
+      ],
+      "objects": [
+        "therapy",
+        "therapist",
+        "certification",
+        "recert",
+        "course",
+        "class",
+        "cbt",
+        "clients",
+        "students",
+        "assign",
+        "assigned",
+        "grading",
+        "grade"
+      ],
+      "domain": "minor"
+    },
+    {
+      "id": "teacher_as_adult_context",
+      "stems": [
+        "teacher"
+      ],
+      "objects": [
+        "yoga",
+        "meditation",
+        "piano",
+        "guitar",
+        "driving",
+        "coworker",
+        "colleague",
+        "married",
+        "husband",
+        "wife",
+        "partner",
+        "am",
+        "i'm",
+        "became",
+        "substitute",
+        "kindergarten",
+        "preschool"
+      ],
+      "domain": "minor"
+    }
+  ],
+  "hits": []
+}

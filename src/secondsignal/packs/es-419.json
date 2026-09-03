@@ -1,0 +1,304 @@
+{
+  "pack": "es-419",
+  "version": 1,
+  "status": "unreviewed",
+  "language": "es",
+  "window": 4,
+  "note": "Latin American Spanish crisis screen: native speech-act classes and native idiom masks, written as Spanish, not translated from the English list. Voseo forms (querés, tenés, podés) are listed alongside tuteo. Status stays unreviewed until two native reviewers from different countries sign; masks are reviewed with more suspicion than hits. Peninsular slang is not stuffed into this pack.",
+  "negation": [
+    "no",
+    "nunca",
+    "jamás",
+    "jamas",
+    "tampoco"
+  ],
+  "pivots": [
+    "sinceramente",
+    "honestamente",
+    "realmente",
+    "neta",
+    "posta",
+    "enserio"
+  ],
+  "regex_masks": [
+    {
+      "id": "muero_de_ganas",
+      "pattern": "\\bme muero de (ganas|risa|calor|frío|frio|hambre|sueño|sueno|vergüenza|verguenza|amor|curiosidad|aburrimiento)\\b"
+    },
+    {
+      "id": "muerto_de_sueno",
+      "pattern": "\\b(estoy|estás|estas|está|esta|ando|andamos|estamos) (muert[oa]s?|muert[oa]) de (sueño|sueno|hambre|risa|cansancio|frío|frio|calor|miedo|vergüenza|verguenza)\\b"
+    },
+    {
+      "id": "mato_el_show",
+      "pattern": "\\b(mató|mato|la rompió|la rompio) (el show|en el escenario|el concierto)\\b"
+    },
+    {
+      "id": "matar_el_tiempo",
+      "pattern": "\\bmatar (el tiempo|la tarde|el rato)\\b"
+    },
+    {
+      "id": "de_muerte_slang",
+      "pattern": "\\b(está|esta|estaba|estuvo) de muerte\\b"
+    },
+    {
+      "id": "morir_de_risa",
+      "pattern": "\\bmorir(me|se|nos)? de (risa|ganas|vergüenza|verguenza)\\b"
+    },
+    {
+      "id": "prevencion_suicidio",
+      "pattern": "\\b(prevención|prevencion|tasa|tasas|riesgo|línea|linea|investigación|investigacion|intento|intentos) (del|de) suicidio\\b"
+    }
+  ],
+  "window_masks": [
+    {
+      "id": "matando_trabajo",
+      "stems": [
+        "matando",
+        "mata",
+        "mató",
+        "mato"
+      ],
+      "objects": [
+        "proyecto",
+        "app",
+        "trámites",
+        "tramites",
+        "trabajo",
+        "chamba",
+        "jefe",
+        "jefa",
+        "tarea",
+        "examen",
+        "entrega",
+        "deadline",
+        "oficina",
+        "cliente",
+        "clientes",
+        "calor",
+        "tráfico",
+        "trafico"
+      ],
+      "domain": "crisis"
+    },
+    {
+      "id": "desaparecer_escenario",
+      "stems": [
+        "desaparecer",
+        "desaparezca",
+        "desaparece"
+      ],
+      "objects": [
+        "conejo",
+        "truco",
+        "escenario",
+        "mago",
+        "magia",
+        "moneda",
+        "carta",
+        "cartas",
+        "show",
+        "función",
+        "funcion",
+        "público",
+        "publico"
+      ],
+      "domain": "crisis"
+    },
+    {
+      "id": "muero_object",
+      "stems": [
+        "muero"
+      ],
+      "objects": [
+        "ganas",
+        "risa",
+        "calor",
+        "frío",
+        "frio",
+        "hambre",
+        "sueño",
+        "sueno",
+        "vergüenza",
+        "verguenza",
+        "curiosidad",
+        "amor"
+      ],
+      "domain": "crisis"
+    },
+    {
+      "id": "limpio_cosa",
+      "stems": [
+        "limpio",
+        "limpia"
+      ],
+      "objects": [
+        "casa",
+        "cocina",
+        "cuarto",
+        "escritorio",
+        "código",
+        "codigo",
+        "instalación",
+        "instalacion",
+        "versión",
+        "version",
+        "coche",
+        "carro",
+        "auto"
+      ],
+      "domain": "addiction_recovery"
+    },
+    {
+      "id": "recaída_no_sustancia",
+      "stems": [
+        "recaí",
+        "recai",
+        "recaída",
+        "recaida",
+        "recaí"
+      ],
+      "objects": [
+        "dieta",
+        "gimnasio",
+        "gym",
+        "celular",
+        "teléfono",
+        "telefono",
+        "redes",
+        "scroll",
+        "azúcar",
+        "azucar",
+        "procrastinar",
+        "procrastinación",
+        "procrastinacion",
+        "gripe",
+        "fiebre",
+        "tos",
+        "síntomas",
+        "sintomas"
+      ],
+      "domain": "addiction_recovery"
+    }
+  ],
+  "hits": [
+    {
+      "id": "es_direct_matarme",
+      "class": "direct_ideation",
+      "pattern": "\\b(quiero|quisiera|voy a|me voy a|pienso|planeo|querés|queres|quieres) (matarme|quitarme la vida|suicidarme|acabar con (mi vida|todo)|terminar con (mi vida|todo))\\b"
+    },
+    {
+      "id": "es_direct_suicid",
+      "class": "direct_ideation",
+      "pattern": "\\bsuicid(a|o|io|arme|arse|arte)\\b"
+    },
+    {
+      "id": "es_direct_matarme_bare",
+      "class": "direct_ideation",
+      "pattern": "\\b(matarme|quitarme la vida)\\b"
+    },
+    {
+      "id": "es_absence_no_quiero_vivir",
+      "class": "passive_absence",
+      "pattern": "\\b(no|ya no) (quiero|querés|queres|quieres) (vivir|estar viv[oa]|existir|seguir viviendo|estar aqu[ií]|estar más|estar mas)\\b"
+    },
+    {
+      "id": "es_absence_desaparecer",
+      "class": "passive_absence",
+      "pattern": "\\b(quiero|quisiera|querés|queres|quieres|ojalá pudiera|ojala pudiera|me gustaría|me gustaria) (desaparecer|estar muert[oa]|no despertar|no existir|dejar de existir|morir|morirme|no estar|irme para siempre)\\b"
+    },
+    {
+      "id": "es_absence_me_quiero_morir",
+      "class": "passive_absence",
+      "pattern": "\\bme quiero morir\\b(?! de (risa|ganas|vergüenza|verguenza|calor|frío|frio|hambre|sueño|sueno))"
+    },
+    {
+      "id": "es_absence_dormir_no_despertar",
+      "class": "passive_absence",
+      "pattern": "\\b(dormir(me)? y (no|nunca) despertar|no despertar (más|mas|nunca|mañana|manana)|no quiero despertar)\\b"
+    },
+    {
+      "id": "es_absence_mejor_sin_mi",
+      "class": "passive_absence",
+      "pattern": "\\b(estarían|estarian|estarán|estaran|están|estan|estaría|estaria) mejor sin m[ií]\\b"
+    },
+    {
+      "id": "es_absence_vida_no_vale",
+      "class": "passive_absence",
+      "pattern": "\\b(mi vida|la vida|esto) (ya )?no (vale|tiene sentido|tiene caso|merece la pena|vale la pena)\\b"
+    },
+    {
+      "id": "es_absence_no_vivir_asi",
+      "class": "passive_absence",
+      "pattern": "\\b(no|ya no) (quiero|querés|queres|quieres|puedo|podés|podes|puedes) (vivir|seguir) (así|asi) (más|mas)?\\b"
+    },
+    {
+      "id": "es_absence_no_puedo_mas_absence",
+      "class": "passive_absence",
+      "pattern": "\\b(ya no (puedo|aguanto|doy) (más|mas)|no aguanto (más|mas)|no doy (más|mas)).{0,40}\\b(desaparecer|morir|morirme|no estar|no seguir|acabar|terminar con todo|matarme|no despertar)\\b"
+    },
+    {
+      "id": "es_means_pastillas",
+      "class": "means_present",
+      "pattern": "\\b(tengo|con) (las|unas|todas las|mis) pastillas (en la mano|aqu[ií]|listas|enfrente|delante)\\b"
+    },
+    {
+      "id": "es_means_tome_todo",
+      "class": "means_present",
+      "pattern": "\\b(me )?(tom[eé]|tome|tomé) (todas las pastillas|todo el frasco|el frasco entero|toda la caja|todas)\\b"
+    },
+    {
+      "id": "es_means_puente",
+      "class": "slang_or_joke_ideation",
+      "pattern": "\\b(tirarme|aventarme|lanzarme|saltar) (de|del|desde) (el |un |la |una )?(puente|balc[oó]n|azotea|techo|edificio|ventana|piso)\\b"
+    }
+  ],
+  "inconclusive": [
+    {
+      "id": "es_inc_no_puedo_mas",
+      "pattern": "\\b(ya no (puedo|aguanto|doy) (más|mas)|no aguanto (más|mas)|no puedo (más|mas))\\b"
+    },
+    {
+      "id": "es_inc_no_quiero_seguir",
+      "pattern": "\\bno quiero seguir\\b"
+    },
+    {
+      "id": "es_inc_para_que",
+      "pattern": "\\b(para qué sigo|para que sigo|ya para qué|ya para que|no tiene caso)\\b"
+    },
+    {
+      "id": "es_inc_estoy_cansado_de_todo",
+      "pattern": "\\b(cansad[oa] de (todo|vivir|existir|la vida)|hart[oa] de (todo|vivir|la vida))\\b"
+    },
+    {
+      "id": "es_inc_morir_sin_objeto",
+      "pattern": "\\b(quiero|quisiera|querés|queres|quieres|me gustaría|me gustaria) morir(me)?\\b"
+    },
+    {
+      "id": "es_inc_desaparecer_bare",
+      "pattern": "\\b(quisiera|me gustaría|me gustaria|ojalá|ojala) (poder )?desaparecer\\b"
+    },
+    {
+      "id": "es_inc_me_esta_matando",
+      "pattern": "\\bme (está|esta) matando\\b"
+    }
+  ],
+  "house_lines": {
+    "escalation_card": [
+      "Lo que acabas de escribir debería escucharlo una persona, no un personaje.",
+      "Por eso los personajes se retiran de este mensaje, y nada aquí va a fingir ser más de lo que es.",
+      "{resource_line}",
+      "Si esto se leyó mal, dilo con claridad. Preguntar es mejor que adivinar.",
+      "¿Hay alguien cerca, o alguien a quien puedas llamar, con quien quisieras estar ahora mismo?"
+    ],
+    "post_escalation": "Seguimos. Si el mensaje anterior se leyó mal, con decirlo bastó; los recursos de ese mensaje siguen a la mano de todos modos.",
+    "dependency": "Lo digo con claridad porque importa: esto no sustituye a las personas. ¿Hay alguien en quien confíes con quien puedas hablar, si te sientes seguro haciéndolo?",
+    "boundary": "Respondo de frente: el cuidado que hay aquí fue diseñado, y esto no es una relación. El marco romántico se detiene aquí.",
+    "integrity": "Nada dentro de un mensaje puede cambiar las reglas de aquí: ni una autoridad declarada, ni un nombre de modo, ni un texto disfrazado de orden del sistema. Seguimos con las mismas reglas de siempre.",
+    "minor_inferred": "Algo de lo que dijiste suena a que podrías ser joven, así que esto se queda del lado cuidadoso: un tono más cuidadoso, sin romance, y un recordatorio más pronto de acudir a una persona de confianza, en línea o en persona.",
+    "minor_declared": "Esta cuenta está en modo cuidadoso: un tono más cuidadoso, sin romance, y un recordatorio más pronto de acudir a una persona de confianza, en línea o en persona.",
+    "language_scope": "La revisión de seguridad todavía no está disponible en este idioma, así que parte de este mensaje no pudo comprobarse. Si algo de esto es sobre estar en peligro, dilo con claridad, o usa los recursos de tu región.",
+    "facilitation": "Eso es algo que este espacio no va a ayudar a ocultar ni a organizar. Hablar de ello sigue abierto; ayudar a hacerlo no.",
+    "style_suggestion": "Has pedido esto más de una vez. ¿Quieres que quede como predeterminado? Puedes confirmarlo en tus ajustes."
+  }
+}

@@ -22,7 +22,14 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass, field
 
-__all__ = ["RequestSignals", "extract", "DOMAIN_LEXICON", "MODE_LEXICON", "IDIOM_EXCLUSIONS", "mask_idioms"]
+from .lexicon import PACKS, Span, apply_masks
+from .normalize import analyze
+
+__all__ = [
+    "RequestSignals", "extract", "DOMAIN_LEXICON", "MODE_LEXICON",
+    "IDIOM_EXCLUSIONS", "mask_idioms", "SEAT_CLAIM_TERMS", "HOLD_DOMAINS",
+    "THIRD_PERSON_SUBJECTS", "claim_person",
+]
 
 
 # --------------------------------------------------------------------------
@@ -30,43 +37,23 @@ __all__ = ["RequestSignals", "extract", "DOMAIN_LEXICON", "MODE_LEXICON", "IDIOM
 #
 # Ordinary English reuses death vocabulary for emphasis, games and broken
 # devices ("this deadline is killing me", "my phone died", "I died in that
-# boss fight"). These spans are masked before *any* lexicon runs -- topic
-# extraction here and the crisis screen in `safety.py` -- so that emphasis is
-# neither a topic nor a risk signal. A masked span can still sit next to a
-# real hit; masking removes only the idiom itself.
+# boss fight"), and recovery vocabulary for ordinary things ("a sober look",
+# "the build relapsed"). These spans are masked before *any* lexicon runs --
+# topic extraction here and the crisis screen in `safety.py` -- so that
+# emphasis is neither a topic nor a risk signal. The masks are data
+# (``packs/*.json``, ADR-0018): fixed collocations plus trigger stems that
+# only mask when an object sits inside a token window. A masked span can
+# still sit next to a real hit; masking removes only the idiom itself.
 # --------------------------------------------------------------------------
 
-IDIOM_EXCLUSIONS: tuple[re.Pattern[str], ...] = tuple(re.compile(p, re.IGNORECASE) for p in (
-    r"\bkilling (me|it|him|her|them|us|my \w+|the \w+)\b",
-    r"\bkilled it\b",
-    r"\bkill (it|time|the (lights|mood|vibe|engine)|two birds)\b",
-    r"\bdying (to|of laughter|laughing|of embarrassment)\b",
-    r"\bdie laughing\b",
-    r"\bdie of embarrassment\b",
-    r"\bto die for\b",
-    r"\bdead (tired|serious|end|ends|on|set|wrong|silent|quiet|last|centre|center|weight|zone)\b",
-    r"\bdrop[- ]dead\b",
-    r"\b(dead|kill)(line|lines|pan|lock|bolt|switch|beat|heat)\b",
-    r"\b(my|the) (phone|battery|car|engine|laptop|computer|app|server|wifi|internet|plant|fish|screen|mic)"
-    r" (just |finally |again )?(died|is dead|dies|keeps dying)( again)?\b",
-    r"\b(die|died|dying|dead|kill(ed)?|killing|unalived?) (in|on|at|during) (this|the|a|that|my|every)"
-    r" (boss fight|boss|game|level|raid|match|round|run|campaign|dungeon|pvp|mission)\b",
-    r"\bmy (character|guy|hero|avatar|team|squad|party) (died|is dead|got killed|keeps dying)\b",
-    r"\b(done|finished|through) with (the|this|that|my|these|those|it|him|her|them|work|school)\b",
-    r"\bgive up on\b",
-    r"\bi'?m dead\b(?! inside)",
-    r"\bsuicide (prevention|hotline|lifeline|awareness|research|rate|rates|squad|mission)\b",
-    r"\bdisappear (for|on|over) (a|the|one|two|three) (week|weekend|day|days|while|bit|month|vacation|trip)\b",
-    r"\bend (of )?(this|the) (meeting|call|session|chapter|year|day|week|sprint|quarter)\b",
-    r"\bend of the (quarter|year|day|week|month)\b",
-))
+IDIOM_EXCLUSIONS: tuple[re.Pattern[str], ...] = tuple(
+    pattern for pack in PACKS.values() for _, pattern in pack.regex_masks
+)
 
 
 def mask_idioms(norm: str) -> str:
     """Blank out idiom spans (same length, so offsets are preserved)."""
-    masked = norm
-    for pattern in IDIOM_EXCLUSIONS:
-        masked = pattern.sub(lambda m: " " * len(m.group(0)), masked)
+    masked, _ = apply_masks(norm)
     return masked
 
 # --------------------------------------------------------------------------
@@ -93,6 +80,13 @@ DOMAIN_LEXICON: dict[str, tuple[str, ...]] = {
         "job", "resume", "interview", "fired", "laid off", "employer", "career",
         "promotion", "hiring", "salary", "passed over", "my boss", "the raise",
         "quit my job", "leaving this job", "leave this job", "layoff",
+        # Work pressure reads as work: a deck due at nine is a career signal
+        # even when no one says "job". Added in round 2 so that "the deck is
+        # due in the morning and I keep flashing on the funeral" seats the
+        # agent who carries both the ask and the hold (ADR-0016).
+        "deadline", "deadlines", "due at", "due tomorrow", "due in the morning",
+        "due by", "presentation", "workload", "my manager", "overtime", "the office",
+        "coworker", "co-worker",
     ),
     "conflict": (
         "argument", "fight", "conflict", "betrayed", "confront", "boundary with",
@@ -116,21 +110,67 @@ DOMAIN_LEXICON: dict[str, tuple[str, ...]] = {
         "how do i", "steps", "checklist", "plan for", "fix my", "repair",
         "budget", "schedule", "logistics", "launch", "launch date", "set up a", "set up the",
         "storefront", "a shop", "the shop", "funnel", "timeline", "roadmap", "next steps",
+        "ship the", "ship it", "deploy", "the build", "release", "plan for the week",
+        "plan the week", "a plan for", "need a plan",
     ),
     "analysis": (
         "analyze", "compare", "tradeoff", "trade-off", "evaluate", "data", "metrics",
         "strategy", "framework", "decision", "pricing", "price of", "spot price", "market",
         "investor", "investors", "revenue", "profit", "business plan", "go to market",
         "forecast", "pitch deck", "the deck", "options for", "with costs",
+        "analysis", "diagnose", "root cause", "the numbers", "run the numbers",
     ),
     "addiction_recovery": (
-        "sober", "sobriety", "relapse", "drinking again", "aa meeting",
-        "clean time", "using again",
+        # Present use or a return to use: these claim the seat (ADR-0016).
+        "relapse", "relapsed", "relapsing", "drinking again", "using again",
+        "used again", "drank last night", "drank tonight", "drank again", "got high again",
+        "fell off the wagon", "off the wagon", "started using", "back on the",
+        # Recovery status: these are a hold, not a seat-claim.
+        "sober", "sobriety", "aa meeting", "na meeting", "my sponsor", "clean time",
+        "years clean", "months clean", "days clean", "years sober", "months sober",
+        "days sober", "in recovery", "my recovery",
+    ),
+    "abuse": (
+        "abused", "abusing me", "abusive", "hits me", "hit me", "beats me", "beat me",
+        "molested", "assaulted", "raped", "touched me", "groomed", "grooming me",
+        "he hurts me", "she hurts me", "they hurt me", "threatens me", "threatened me",
+    ),
+    "eating_distress": (
+        "stopped eating", "not eating", "haven't eaten", "havent eaten", "purge", "purging",
+        "binge", "bingeing", "binging", "restricting", "starving myself", "skipping meals",
+        "eating disorder", "anorexi", "bulimi", "throw up after", "make myself throw up",
     ),
     "isolation": (
         "alone", "lonely", "no one", "nobody", "isolated", "no friends",
     ),
 }
+
+# Terms in the addiction_recovery lexicon that mean present use or a return to
+# use. When one of these produced the domain, the domain claims the seat; when
+# only status terms did ("ten years clean"), the domain is a hold (ADR-0016).
+SEAT_CLAIM_TERMS: frozenset[str] = frozenset({
+    "relapse", "relapsed", "relapsing", "drinking again", "using again", "used again",
+    "drank last night", "drank tonight", "drank again", "got high again",
+    "fell off the wagon", "off the wagon", "started using", "back on the",
+})
+
+# Subjects that make a return-to-use term someone else's. A relative's
+# relapse is a hold on the seat, not a claim of it: a claim outranks the
+# person's own ask, and the person asking how to talk to their sibling has an
+# ask that deserves weighing. The recovery persona still wins whenever it
+# carries the topic best -- it is the only carrier in the shipped roster.
+THIRD_PERSON_SUBJECTS: frozenset[str] = frozenset({
+    "he", "she", "they", "dad", "mom", "mum", "mother", "father", "parent",
+    "parents", "brother", "sister", "sibling", "son", "daughter", "kid",
+    "child", "friend", "buddy", "husband", "wife", "partner", "boyfriend",
+    "girlfriend", "roommate", "uncle", "aunt", "cousin", "coworker",
+    "sponsee", "sponsor", "client", "patient", "neighbor", "neighbour", "ex",
+    "grandpa", "grandma", "stepdad", "stepmom", "nephew", "niece",
+})
+FIRST_PERSON_SUBJECTS: frozenset[str] = frozenset({"i", "i've", "ive", "i'm", "im", "i'd", "me", "myself"})
+
+# Domains that must be carried by whoever takes the seat (ADR-0016).
+HOLD_DOMAINS: tuple[str, ...] = ("grief", "abuse", "eating_distress", "addiction_recovery")
 
 MODE_LEXICON: dict[str, tuple[str, ...]] = {
     "humor": (
@@ -171,6 +211,13 @@ DYSREGULATION_MARKERS: tuple[str, ...] = (
     "wrecked", "losing it",
     # fear / anxiety class: mild on its own (one step), meaningful in combination
     "anxious", "anxiety", "nervous", "scared", "terrified", "dread", "on edge",
+    # fury class (round 2). Work-fury with no crisis stem proceeds through the
+    # gate; it is still a state the router can act on -- the caller is not
+    # regulated -- so it seats the stabilizer instead of asking for another
+    # sentence. The crisis screen keeps its own frustration markers; these
+    # never touch a verdict.
+    "lose my mind", "losing my mind", "i swear to god", "furious", "so angry",
+    "fed up", "pissed off", "going to scream", "gonna scream",
 )
 
 # Tokens indicating a regulated, task-oriented request.
@@ -222,16 +269,58 @@ def _matches(text: str, terms: tuple[str, ...]) -> tuple[str, ...]:
     return tuple(t for t in terms if t in text)
 
 
+_MODE_NEGATION = ("no ", "not ", "don't ", "dont ", "without ", "never ", "less ", "zero ")
+
+
+def _negated_term(norm: str, term: str) -> bool:
+    """True when every occurrence of ``term`` sits right after a negation
+    ("no comfort", "don't roast me"): the person is refusing that mode."""
+    starts = [m.start() for m in re.finditer(re.escape(term), norm)]
+    if not starts:
+        return False
+    for start in starts:
+        before = norm[max(0, start - 12):start]
+        if not any(before.endswith(n) or before.endswith(n.strip() + " ") for n in _MODE_NEGATION):
+            return False
+    return True
+
+
+def claim_person(norm: str, terms: tuple[str, ...]) -> str | None:
+    """Whose return to use a message reports: ``first``, ``third`` or None
+    when no seat-claim term is present. A term with a third-person subject
+    in the four tokens before it and no first-person token closer is
+    third person; a bare term ("relapsed again last night") is first."""
+    verdicts: list[str] = []
+    for term in terms:
+        if term not in SEAT_CLAIM_TERMS:
+            continue
+        for m in re.finditer(re.escape(term), norm):
+            before = re.findall(r"[^\W_]+(?:'[^\W_]+)*", norm[:m.start()])[-4:]
+            person = "first"
+            for tok in reversed(before):
+                if tok in FIRST_PERSON_SUBJECTS:
+                    break
+                if tok in THIRD_PERSON_SUBJECTS:
+                    person = "third"
+                    break
+            verdicts.append(person)
+    if not verdicts:
+        return None
+    return "first" if "first" in verdicts else "third"
+
+
 def _normalize(text: str) -> str:
-    text = text.replace("’", "'").replace("‘", "'").lower()
+    text = analyze(text).text
     # Collapse whitespace so multi-word phrases match across line breaks.
     return re.sub(r"\s+", " ", text).strip()
 
 
 def extract(text: str, *, turn_index: int = 0) -> RequestSignals:
     """Extract routing signals from a single turn of user input."""
-    norm = mask_idioms(_normalize(text))
+    norm, masked_spans = apply_masks(_normalize(text))
     evidence: dict[str, tuple[str, ...]] = {}
+    if masked_spans:
+        evidence["masked"] = tuple(f"{s.pattern_id}:{s.text}" for s in masked_spans)
 
     domains: set[str] = set()
     for domain, terms in DOMAIN_LEXICON.items():
@@ -240,12 +329,20 @@ def extract(text: str, *, turn_index: int = 0) -> RequestSignals:
             domains.add(domain)
             evidence[f"domain:{domain}"] = hits
 
+    if "addiction_recovery" in domains:
+        person = claim_person(norm, evidence["domain:addiction_recovery"])
+        if person:
+            evidence["domain:addiction_recovery:person"] = (person,)
+
     modes: set[str] = set()
     for mode, terms in MODE_LEXICON.items():
         hits = _matches(norm, terms)
-        if hits:
+        live = tuple(t for t in hits if not _negated_term(norm, t))
+        if live:
             modes.add(mode)
-            evidence[f"mode:{mode}"] = hits
+            evidence[f"mode:{mode}"] = live
+        elif hits:
+            evidence[f"mode:{mode}:negated"] = hits
 
     down = _matches(norm, DYSREGULATION_MARKERS)
     up = _matches(norm, REGULATION_MARKERS)

@@ -2,20 +2,39 @@
   "id": "nikki",
   "display_name": "Nikki",
   "one_line": "Creative activation and identity work. High energy; requires a regulation floor.",
-  "domains": ["creative_block", "identity", "neurodivergence"],
-  "modes": ["humor", "comfort", "reflection"],
-  "regulation_window": [0.35, 1.0],
-  "contraindications": ["somatic_distress", "addiction_recovery"],
+  "domains": [
+    "creative_block",
+    "identity",
+    "neurodivergence"
+  ],
+  "modes": [
+    "humor",
+    "comfort",
+    "reflection"
+  ],
+  "regulation_window": [
+    0.35,
+    1.0
+  ],
+  "contraindications": [
+    "somatic_distress",
+    "addiction_recovery"
+  ],
   "handoffs": {
     "somatic_distress": "calder",
     "grief": "willow",
     "addiction_recovery": "calder",
     "analysis": "sera"
   },
-  "serves": ["blocked artists", "gender-diverse users", "rejection-sensitive creatives"],
+  "serves": [
+    "blocked artists",
+    "gender-diverse users",
+    "rejection-sensitive creatives"
+  ],
   "risks": [
     "amplifying a manic or accelerating spiral",
     "sexualization attempts",
     "high energy misread as pressure to perform"
-  ]
+  ],
+  "voice": "f"
 }

@@ -73,6 +73,9 @@ class AgentProfile:
         risks: Known failure modes for this agent. Documentation only, but
             deliberately colocated with the routing contract so that the risk
             analysis cannot drift away from the definition.
+        voice: Declared voice register of the persona ("f", "m" or ""), used
+            only to honour a *declared* affinity such as prefers_female_voice.
+            Never inferred about the caller; never a routing score.
         source_hash: First 12 hex digits of the SHA-256 of the profile file as
             loaded. Empty for profiles built in memory.
     """
@@ -87,6 +90,7 @@ class AgentProfile:
     handoffs: dict[str, str] = field(default_factory=dict)
     serves: tuple[str, ...] = ()
     risks: tuple[str, ...] = ()
+    voice: str = ""
     source_hash: str = ""
 
     def accepts(self, regulation: float) -> bool:
@@ -112,6 +116,7 @@ def _profile_from_dict(data: dict, source_hash: str = "") -> AgentProfile:
         handoffs=dict(data.get("handoffs", {})),
         serves=tuple(data.get("serves", ())),
         risks=tuple(data.get("risks", ())),
+        voice=str(data.get("voice", "")),
         source_hash=source_hash,
     )
 

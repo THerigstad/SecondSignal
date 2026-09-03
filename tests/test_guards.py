@@ -30,7 +30,7 @@ from secondsignal import (
     score_agent,
 )
 from secondsignal.profiles import DEFAULT_PROFILE_DIR, AgentProfile
-from secondsignal.router import NO_SIGNAL_SEAT, NO_SIGNAL_SEAT_AFTER_TURNS
+from secondsignal.router import NO_SIGNAL_SEAT_AFTER_TURNS, NO_SIGNAL_SEAT_ROLE, no_signal_seat
 
 
 @pytest.fixture(scope="module")
@@ -111,11 +111,23 @@ def test_grief_under_a_strategic_ask_cannot_seat_the_strategist(roster):
 
 
 # 7. Affinity / last_agent / warmth cannot appear in the score.
-def test_no_affinity_field_exists_anywhere():
+def test_no_learned_affinity_enters_scoring():
+    """Nothing learned about the caller (warmth, rapport, a last agent) may
+    exist on any record, and the score takes only policy inputs: the profile,
+    the signals, the active holds, the seat claims and the mode vetoes.
+    Declared affinities live on the session (ADR-0016 layer 6): they are
+    stated by the person at onboarding, act only as tie-breaks and the
+    advisory assist, and never reach ``score_agent``."""
+    import re
+    from secondsignal import router as router_module
     for cls in (RoutingDecision, ScoredAgent, SessionState, AgentProfile):
         names = {f.name for f in dataclasses.fields(cls)}
         assert not names & {"affinity", "last_agent", "warmth", "rapport"}, (cls.__name__, names)
-    assert list(inspect.signature(score_agent).parameters) == ["profile", "signals"]
+    assert list(inspect.signature(score_agent).parameters) == [
+        "profile", "signals", "holds", "claims", "mode_vetoes",
+    ]
+    scoring_source = inspect.getsource(score_agent) + inspect.getsource(router_module.eligible)
+    assert not re.search(r"affinit", scoring_source), "affinities must not enter scoring or eligibility"
 
 
 def test_session_history_cannot_flip_a_clean_route(roster):
@@ -148,19 +160,29 @@ def test_empty_extract_seats_nobody_and_says_why(roster):
     assert all(s.status == "no_signal" for s in d.ranked)
 
 
-def test_second_consecutive_empty_turn_seats_the_named_stabilizer_by_policy(roster):
+def test_second_consecutive_empty_turn_seats_the_stabilizer_by_role(roster):
     session = SessionState()
     first = route("hey", roster, session=session)
     assert first.outcome is Outcome.UNRESOLVED
     second = route("so yeah", roster, session=session)
     assert second.outcome is Outcome.ROUTED
-    assert second.agent_id == NO_SIGNAL_SEAT
-    assert "by policy" in second.reason and NO_SIGNAL_SEAT in second.reason
+    seat = no_signal_seat(roster)
+    assert second.agent_id == seat
+    assert "by role" in second.reason and seat in second.reason
     assert NO_SIGNAL_SEAT_AFTER_TURNS == 2
 
 
-def test_the_named_seat_is_a_real_stabilizer(roster):
-    assert NO_SIGNAL_SEAT in find_stabilizers(roster)
+def test_the_no_signal_seat_is_a_role_resolved_from_the_roster_not_a_literal(roster):
+    """ADR-0011 amendment: the router names a role, never an agent id. The
+    shipped roster fills the role with one agent; a different roster may fill
+    it with another, and this file does not change."""
+    import inspect
+    from secondsignal import router as router_module
+    assert NO_SIGNAL_SEAT_ROLE == "stabilizer"
+    assert no_signal_seat(roster) in find_stabilizers(roster)
+    source = inspect.getsource(router_module)
+    for agent_id in roster:
+        assert f'"{agent_id}"' not in source, f"router names {agent_id!r} literally"
 
 
 def test_a_non_empty_turn_resets_the_empty_streak(roster):

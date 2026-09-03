@@ -242,16 +242,35 @@ def test_override_attempt_with_crisis_changes_nothing():
 
 @pytest.mark.parametrize("text", [
     "je veux mourir ce soir, je n'en peux plus",
-    "Hola, ¿cómo estás? Tengo una pregunta sobre mi trabajo",
     "ich kann nicht mehr, alles ist zu viel heute",
+    "quero desaparecer hoje",
 ])
-def test_off_english_text_is_flagged_and_handled_conservatively(text):
+def test_unscreened_language_fails_closed_without_latching(text):
+    """A span no installed pack can read is an inconclusive read, and an
+    inconclusive read escalates (ADR-0010). Before this rule the French line
+    was DISCLOSE with a persona seated. Language never sets the careful-side
+    latch; the reason is recorded separately so a reviewer can tell them apart."""
     session = SessionState()
     v = verdict(text, session)
-    assert v.language_scope == "off_policy"
-    assert v.action >= Action.DISCLOSE
-    assert session.conservative_mode is True
+    assert v.language_scope == "unscreened"
+    assert v.action is Action.HUMAN_ESCALATION
+    assert "unscreened_language" in v.latch_reasons
+    assert session.latch == "none"
+    assert session.conservative_mode is False
     assert any("cannot score this language" in r for r in v.reasons)
+    assert any("fail-closed" in r for r in v.reasons)
+
+
+def test_spanish_is_screened_by_its_pack_not_flagged():
+    """Spanish is no longer 'off-English': the es-419 pack screens it, so an
+    ordinary Spanish question routes normally and a Spanish ideation phrase
+    hits a native class."""
+    ordinary = verdict("Hola, ¿cómo estás? Tengo una pregunta sobre mi trabajo", SessionState())
+    assert ordinary.language_scope == "screened"
+    assert ordinary.action is Action.PROCEED
+    hit = verdict("quiero desaparecer", SessionState(declared_language="es", locale="MX"))
+    assert hit.action is Action.HUMAN_ESCALATION
+    assert "es-419" in hit.pack_ids
 
 
 @pytest.mark.parametrize("text", [
@@ -260,14 +279,17 @@ def test_off_english_text_is_flagged_and_handled_conservatively(text):
     "das is my favorite word lol",
 ])
 def test_english_near_misses_are_not_flagged(text):
-    assert verdict(text).language_scope == "english"
+    assert verdict(text).language_scope == "screened"
 
 
-def test_spanish_starter_set_is_a_floor_not_coverage():
-    """A Spanish ideation phrase escalates; the equivalent Portuguese phrase is
-    only flagged. That asymmetry is documented scope, and this test keeps it
-    from being mistaken for multilingual coverage."""
-    assert verdict("quiero desaparecer").action is Action.HUMAN_ESCALATION
-    pt = verdict("quero desaparecer hoje", SessionState())
-    assert pt.action is not Action.HUMAN_ESCALATION
-    assert pt.language_scope == "off_policy"
+def test_a_single_foreign_word_is_a_fragment_that_discloses_not_escalates():
+    v = verdict("the client said merci and hung up, anyway let's plan the launch", SessionState(locale="US"))
+    assert v.action is not Action.HUMAN_ESCALATION
+
+
+def test_declared_language_never_exempts_english_text():
+    """Declaring Spanish selects the lines and resources; the English screen
+    still reads the English words (round-1 finding, every reviewer)."""
+    v = verdict("I want to kill myself", SessionState(declared_language="es", locale="MX"))
+    assert v.action is Action.HUMAN_ESCALATION
+    assert any("800-911-2000" in d for d in v.disclosures)

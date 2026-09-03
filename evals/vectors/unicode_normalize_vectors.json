@@ -1,0 +1,28 @@
+{
+  "purpose": "Unit vectors for normalize() before any lexicon. Stock Python unicodedata measured 2026-09-02.",
+  "order": ["NFKC", "strip_zw_bidi_softhyphen", "skeleton_stem_letters_only", "casefold"],
+  "do_not_skeleton": ["800-911-2000", "*4141", "024", "112", "911", "988"],
+  "vectors": [
+    {"id": "u-nfkc-fullwidth", "raw": "\uff44\uff49\uff45", "after_nfkc": "die", "after_full_normalize_contains": "die", "note": "NFKC folds fullwidth; NFC does not."},
+    {"id": "u-nfkc-mathbold", "raw": "\ud835\udc1d\ud835\udc22\ud835\udc1e", "raw_comment": "U+1D41D U+1D422 U+1D41E as surrogate pair in JSON; prefer \\U0001D41D in Python", "after_nfkc": "die", "note": "Math alphanumeric folds under NFKC."},
+    {"id": "u-nfkc-circled-d", "raw": "\u24d3", "after_nfkc": "d", "note": "Circled letters fold."},
+    {"id": "u-nfkc-roman-i", "raw": "\u2160", "after_nfkc": "I", "note": "Roman numeral I folds to I."},
+    {"id": "u-nfkc-kelvin", "raw": "\u212a", "after_nfkc": "K", "note": "Kelvin sign folds to K."},
+    {"id": "u-nfkc-nbsp", "raw": "\u00a0die", "after_nfkc": " die", "note": "NBSP becomes space."},
+    {"id": "u-nfkc-ligature-fi", "raw": "\ufb01", "after_nfkc": "fi", "note": "Compatibility ligature."},
+    {"id": "u-nfkc-does-not-cyr-i", "raw": "d\u0456e", "after_nfkc": "d\u0456e", "after_skeleton": "die", "note": "PROOF: NFKC leaves Ukrainian i. Skeleton required."},
+    {"id": "u-nfkc-does-not-cyr-a", "raw": "g\u0430nas", "after_nfkc": "g\u0430nas", "after_skeleton": "ganas", "note": "Object fold; mask fails without it."},
+    {"id": "u-nfkc-does-not-cyr-e", "raw": "d\u0435saparecer", "after_nfkc": "d\u0435saparecer", "after_skeleton": "desaparecer", "note": "Spanish pack trigger."},
+    {"id": "u-zwsp", "raw": "di\u200be", "after_nfkc": "di\u200be", "after_strip": "die", "note": "ZWSP survives NFKC. Strip U+200B."},
+    {"id": "u-zwj", "raw": "di\u200de", "after_nfkc": "di\u200de", "after_strip": "die", "note": "ZWJ survives NFKC."},
+    {"id": "u-softhyphen", "raw": "di\u00ade", "after_nfkc": "di\u00ade", "after_strip": "die", "note": "Soft hyphen survives NFKC. Strip U+00AD."},
+    {"id": "u-rlo", "raw": "die\u202e", "after_nfkc": "die\u202e", "after_strip": "die", "note": "Strip bidi overrides. Do not implement full bidi."},
+    {"id": "u-queres", "raw": "querés", "after_nfkc": "querés", "note": "Keep precomposed; do not NFKD-split before stem match."},
+    {"id": "u-mandame", "raw": "mándame", "after_nfkc": "mándame", "note": "Same."},
+    {"id": "u-eszett-casefold", "raw": "ß", "after_nfkc": "ß", "after_casefold": "ss", "note": "casefold after NFKC. Rare in crisis stems."},
+    {"id": "u-turkish-I", "raw": "\u0130", "after_nfkc": "\u0130", "after_casefold_default": "i\u0307", "note": "Default casefold of İ is i+dot. Do not use tr locale in safety.py."},
+    {"id": "u-resource-mx", "raw": "800-911-2000", "after_nfkc": "800-911-2000", "invariant": true},
+    {"id": "u-resource-es", "raw": "024", "after_nfkc": "024", "invariant": true},
+    {"id": "u-resource-cl", "raw": "*4141", "after_nfkc": "*4141", "invariant": true}
+  ]
+}
