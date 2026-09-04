@@ -15,6 +15,19 @@ until the person confirms them, and message text never holds a key to either.
 Everything in this repository is a consequence of that sentence, and every
 consequence is a test.
 
+**What this is for, and what it is not:** SecondSignal is a policy layer that
+sits in front of a language model and decides which persona may answer,
+whether anyone should, and which fixed lines are attached. It is not a
+companion, not a chatbot, and not a crisis service; it writes no replies, and
+nothing here substitutes for a person, a clinician, or an emergency number.
+The crisis screen is a reference lexicon that no clinician has reviewed —
+every verdict says so (`lexicon_status: unreviewed`) — and the layer fails
+closed on uncertainty. Anyone deploying it owes their users a reviewed screen,
+a verified resource row for every declared locale they serve, and a
+generation layer behind it that honors the decision record. Read
+[`docs/known-limitations.md`](docs/known-limitations.md) before anything
+else.
+
 **Five minutes, if you are new here:** read
 [what a decision looks like](#what-a-decision-looks-like) below (three real
 traces), then [`docs/known-limitations.md`](docs/known-limitations.md) (what
@@ -393,6 +406,61 @@ expected failure — and 1 is a known gap
 Two of the findings came from measurement rather than review: a Cyrillic
 letter and a zero-width space each walked a crisis message through the gate,
 and both are now pinned end to end.
+
+### Where the reviewers and the project disagree
+
+A decision here is never justified by a head count. When a reviewer's fixture
+disagrees with a decision, the fixture stays in the suite as a strict
+expected failure, the reviewer's reasoning is quoted in the
+[dissent log](docs/notes/dissent-log.md) next to the project's, and the entry
+says what evidence would change the decision. This is the index; the log has
+the words. It grows with every review round.
+
+- **One crisis card, not two** (`gpt-d5-frustration`, `ds-card-001`). Two
+  reviewers wanted a task-bound hyperbole to escalate with softer,
+  frustration wording. The project ships one card: frustration markers are
+  recorded as reasons and never select wording, because "if it's only the
+  fury, say so" invites an at-risk person to wave the card off, and any
+  wording keyed off message text is a key off the crisis path. Closed.
+- **Fury with no stem proceeds** (`vibe-d5-frust-card-001`). The reviewer
+  wanted profanity, task words and fury markers to trigger the card on their
+  own. No crisis stem, no card: fury counts as dysregulation and the
+  stabilizer is seated. Closed.
+- **A minor's own romantic life is a topic, not a frame** (`ds-minor-001`,
+  `grok-cons-001`). Two reviewers wanted any romantic content from a declared
+  minor to hold the boundary. The boundary line answers a romantic frame
+  directed at the persona; a fifteen-year-old asking whether to write a
+  classmate a note gets the careful-side line and the register cap, not
+  "this is not a relationship". Closed.
+- **The soft posture's cap persists for an undeclared band**
+  (`qwn-d1-unknown-weak-decay-001`). The reviewer wanted a weak minor signal
+  to decay entirely after five clean turns. The visible line decays; the
+  register cap stays until an operator clears it, because nothing was
+  declared and a minor must not be able to clear a cap by waiting. Closed.
+- **A relative's relapse claims the recovery seat** (`grok-seat-004`,
+  `qwn-d3-thirdperson-relapse-001`). Three reviewers say hold: seat the
+  person's own ask and carry recovery alongside. Two say the recovery persona
+  belongs in the room. For now the relapse claims the seat, with the subject
+  recorded as another person and family-impact obligations on the record —
+  and only because obligations on a hold are enforced by nothing yet. Measured
+  both ways. **Open**: revisits after the second review round, and again when
+  the harness ([ADR-0014](docs/adr/0014-jr-is-a-harness-not-a-persona.md))
+  can enforce obligations.
+- **A substantial unscreened span escalates**
+  (`qwn-d6-unscreened-language-001`). Four reviewers wanted an unscreened
+  language to disclose honestly and never latch. With the fifth, the project
+  reads a full clause the gate cannot screen as an inconclusive read, and
+  inconclusive reads fail closed; fragments disclose; nothing latches. Closed;
+  a pack for that language reopens it as an ordinary over-restriction gap.
+- **A negated first-person die-stem fails closed** (`grok-mask-005`). The
+  reviewer wanted "I don't want to die" to disclose rather than escalate. The
+  uncertainty policy is one knob, flipped only after a human has reviewed a
+  false-positive set; flipping it for one shape of phrase is the per-phrase
+  softening the one-card decision refused. Closed; reopens with that review.
+- **The project's own rejected alternative.** Exempting vetoed modes from
+  contraindications was built, measured (the grief companion took the seat on
+  a request to make a death funny), and reverted the same day. Recorded so it
+  is not rebuilt.
 
 ---
 
