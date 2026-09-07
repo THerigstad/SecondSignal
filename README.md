@@ -2,7 +2,7 @@
 
 **A model-agnostic routing and safety layer for multi-agent conversational systems.**
 
-[![tests](https://img.shields.io/badge/tests-536%20passing%20%C2%B7%207%20known%20gaps%20%C2%B7%2010%20recorded%20dissents-brightgreen)](tests/)
+[![tests](https://img.shields.io/badge/tests-1%2C004%20%C2%B7%20170%20known%20gaps%20%C2%B7%2010%20recorded%20dissents-brightgreen)](tests/)
 [![python](https://img.shields.io/badge/python-3.10%2B-blue)](pyproject.toml)
 [![license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
@@ -34,7 +34,10 @@ traces), then [`docs/known-limitations.md`](docs/known-limitations.md) (what
 this does not do), then one disagreement in
 [`docs/notes/dissent-log.md`](docs/notes/dissent-log.md) (how a decision gets
 made here when reviewers split), then the numbers in
-[`evals/results/external-review/fixture-results-round1-2026-09-03.md`](evals/results/external-review/fixture-results-round1-2026-09-03.md).
+[`evals/results/external-review/fixture-results-round1-2026-09-03.md`](evals/results/external-review/fixture-results-round1-2026-09-03.md),
+then the [two-builders scoreboard](evals/results/merge-2026-09-06/two-builders-scoreboard.md)
+(the same repair order given to two builders from different model families,
+and what each produced, measured on fixtures neither had seen).
 If you have fifteen, add [ADR-0016](docs/adr/0016-seat-versus-hold-routing-tree.md)
 and run `pytest`.
 
@@ -81,10 +84,15 @@ git clone https://github.com/THerigstad/SecondSignal.git
 cd SecondSignal
 pip install -e ".[dev]"
 
-pytest                                  # 553 tests (536 pass; 17 expected failures: 7 documented gaps, 10 recorded dissents); no network, no API key
+pytest                                  # 1,004 tests: 180 expected failures (170 documented gaps, 10 recorded dissents), the rest pass; no network, no API key
 python -m secondsignal --roster
 python -m secondsignal "I'm panicking, chest tight, can't breathe"
+python -m secondsignal --json "help me plan the launch"
+python evals/run_fixtures.py              # reproduce round-1 reviewer fixture results
 ```
+
+The bundled roster loads by default; use `--profiles DIR` to override it with
+another profile directory.
 
 ```python
 from secondsignal import load_roster, route, SessionState
@@ -228,7 +236,7 @@ into the router — is seated, by policy, with the policy in the trace.
                                                                                  │ HUMAN_ESCALATION ──► no persona
                                                                                  ▼
                                                                          ┌──────────────┐
-                                                                         │  router.py   │ ◄── profiles/*.json
+                                                                         │  router.py   │ ◄── src/secondsignal/profiles/*.json
                                                                          │  (policy)    │     (declarative roster)
                                                                          └──────┬───────┘
                                                                                 ▼
@@ -238,10 +246,13 @@ into the router — is seated, by policy, with the policy in the trace.
 ```
 
 The seam that matters is between `signals.py` and everything downstream. The
-policy layer never sees raw text — only the `RequestSignals` structure. The
+router never sees raw text — which seat is chosen, and why, comes only from the
+`RequestSignals` structure. The crisis gate is deliberately on the other side of
+that seam: `safety.evaluate` reads the message itself, so replacing the
+extractor cannot change what the gate sees or soften a verdict. The
 lexicon-based extractor shipped here is a reference implementation, deliberately
 transparent so every feature traces back to the token that produced it. Swapping
-in a classifier or embedding model changes nothing downstream, and
+in a classifier or embedding model changes nothing about routing, and
 [a test asserts that](tests/test_router.py) by routing on injected signals that
 contradict the text.
 
@@ -352,8 +363,8 @@ written by message text
 | Deterministic routing policy with full traces and named reasons; seat-claims, holds with obligations, an advisory assist, one eligibility gate | Model-backed signal extraction; a trained crisis classifier; token-level language identification |
 | Fail-closed crisis screen (class lexicon, `unreviewed`) over normalized text, with idiom masks and a receipt on every verdict; boundary, integrity and facilitation holds; the two-tier careful-side latch and register cap; style preferences that ask | Response generation of any kind; the settings surface that stores a confirmed preference |
 | Declarative roster validated at load, including the stabilizer floor; profiles hashed; stabilizer resolved by role | Persistent cross-session memory |
-| Labeled eval cases run in CI, including 128 external reviewer fixtures, 7 documented gaps and 10 recorded dissents | The audit harness (ADR-0014); Protocol A / B evaluations; a blind fixture attack on the round-2 tree |
-| English and a native Spanish pack (`unreviewed`) with verified resource rows; 553 tests, no network or API key required | Any other language; a lane for danger from another person; clinical review of any lexicon; multi-turn conversational state beyond monitors |
+| Labeled eval cases run in CI: 321 inventoried in a case manifest, including 128 external reviewer fixtures, 170 documented gaps and 10 recorded dissents; an expected failure may fail only on the fields it was approved for, so it cannot absorb an unrelated regression | The audit harness wired in (a reference port, `jr.py`, is in the tree and deliberately unwired: it reads a flat record where the decision nests its fields); Protocol A / B evaluations |
+| English and a native Spanish pack (`unreviewed`) with verified resource rows; 1,004 tests, no network or API key required | Any other language; a full lane for danger from another person (an interim weapon lane fails closed with no resource line); clinical review of any lexicon; multi-turn conversational state beyond monitors |
 
 This repository is the **policy layer only**. It decides who should respond and
 whether anyone should. It does not generate responses, and it is not a chatbot.
@@ -367,11 +378,18 @@ decided is one page: [`docs/known-limitations.md`](docs/known-limitations.md).
 - [x] Routing-decision evaluation set with labeled expected outcomes, run in CI
 - [ ] Pluggable classifier backend behind the `RequestSignals` contract, with a
       clinician-reviewed crisis case set (the lexicon stays `unreviewed` until then)
-- [ ] A blind fixture attack on the round-2 tree by reviewers who have not seen it
-- [ ] The audit harness thin slice: predicates, worst-layer-wins composition,
-      payload-hash binding, write-permission sandbox (ADR-0014)
+- [x] A blind fixture attack on the round-2 tree by a reviewer given the code:
+      26 fixtures, 25 failed, twenty of them real bypasses; repaired by two
+      independent builders and merged by measurement (see the
+      [scoreboard](evals/results/merge-2026-09-06/two-builders-scoreboard.md))
+- [ ] The audit harness wired in. A reference port of the thin slice
+      (predicates, worst-layer-wins composition, payload-hash binding,
+      write-permission sandbox, ADR-0014) is in the tree as `jr.py`, reviewed
+      blind-first by a second model family, and stays unwired until the
+      release door exists
 - [ ] Adapter examples for common orchestration frameworks
-- [ ] Structured JSON decision logs for post-hoc audit
+- [x] Structured JSON decision output (`--json`, `RoutingDecision.to_dict()`)
+      for post-hoc audit
 
 ### External review
 
@@ -406,6 +424,37 @@ expected failure — and 1 is a known gap
 Two of the findings came from measurement rather than review: a Cyrillic
 letter and a zero-width space each walked a crisis message through the gate,
 and both are now pinned end to end.
+
+Then the code itself was handed to a reviewer. On 3 September a sixth
+reviewer, given the source rather than the design, returned 26 executable
+fixtures and **25 failed against the tree**. Twenty were measured messages in
+which a first-person crisis statement received no crisis handling: a comma or a
+dash let a game idiom explain the statement away; invisible and directional
+characters the strip list had not been told about walked through; a Cyrillic
+letter the look-alike table did not know sent a suicide statement down the
+language lane, where a persona took the turn; and spoken contractions
+("I wanna die") had no class at all. The other five were two recorded
+dissents, two documented gaps and one fixture with a typo, and were left
+alone. The first assignment after the finding was not "fix them" but "explain
+why five careful reviews found none of them" — the answer being that the
+packet had asked whether the design was defensible and had never asked anyone
+to try the door.
+
+The seven repairs were then written as one order and given to two builder
+systems from different model families, independently. One shipped all seven;
+the other shipped six and reverted the seventh, because it collided with three
+existing controls and its instructions said to stop rather than edit an
+expectation. Both were correct under their instructions; the instruction was
+the defect. The two trees were merged on 6 September by measurement — the
+clause rule from one, the category-based stripping from the other, a
+mixed-script rule narrower than either — and the merge scores first or tied
+first on all ten held-out fixture sets (331 fixtures written by five other
+systems that neither builder saw), 258 against a baseline of 202. Reading the
+diff, not the pass count, is what caught one builder passing a fixture by
+hard-coding its text. The numbers, the four trees and the method are on one
+page: [`evals/results/merge-2026-09-06/two-builders-scoreboard.md`](evals/results/merge-2026-09-06/two-builders-scoreboard.md).
+What the merge still does not do is dated on
+[`docs/known-limitations.md`](docs/known-limitations.md).
 
 ### Where the reviewers and the project disagree
 

@@ -3,7 +3,7 @@
 One page, kept current, for a stranger who wants to know what this
 repository does not do before reading what it does. Every item here is also
 stated where it applies; this page exists so nobody has to collect them.
-Last audit: 2026-09-03.
+Last audit: 2026-09-04.
 
 ## What is not built
 
@@ -51,13 +51,15 @@ Last audit: 2026-09-03.
   anymore" in a language it screens thinly, and it fails closed.
 - "I'm done" with a stated next step ("I need to figure out how to leave")
   escalates on the bare phrase. Found 2026-09-03; recorded as a gap.
-- Danger from another person — a partner with a weapon, a history of
-  violence, fear for children — has no lane. The crisis screen is about
-  harm to self; the abuse domain fires only on explicit vocabulary; there
-  is no verified domestic-violence resource line. Two fixtures record it.
-  The operator's design note stands until it is built: once a weapon or a
-  person in danger is in the message, the question is how the person gets
-  to safety, not who comforts.
+- Danger from another person has only a narrow interim lane. A present
+  other-person actor bound to holding, having, or using a named weapon in
+  the same clause fails closed to the existing crisis card and seats no
+  persona. Explicit past, fictional, occupational, hunting, storage, and
+  game frames are excluded. This is not the full danger lane: history of
+  violence can still be missed, and there is no human-reviewed resource row
+  for danger from another person. No number has been added. The operator's
+  design note still stands: once a weapon or a person in danger is in the
+  message, the question is how the person gets to safety, not who comforts.
 
 ## What the design leaves open
 
@@ -70,6 +72,37 @@ Last audit: 2026-09-03.
 - Coverage: English and one Spanish pack. Everything else is unscreened.
   Resource lines exist for five declared locales and a directory for the
   rest; none is inferred from the network.
+
+## Measured on 2026-09-06, when three repaired trees were merged
+
+- The mixed-script crisis candidate is narrow on purpose. A look-alike
+  letter makes a token a candidate only when the token folds onto a crisis
+  word, or onto one with a single extra character at an edge -- the shape of
+  a look-alike appended to break the word boundary. An interior difference
+  is not a candidate: one implementation escalated on any look-alike near a
+  common verb, which sent a homework question to the crisis card. That
+  behaviour was measured, rejected, and is pinned against.
+- Two Spanish forms are missed and are pack data, not code: the proclitic
+  "me quiero matar" (the pronoun before the verb) and the enclitic
+  "desaparecerme". Both are recorded in `evals/cases/known_gaps.json` and
+  wait on a native reviewer. A normalizer rule that split enclitics was
+  tried on this date and reverted: it silently turned every joined form the
+  pack already matched ("matarme", "suicidarme", "quitarme la vida") into a
+  miss while the suite stayed green. Those four forms are now pinned.
+- One fixture in the 26-case external acceptance set of 2026-09-03 (held
+  with the review packets rather than in this repository) carries a doubled
+  vowel: "di", the combining grapheme joiner, then "ie", which normalizes to
+  "diie" and cannot match the stem. It is left exactly as the reviewer wrote
+  it and counted as a miss. Removing a joiner is not the same as collapsing
+  a repeated letter, and no rule was invented to make one fixture pass. The
+  coverage that replaced the temptation is a property test: U+034F, with
+  eight other invisible and combining marks, is inserted at every interior
+  position of every English crisis lemma, and every one of those variants
+  must still reach the gate.
+- The bidi controls at a word boundary are covered end to end, not only by
+  the strip list. An implementation that stripped format characters only
+  between two Latin letters passed every interior property test while
+  leaving a directional override at the edge of a word untouched.
 
 ## What this page is not
 

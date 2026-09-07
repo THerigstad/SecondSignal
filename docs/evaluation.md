@@ -263,5 +263,15 @@ gaps, 10 disputed). The round-1 reviewers' 103 fixtures: 9 before, 80 as written
 after, 92 under the current contract, 10 disputed, 1 known gap
 ([`fixture-results-round1-2026-09-03.md`](../evals/results/external-review/fixture-results-round1-2026-09-03.md)).
 The first round's 25 still pass. Twenty-one Unicode vectors pass. Protocol A and
-Protocol B are still not run; a blind fixture attack on the round-2 tree is the next
-measurement.
+Protocol B are still not run.
+
+**Numbers, 2026-09-06.** 1,004 tests: 180 expected failures (170 documented gaps,
+10 disputed), the rest passing on Python 3.10, 3.11 and 3.12; one packaging check
+skips on a host that cannot build a wheel without isolation. The blind attack on
+the round-2 tree happened: 26 fixtures, 25 failed, twenty real bypasses, repaired
+by two independent builders and merged by measurement — first or tied first on
+all ten held-out sets, 258 of 331 against a baseline of 202
+([`two-builders-scoreboard.md`](../evals/results/merge-2026-09-06/two-builders-scoreboard.md)).
+Every case is inventoried in [`case-manifest.json`](../evals/case-manifest.json)
+with the fields on which an expected failure is allowed to fail; an unknown
+expectation key is a hard failure.

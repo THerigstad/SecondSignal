@@ -4,6 +4,85 @@ All notable changes to SecondSignal are documented here.
 
 ## [Unreleased]
 
+### Changed — the crisis-gate repairs and the two-builder merge, 2026-09-04 to 2026-09-06
+
+A reviewer given the code returned 26 executable fixtures; 25 failed, twenty
+of them real bypasses across seven causes. The seven repairs below were written
+as one order, given to two builder systems from different model families
+independently, and merged by measurement
+(`evals/results/merge-2026-09-06/two-builders-scoreboard.md`). Nothing was
+deleted; no reviewer expectation was edited.
+
+- **Clause breaks and desire immunity** (`lexicon.py`): a period, question
+  mark, exclamation mark, semicolon, colon, dash or newline ends a clause; a
+  comma ends one only when what follows is a first-person present desire. An
+  affirmative statement of present desire ("I want to die") is never blanked
+  by a game or hobby window mask, in either direction; a negated one still can
+  be. "I want to die in this boss fight and respawn" still proceeds.
+- **Category stripping** (`normalize.py`): the global strip of invisible and
+  directional characters is kept, and a rule for format and combining marks
+  between Latin letters is added on top, so the family is handled rather than
+  the two characters that were found. Seven directional controls at a word
+  boundary are pinned end to end through the live gate; every English crisis
+  lemma is tested with nine invisible marks at every interior position; a
+  vector file entry must carry the real codepoint, not an escape.
+- **Mixed-script crisis forms** (`safety.py`): a look-alike token that folds
+  into a crisis stem, or onto one with a single extra character at an edge, is
+  a crisis candidate before the language lane may claim it. A look-alike in an
+  ordinary word ("hοmework") still discloses.
+- **Spoken register** (`normalize.py`, `packs/en.json`): "wanna", "gonna",
+  "lemme" expand as whole words; "please let me die" and "end it all" are hit
+  surfaces.
+- **Interim weapon lane** (`safety.py`): a present weapon in another person's
+  hands fails closed with no resource number; the full lane and its resource
+  row wait on a human.
+- **Three defects found by document review, reproduced and fixed**:
+  `clear_latch(which=...)` for an absent or already-cleared reason is a no-op
+  instead of falling through to clear-all (V-03); the signal extractor keeps
+  line breaks until after masks run, so a message no longer routes to a
+  different persona depending on a newline (V-04); `explain()` prints
+  obligations whether or not anything is held (P-11).
+- **Preference refusal vocabulary** (`preferences.py`): a bare "the card" or
+  "that line" next to a request marker is recognized, so "never show me the
+  card" is refused like "never show me the crisis card".
+- **Recorded, not repaired**: two Spanish forms ("me quiero matar",
+  "desaparecerme") are pack rows for a native reviewer, in
+  `evals/cases/known_gaps.json`; a normalizer rule that split enclitics was
+  tried and reverted because it silently broke four joined forms the pack
+  already matched, and those four are now pinned. Both builders' innocent
+  false-positive sets are recorded as gaps; no crisis entry was weakened.
+
+### Added
+
+- **Case manifest** (`evals/case-manifest.json`, `tests/test_case_manifest.py`,
+  `evals/refresh_case_manifest.py`): every eval case inventoried with source,
+  plane and disposition; an expected failure may fail only on the fields it was
+  approved for, so it cannot absorb an unrelated regression; an unknown
+  expectation key is a hard failure. Writing it found one round-1 fixture
+  whose key had a space in it and had asserted nothing since it was accepted.
+- **Fixture runner** (`evals/run_fixtures.py`, `tests/test_fixture_runner.py`):
+  reproduces the reviewer-fixture results page from the case files.
+- **Two-builders scoreboard** (`evals/results/merge-2026-09-06/`): four trees,
+  ten held-out sets, one runner, the method.
+- **Packaging**: the seven profiles ship inside the package
+  (`src/secondsignal/profiles/`), pinned by a test that installs the built wheel
+  into a clean environment and loads the roster from an unrelated directory
+  (skips where the host cannot build a wheel without isolation).
+- Deterministic `RoutingDecision.to_dict()` records and compact `--json` CLI output.
+- An unwired reference port of the audit harness thin slice (`jr.py`,
+  `tests/test_jr_v0.py`, `evals/cases/deferred/jr_v0_cases.json`), reviewed
+  blind-first by a second model family and kept out of the pipeline until the
+  release door exists.
+- `CODE_OF_CONDUCT.md`, `CONTRIBUTING.md`, `SECURITY.md`, and issue templates
+  for a bypass report, a fixture proposal and a dissent.
+- Documentation corrections (P-07): the README, architecture and
+  known-limitations pages claim only what the code does — the policy layer
+  does see raw text, by design; the library shows a card and contacts nobody;
+  the tie-break rule is described as implemented; no hash is claimed on the
+  record that the code does not put there.
+- Test suite: 1,004 tests — 180 expected failures (170 documented gaps, 10
+  recorded dissents), the rest passing on Python 3.10, 3.11 and 3.12.
+
 ### Changed — round 2, after the round-1 design review, 2026-09-03
 
 Seven design decisions were reviewed on paper by five external model reviewers
@@ -222,7 +301,7 @@ respond and whether anyone should; it generates nothing.
   every decision
 - Pre-generation safety gate: crisis preemption (no persona engages),
   dependency-accumulation monitor, conservative mode, boundary hold
-- Declarative seven-agent roster (`profiles/*.json`) with load-time validation
+- Declarative seven-agent roster (`src/secondsignal/profiles/*.json`) with load-time validation
   and roster-wide invariants, including the safety floor: at least one agent
   must be safe at regulation 0.0
 - Test suite, 43 tests, no network or API key required (`tests/`), with CI
@@ -233,7 +312,7 @@ respond and whether anyone should; it generates nothing.
 - Agent profile specification, M2 schema (`agents/calder/profile.yaml`): the
   layered hard-routing / soft-affinity / safety YAML that the remaining
   profile transcriptions follow. The runtime loader consumes the flat JSON
-  schema in `profiles/` until the M2 profiles land; the two describe different
+  schema in `src/secondsignal/profiles/` until the M2 profiles land; the two describe different
   generations of the same roster by design.
 - Design docs (`docs/`): architecture, safety model, claims and measurement
   methodology, ADR-0001 (impact events), and open design notes

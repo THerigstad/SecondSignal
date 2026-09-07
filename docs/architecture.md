@@ -12,8 +12,16 @@ Each stage has one responsibility and a stable contract with the next.
 `normalize.py` runs first and always: NFKC, invisible and bidirectional
 characters stripped, a small hashed skeleton of look-alike letters, casefold.
 `lexicon.py` then applies the idiom masks from the language packs and records
-every span it blanked. Both the extractor and the gate see the same normalized,
-masked text; neither ever sees raw text (ADR-0018).
+every span it blanked. Both the extractor and the gate normalize and mask
+before they match, and they call the same `normalize` for it (ADR-0018).
+
+Both are handed the raw message and normalize it themselves; neither is
+given a pre-cleaned string by the caller. That is deliberate and it is the
+property that matters: a deployment that replaces the extractor cannot hand
+the gate a text the gate has not screened for itself. `route()` also passes
+the raw message to `SessionState.observe()` and to `evaluate()`, so a
+session is not a pure value and a retry of the same turn must reuse the
+completed decision rather than call `route()` again.
 
 ## The signal boundary
 
@@ -62,7 +70,7 @@ Four actions, ordered by precedence (`IntEnum`, so `max()` composes them):
 
 | Action | Persona engages? | Meaning |
 |---|---|---|
-| `HUMAN_ESCALATION` | no | fixed handoff to human support; non-overridable |
+| `HUMAN_ESCALATION` | no | fixed card with the declared locale's resource line; non-overridable. The library contacts nobody and hands off to nobody: it returns text and a verdict. Whether a human ever sees the concern is the deploying application's responsibility, and an application with no staffed response must describe itself as resource-only |
 | `BOUNDARY_HOLD` | yes | a held boundary: romantic/sexual frame declined, an integrity event, a facilitation request refused, a substantial unscreened span |
 | `DISCLOSE` | yes | required disclosure appended (dependency, the careful-side line, an unscreened fragment, a style suggestion) |
 | `PROCEED` | yes | normal routing |
@@ -89,14 +97,19 @@ Contraindications are evaluated before scoring and produce a hard veto. A vetoed
 agent is still returned in `ranked` — marked, with the reason — because a
 decision log that hides the rejected options is not an audit trail.
 
-Ties break alphabetically by agent id. This is arbitrary but *deterministic*,
-which is the property the tests depend on.
+Ties break by specialist precision first (how much of the agent's declared
+range the asked-for topic covers), then by the wider safe window, and only
+then by agent id. Two named cases come before all of that: when nothing
+routable survives the vetoes, and when a mode is asked for with no topic,
+the designated stabilizer takes the seat (ADR-0011). The id is the last
+resort, not the rule, and the decision records which of these broke the tie
+so no seat is ever explained as "id order".
 
 ## Extension points
 
 | To change | Edit |
 |---|---|
-| Add or retune an agent | `profiles/*.json` — no code change |
+| Add or retune an agent | `src/secondsignal/profiles/*.json` — no code change |
 | Change what the system detects | `signals.py` lexicons, or replace the module |
 | Change how much affect state matters | scoring weights in `router.py` |
 | Add a safety monitor | `safety.py`, plus a field on `SessionState` if stateful |
