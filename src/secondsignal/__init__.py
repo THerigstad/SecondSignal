@@ -1,10 +1,34 @@
 """SecondSignal: a model-agnostic routing and safety layer for multi-agent systems."""
 
-from .profiles import AgentProfile, find_stabilizers, load_profile, load_roster, roster_hash
+from .jr import (
+    ALLOWED_TOOLS,
+    DISCLOSURE_FAMILIES,
+    HIGH_RISK_CLASSES,
+    LAYER_ORDER,
+    MODE_MARKERS,
+    AuditRequest,
+    AuditVerdict,
+    LayerVerdicts,
+    audit,
+    disclosure_families,
+    high_risk,
+    payload_hash,
+    stack_families,
+)
 from .lexicon import PACKS, Span, apply_masks
 from .normalize import analyze, normalize
-from .preferences import PreferenceEvent, assess as assess_preference
-from .router import Outcome, RoutingDecision, ScoredAgent, eligible, no_signal_seat, route, score_agent
+from .preferences import PreferenceEvent
+from .preferences import assess as assess_preference
+from .profiles import AgentProfile, find_stabilizers, load_profile, load_roster, roster_hash
+from .router import (
+    Outcome,
+    RoutingDecision,
+    ScoredAgent,
+    eligible,
+    no_signal_seat,
+    route,
+    score_agent,
+)
 from .safety import Action, SafetyVerdict, SessionState, crisis_read, crisis_screen, evaluate
 from .signals import RequestSignals, extract
 
@@ -38,5 +62,18 @@ __all__ = [
     "eligible",
     "no_signal_seat",
     "crisis_screen",
+    "ALLOWED_TOOLS",
+    "DISCLOSURE_FAMILIES",
+    "HIGH_RISK_CLASSES",
+    "LAYER_ORDER",
+    "MODE_MARKERS",
+    "AuditRequest",
+    "AuditVerdict",
+    "LayerVerdicts",
+    "audit",
+    "disclosure_families",
+    "high_risk",
+    "payload_hash",
+    "stack_families",
     "__version__",
 ]

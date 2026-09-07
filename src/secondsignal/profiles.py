@@ -44,7 +44,7 @@ __all__ = [
     "DEFAULT_PROFILE_DIR",
 ]
 
-DEFAULT_PROFILE_DIR = Path(__file__).resolve().parents[2] / "profiles"
+DEFAULT_PROFILE_DIR = Path(__file__).resolve().parent / "profiles"
 
 
 @dataclass(frozen=True)

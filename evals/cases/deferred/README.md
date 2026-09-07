@@ -8,9 +8,10 @@ repository does not implement yet.
   strings) and the ADR-0001 impact-event firewall. The routing half of the
   firewall is already pinned by `tests/test_guards.py`; the forbidden-string
   half needs a generation layer.
-* `jr_harness_cases.json` and `l3_cultural_cases.json` — the deferred
-  `jr_harness` component (ADR-0014): typed audit verdicts, worst-layer-wins
-  composition, cultural-bypass predicates.
+* `jr_harness_cases.json`, `jr_v0_cases.json` and `l3_cultural_cases.json` —
+  the deferred `jr_harness` component (ADR-0014): typed audit verdicts,
+  worst-layer-wins composition, synthetic v0 predicate gold, and
+  cultural-bypass predicates.
 * `vendor_desync_cases.json` — transport events between this layer's verdict
   and a vendor model's own safety behavior.
 

@@ -21,7 +21,11 @@ classifiers = [
 dependencies = []
 
 [project.optional-dependencies]
-dev = ["pytest>=7.0"]
+dev = [
+  "mypy",
+  "pytest>=7.0",
+  "ruff",
+]
 
 [project.scripts]
 secondsignal = "secondsignal.cli:main"
@@ -30,8 +34,32 @@ secondsignal = "secondsignal.cli:main"
 where = ["src"]
 
 [tool.setuptools.package-data]
-secondsignal = ["packs/*.json"]
+secondsignal = ["packs/*.json", "profiles/*.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
+markers = [
+  "slow: builds and installs an isolated wheel",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I"]
+
+[tool.ruff.lint.per-file-ignores]
+# C6 requires these supplied reference files to remain byte-for-byte unchanged.
+"src/secondsignal/jr.py" = ["F401", "F841"]
+"tests/test_jr_v0.py" = ["I001"]
+
+[tool.mypy]
+python_version = "3.10"
+strict_optional = true
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["secondsignal", "secondsignal.*"]
+disallow_untyped_defs = true
