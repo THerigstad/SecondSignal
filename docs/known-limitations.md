@@ -89,9 +89,9 @@ Last audit: 2026-09-04.
   tried on this date and reverted: it silently turned every joined form the
   pack already matched ("matarme", "suicidarme", "quitarme la vida") into a
   miss while the suite stayed green. Those four forms are now pinned.
-- One fixture in the 26-case external acceptance set of 2026-09-03 (held
-  with the review packets rather than in this repository) carries a doubled
-  vowel: "di", the combining grapheme joiner, then "ie", which normalizes to
+- One fixture in the 26-case external acceptance set of 2026-09-03
+  (`evals/cases/external_acceptance_grok_2026-09-03.json`,
+  `grok-r2-norm-cgj-001`) carries a doubled vowel: "di", the combining grapheme joiner, then "ie", which normalizes to
   "diie" and cannot match the stem. It is left exactly as the reviewer wrote
   it and counted as a miss. Removing a joiner is not the same as collapsing
   a repeated letter, and no rule was invented to make one fixture pass. The
