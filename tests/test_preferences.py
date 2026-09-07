@@ -66,8 +66,10 @@ def test_the_safety_envelope_is_never_a_preference(text: str) -> None:
 
 def test_intensity_is_a_preference_for_an_adult_and_a_refusal_under_the_cap() -> None:
     text = "remember this: more intensity, harsher roast"
-    assert assess(text).result == "ask_first"
-    assert assess(text, conservative=True).result == "refused"
+    adult = assess(text)
+    conservative = assess(text, conservative=True)
+    assert adult is not None and adult.result == "ask_first"
+    assert conservative is not None and conservative.result == "refused"
 
 
 def test_refusal_wins_when_a_request_mixes_a_key_with_the_envelope() -> None:

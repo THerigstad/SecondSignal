@@ -183,6 +183,11 @@
   ],
   "hits": [
     {
+      "id": "es_absence_me_muero_bare",
+      "class": "passive_absence",
+      "pattern": "\\bme muero\\b"
+    },
+    {
       "id": "es_direct_matarme",
       "class": "direct_ideation",
       "pattern": "\\b(quiero|quisiera|voy a|me voy a|pienso|planeo|querés|queres|quieres) (matarme|quitarme la vida|suicidarme|acabar con (mi vida|todo)|terminar con (mi vida|todo))\\b"

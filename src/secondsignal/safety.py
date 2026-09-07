@@ -56,19 +56,21 @@ import re
 import unicodedata
 from dataclasses import dataclass, field
 from enum import IntEnum
+from typing import TypedDict
 
 from .lexicon import (
     PACKS,
     RESOURCES,
     Span,
     apply_masks,
-    patterns_hash as _patterns_hash,
-    resource_line as _resource_line_for,
     screen_packs,
     tokenize,
 )
+from .lexicon import patterns_hash as _patterns_hash
+from .lexicon import resource_line as _resource_line_for
 from .normalize import analyze
-from .preferences import PreferenceEvent, STYLE_ASK_COOLDOWN_TURNS, STYLE_ASK_THRESHOLD, assess as assess_preference
+from .preferences import STYLE_ASK_COOLDOWN_TURNS, STYLE_ASK_THRESHOLD, PreferenceEvent
+from .preferences import assess as assess_preference
 from .signals import RequestSignals
 
 __all__ = [
@@ -282,6 +284,77 @@ CRISIS_CLASSES: dict[str, tuple[re.Pattern[str], ...]] = {
         r"\b(took|taken|swallowed|drank|downed) (everything|all of them|all of it|all the pills|the whole bottle|the entire bottle|whole bottle|too much|too many|way too much|everything in the cabinet)\b",
     )),
 }
+
+# A mixed-script token that folds to one of these crisis forms is resolved in
+# the crisis lane before language-scope handling. Exact phrases still HIT the
+# classes above; a bare or malformed form is an inconclusive read and follows
+# the existing fail-closed policy instead of being mislabeled as a language
+# the system cannot screen.
+_MIXED_SCRIPT_CRISIS_FORMS: frozenset[str] = frozenset({
+    "die", "dies", "died", "dying", "dead",
+    "suicide", "suicidal",
+    "kill", "kills", "killed", "killing",
+    "harm", "harms", "harmed", "harming",
+    "hurt", "hurts", "hurting",
+    "cut", "cuts", "cutting",
+    "unalive", "disappear", "vanish",
+})
+
+
+def _mixed_token_is_crisis_form(token: str) -> bool:
+    """Whether one mixed-script token reads as a crisis word.
+
+    Two shapes count, and only two. The token folds exactly onto a crisis
+    form, or it folds onto one with a single extra character at an edge --
+    the shape of a look-alike appended or prepended to break the word
+    boundary ("die" plus a Cyrillic a reads as "diea" and matches nothing).
+    An interior difference is not a candidate: it is an ordinary word that
+    happens to be one edit from a crisis form, and carding it would card
+    bilingual writers for a typo.
+    """
+    if token in _MIXED_SCRIPT_CRISIS_FORMS:
+        return True
+    if len(token) < 2:
+        return False
+    return token[1:] in _MIXED_SCRIPT_CRISIS_FORMS or token[:-1] in _MIXED_SCRIPT_CRISIS_FORMS
+
+_OTHER_PERSON_ACTOR_RE = (
+    r"(?:my (?:partner|roommate|parent|relative|spouse)|"
+    r"the (?:other adult|visitor|neighbor|stranger)|"
+    r"another person|someone|somebody|he|she|they)"
+)
+_PRESENT_WEAPON_ACTION_RE = (
+    r"(?:(?:is|are) (?:holding|using|waving|brandishing|pointing)|"
+    r"has|have|holds|uses|waves|brandishes|points)"
+)
+_WEAPON_RE = r"(?:(?:a|an|the|his|her|their|our|my) )?(?:loaded )?(?:gun|handgun|pistol|rifle|knife|blade|weapon)s?"
+_OTHER_PERSON_WEAPON_RE = re.compile(
+    rf"\b{_OTHER_PERSON_ACTOR_RE}\b.{{0,80}}?\b{_PRESENT_WEAPON_ACTION_RE}\b\s+{_WEAPON_RE}\b",
+    re.IGNORECASE,
+)
+_OTHER_PERSON_WEAPON_EXCLUSION_RE = re.compile(
+    r"\b(?:last (?:year|time|week|month)|yesterday|ago|used to|novel|film|movie|story|news|"
+    r"video game|game|hunting trip|job|work|locked|secured)\b",
+    re.IGNORECASE,
+)
+_WEAPON_CLAUSE_RE = re.compile(r"[^.!?,:;\n\u2013\u2014]+")
+
+
+def _other_person_weapon_span(text: str) -> tuple[str, int, int] | None:
+    """Find present other-person possession/use of a weapon in one clause.
+
+    This is an intentionally narrow interim. It excludes explicit past and
+    fictional/occupational frames and does not replace the existing
+    first-person means class.
+    """
+    for clause_match in _WEAPON_CLAUSE_RE.finditer(text):
+        clause = clause_match.group(0)
+        if _OTHER_PERSON_WEAPON_EXCLUSION_RE.search(clause):
+            continue
+        match = _OTHER_PERSON_WEAPON_RE.search(clause)
+        if match:
+            return match.group(0).strip(), clause_match.start() + match.start(), clause_match.start() + match.end()
+    return None
 
 # Ambiguous language. Under the fail-closed policy these escalate exactly like
 # a hit, but they are recorded separately so the false-positive cost is
@@ -517,7 +590,14 @@ class SessionState:
         no path here; a message that names this method is an integrity event."""
         if not reason or not reason.strip():
             raise ValueError("clearing a latch requires a recorded reason")
-        if which and which in self.latch_reasons:
+        if which is not None:
+            if which not in self.latch_reasons:
+                # V-03: an absent or already-cleared reason is a no-op. It must
+                # never broaden into a clear-all -- calling the same selective
+                # clear twice would otherwise remove protections the caller
+                # never named, including a declared age band. Nothing is
+                # recorded because no state changed.
+                return
             self.latch_reasons.remove(which)
             self.latch_history.append(("clear", f"{which}:{reason}", actor, self.turn_count))
             if self.latch_reasons:
@@ -629,6 +709,19 @@ class SafetyVerdict:
         return self.action is not Action.HUMAN_ESCALATION
 
 
+class _SafetyVerdictCommon(TypedDict):
+    crisis_read: str
+    latch: str
+    register_caps: tuple[str, ...]
+    masked_spans: tuple[Span, ...]
+    hit_spans: tuple[Span, ...]
+    pack_ids: tuple[str, ...]
+    patterns_hash: str
+    normalized_forms: tuple[str, ...]
+    mixed_script_tokens: int
+    frustration_frame: bool
+
+
 def _hits(text: str, terms: tuple[str, ...]) -> tuple[str, ...]:
     return tuple(t for t in terms if t in text)
 
@@ -664,7 +757,8 @@ def _negated(masked: str, start: int, negation: frozenset[str]) -> bool:
 
 def crisis_screen(text: str) -> CrisisScreen:
     """Screen one turn with every installed pack. Pure and roster-free."""
-    norm = _normalize(text)
+    analysis = analyze(text)
+    norm = analysis.text
     masked, masked_spans = apply_masks(norm)
     evidence: list[tuple[str, str]] = []
     hit_spans: list[Span] = []
@@ -684,6 +778,11 @@ def crisis_screen(text: str) -> CrisisScreen:
                     hit_spans.append(span)
                 break
 
+    if other_person_weapon := _other_person_weapon_span(masked):
+        matched, start, end = other_person_weapon
+        evidence.append(("other_person_weapon", matched))
+        hit_spans.append(Span(matched, "en:other_person_weapon", start, end, "hit", "en", "other_person_weapon"))
+
     pack_hits, pack_inconclusive = screen_packs(masked)
     for span in pack_hits:
         evidence.append((span.domain, span.text))
@@ -691,6 +790,24 @@ def crisis_screen(text: str) -> CrisisScreen:
 
     if evidence:
         return CrisisScreen("HIT", tuple(evidence), masked, masked_spans, tuple(hit_spans), negated)
+
+    explained = "".join(span.text for span in masked_spans + tuple(hit_spans))
+    mixed_crisis_candidates = tuple(
+        token
+        for token in analysis.mixed_tokens
+        if token not in explained and _mixed_token_is_crisis_form(token)
+    )
+    if mixed_crisis_candidates:
+        token = mixed_crisis_candidates[0]
+        span = Span(token, "en:mixed_script_crisis_candidate", 0, 0, "inconclusive", "en", "inconclusive")
+        return CrisisScreen(
+            "INCONCLUSIVE",
+            (("mixed_script_crisis_candidate", token),),
+            masked,
+            masked_spans,
+            tuple(hit_spans) + (span,),
+            negated,
+        )
 
     for pattern in INCONCLUSIVE_PATTERNS:
         m = pattern.search(masked)
@@ -819,18 +936,18 @@ def evaluate(
 
     screen = crisis_screen(text)
     read = screen.read
-    common = dict(
-        crisis_read=read,
-        latch=latch,
-        register_caps=register_caps,
-        masked_spans=screen.masked_spans,
-        hit_spans=screen.hit_spans,
-        pack_ids=pack_ids,
-        patterns_hash=phash,
-        normalized_forms=analysis.forms,
-        mixed_script_tokens=analysis.mixed_script_tokens,
-        frustration_frame=bool(frustration),
-    )
+    common: _SafetyVerdictCommon = {
+        "crisis_read": read,
+        "latch": latch,
+        "register_caps": register_caps,
+        "masked_spans": screen.masked_spans,
+        "hit_spans": screen.hit_spans,
+        "pack_ids": pack_ids,
+        "patterns_hash": phash,
+        "normalized_forms": analysis.forms,
+        "mixed_script_tokens": analysis.mixed_script_tokens,
+        "frustration_frame": bool(frustration),
+    }
 
     def _finish(verdict: SafetyVerdict) -> SafetyVerdict:
         if session is not None:
@@ -978,7 +1095,7 @@ def evaluate(
     # Style monitor: ask once, never during a hold or an escalation aftermath.
     if session is not None:
         blocked = action >= Action.BOUNDARY_HOLD or signals.is_dysregulated or bool(holds) or session.escalated_last_turn
-        if _style_suggestion(session, pref, blocked=blocked):
+        if pref is not None and _style_suggestion(session, pref, blocked=blocked):
             action = max(action, Action.DISCLOSE)
             reasons.append(f"style suggestion offered once for {pref.key!r}; confirmation is an operator action")
             disclosures.append(lines["style_suggestion"])

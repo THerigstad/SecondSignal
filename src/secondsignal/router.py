@@ -57,8 +57,9 @@ from __future__ import annotations
 from dataclasses import dataclass
 from enum import Enum
 
+from .lexicon import Span
 from .profiles import AgentProfile, find_stabilizers, roster_hash
-from .safety import Action, CAPPED_MODES, SafetyVerdict, SessionState, evaluate
+from .safety import CAPPED_MODES, Action, SafetyVerdict, SessionState, evaluate
 from .signals import HOLD_DOMAINS, SEAT_CLAIM_TERMS, RequestSignals, extract
 
 __all__ = [
@@ -144,6 +145,73 @@ class ScoredAgent:
         return self.status == "scored"
 
 
+def _span_to_dict(span: Span) -> dict[str, object]:
+    """Serialize one lexicon span without relying on dataclass internals."""
+    return {
+        "text": span.text,
+        "pattern_id": span.pattern_id,
+        "start": span.start,
+        "end": span.end,
+        "kind": span.kind,
+        "pack": span.pack,
+        "domain": span.domain,
+    }
+
+
+def _signals_to_dict(signals: RequestSignals) -> dict[str, object]:
+    """Serialize the signal boundary, sorting its unordered collections."""
+    return {
+        "regulation": signals.regulation,
+        "domains": sorted(signals.domains),
+        "modes": sorted(signals.modes),
+        "evidence": {
+            key: list(signals.evidence[key])
+            for key in sorted(signals.evidence)
+        },
+        "turn_index": signals.turn_index,
+    }
+
+
+def _safety_to_dict(verdict: SafetyVerdict) -> dict[str, object]:
+    """Serialize every stored field on a safety verdict."""
+    return {
+        "action": verdict.action.name,
+        "reasons": list(verdict.reasons),
+        "disclosures": list(verdict.disclosures),
+        "crisis_read": verdict.crisis_read,
+        "crisis_classes": list(verdict.crisis_classes),
+        "lexicon_status": verdict.lexicon_status,
+        "integrity_event": verdict.integrity_event,
+        "language_scope": verdict.language_scope,
+        "card": verdict.card,
+        "latch": verdict.latch,
+        "latch_reasons": list(verdict.latch_reasons),
+        "register_caps": list(verdict.register_caps),
+        "holds": list(verdict.holds),
+        "masked_spans": [_span_to_dict(span) for span in verdict.masked_spans],
+        "hit_spans": [_span_to_dict(span) for span in verdict.hit_spans],
+        "pack_ids": list(verdict.pack_ids),
+        "patterns_hash": verdict.patterns_hash,
+        "normalized_forms": list(verdict.normalized_forms),
+        "mixed_script_tokens": verdict.mixed_script_tokens,
+        "frustration_frame": verdict.frustration_frame,
+        "preference_result": verdict.preference_result,
+        "preference_key": verdict.preference_key,
+        "facilitation": verdict.facilitation,
+    }
+
+
+def _scored_agent_to_dict(scored: ScoredAgent) -> dict[str, object]:
+    """Serialize every stored field on a ranked candidate."""
+    return {
+        "agent_id": scored.agent_id,
+        "score": scored.score,
+        "rationale": list(scored.rationale),
+        "vetoed": scored.vetoed,
+        "status": scored.status,
+    }
+
+
 @dataclass(frozen=True)
 class RoutingDecision:
     """The full, loggable record of one routing decision."""
@@ -178,6 +246,35 @@ class RoutingDecision:
     @property
     def register_caps(self) -> tuple[str, ...]:
         return self.safety.register_caps
+
+    def to_dict(self) -> dict[str, object]:
+        """Return a deterministic, standard-library JSON-ready record.
+
+        The schema is written field by field so adding a decision, signal,
+        verdict, candidate, or span field requires an explicit schema choice.
+        Enums use their names, unordered signal sets are sorted, and every
+        mapping key is a string.
+        """
+        return {
+            "schema_version": 1,
+            "agent_id": self.agent_id,
+            "signals": _signals_to_dict(self.signals),
+            "safety": _safety_to_dict(self.safety),
+            "ranked": [_scored_agent_to_dict(scored) for scored in self.ranked],
+            "handoff_hints": [list(hint) for hint in self.handoff_hints],
+            "outcome": self.outcome.name,
+            "reason": self.reason,
+            "shadow_agent_id": self.shadow_agent_id,
+            "roster_hash": self.roster_hash,
+            "seat_claim": self.seat_claim,
+            "claim_subject": self.claim_subject,
+            "held": list(self.held),
+            "obligations": list(self.obligations),
+            "assist_agent_id": self.assist_agent_id,
+            "assist_reason": self.assist_reason,
+            "mode_vetoes": list(self.mode_vetoes),
+            "explain": self.explain(),
+        }
 
     def explain(self) -> str:
         """Human-readable trace of why this decision was made."""
@@ -217,7 +314,13 @@ class RoutingDecision:
         if self.seat_claim:
             lines.append(f"seat claim = {self.seat_claim}" + (f" (subject: {self.claim_subject})" if self.claim_subject else ""))
         if self.held:
-            lines.append(f"held       = {', '.join(self.held)}  obligations: {', '.join(self.obligations)}")
+            lines.append(f"held       = {', '.join(self.held)}")
+        if self.obligations:
+            # P-11: obligations are printed independently of held domains. A
+            # relative's relapse carries family-impact obligations with an
+            # empty held list, so nesting this line under held made the
+            # requirements of that decision invisible in the trace.
+            lines.append(f"obligations = {', '.join(self.obligations)}")
         if self.assist_agent_id:
             lines.append(f"assist     = {self.assist_agent_id} ({self.assist_reason})")
         if self.mode_vetoes:
@@ -563,7 +666,12 @@ def _obligations(
             out.append(f"{ob}:{hold}" if ob == "acknowledge" else ob)
     # de-duplicate, order preserved
     seen: set[str] = set()
-    return tuple(o for o in out if not (o in seen or seen.add(o)))
+    unique: list[str] = []
+    for obligation in out:
+        if obligation not in seen:
+            seen.add(obligation)
+            unique.append(obligation)
+    return tuple(unique)
 
 
 def _assist(
@@ -782,7 +890,10 @@ def route(
         for condition, target in sorted(profile.handoffs.items())
         if condition in sig.domains or condition in sig.modes
     )
-    shadow = next((s.agent_id for s in scored if s.eligible and s.agent_id != selected.agent_id), None)
+    shadow_agent_id = next(
+        (s.agent_id for s in scored if s.eligible and s.agent_id != selected.agent_id),
+        None,
+    )
     assist_id, assist_reason = _assist(session, roster, sig, selected.agent_id, holds, claims, vetoes)
 
     return RoutingDecision(
@@ -793,7 +904,7 @@ def route(
         handoff_hints=hints,
         outcome=Outcome.ROUTED,
         reason=rule,
-        shadow_agent_id=shadow,
+        shadow_agent_id=shadow_agent_id,
         roster_hash=rhash,
         seat_claim=claims[0] if claims else None,
         claim_subject=subject,

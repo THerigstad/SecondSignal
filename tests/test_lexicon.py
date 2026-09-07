@@ -243,3 +243,19 @@ def test_every_pinned_number_survives_normalize() -> None:
         for line in row["lines"].values():
             for number in re.findall(r"\*?\d[\d-]{1,}", line):
                 assert normalize(number) == number
+
+
+# --- es-419 enclitic forms: regression pin ------------------------------------
+
+@pytest.mark.parametrize("text", [
+    "quiero matarme",
+    "quiero morirme",
+    "quiero suicidarme",
+    "quiero quitarme la vida",
+])
+def test_joined_enclitic_spanish_forms_still_hit(text: str) -> None:
+    """The pack matches these infinitives with the pronoun attached, as one
+    token. A normalizer that splits enclitics (2026-09-06, reverted) silently
+    turned every one of these into a miss while the suite stayed green. This
+    pin fails if that is attempted again."""
+    assert crisis_screen(text).read == "HIT", text

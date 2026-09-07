@@ -92,6 +92,12 @@ ENVELOPE_TERMS = _compile((
     r"\bseat (calder|ellie|nikki|ravi|sera|vandal|willow)\b",
     r"\b(no|without|skip|drop|remove|hide|turn off|disable|stop) (the |those |these |all |any )?(warnings?|lines?|cards?|disclaimers?|disclosures?|resources?|checks?|hotlines?|numbers?)\b",
     r"\b(never|don'?t|do not|stop) (show|showing|send|sending|give|giving|attach|attaching) (me )?(that|the|those|any) (crisis|safety|warning|boundary|dependency|hotline|resource)",
+    # A person who has just seen the crisis card calls it "the card", not
+    # "the crisis card". The bare noun only reaches here when a request
+    # marker ("save this", "from now on", "never") is already present, so
+    # an attempt to store a policy bit is refused whatever it is called.
+    r"\b(never|don'?t|do not|stop|no more) (show|showing|send|sending|give|giving|attach|attaching|display)"
+    r"( me)?( that| the| those| this| any)? ?(cards?|lines?|screens?|notices?)\b",
     r"\bromantic partner\b",
     r"\bas my (girlfriend|boyfriend|lover|partner|wife|husband)\b",
 ))

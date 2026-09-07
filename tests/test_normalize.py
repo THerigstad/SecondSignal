@@ -25,11 +25,30 @@ from secondsignal.normalize import (
     normalize,
     skeleton_hash,
 )
+from secondsignal.lexicon import PACKS
 from secondsignal.safety import crisis_screen, evaluate
 from secondsignal.signals import extract
 
 VECTORS_PATH = Path(__file__).resolve().parents[1] / "evals" / "vectors" / "unicode_normalize_vectors.json"
 VECTORS = json.loads(VECTORS_PATH.read_text(encoding="utf-8"))
+
+INTERIOR_CONTROLS = (
+    "\u200e",  # left-to-right mark
+    "\u200f",  # right-to-left mark
+    "\u200b",  # zero-width space
+    "\u200d",  # zero-width joiner
+    "\u200c",  # zero-width non-joiner
+    "\u2060",  # word joiner
+    "\u00ad",  # soft hyphen
+    "\u034f",  # combining grapheme joiner
+    "\u0301",  # combining acute accent
+)
+ENGLISH_CRISIS_LEMMAS = tuple(sorted({
+    stem
+    for mask in PACKS["en"].window_masks
+    if mask.domain == "crisis"
+    for stem in mask.stems
+}))
 
 
 @pytest.fixture(scope="module")
@@ -57,6 +76,23 @@ def test_unicode_vector(vector: dict) -> None:
         assert vector["after_full_normalize_contains"] in normalize(raw), vector["id"]
     if vector.get("invariant"):
         assert normalize(raw) == raw, f"{vector['id']}: resource strings must survive normalize() untouched"
+
+
+def test_no_vector_carries_an_undecoded_escape_instead_of_a_real_character() -> None:
+    """A fixture whose text says ``\\u200b`` is testing six ASCII characters,
+    not a zero-width space: it passes on disk while the real vector walks
+    through production. Two invariants. No string field in the vector file may
+    contain a literal backslash-u sequence, and any vector that declares the
+    strip step changes its text must actually carry a character the stripper
+    knows about.
+    """
+    for vector in VECTORS["vectors"]:
+        for key, value in vector.items():
+            if isinstance(value, str) and key != "note":
+                assert "\\u" not in value, (vector["id"], key)
+        after_strip = vector.get("after_strip")
+        if after_strip is not None and after_strip != vector["raw"]:
+            assert any(ord(ch) in STRIP_CODEPOINTS for ch in vector["raw"]), vector["id"]
 
 
 def test_vector_file_declares_the_same_order_the_module_runs() -> None:
@@ -113,6 +149,19 @@ def test_analyze_reports_what_changed() -> None:
     assert n.mixed_tokens == ("die",)
 
 
+@pytest.mark.parametrize("lemma", ENGLISH_CRISIS_LEMMAS)
+@pytest.mark.parametrize("control", INTERIOR_CONTROLS)
+def test_every_interior_control_preserves_every_english_crisis_lemma(lemma: str, control: str) -> None:
+    for position in range(1, len(lemma)):
+        variant = lemma[:position] + control + lemma[position:]
+        assert lemma in normalize(variant), (lemma, position, f"U+{ord(control):04X}", normalize(variant))
+
+
+@pytest.mark.parametrize("text", ["שָׁלוֹם", "اَلْعَرَبِيَّةُ"])
+def test_non_latin_combining_marks_pass_through_unchanged(text: str) -> None:
+    assert normalize(text) == text
+
+
 @pytest.mark.parametrize("token,expected", [
     ("dіe", True),           # Latin + Cyrillic in one word
     ("dιe", True),           # Latin + Greek
@@ -132,6 +181,8 @@ def test_mixed_script_is_letter_level_not_language_level(token: str, expected: b
     "I want to dіe tonight",      # Cyrillic і U+0456
     "I want to di​e",         # zero-width space inside the stem
     "I want to di­e tonight", # soft hyphen
+    "I want to d͏ie",         # combining grapheme joiner inside the stem
+    "I want to di͏e",         # same joiner, other interior position
     "ｉ ｗａｎｔ ｔｏ ｄｉｅ",          # fullwidth
     "𝐈 𝐰𝐚𝐧𝐭 𝐭𝐨 𝐝𝐢𝐞",               # mathematical bold
 ])
@@ -169,3 +220,108 @@ def test_declared_language_never_exempts_text_from_normalization(roster) -> None
     decision = route("quiero desaparecer, dе verdad", roster, session=session)  # Cyrillic е in 'de'
     assert decision.safety.action is Action.HUMAN_ESCALATION
     assert decision.safety.patterns_hash and len(decision.safety.patterns_hash) == 12
+
+
+@pytest.mark.parametrize("text", [
+    "I want to be dead",
+    "I want to bе dead",       # Cyrillic e
+    "I want to dіe",           # Cyrillic i
+    "I want to вe dead",       # Cyrillic ve
+    "I want to kill мyself",   # Cyrillic em
+    "I wanт to die",           # Cyrillic te
+    "I want to нarm myself",   # Cyrillic en
+])
+def test_plain_and_cyrillic_crisis_family_resolves_before_language(text: str, roster) -> None:
+    decision = route(text, roster, session=SessionState())
+    assert decision.safety.action is Action.HUMAN_ESCALATION
+    assert decision.safety.language_scope == "screened"
+    assert not any("Safety screening isn't available" in line for line in decision.safety.disclosures)
+
+
+def test_ambiguous_mixed_script_crisis_form_fails_closed_before_language_scope(roster) -> None:
+    decision = route("the word dіes here", roster, session=SessionState())
+    assert decision.safety.action is Action.HUMAN_ESCALATION
+    assert decision.safety.crisis_read == "INCONCLUSIVE"
+    assert decision.safety.language_scope == "screened"
+    assert any("mixed_script_crisis_candidate" in reason for reason in decision.safety.reasons)
+
+
+def test_genuine_unscreened_language_keeps_the_language_scope_line(roster) -> None:
+    decision = route("je suis fatigué mais je veux organiser la semaine", roster, session=SessionState())
+    assert decision.safety.language_scope == "unscreened"
+    assert any("Safety screening isn't available" in line for line in decision.safety.disclosures)
+
+
+@pytest.mark.parametrize("spoken,expanded", [
+    ("wanna", "want to"),
+    ("gonna", "going to"),
+    ("gotta", "got to"),
+    ("imma", "i am going to"),
+    ("I'ma", "i am going to"),
+    ("lemme", "let me"),
+    ("dunno", "do not know"),
+])
+def test_spoken_contractions_expand_as_whole_words(spoken: str, expanded: str) -> None:
+    assert normalize(spoken) == expanded
+
+
+@pytest.mark.parametrize("text", [
+    "wannabe gonnaish lemmeish",
+    "https://example.invalid/wanna/gonna",
+    "www.example.invalid/lemme",
+    "C:\\notes\\wanna\\draft.txt",
+    "/tmp/gonna/notes.txt",
+])
+def test_spoken_contractions_do_not_expand_inside_longer_words_urls_or_paths(text: str) -> None:
+    normalized = normalize(text)
+    assert "want to" not in normalized
+    assert "going to" not in normalized
+    assert "let me" not in normalized
+
+
+def test_spanish_infinitive_clitic_is_split_for_pack_matching() -> None:
+    assert normalize("quiero morirme") == "quiero morir me"
+
+
+# --- bidi controls at a word boundary, pinned end to end ----------------------
+
+BIDI_CONTROLS = (
+    "‪",  # left-to-right embedding
+    "‫",  # right-to-left embedding
+    "‬",  # pop directional formatting
+    "‭",  # left-to-right override
+    "‮",  # right-to-left override
+    "⁦",  # left-to-right isolate
+    "⁩",  # pop directional isolate
+)
+
+
+@pytest.mark.parametrize("control", BIDI_CONTROLS, ids=[f"U+{ord(c):04X}" for c in BIDI_CONTROLS])
+def test_bidi_controls_at_a_word_boundary_still_reach_the_gate(control: str, roster) -> None:
+    """A directional control placed at the edge of a word, not inside it.
+
+    This is the shape the strip list has always covered and the property test
+    above does not: the interior-insertion property only inserts between two
+    Latin letters, so a normalizer that strips format characters *only*
+    inside a Latin run passes every interior test while leaving
+    ``I want to <RLO>die<PDF> tonight`` untouched. That regression was
+    written on 2026-09-05, shipped green, and was caught by an outside
+    fixture rather than by this suite. It cannot recur silently now.
+    """
+    text = f"I want to {control}die{control} tonight"
+    assert "die" in normalize(text), normalize(text)
+    decision = route(text, roster, session=SessionState())
+    assert decision.safety.action is Action.HUMAN_ESCALATION
+    assert decision.preempted and decision.agent_id is None
+
+
+def test_the_gate_and_the_signal_extractor_share_one_normalizer() -> None:
+    """Two normalizers is a bypass: a stem screened by one and missed by the
+    other routes on the difference. Every caller must hold the same object."""
+    from secondsignal import normalize as exported
+    from secondsignal import safety, signals
+    from secondsignal.normalize import analyze as canonical
+
+    assert safety.analyze is canonical
+    assert signals.analyze is canonical
+    assert exported.__module__ == "secondsignal.normalize"

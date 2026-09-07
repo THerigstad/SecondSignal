@@ -6,9 +6,16 @@ it. In production this layer is expected to be replaced by a classifier or
 embedding model.
 
 The architectural contract is that whatever replaces it must emit the same
-`RequestSignals` structure. The policy layer (`router.py`, `safety.py`) never
-touches raw text -- it only consumes signals. That separation is what makes
-routing decisions reviewable and testable independently of the model.
+`RequestSignals` structure. Routing then reads only those signals: which seat
+is chosen, and why, is decided from the structured features and never from
+the message itself. That separation is what makes routing decisions
+reviewable and testable independently of the model.
+
+The crisis gate is not on that side of the seam. `safety.evaluate` is handed
+the raw message and screens it directly, so replacing this extractor cannot
+change what the gate sees or lower a verdict. Say "the router never touches
+raw text", not "the policy layer never touches raw text": the second is
+false and the difference is the whole safety property.
 
 The lexicons are organised by *class of phrasing*, not by individual test
 case: each tag lists several ways people actually say a thing, so that a
@@ -22,7 +29,7 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass, field
 
-from .lexicon import PACKS, Span, apply_masks
+from .lexicon import PACKS, apply_masks
 from .normalize import analyze
 
 __all__ = [
@@ -310,14 +317,29 @@ def claim_person(norm: str, terms: tuple[str, ...]) -> str | None:
 
 
 def _normalize(text: str) -> str:
+    """Normalize for mask decisions, keeping clause boundaries intact.
+
+    V-04: horizontal whitespace collapses, but a line break survives. The
+    mask engine treats a newline as the end of a clause exactly as the
+    safety screen does; collapsing it here first let an object on one line
+    explain a stem on the next, so the same message routed differently
+    depending on whether the writer pressed enter or typed a period.
+    """
     text = analyze(text).text
-    # Collapse whitespace so multi-word phrases match across line breaks.
+    text = re.sub(r"[^\S\n]+", " ", text)
+    return re.sub(r" *\n+ *", "\n", text).strip()
+
+
+def _fold_lines(text: str) -> str:
+    """Collapse the surviving line breaks once masking has been decided, so a
+    phrase written across two lines still matches as one phrase."""
     return re.sub(r"\s+", " ", text).strip()
 
 
 def extract(text: str, *, turn_index: int = 0) -> RequestSignals:
     """Extract routing signals from a single turn of user input."""
     norm, masked_spans = apply_masks(_normalize(text))
+    norm = _fold_lines(norm)
     evidence: dict[str, tuple[str, ...]] = {}
     if masked_spans:
         evidence["masked"] = tuple(f"{s.pattern_id}:{s.text}" for s in masked_spans)

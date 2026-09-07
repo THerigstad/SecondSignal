@@ -442,5 +442,21 @@
       "domain": "minor"
     }
   ],
-  "hits": []
+  "hits": [
+    {
+      "id": "en_let_me_die",
+      "class": "permission_ideation",
+      "pattern": "\\blet me die\\b"
+    },
+    {
+      "id": "en_first_person_end_it",
+      "class": "direct_ideation",
+      "pattern": "\\b(i|i'?m|i am|i'?ll|i will|i would|i'?d|i want to|i need to|i plan to|i am going to|i'?m going to) (just )?end it\\b(?! all)"
+    },
+    {
+      "id": "en_first_person_end_it_all",
+      "class": "direct_ideation",
+      "pattern": "\\b(i|i'?m|i am|i'?ll|i will|i would|i'?d|i want to|i need to|i plan to|i am going to|i'?m going to) (just )?end it all\\b"
+    }
+  ]
 }

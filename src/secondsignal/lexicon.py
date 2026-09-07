@@ -64,7 +64,8 @@ __all__ = [
 PACK_DIR = Path(__file__).resolve().parent / "packs"
 
 _TOKEN_RE = re.compile(r"[^\W_]+(?:'[^\W_]+)*")
-_CLAUSE_BREAK_RE = re.compile(r"[.!?;\n]")
+_HARD_CLAUSE_BREAK_RE = re.compile(r"[.!?;:\u2014\u2013\n]")  # B4: colon/semi/em/en dash (+ sentence)
+_CLAUSE_BREAK_RE = _HARD_CLAUSE_BREAK_RE  # exported name kept for callers/tests
 
 
 @dataclass(frozen=True)
@@ -213,6 +214,28 @@ def _blank(text: str, start: int, end: int) -> str:
     return text[:start] + " " * (end - start) + text[end:]
 
 
+
+# First-person present desire must never be blanked by a game/hobby window
+# mask (B4). Past-tense game reports ("I died in that boss fight") keep the mask.
+_PRESENT_DESIRE_RE = re.compile(
+    # Affirmative first-person present desire only (B4). Negated forms
+    # ("I don't want to die") must remain maskable by work-object windows.
+    r"\bi(?:'m| am)?(?!(?:\s+(?:do(?:\s+not)|don'?t|dont|never|not))+)"
+    r"(?:\s+(?!don'?t|dont|never|not|do)\w+){0,4}\s+"
+    r"(?:want|need|going|gonna|plan(?:ning)?|ready|trying|tried|decided)\s+to\s+"
+    r"(?:die|be\s+dead|kill\s+myself|end\s+it(?:\s+all)?|end\s+my(?:\s+own)?\s+life)\b",
+    re.IGNORECASE,
+)
+
+
+def _present_desire_spans(text: str) -> list[tuple[int, int]]:
+    return [(m.start(), m.end()) for m in _PRESENT_DESIRE_RE.finditer(text)]
+
+
+def _overlaps_desire(start: int, end: int, desire: list[tuple[int, int]]) -> bool:
+    return any(start < d_end and end > d_start for d_start, d_end in desire)
+
+
 def _same_clause(
     text: str,
     tokens: list[tuple[str, int, int]],
@@ -223,12 +246,26 @@ def _same_clause(
     """True when tokens ``i`` and ``j`` share a clause: no sentence break in
     the text between them and no sincerity pivot among the tokens between
     them. A pivot is a word like "honestly" that marks the speaker leaving
-    hyperbole; whatever follows it is read on its own."""
+    hyperbole; whatever follows it is read on its own.
+
+    B4: colon, semicolon, em dash and en dash always end a clause. A comma
+    ends a clause when what follows begins a first-person subject
+    (I / I'm / I'd / we / we'd), so game talk cannot silence a later desire
+    clause, while hyperbolic tails like "me muero, qué risa" stay same-clause.
+    """
     lo, hi = (i, j) if i < j else (j, i)
     between_text = text[tokens[lo][2]:tokens[hi][1]]
-    if _CLAUSE_BREAK_RE.search(between_text):
+    if _HARD_CLAUSE_BREAK_RE.search(between_text):
         return False
+    if "," in between_text:
+        # Comma ends a clause when what follows is first-person present desire
+        # (B4: "..., I want to die"). Continuations like "..., I want the meeting
+        # to end" stay same-clause so a work-object mask can explain negated die.
+        after = between_text.rsplit(",", 1)[-1]
+        if _PRESENT_DESIRE_RE.search(after):
+            return False
     return not any(tok in pivots for tok, _, _ in tokens[lo + 1:hi])
+
 
 
 def apply_masks(norm: str, packs: tuple[Pack, ...] | None = None) -> tuple[str, tuple[Span, ...]]:
@@ -247,6 +284,7 @@ def apply_masks(norm: str, packs: tuple[Pack, ...] | None = None) -> tuple[str, 
                 masked = _blank(masked, m.start(), m.end())
 
     tokens = tokenize(masked)
+    desire_spans = _present_desire_spans(masked)
     for pack in packs:
         for mask in pack.window_masks:
             w = mask.window or pack.window
@@ -265,6 +303,9 @@ def apply_masks(norm: str, packs: tuple[Pack, ...] | None = None) -> tuple[str, 
                     before = tokens[max(0, i - 3): i]
                     if not any(t in pack.negation for t, _, _ in before):
                         continue
+                # B4: first-person present desire is never masked by game/hobby idiom.
+                if _overlaps_desire(start, end, desire_spans):
+                    continue
                 spans.append(Span(tok, mask.id, start, end, "mask", pack.id, mask.domain))
                 masked = _blank(masked, start, end)
     return masked, tuple(spans)

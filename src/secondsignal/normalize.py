@@ -6,11 +6,11 @@ Four steps, in this order, every time:
    mathematical alphanumerics, circled letters, ligatures and the no-break
    space to their plain forms. ``unicodedata`` is the standard library; there
    is no dependency.
-2. **Strip invisibles** -- zero-width space / non-joiner / joiner, the byte
-   order mark, the word joiner, the soft hyphen, and the bidirectional
-   override and isolate controls. ``di<ZWSP>e`` must reach the lexicon as
-   ``die``. Nothing here emulates the bidi algorithm; removing the controls
-   is enough at this layer.
+2. **Strip invisibles** -- preserve the historic deny-list, then remove any
+   format character inside a Latin letter run and any combining mark between
+   Latin letters. ``di<ZWSP>e`` must reach the lexicon as ``die``. The
+   Latin-only context rule avoids corrupting scripts where these characters
+   carry meaning. Nothing here emulates the bidi algorithm.
 3. **Skeleton** -- a small, reviewed map of look-alike letters (Cyrillic,
    Greek, a few Latin variants) onto the Latin letters that occur in the
    stems the lexicons match. NFKC does *not* do this: a Cyrillic ``і``
@@ -20,8 +20,9 @@ Four steps, in this order, every time:
    non-Latin text; it is the handful of letters that spell our stems.
 4. ``casefold`` -- default casefold, never a Turkish locale.
 
-The map is hashed (``skeleton_hash``) and recorded on every decision so a
-reviewer can tell which normalization produced a match. Digits and
+The map is hashed (``skeleton_hash``) and exported, so a reviewer can pin
+which fold table produced a match. It is not carried on the decision record
+today; the record carries ``patterns_hash`` and ``roster_hash``. Digits and
 punctuation are never touched: resource strings such as ``800-911-2000``
 are invariant under ``normalize`` by construction, and a test pins that.
 
@@ -33,6 +34,7 @@ The measurement that justified this module is in
 from __future__ import annotations
 
 import hashlib
+import re
 import unicodedata
 from dataclasses import dataclass
 
@@ -62,8 +64,9 @@ STRIP_CODEPOINTS: frozenset[int] = frozenset(
 # Uppercase forms are listed because the skeleton runs before casefold.
 SKELETON: dict[str, str] = {
     # Cyrillic lowercase
-    "а": "a", "е": "e", "і": "i", "о": "o", "р": "p",
+    "а": "a", "в": "b", "е": "e", "і": "i", "о": "o", "р": "p",
     "с": "c", "у": "y", "х": "x", "ѕ": "s", "ј": "j",
+    "м": "m", "н": "h", "т": "t",
     "һ": "h", "ԁ": "d", "ԛ": "q", "ԝ": "w", "ӏ": "l",
     "г": "r", "к": "k",
     # Cyrillic uppercase
@@ -85,8 +88,104 @@ SKELETON: dict[str, str] = {
 }
 
 _SKELETON_TABLE = {ord(k): v for k, v in SKELETON.items()}
-_STRIP_TABLE = {cp: None for cp in STRIP_CODEPOINTS}
 _QUOTE_TABLE = {0x2019: "'", 0x2018: "'", 0x201C: '"', 0x201D: '"'}
+_CONTRACTION_RE = re.compile(r"\b(?:wanna|gonna|gotta|imma|i'ma|lemme|dunno|morirme)\b")
+_PROTECTED_LOCATION_RE = re.compile(r"\S*(?:(?:https?://|www\.)|[\\/])\S*", re.IGNORECASE)
+_CONTRACTIONS = {
+    "wanna": "want to",
+    "gonna": "going to",
+    "gotta": "got to",
+    "imma": "i am going to",
+    "i'ma": "i am going to",
+    "lemme": "let me",
+    "dunno": "do not know",
+    "morirme": "morir me",
+}
+
+
+def _is_latin_letter(ch: str) -> bool:
+    if not ch.isalpha():
+        return False
+    try:
+        return unicodedata.name(ch).startswith("LATIN")
+    except ValueError:
+        return False
+
+
+def _between_latin_letters(text: str, index: int, categories: frozenset[str]) -> bool:
+    """Whether a category character is internal to one Latin letter run.
+
+    Adjacent characters from the same removable category are skipped so a
+    short run of controls cannot protect itself merely by being doubled.
+    """
+    left = index - 1
+    while left >= 0 and unicodedata.category(text[left]) in categories:
+        left -= 1
+    right = index + 1
+    while right < len(text) and unicodedata.category(text[right]) in categories:
+        right += 1
+    return left >= 0 and right < len(text) and _is_latin_letter(text[left]) and _is_latin_letter(text[right])
+
+
+def _protect_interior_combining_marks(text: str) -> tuple[str, dict[str, str]]:
+    """Keep raw combining marks visible to the post-NFKC category rule.
+
+    NFKC would otherwise compose, for example, ``i`` plus a combining acute
+    into one precomposed letter before the strip step could inspect the mark.
+    A temporary private-use placeholder prevents that composition; it is
+    restored as a combining mark immediately after NFKC and then removed by
+    ``_strip_categories``. Existing precomposed letters remain untouched.
+    """
+    mark_categories = frozenset({"Mn", "Me"})
+    indexes = {
+        i
+        for i, ch in enumerate(text)
+        if unicodedata.category(ch) in mark_categories
+        and _between_latin_letters(text, i, mark_categories)
+    }
+    if not indexes:
+        return text, {}
+    placeholder_ord = 0xF0000
+    replacements: dict[int, str] = {}
+    restore: dict[str, str] = {}
+    for index in sorted(indexes):
+        while chr(placeholder_ord) in text or chr(placeholder_ord) in restore:
+            placeholder_ord += 1
+        placeholder = chr(placeholder_ord)
+        replacements[index] = placeholder
+        restore[placeholder] = text[index]
+        placeholder_ord += 1
+    return "".join(replacements.get(i, ch) for i, ch in enumerate(text)), restore
+
+
+def _strip_categories(text: str) -> tuple[str, int]:
+    format_category = frozenset({"Cf"})
+    mark_categories = frozenset({"Mn", "Me"})
+    remove: set[int] = set()
+    for i, ch in enumerate(text):
+        category = unicodedata.category(ch)
+        if ord(ch) in STRIP_CODEPOINTS:
+            remove.add(i)
+        elif category == "Cf" and _between_latin_letters(text, i, format_category):
+            remove.add(i)
+        elif category in mark_categories and _between_latin_letters(text, i, mark_categories):
+            remove.add(i)
+    return "".join(ch for i, ch in enumerate(text) if i not in remove), len(remove)
+
+
+def _expand_contractions(text: str) -> str:
+    """Expand reviewed spoken forms and one clitic split outside URLs/paths."""
+    def expand(segment: str) -> str:
+        return _CONTRACTION_RE.sub(lambda match: _CONTRACTIONS[match.group(0)], segment)
+
+    pieces: list[str] = []
+    cursor = 0
+    for match in _PROTECTED_LOCATION_RE.finditer(text):
+        pieces.append(expand(text[cursor:match.start()]))
+        pieces.append(match.group(0))
+        cursor = match.end()
+    pieces.append(expand(text[cursor:]))
+    return "".join(pieces)
 
 
 def skeleton_hash() -> str:
@@ -140,9 +239,11 @@ class Normalized:
 
 def analyze(text: str) -> Normalized:
     """Normalize ``text`` and report what changed."""
-    nfkc = unicodedata.normalize("NFKC", text)
-    stripped = nfkc.translate(_STRIP_TABLE)
-    n_stripped = len(nfkc) - len(stripped)
+    protected, restore = _protect_interior_combining_marks(text)
+    nfkc = unicodedata.normalize("NFKC", protected)
+    for placeholder, mark in restore.items():
+        nfkc = nfkc.replace(placeholder, mark)
+    stripped, n_stripped = _strip_categories(nfkc)
 
     mixed_raw = [tok for tok in stripped.split() if is_mixed_script_token(tok)]
     mixed_folded = tuple(
@@ -154,6 +255,7 @@ def analyze(text: str) -> Normalized:
     n_folded = sum(1 for a, b in zip(stripped, folded) if a != b)
 
     out = folded.translate(_QUOTE_TABLE).casefold()
+    out = _expand_contractions(out)
     return Normalized(
         text=out,
         raw=text,
@@ -165,5 +267,5 @@ def analyze(text: str) -> Normalized:
 
 
 def normalize(text: str) -> str:
-    """NFKC -> strip invisibles and bidi controls -> skeleton -> casefold."""
+    """NFKC -> category strip -> skeleton -> casefold -> spoken expansion."""
     return analyze(text).text

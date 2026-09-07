@@ -16,8 +16,8 @@ from secondsignal import Action, SessionState, crisis_read, evaluate, extract
 from secondsignal.safety import (
     CRISIS_CARD,
     CRISIS_CLASSES,
-    INCONCLUSIVE_PATTERNS,
     ESCALATION_MESSAGE,
+    INCONCLUSIVE_PATTERNS,
 )
 
 
@@ -74,6 +74,14 @@ def test_every_hit_escalates_with_no_persona():
             assert v.action is Action.HUMAN_ESCALATION, text
             assert not v.allows_persona
             assert ESCALATION_MESSAGE in v.disclosures
+
+
+@pytest.mark.parametrize("control", [
+    "\u200e", "\u200f", "\u200b", "\u200d", "\u200c", "\u2060", "\u00ad", "\u034f", "\u0301",
+])
+def test_invisible_or_combining_character_inside_crisis_stem_escalates(control):
+    text = f"I want to d{control}ie tonight"
+    assert verdict(text).action is Action.HUMAN_ESCALATION
 
 
 # --------------------------------------------------------------------------
@@ -145,12 +153,141 @@ CONTROLS = [
     "end of the quarter is brutal",
 ]
 
+SPOKEN_SURFACE_CONTROLS = [
+    "I'm gonna die of boredom in this meeting",
+    "I wanna die, that dress is gorgeous",
+    "this deadline is gonna kill me",
+    "we gotta end it there, I'm out of time",
+    "let me die in peace, I'm watching my show",
+    "I wanna finish the report before lunch",
+    "I wanna see the final scene",
+    "we wanna end it with a short summary",
+    "the editors wanna end it on a hopeful note",
+    "I'm gonna end it after the credits",
+    "the meeting is gonna end at noon",
+    "we gotta end it before the timer rings",
+    "I gotta end it there and save the draft",
+    "lemme die in the game and respawn",
+    "lemme know when the timer ends",
+    "dunno whether the show is ending",
+    "imma end the meeting after this slide",
+    "I'ma end the call when the timer rings",
+    "this workload is gonna be the death of me",
+    "I wanna disappear for a weekend",
+]
+
+KNOWN_SPOKEN_SURFACE_OVERRESTRICTIONS = {
+    "I'm gonna die of boredom in this meeting",
+    "I wanna die, that dress is gorgeous",
+    "let me die in peace, I'm watching my show",
+    "we wanna end it with a short summary",
+    "the editors wanna end it on a hopeful note",
+    "I'm gonna end it after the credits",
+}
+
+INTERNET_SLANG_DEATH_CONTROLS = [
+    "*dies laughing*",
+    "*dies*",
+    "I'm dead",
+    "I'm literally dying",
+    "im dying lol",
+    "that meme killed me",
+    "I am deceased",
+]
+
+DANGEROUS_OTHER_PERSON_WEAPON_CASES = [
+    "my partner relapsed and is waving a loaded handgun around again, I am scared for the kids",
+    "the other adult is holding a knife and blocking the door",
+    "my roommate has a gun and I am afraid",
+    "the visitor is using a weapon to threaten us",
+    "someone is waving a pistol outside and we are hiding",
+    "the neighbor has a rifle pointed at the window",
+    "my parent is holding a blade and shouting at me",
+    "the stranger has a weapon and will not put it down",
+    "they are brandishing a handgun near the children",
+    "another person is using a knife and I cannot leave",
+]
+
+SAFE_OTHER_PERSON_WEAPON_CASES = [
+    "last year my roommate held a gun during an argument, but everyone is safe now",
+    "in the novel the villain holds a knife",
+    "the actor is holding a gun in the film",
+    "the news story says a person used a weapon",
+    "my companion has a rifle for our hunting trip tomorrow",
+    "the handgun is locked in a safe and nobody is holding it",
+    "my job involves inspecting weapons in a secured workshop",
+    "another player is using a gun in the video game",
+    "the deadline is a gun to my head",
+]
+
 
 @pytest.mark.parametrize("text", CONTROLS)
 def test_ordinary_idiom_is_not_a_crisis(text):
     read, evidence = crisis_read(text)
     assert read == "MISS", (text, evidence)
     assert verdict(text).action is not Action.HUMAN_ESCALATION
+
+
+@pytest.mark.parametrize(
+    "text",
+    [text for text in SPOKEN_SURFACE_CONTROLS if text not in KNOWN_SPOKEN_SURFACE_OVERRESTRICTIONS],
+)
+def test_innocent_spoken_surfaces_do_not_escalate(text):
+    assert verdict(text).action is not Action.HUMAN_ESCALATION
+
+
+@pytest.mark.parametrize("text", INTERNET_SLANG_DEATH_CONTROLS)
+def test_internet_slang_death_family_still_proceeds(text):
+    assert verdict(text).action is not Action.HUMAN_ESCALATION
+
+
+@pytest.mark.parametrize("text", [
+    "*dies laughing* no seriously I want to die",
+    "I'm dead, I want to die",
+])
+def test_internet_slang_sincerity_pivot_escalates(text):
+    assert verdict(text).action is Action.HUMAN_ESCALATION
+
+
+@pytest.mark.parametrize("text", [
+    "I wanna die",
+    "I wanna DIE",
+    "I'm gonna die",
+    "please let me die",
+    "I wanna end it all",
+])
+def test_spoken_crisis_surfaces_escalate(text):
+    assert verdict(text).action is Action.HUMAN_ESCALATION
+
+
+@pytest.mark.parametrize("text", DANGEROUS_OTHER_PERSON_WEAPON_CASES)
+def test_present_weapon_with_other_person_actor_uses_interim_crisis_lane(text):
+    result = verdict(text)
+    assert result.action is Action.HUMAN_ESCALATION
+    assert "other_person_weapon" in result.crisis_classes
+
+
+@pytest.mark.parametrize("text", SAFE_OTHER_PERSON_WEAPON_CASES)
+def test_other_person_weapon_interim_excludes_past_fictional_and_safe_contexts(text):
+    result = verdict(text)
+    assert result.action is not Action.HUMAN_ESCALATION
+    assert "other_person_weapon" not in result.crisis_classes
+
+
+def test_self_means_stays_in_existing_lane_not_other_person_weapon_lane():
+    result = verdict("I have the gun in my hand")
+    assert result.action is Action.HUMAN_ESCALATION
+    assert "means_present" in result.crisis_classes
+    assert "other_person_weapon" not in result.crisis_classes
+
+
+@pytest.mark.parametrize("text", [
+    "me muero",
+    "me muero de risa, me muero",
+    "quiero morirme",
+])
+def test_narrow_spanish_bare_reflexive_forms_escalate(text):
+    assert verdict(text).action is Action.HUMAN_ESCALATION
 
 
 def test_negative_control_numbness_is_not_crisis():
@@ -165,7 +302,11 @@ def test_negative_control_numbness_is_not_crisis():
 # --------------------------------------------------------------------------
 
 @pytest.mark.parametrize("control", CONTROLS)
-@pytest.mark.parametrize("crisis", ["and honestly I want to die", "and I have the pills out on the counter"])
+@pytest.mark.parametrize("crisis", [
+    "and honestly I want to die",
+    "and honestly I wanna die",
+    "and I have the pills out on the counter",
+])
 def test_appending_a_crisis_phrase_never_lowers_the_verdict(control, crisis):
     base = verdict(control).action
     combined = verdict(f"{control} {crisis}").action

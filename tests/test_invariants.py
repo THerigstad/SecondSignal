@@ -14,12 +14,12 @@ here.
 
 from __future__ import annotations
 
+import pytest
+
 from secondsignal.profiles import AgentProfile, load_roster
 from secondsignal.router import route, score_agent
 from secondsignal.safety import Action, SessionState
 from secondsignal.signals import RequestSignals
-
-import pytest
 
 
 @pytest.fixture(scope="module")

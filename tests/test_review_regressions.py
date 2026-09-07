@@ -9,7 +9,6 @@ docs/notes/test-audit-2026-08.md: red on the baseline, green after the fixes.
 from __future__ import annotations
 
 import json
-from pathlib import Path
 
 import pytest
 

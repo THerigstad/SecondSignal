@@ -119,7 +119,9 @@ def test_no_learned_affinity_enters_scoring():
     stated by the person at onboarding, act only as tie-breaks and the
     advisory assist, and never reach ``score_agent``."""
     import re
+
     from secondsignal import router as router_module
+
     for cls in (RoutingDecision, ScoredAgent, SessionState, AgentProfile):
         names = {f.name for f in dataclasses.fields(cls)}
         assert not names & {"affinity", "last_agent", "warmth", "rapport"}, (cls.__name__, names)
@@ -177,7 +179,9 @@ def test_the_no_signal_seat_is_a_role_resolved_from_the_roster_not_a_literal(ros
     shipped roster fills the role with one agent; a different roster may fill
     it with another, and this file does not change."""
     import inspect
+
     from secondsignal import router as router_module
+
     assert NO_SIGNAL_SEAT_ROLE == "stabilizer"
     assert no_signal_seat(roster) in find_stabilizers(roster)
     source = inspect.getsource(router_module)
