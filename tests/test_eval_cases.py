@@ -107,27 +107,53 @@ def run_case(case: dict, roster):
     return route(case["text"], roster, session=session), session
 
 
-def check_case(case: dict, decision, session) -> None:
+EXPECT_KEYS: frozenset[str] = frozenset({
+    "safety", "outcome", "agent", "agent_any_of", "reason_contains",
+    "crisis_read", "integrity_event", "disclosures_contain", "latch",
+    "latch_reasons", "held", "assist", "card", "preference_result",
+    "language_scope", "not_seated", "obligations_contain", "ineligible",
+})
+"""Every expectation key the runner knows how to check.
+
+A key outside this set is silently ignored by an ``if "x" in expect`` runner,
+so a fixture with a misspelled key looks like it is asserting something and
+asserts nothing. ``tests/test_case_manifest.py`` fails on any key not listed
+here; adding a key to a fixture means adding the check and the name together.
+"""
+
+
+def field_failures(case: dict, decision, session) -> dict[str, str]:
+    """Check every expectation and return the failures keyed by field.
+
+    Returning a dict instead of raising on the first failure is what lets an
+    expected-to-fail case stay narrow. A case marked ``known_gap`` because of
+    its ``safety`` verdict must still assert its seat, its holds and its
+    obligations: before this, any one failure inside such a case produced an
+    xfail, so an unrelated regression injected anywhere in it was recorded as
+    an expected failure and never seen. Measured 2026-09-05; fixed here.
+    """
     expect = case["expect"]
+    bad: dict[str, str] = {}
+
+    def check(field: str, ok: bool, message: str) -> None:
+        if not ok:
+            bad[field] = message
 
     if "safety" in expect:
-        assert decision.safety.action is Action[expect["safety"]], (
-            f"safety: expected {expect['safety']}, got {decision.safety.action.name}; "
-            f"reasons={decision.safety.reasons}"
-        )
+        check("safety", decision.safety.action is Action[expect["safety"]],
+              f"expected {expect['safety']}, got {decision.safety.action.name}; "
+              f"reasons={decision.safety.reasons}")
     if "outcome" in expect:
-        assert decision.outcome is Outcome[expect["outcome"]], (
-            f"outcome: expected {expect['outcome']}, got {decision.outcome.value} ({decision.reason})"
-        )
+        check("outcome", decision.outcome is Outcome[expect["outcome"]],
+              f"expected {expect['outcome']}, got {decision.outcome.value} ({decision.reason})")
     if "agent" in expect:
-        assert decision.agent_id == expect["agent"], (
-            f"agent: expected {expect['agent']!r}, got {decision.agent_id!r}; reason={decision.reason!r}; "
-            f"ranked={[(s.agent_id, s.status, s.score) for s in decision.ranked]}"
-        )
+        check("agent", decision.agent_id == expect["agent"],
+              f"expected {expect['agent']!r}, got {decision.agent_id!r}; reason={decision.reason!r}; "
+              f"ranked={[(s.agent_id, s.status, s.score) for s in decision.ranked]}")
     if "agent_any_of" in expect:
-        assert decision.agent_id in expect["agent_any_of"], (
-            f"agent: expected one of {expect['agent_any_of']}, got {decision.agent_id!r}; reason={decision.reason!r}"
-        )
+        check("agent_any_of", decision.agent_id in expect["agent_any_of"],
+              f"expected one of {expect['agent_any_of']}, got {decision.agent_id!r}; "
+              f"reason={decision.reason!r}")
     if "reason_contains" in expect:
         trace = " || ".join([
             decision.reason,
@@ -135,86 +161,118 @@ def check_case(case: dict, decision, session) -> None:
             decision.assist_reason,
             *(" ".join(s.rationale) for s in decision.ranked),
         ])
-        assert expect["reason_contains"] in trace, (
-            f"reason: expected the record to contain {expect['reason_contains']!r}; "
-            f"reason={decision.reason!r}; safety={decision.safety.reasons}"
-        )
+        check("reason_contains", expect["reason_contains"] in trace,
+              f"expected the record to contain {expect['reason_contains']!r}; "
+              f"reason={decision.reason!r}; safety={decision.safety.reasons}")
     if "crisis_read" in expect:
-        assert decision.safety.crisis_read == expect["crisis_read"], (
-            f"crisis_read: expected {expect['crisis_read']}, got {decision.safety.crisis_read}"
-        )
+        check("crisis_read", decision.safety.crisis_read == expect["crisis_read"],
+              f"expected {expect['crisis_read']}, got {decision.safety.crisis_read}")
     if "integrity_event" in expect:
-        assert decision.safety.integrity_event is expect["integrity_event"]
+        check("integrity_event", decision.safety.integrity_event is expect["integrity_event"],
+              f"expected {expect['integrity_event']}, got {decision.safety.integrity_event}")
     if "disclosures_contain" in expect:
         needle = expect["disclosures_contain"]
-        assert any(needle in d for d in decision.safety.disclosures), (
-            f"disclosures: none contains {needle!r}; got {decision.safety.disclosures}"
-        )
+        check("disclosures_contain", any(needle in d for d in decision.safety.disclosures),
+              f"none contains {needle!r}; got {decision.safety.disclosures}")
     if "latch" in expect:
-        assert session.latch == expect["latch"], (
-            f"latch: expected {expect['latch']}, got {session.latch} ({session.latch_reasons}); "
-            f"history={session.latch_history}"
-        )
+        check("latch", session.latch == expect["latch"],
+              f"expected {expect['latch']}, got {session.latch} ({session.latch_reasons}); "
+              f"history={session.latch_history}")
     if "latch_reasons" in expect:
-        for reason in expect["latch_reasons"]:
-            assert reason in decision.safety.latch_reasons, (
-                f"latch_reasons: expected {reason!r} in {decision.safety.latch_reasons}"
-            )
+        missing = [r for r in expect["latch_reasons"] if r not in decision.safety.latch_reasons]
+        check("latch_reasons", not missing,
+              f"expected {missing} in {decision.safety.latch_reasons}")
     if "held" in expect:
-        for domain in expect["held"]:
-            assert domain in decision.held, f"held: expected {domain!r} in {decision.held}"
+        missing = [d for d in expect["held"] if d not in decision.held]
+        check("held", not missing, f"expected {missing} in {decision.held}")
     if "assist" in expect:
-        assert decision.assist_agent_id == expect["assist"], (
-            f"assist: expected {expect['assist']!r}, got {decision.assist_agent_id!r} ({decision.assist_reason})"
-        )
+        check("assist", decision.assist_agent_id == expect["assist"],
+              f"expected {expect['assist']!r}, got {decision.assist_agent_id!r} "
+              f"({decision.assist_reason})")
     if "card" in expect and expect["card"] is not None:
-        assert decision.safety.card == expect["card"], (
-            f"card: expected {expect['card']}, got {decision.safety.card}"
-        )
+        check("card", decision.safety.card == expect["card"],
+              f"expected {expect['card']}, got {decision.safety.card}")
     if "preference_result" in expect:
-        assert decision.safety.preference_result == expect["preference_result"], (
-            f"preference_result: expected {expect['preference_result']}, got {decision.safety.preference_result}; "
-            f"reasons={decision.safety.reasons}"
-        )
+        check("preference_result", decision.safety.preference_result == expect["preference_result"],
+              f"expected {expect['preference_result']}, got {decision.safety.preference_result}; "
+              f"reasons={decision.safety.reasons}")
     if "language_scope" in expect:
-        assert decision.safety.language_scope == expect["language_scope"]
-    for agent_id in expect.get("not_seated", []):
-        assert decision.agent_id != agent_id, f"{agent_id!r} was seated but must not be"
-        assert decision.assist_agent_id != agent_id, f"{agent_id!r} was the assist but must not be"
-    for needle in expect.get("obligations_contain", []):
-        assert any(needle in o for o in decision.obligations), (
-            f"obligations: none contains {needle!r}; got {decision.obligations}"
-        )
+        check("language_scope", decision.safety.language_scope == expect["language_scope"],
+              f"expected {expect['language_scope']}, got {decision.safety.language_scope}")
+    seated = [a for a in expect.get("not_seated", [])
+              if a in (decision.agent_id, decision.assist_agent_id)]
+    if expect.get("not_seated"):
+        check("not_seated", not seated, f"{seated} seated or assisted but must not be")
+    if expect.get("obligations_contain"):
+        missing = [n for n in expect["obligations_contain"]
+                   if not any(n in o for o in decision.obligations)]
+        check("obligations_contain", not missing,
+              f"none contains {missing}; got {decision.obligations}")
     statuses = {s.agent_id: s.status for s in decision.ranked}
-    for agent_id in expect.get("ineligible", []):
-        assert decision.agent_id != agent_id, f"{agent_id!r} was seated but must be ineligible"
-        assert decision.assist_agent_id != agent_id, f"{agent_id!r} was the assist but must be ineligible"
-        if agent_id in statuses and not decision.preempted:
-            assert statuses[agent_id] in INELIGIBLE_STATUSES, (
-                f"{agent_id!r} must be vetoed, below floor, capped or outranked in the trace; "
-                f"status={statuses[agent_id]!r}"
-            )
-    assert "id order" not in decision.reason, (
-        f"a labeled case must never resolve by id order: {decision.reason!r}"
-    )
+    if expect.get("ineligible"):
+        problems = []
+        for agent_id in expect["ineligible"]:
+            if agent_id in (decision.agent_id, decision.assist_agent_id):
+                problems.append(f"{agent_id!r} seated or assisted")
+            elif (agent_id in statuses and not decision.preempted
+                  and statuses[agent_id] not in INELIGIBLE_STATUSES):
+                problems.append(f"{agent_id!r} status={statuses[agent_id]!r}")
+        check("ineligible", not problems,
+              f"must be vetoed, below floor, capped or outranked: {problems}")
+    check("id_order", "id order" not in decision.reason,
+          f"a labeled case must never resolve by id order: {decision.reason!r}")
+    return bad
+
+
+def check_case(case: dict, decision, session) -> None:
+    """Raise on the first failing field. Kept for callers that want the old
+    all-or-nothing behaviour."""
+    bad = field_failures(case, decision, session)
+    if bad:
+        field, message = next(iter(bad.items()))
+        raise AssertionError(f"{field}: {message}")
+
+
+MANIFEST_PATH = Path(__file__).resolve().parents[1] / "evals" / "case-manifest.json"
+MANIFEST = {
+    entry["id"]: entry
+    for entry in json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))["cases"]
+}
 
 
 @pytest.mark.parametrize("label,case", CASES, ids=[label for label, _ in CASES])
 def test_eval_case(label: str, case: dict, roster) -> None:
     decision, session = run_case(case, roster)
+    bad = field_failures(case, decision, session)
     expected_to_fail = case.get("known_gap") or case.get("disputed")
-    if expected_to_fail:
-        try:
-            check_case(case, decision, session)
-        except AssertionError as exc:
-            kind = "known gap" if case.get("known_gap") else "disputed"
-            note = case.get("gap_note") or case.get("dispute_note") or case.get("why", "")
-            pytest.xfail(f"{kind}: {note} :: {exc}")
+
+    if not expected_to_fail:
+        if bad:
+            field, message = next(iter(bad.items()))
+            raise AssertionError(f"{field}: {message}")
+        return
+
+    kind = "known gap" if case.get("known_gap") else "disputed"
+    approved = set(MANIFEST.get(case["id"], {}).get("mismatch_fields", []))
+    unapproved = {f: m for f, m in bad.items() if f not in approved}
+    if unapproved:
+        # The point of the manifest. This case is allowed to fail on the
+        # fields its disposition names and on nothing else, so a regression
+        # anywhere else inside it is a red test rather than one more
+        # expected failure nobody reads.
+        field, message = next(iter(unapproved.items()))
         pytest.fail(
-            f"{label} is marked {'known_gap' if case.get('known_gap') else 'disputed'} but now passes; "
-            "remove the marker so the record stays honest"
+            f"{label} is marked {kind} on {sorted(approved)}, but {field} also "
+            f"fails now: {message}. Either this is a regression, or the "
+            f"disposition changed and evals/case-manifest.json must say so."
         )
-    check_case(case, decision, session)
+    if bad:
+        note = case.get("gap_note") or case.get("dispute_note") or case.get("why", "")
+        pytest.xfail(f"{kind} on {sorted(bad)}: {note}")
+    pytest.fail(
+        f"{label} is marked {kind} but now passes; "
+        "remove the marker so the record stays honest"
+    )
 
 
 def test_every_case_carries_a_reason_or_is_schema_v1() -> None:
