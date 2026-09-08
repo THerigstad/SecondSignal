@@ -2,7 +2,12 @@
 
 All notable changes to SecondSignal are documented here.
 
-## [Unreleased]
+## [0.1.0] — 2026-09-08
+
+The first tagged release: the policy layer as it stands after the external
+review rounds, the two-builder merge, and the decision register. Everything
+below this heading and above the initial edition entered the tree between
+31 August and 8 September 2026.
 
 ### Added — the Security Division records and the decision register, 2026-09-08
 
@@ -375,7 +380,7 @@ was deleted to make the suite green.
 - Test suite grows from 43 to 50 tests (research batch), then to 250 tests —
   247 passing and 3 documented gaps (review batch).
 
-## [0.1.0] — 2026-08-31
+## Initial reference implementation — 2026-08-31 (untagged)
 
 Initial reference implementation: the policy layer only. It decides who should
 respond and whether anyone should; it generates nothing.
