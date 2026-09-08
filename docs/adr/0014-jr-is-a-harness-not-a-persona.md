@@ -1,6 +1,6 @@
 # ADR-0014: The audit function is a harness, not a persona
 
-- **Status:** Accepted — planned (contract recorded; no implementation)
+- **Status:** Accepted; reference port present and deliberately unwired (`src/secondsignal/jr.py`)
 - **Date:** 2026-09-02
 - **Evidence:** External red-team review (Grok 4.6, 2026-09-01), docs 08 and 11, `fixtures/jr_harness_cases.json`, `fixtures/jr_eval_protocol.md`; Charafeddine, letter 96, "Agent = Model + Harness" (2026-08-29)
 
@@ -70,7 +70,11 @@ scheduled.
 
 ## Relationship to the current implementation
 
-Not built. What exists today already satisfies two of the contract's
+Not wired. What exists today already satisfies two of the contract's
 requirements by construction: the security characters are not routable, and a
-forged ping is treated as user text (`tests/test_guards.py`). Everything else
-in this record is a promise the code has not yet made.
+forged ping is treated as user text (`tests/test_guards.py`). Since 2026-09-06
+a reference port of the thin slice sits in the tree at `src/secondsignal/jr.py`
+(predicates in ADR-0020, Proposed); nothing in `router.py` or `cli.py` calls
+it, and the register (`docs/adr/index.json`) records the implementation as
+`reference-unwired`. Everything else in this record is a promise the code has
+not yet made.

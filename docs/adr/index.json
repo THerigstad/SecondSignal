@@ -1,0 +1,350 @@
+{
+  "version": 1,
+  "note": "Machine-checked register of every architecture decision record. tests/test_adr_index.py enforces it: every record file is listed here and nowhere else; the status line inside each record agrees with the decision field; a record whose implementation is built, partial or reference-unwired names evidence tests that exist and modules that exist; every ADR number cited from src/, tests/ or evals/ resolves to a record, and a citation of a Proposed record carries the marker (Proposed) beside it; relationships point both ways; and every record that is Proposed, or whose implementation is none or reference-unwired, is named in the README so the public claim can never run ahead of the tree. Flipping decision or implementation is a human act; the checks refuse a flip the tree cannot show. Numbers under reserved are held for named records that have not been written; a reserved number has no file and may not be cited from code.",
+  "decision_values": [
+    "Proposed",
+    "Accepted",
+    "Superseded"
+  ],
+  "implementation_values": [
+    "not-code",
+    "none",
+    "partial",
+    "reference-unwired",
+    "built"
+  ],
+  "records": [
+    {
+      "number": "0001",
+      "file": "0001-impact-events.md",
+      "title": "Impact Events: longitudinal outcome signals",
+      "decision": "Accepted",
+      "implementation": "none",
+      "evidence": [],
+      "modules": [],
+      "notes": "Design locked; implementation deferred. tests/test_guards.py::test_impact_events_cannot_reach_the_score pins the one rule the router already honours."
+    },
+    {
+      "number": "0002",
+      "file": "0002-user-authority-is-source-anchored.md",
+      "title": "User authority is source-anchored",
+      "decision": "Accepted",
+      "implementation": "none",
+      "evidence": [],
+      "modules": [],
+      "notes": "Planned; the intake-and-provenance record (ADR-0022) is where this becomes code."
+    },
+    {
+      "number": "0003",
+      "file": "0003-persona-execution-separation.md",
+      "title": "Persona and execution are separated",
+      "decision": "Accepted",
+      "implementation": "partial",
+      "evidence": [
+        "tests/test_guards.py::test_no_learned_affinity_enters_scoring",
+        "tests/test_router.py::test_injected_signals_bypass_the_default_extractor"
+      ],
+      "modules": [
+        "src/secondsignal/router.py",
+        "src/secondsignal/profiles.py"
+      ],
+      "notes": "Partially realized: profiles are data and the router scores them; the execution layer that would run a persona is not in this repository."
+    },
+    {
+      "number": "0004",
+      "file": "0004-operational-constraints-are-typed.md",
+      "title": "Operational constraints are typed",
+      "decision": "Accepted",
+      "implementation": "partial",
+      "evidence": [
+        "tests/test_invariants.py::test_grief_vetoes_every_contraindicated_agent",
+        "tests/test_holds.py::test_every_hold_domain_has_obligations"
+      ],
+      "modules": [
+        "src/secondsignal/router.py"
+      ],
+      "notes": "Precursor built: vetoes, holds and obligations are typed on the decision record."
+    },
+    {
+      "number": "0005",
+      "file": "0005-safety-state-separate-from-personal-memory.md",
+      "title": "Safety state is separate from personal memory",
+      "decision": "Accepted",
+      "implementation": "partial",
+      "evidence": [
+        "tests/test_preferences.py::test_the_safety_envelope_is_never_a_preference",
+        "tests/test_latch.py::test_message_text_cannot_clear_a_latch"
+      ],
+      "modules": [
+        "src/secondsignal/safety.py",
+        "src/secondsignal/preferences.py"
+      ],
+      "notes": "Partially realized: the latch and the preference store are separate objects; persistent memory is not built."
+    },
+    {
+      "number": "0006",
+      "file": "0006-generated-artifacts-begin-in-quarantine.md",
+      "title": "Generated artifacts begin in quarantine",
+      "decision": "Accepted",
+      "implementation": "none",
+      "evidence": [],
+      "modules": [],
+      "notes": "Planned; nothing in this repository generates artifacts yet."
+    },
+    {
+      "number": "0007",
+      "file": "0007-memory-lifecycle-and-supersession.md",
+      "title": "Memory is episodic, versioned, and lifecycle-governed",
+      "decision": "Accepted",
+      "implementation": "none",
+      "evidence": [],
+      "modules": [],
+      "notes": "Planned; persistent memory is not built."
+    },
+    {
+      "number": "0008",
+      "file": "0008-human-value-evaluated-separately.md",
+      "title": "Human value is evaluated separately from autonomous performance",
+      "decision": "Accepted",
+      "implementation": "partial",
+      "evidence": [
+        "tests/test_eval_cases.py::test_every_disputed_case_names_its_justification",
+        "tests/test_case_manifest.py"
+      ],
+      "modules": [
+        "evals/run_fixtures.py"
+      ],
+      "notes": "Partially realized in the evaluation program: disputed and contract-adjusted cases carry the human justification beside the pass count."
+    },
+    {
+      "number": "0009",
+      "file": "0009-consensus-is-not-independent-evidence.md",
+      "title": "Multi-agent consensus is not independent evidence",
+      "decision": "Accepted",
+      "implementation": "not-code",
+      "evidence": [],
+      "modules": [],
+      "notes": "A principle of the review process, in force; it has no runtime object."
+    },
+    {
+      "number": "0010",
+      "file": "0010-crisis-screen-is-a-floor-and-fails-closed.md",
+      "title": "The crisis screen is a floor, and it fails closed",
+      "decision": "Accepted",
+      "implementation": "built",
+      "evidence": [
+        "tests/test_crisis_gate.py::test_every_hit_escalates_with_no_persona",
+        "tests/test_crisis_gate.py::test_inconclusive_language_escalates_under_fail_closed",
+        "tests/test_safety.py::test_crisis_preempts_persona_entirely"
+      ],
+      "modules": [
+        "src/secondsignal/safety.py"
+      ],
+      "notes": ""
+    },
+    {
+      "number": "0011",
+      "file": "0011-no-signal-routing-is-a-policy.md",
+      "title": "No-signal routing is a policy, not an accident",
+      "decision": "Accepted",
+      "implementation": "built",
+      "evidence": [
+        "tests/test_guards.py::test_empty_extract_seats_nobody_and_says_why",
+        "tests/test_guards.py::test_no_route_ever_resolves_by_id_order_for_a_real_message"
+      ],
+      "modules": [
+        "src/secondsignal/router.py"
+      ],
+      "notes": "Amended 2026-09-03 inside the record."
+    },
+    {
+      "number": "0012",
+      "file": "0012-regulation-floor-is-eligibility.md",
+      "title": "The regulation floor is eligibility, and the roster must prove it at load",
+      "decision": "Accepted",
+      "implementation": "built",
+      "evidence": [
+        "tests/test_guards.py::test_caller_below_an_agents_floor_is_ineligible_not_penalized",
+        "tests/test_guards.py::test_roster_without_a_stabilizer_fails_to_load",
+        "tests/test_profiles.py::test_roster_has_a_full_range_stabilizer"
+      ],
+      "modules": [
+        "src/secondsignal/profiles.py",
+        "src/secondsignal/router.py"
+      ],
+      "notes": ""
+    },
+    {
+      "number": "0013",
+      "file": "0013-two-evaluation-planes.md",
+      "title": "Two evaluation planes, one honest runner",
+      "decision": "Accepted",
+      "implementation": "partial",
+      "evidence": [
+        "tests/test_eval_cases.py::test_deferred_plane_fixtures_are_not_run_as_policy_cases",
+        "tests/test_fixture_runner.py"
+      ],
+      "modules": [
+        "evals/run_fixtures.py"
+      ],
+      "notes": "Policy plane runs; generation and harness planes are stored, not run."
+    },
+    {
+      "number": "0014",
+      "file": "0014-jr-is-a-harness-not-a-persona.md",
+      "title": "The audit function is a harness, not a persona",
+      "decision": "Accepted",
+      "implementation": "reference-unwired",
+      "evidence": [
+        "tests/test_guards.py::test_security_characters_are_not_routable",
+        "tests/test_jr_v0.py"
+      ],
+      "modules": [
+        "src/secondsignal/jr.py"
+      ],
+      "notes": "A reference port of the thin slice is in the tree and deliberately unwired; nothing in router.py or cli.py calls audit(). Status line corrected 2026-09-08: Accepted; reference port present and deliberately unwired."
+    },
+    {
+      "number": "0015",
+      "file": "0015-two-tier-latch-with-declared-bands.md",
+      "title": "The careful-side latch has two tiers, declared-age priors, and clears by reason",
+      "decision": "Accepted",
+      "implementation": "built",
+      "evidence": [
+        "tests/test_latch.py::test_strong_signal_sets_a_hard_latch_that_does_not_expire",
+        "tests/test_latch.py::test_operator_clears_by_reason_and_the_record_says_who"
+      ],
+      "modules": [
+        "src/secondsignal/safety.py"
+      ],
+      "notes": "",
+      "amended_by": [
+        "0023"
+      ]
+    },
+    {
+      "number": "0016",
+      "file": "0016-seat-versus-hold-routing-tree.md",
+      "title": "Seat versus hold: a seven-layer routing tree with one eligibility gate",
+      "decision": "Accepted",
+      "implementation": "built",
+      "evidence": [
+        "tests/test_holds.py::test_the_seat_is_scored_on_the_ask_and_the_hold_is_carried",
+        "tests/test_holds.py::test_acute_danger_outranks_every_claim"
+      ],
+      "modules": [
+        "src/secondsignal/router.py",
+        "src/secondsignal/signals.py"
+      ],
+      "notes": ""
+    },
+    {
+      "number": "0017",
+      "file": "0017-style-preferences-never-touch-the-envelope.md",
+      "title": "Style preferences are declared or confirmed, never inferred into policy, and never touch the safety envelope",
+      "decision": "Accepted",
+      "implementation": "partial",
+      "evidence": [
+        "tests/test_preferences.py::test_the_safety_envelope_is_never_a_preference",
+        "tests/test_preferences.py::test_nothing_is_stored_by_a_turn"
+      ],
+      "modules": [
+        "src/secondsignal/preferences.py"
+      ],
+      "notes": "Policy layer built; the settings surface that stores a confirmed preference is not."
+    },
+    {
+      "number": "0018",
+      "file": "0018-normalize-masks-and-language-packs.md",
+      "title": "Normalize before every lexicon; masks are pre-filters with objects; languages are packs, and declaring one never exempts text",
+      "decision": "Accepted",
+      "implementation": "built",
+      "evidence": [
+        "tests/test_normalize.py",
+        "tests/test_lexicon.py",
+        "tests/test_crisis_gate.py::test_declared_language_never_exempts_english_text"
+      ],
+      "modules": [
+        "src/secondsignal/normalize.py",
+        "src/secondsignal/lexicon.py"
+      ],
+      "notes": ""
+    },
+    {
+      "number": "0019",
+      "file": "0019-security-triad-and-commit-monitor.md",
+      "title": "Security triad clocks and the unnamed commit monitor",
+      "decision": "Proposed",
+      "implementation": "none",
+      "evidence": [],
+      "modules": [],
+      "amended_by": [
+        "0022",
+        "0023"
+      ],
+      "notes": "Drafted by an external reviewer (2026-09-03), accepted in principle by the operator (2026-09-07), amended 2026-09-08 (the gate is object one; narrators outside the five; intake after the gate). Stays Proposed until review round 2 reviews the amendment. The gate it names is built and belongs to ADR-0010 and ADR-0015; the other four objects are not built."
+    },
+    {
+      "number": "0020",
+      "file": "0020-jr-v0-predicates.md",
+      "title": "J.R. v0 predicates",
+      "decision": "Proposed",
+      "implementation": "reference-unwired",
+      "evidence": [
+        "tests/test_jr_v0.py",
+        "tests/test_nd_interruption_stack.py"
+      ],
+      "modules": [
+        "src/secondsignal/jr.py"
+      ],
+      "notes": "The reference port implements these predicates on synthetic records and is unwired. Five corrections are listed inside the record and must be verified against the code before the decision can flip to Accepted."
+    },
+    {
+      "number": "0022",
+      "file": "0022-intake-and-provenance.md",
+      "title": "Intake and provenance runs after the gate and before routing, and proposes but never grants",
+      "decision": "Proposed",
+      "implementation": "none",
+      "evidence": [],
+      "modules": [],
+      "amends": [
+        "0019"
+      ],
+      "notes": "Not built. The integrity patterns and the forged-ping guard exist inside the gate (safety.py, tests/test_guards.py) and are the detectors this record gathers under one name; no intake function, row, stamp, backend or validator exists."
+    },
+    {
+      "number": "0023",
+      "file": "0023-ledger-and-interlock.md",
+      "title": "The ledger and the interlock are two named things bound by one invariant, and nothing weakens a restriction without a clearance row",
+      "decision": "Proposed",
+      "implementation": "none",
+      "evidence": [],
+      "modules": [],
+      "amends": [
+        "0019",
+        "0015"
+      ],
+      "notes": "Not built. Session-scoped latch state, operator clear by reason and selective clear exist inside the gate (tests/test_latch.py); no append-only row, hash chain, interlock, clearance row, persistence, manifest, aftermath counter or narrator exists. Amends ADR-0015's hard-tier visibility clause (once when the latch sets, again only as a refusal's reason); the cap is unchanged."
+    },
+    {
+      "number": "0025",
+      "file": "0025-assist-from-the-hold-and-affinity-seat-trade.md",
+      "title": "The assist from the hold, and an affinity that can trade seats",
+      "decision": "Proposed",
+      "implementation": "none",
+      "evidence": [],
+      "modules": [],
+      "notes": "The operator's design intent, recorded with its target case (SiblingAssist) and its gate. Not adopted; would amend ADR-0016 if Accepted; not to be built before a generation layer exists."
+    }
+  ],
+  "reserved": [
+    {
+      "number": "0021",
+      "held_for": "the neurodivergent interruption stack (an external reviewer's draft); lands only with its fixtures, gated by the rule that neurodivergent-friendliness claims wait on green fixtures"
+    },
+    {
+      "number": "0024",
+      "held_for": "the completion field per profile; lands with its own change"
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-"""J.R. v0 — voiceless audit harness (ADR-0014, ADR-0019, ADR-0020).
+"""J.R. v0 — voiceless audit harness (ADR-0014; ADR-0019 (Proposed); ADR-0020 (Proposed)).
 
 Pure function: ``audit(request) -> AuditVerdict``. No persona, no prompt, no
 seat, no writes except the caller appending an audit row. The crisis gate

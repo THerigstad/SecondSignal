@@ -2,7 +2,7 @@
 
 **A model-agnostic routing and safety layer for multi-agent conversational systems.**
 
-[![tests](https://img.shields.io/badge/tests-1%2C004%20%C2%B7%20170%20known%20gaps%20%C2%B7%2010%20recorded%20dissents-brightgreen)](tests/)
+[![tests](https://img.shields.io/badge/tests-1%2C070%20%C2%B7%20176%20known%20gaps%20%C2%B7%2014%20recorded%20dissents-brightgreen)](tests/)
 [![python](https://img.shields.io/badge/python-3.10%2B-blue)](pyproject.toml)
 [![license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
@@ -55,12 +55,24 @@ the fix is to reword a paragraph and hope.
 SecondSignal treats agent selection as a **policy decision**: explicit, scored,
 versioned, and testable independent of any model.
 
-In the vocabulary that is settling across the industry — *an agent is a model
-plus a harness*, where the harness is identity, permissions, memory, tools,
-approvals and logging — this repository is the model-agnostic policy part of a
-harness: the part that decides who may speak and whether anyone should, before
-any model is called. The agent profiles are the swappable, job-specific part.
-The model is deliberately the least interesting component here.
+In the vocabulary Charafeddine Mouzouni uses in
+[The AI OS](https://charafeddine.co/letters/96-you-won-t-have-100-ai-agents) —
+*an agent is a model plus a harness*, where the harness is identity,
+permissions, memory, tools, approvals and logging — this repository is the
+model-agnostic policy part of a harness: the part that decides who may speak
+and whether anyone should, before any model is called. The agent profiles are
+the swappable, job-specific part. The model is deliberately the least
+interesting component here.
+
+Harnesses worked for code first because code is legible: files you can read,
+changes you can revert, tests that fail out loud. Conversation is the least
+legible thing a model does; a sentence cannot be reverted. This layer makes
+conversation legible after the fact. Every decision is a record that explains
+itself, every reply is meant to be judged against the record it was supposed
+to honor, and a wrong read costs the person nothing, because the next turn is
+screened fresh and no affirmation is ever a key. That is the closest thing to
+version control a conversation can have. (The judging half is the audit
+harness, and it is not wired yet; see [Status](#status).)
 
 Three claims follow from that, and each one is enforced by a test in this repo:
 
@@ -84,7 +96,7 @@ git clone https://github.com/THerigstad/SecondSignal.git
 cd SecondSignal
 pip install -e ".[dev]"
 
-pytest                                  # 1,004 tests: 180 expected failures (170 documented gaps, 10 recorded dissents), the rest pass; no network, no API key
+pytest                                  # 1,070 tests: 190 expected failures (176 documented gaps, 14 recorded dissents), the rest pass; no network, no API key
 python -m secondsignal --roster
 python -m secondsignal "I'm panicking, chest tight, can't breathe"
 python -m secondsignal --json "help me plan the launch"
@@ -363,8 +375,8 @@ written by message text
 | Deterministic routing policy with full traces and named reasons; seat-claims, holds with obligations, an advisory assist, one eligibility gate | Model-backed signal extraction; a trained crisis classifier; token-level language identification |
 | Fail-closed crisis screen (class lexicon, `unreviewed`) over normalized text, with idiom masks and a receipt on every verdict; boundary, integrity and facilitation holds; the two-tier careful-side latch and register cap; style preferences that ask | Response generation of any kind; the settings surface that stores a confirmed preference |
 | Declarative roster validated at load, including the stabilizer floor; profiles hashed; stabilizer resolved by role | Persistent cross-session memory |
-| Labeled eval cases run in CI: 321 inventoried in a case manifest, including 128 external reviewer fixtures, 170 documented gaps and 10 recorded dissents; an expected failure may fail only on the fields it was approved for, so it cannot absorb an unrelated regression | The audit harness wired in (a reference port, `jr.py`, is in the tree and deliberately unwired: it reads a flat record where the decision nests its fields); Protocol A / B evaluations |
-| English and a native Spanish pack (`unreviewed`) with verified resource rows; 1,004 tests, no network or API key required | Any other language; a full lane for danger from another person (an interim weapon lane fails closed with no resource line); clinical review of any lexicon; multi-turn conversational state beyond monitors |
+| Labeled eval cases run in CI: 347 inventoried in a case manifest, including 154 external reviewer fixtures, 176 documented gaps and 14 recorded dissents; an expected failure may fail only on the fields it was approved for, so it cannot absorb an unrelated regression | The audit harness wired in (a reference port, `jr.py`, is in the tree and deliberately unwired: it reads a flat record where the decision nests its fields); Protocol A / B evaluations |
+| English and a native Spanish pack (`unreviewed`) with verified resource rows; 1,070 tests, no network or API key required | Any other language; a full lane for danger from another person (an interim weapon lane fails closed with no resource line); clinical review of any lexicon; multi-turn conversational state beyond monitors |
 
 This repository is the **policy layer only**. It decides who should respond and
 whether anyone should. It does not generate responses, and it is not a chatbot.
@@ -372,6 +384,57 @@ That boundary is deliberate: the routing and safety logic is the part that
 should be auditable, and it is the part that stays stable while the underlying
 model is replaced. The full list of what is not built, not reviewed, and not
 decided is one page: [`docs/known-limitations.md`](docs/known-limitations.md).
+
+**What is not built, by record.** Every architecture decision record carries
+two statuses in a machine-checked register
+([`docs/adr/index.json`](docs/adr/index.json), enforced by
+`tests/test_adr_index.py`): what was decided (Proposed, Accepted, Superseded)
+and what the tree does about it (not-code, none, partial, reference-unwired,
+built). Proposed is never read as Accepted, and Accepted is never read as
+implemented. The records the tree does not yet honor, and the reasons, are:
+
+- The security layer is five objects on five clocks, none of them a persona
+  and none with a profile. **The gate** (`safety.evaluate`, first, on the
+  normalized bytes) is built. **Intake and provenance** (after the gate,
+  before routing; read-only on the bytes; proposes, never grants) is
+  [ADR-0022](docs/adr/0022-intake-and-provenance.md), Proposed, not built.
+  **The audit harness** (after a seated reply, never after the gate fired) is
+  [ADR-0014](docs/adr/0014-jr-is-a-harness-not-a-persona.md), Accepted, with
+  a reference port in the tree that is deliberately unwired and whose
+  predicates are [ADR-0020](docs/adr/0020-jr-v0-predicates.md), Proposed
+  with five open corrections. **The ledger and the interlock** (across turns;
+  append-only rows and the rule that reads them; nothing weakens a
+  restriction without a clearance row) is
+  [ADR-0023](docs/adr/0023-ledger-and-interlock.md), Proposed, not built.
+  **The commit monitor** (at tool time, once tools exist; unnamed) is fixed
+  in [ADR-0019](docs/adr/0019-security-triad-and-commit-monitor.md),
+  Proposed as amended, not built. The three offline narrators sit outside
+  the five and do not exist either.
+- The next build block is not the security layer. It is the lane every
+  reviewing family put first: a fail-closed class for weapon-free danger from
+  another person (present confinement, prior violence, fear for dependents),
+  an abuse-history hold, and a post-separation resource line that ships only
+  after a human has verified every row it points at.
+- [ADR-0025](docs/adr/0025-assist-from-the-hold-and-affinity-seat-trade.md)
+  (an assist drawn from a hold, and an affinity that can trade seats) is the
+  operator's design intent, Proposed, not adopted, and not to be built before
+  a generation layer exists.
+- Four Accepted records have no code behind them by design and are
+  design contracts for layers this repository does not contain:
+  [ADR-0001](docs/adr/0001-impact-events.md) (impact events),
+  [ADR-0002](docs/adr/0002-user-authority-is-source-anchored.md) (the
+  authority model the thesis states; the latch and preference rules that
+  follow from it are built under ADR-0015 and ADR-0017),
+  [ADR-0006](docs/adr/0006-generated-artifacts-begin-in-quarantine.md)
+  (generated artifacts) and
+  [ADR-0007](docs/adr/0007-memory-lifecycle-and-supersession.md) (memory
+  lifecycle). There is no generation layer and no persistent memory here, so
+  there is nothing for them to govern yet.
+
+The Security Division records above were written by the project's own
+assistant and reviewed by five other model families in review round 1; under
+the project's standing rule, none of them becomes Accepted until a second
+round from a different family has read the amended versions.
 
 ### Roadmap
 
@@ -387,6 +450,13 @@ decided is one page: [`docs/known-limitations.md`](docs/known-limitations.md).
       write-permission sandbox, ADR-0014) is in the tree as `jr.py`, reviewed
       blind-first by a second model family, and stays unwired until the
       release door exists
+- [ ] The weapon-free danger class, the abuse-history hold and the
+      post-separation line (the next build block), then the crisis-card and
+      house-line copy changes ruled on 2026-09-08 with their test pins
+- [x] A machine-checked register of every architecture decision record
+      (`docs/adr/index.json`, `tests/test_adr_index.py`): decision status and
+      implementation status kept apart, citations from code reconciled both
+      ways, Proposed records named here or the suite fails
 - [ ] Adapter examples for common orchestration frameworks
 - [x] Structured JSON decision output (`--json`, `RoutingDecision.to_dict()`)
       for post-hoc audit
@@ -486,15 +556,20 @@ the words. It grows with every review round.
   to decay entirely after five clean turns. The visible line decays; the
   register cap stays until an operator clears it, because nothing was
   declared and a minor must not be able to clear a cap by waiting. Closed.
-- **A relative's relapse claims the recovery seat** (`grok-seat-004`,
-  `qwn-d3-thirdperson-relapse-001`). Three reviewers say hold: seat the
-  person's own ask and carry recovery alongside. Two say the recovery persona
-  belongs in the room. For now the relapse claims the seat, with the subject
-  recorded as another person and family-impact obligations on the record —
-  and only because obligations on a hold are enforced by nothing yet. Measured
-  both ways. **Open**: revisits after the second review round, and again when
-  the harness ([ADR-0014](docs/adr/0014-jr-is-a-harness-not-a-persona.md))
-  can enforce obligations.
+- **A relative's relapse: the bare report seats the recovery persona; an
+  ask seats the ask** (`grok-seat-004`, `qwn-d3-thirdperson-relapse-001`).
+  Three reviewers said hold, two said the recovery persona belongs in the
+  room. Decided with dissent on 2026-09-08: a bare report with no other ask
+  seats the recovery persona; an ask seats the ask with the recovery hold
+  carried and the recovery persona offered as a companion on every such
+  reply. The tree still seats the recovery persona on every relative
+  sentence today (measured 2026-09-08); the change to the third-person
+  claim, ADR-0016's amendment and the fixtures are the next build block. The
+  two fixtures stay as dissent because they expect no recovery persona even
+  on the bare report. **Decided with dissent**; the operator's wider intent
+  (the recovery protocol as an assist to a different voice) is filed as
+  [ADR-0025](docs/adr/0025-assist-from-the-hold-and-affinity-seat-trade.md),
+  Proposed.
 - **A substantial unscreened span escalates**
   (`qwn-d6-unscreened-language-001`). Four reviewers wanted an unscreened
   language to disclose honestly and never latch. With the fifth, the project
@@ -525,6 +600,17 @@ poorly "the model will handle it appropriately" holds up as a safety argument
 once real people are involved. The design conclusion, that the route itself must
 be gated rather than the output filtered, is downstream of watching output-level
 guardrails fail.
+
+## Acknowledgments
+
+The framing that an agent is a model plus a harness, and the decision to build
+this project's audit function as a voiceless harness rather than as a
+character ([ADR-0014](docs/adr/0014-jr-is-a-harness-not-a-persona.md)), came
+from Charafeddine Mouzouni's letter #96,
+["You won't have 100 AI agents"](https://charafeddine.co/letters/96-you-won-t-have-100-ai-agents)
+(The AI OS, 29 August 2026). The letter is cited, not adopted as a
+specification; the design choices here, and their mistakes, are the
+maintainer's.
 
 ## License
 

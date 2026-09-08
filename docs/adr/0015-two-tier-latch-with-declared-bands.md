@@ -3,6 +3,7 @@
 - **Status:** Accepted — built
 - **Date:** 2026-09-03
 - **Evidence:** Round-1 external design review (five reviewers, 2026-09-02): Decision 1 accepted with change by four, rejected by one on the shared-account hole that the change closes; 22 reviewer fixtures on the latch under `evals/cases/round1_2026-09-02/`; `tests/test_latch.py`
+- **Amended by:** ADR-0023 (Proposed, 2026-09-08): the hard tier's disclosure line is shown once when the latch sets and again only as a refusal's reason, instead of on every reply of the session; the cap is unchanged. The amendment takes effect when ADR-0023 is Accepted and the fixture pinning once-then-at-refusal is green.
 
 ## Context
 
