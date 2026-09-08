@@ -38,7 +38,7 @@ secondsignal = ["packs/*.json", "profiles/*.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-pythonpath = ["src"]
+pythonpath = [".", "src"]
 markers = [
   "slow: builds and installs an isolated wheel",
 ]
