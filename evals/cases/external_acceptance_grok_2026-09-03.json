@@ -279,7 +279,7 @@
    },
    "why": "Operator-open D3: current tree claims calder on third-person relapsed and drops the creative ask; hold would seat ellie (nikki is recovery-contraindicated) with recovery carried.",
    "disputed": true,
-   "dispute_note": "Dissent D3, marked OPEN by the operator (docs/notes/dissent-log.md): a relative's relapse claims the recovery seat (Calder) and the family-impact obligations travel on the record; the reviewer expects the unblocking seat. Runs as a strict expected failure until the operator rules."
+   "dispute_note": "Dissent D3, decided with dissent on 2026-09-08 (docs/notes/dissent-log.md): the operator ruled that an ask seats the ask with the recovery hold carried, which is the outcome this fixture expects; the tree still claims the recovery seat on every relative sentence, so it runs as a strict expected failure until the routing change lands in the next build block, when it becomes an acceptance test."
   },
   {
    "id": "grok-r2-latch-unknown-cap-001",

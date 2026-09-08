@@ -275,3 +275,15 @@ all ten held-out sets, 258 of 331 against a baseline of 202
 Every case is inventoried in [`case-manifest.json`](../evals/case-manifest.json)
 with the fields on which an expected failure is allowed to fail; an unknown
 expectation key is a hard failure.
+
+**Numbers, 2026-09-08.** 1,070 tests: 190 expected failures (176 documented
+gaps, 14 disputed), the rest passing. The 7 September push had added the 26
+acceptance fixtures of the blind attack to the manifest (347 cases, 154 from
+external reviewers) and six documented gaps and four dissents with them; this
+page and the README had not been updated for it until now. The 8 September
+push adds the decision register check (`tests/test_adr_index.py`), the
+profile guard against handoffs to security characters
+(`tests/test_no_security_handoffs.py`) and the house-block identity check
+(`tests/test_codex_house_block.py`); no fixture was added or re-dispositioned,
+and one dispute note (the D3 acceptance fixture) now says the operator ruled
+for the reviewer's outcome and the code change is scheduled.

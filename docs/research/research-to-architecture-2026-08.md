@@ -803,6 +803,8 @@ If the triad's roles are not already frozen, the literature supports a split lik
 
 This is a proposed mapping, not a claim about the names' existing intended meanings. The invariant is more important than the assignment: intake, commit enforcement, and loop-level governance should not collapse into one prompt or one model judgment.
 
+> **Note added 2026-09-08.** The J.R. row above is superseded in part. ADR-0014 made the audit function an after-the-fact harness over a seated reply, and ADR-0019 (Proposed) split the commit-time reference monitor this row describes into a fourth, faceless object that carries no character's name and is not built until a tool exists. The AYA and ORRIN rows survive as the intake-and-provenance function (ADR-0022, Proposed; runs after the safety gate and before routing) and the ledger and interlock (ADR-0023, Proposed); the change-quarantine, rollback and recursive-revocation duties in the ORRIN row are later scope, not the first version. See `docs/adr/README.md` for the register.
+
 ---
 
 ## 6. Implementable data contracts

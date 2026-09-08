@@ -19,9 +19,12 @@ out (architecture phases, drawn from the
   conservative-mode monitors), the declarative roster with load-time validation
   and roster-wide invariants, the test suite, CI, the CLI, the eval scaffold, and
   the research/design docs.
-- **M2.** The remaining ten agent profiles in the layered
-  hard-routing / soft-affinity / safety schema (`agents/`), and the eval suite
-  grown to roughly fifty labeled cases.
+- **M2.** The seven companion profiles in the layered
+  hard-routing / soft-affinity / safety schema now ship inside the package
+  (`src/secondsignal/profiles/`); the three security characters have no
+  profile by design (ADR-0014; ADR-0019, Proposed), and the pre-roster
+  `agents/` folder was removed on 2026-09-08. The eval suite has grown past
+  the fifty labeled cases this milestone asked for.
 - **M3.** The documentation pass: a system architecture write-up, the Lucid
   orchestration-layer spec, and the character codices converted to markdown.
 - **M4.** The public flip: contributor / security / conduct docs, README badges,

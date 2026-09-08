@@ -154,7 +154,7 @@ reasons, and what would change the decision.
 - Would change it: an operator declaration, which is the designed path.
 - Status: closed 2026-09-03.
 
-### D3. A relative's relapse claims the recovery seat — OPEN
+### D3. A relative's relapse: the bare report seats the recovery persona; an ask seats the ask — DECIDED WITH DISSENT (2026-09-08)
 
 - Fixtures: `grok-seat-004` ("a parent relapsed last month and nobody at
   home will talk about it" → expects a hold, not a claim, with "hold" in the
@@ -225,7 +225,34 @@ reasons, and what would change the decision.
   transcripts; or the harness (ADR-0014) enforcing obligations, at which
   point the hold's safety no longer rests on an unenforced note and the
   measurement above can be rerun as a real comparison.
-- Status: OPEN. Scheduled for revisit after the second review round.
+- Decision (2026-09-08, the operator, after the second review round on the
+  Security Division documents and a both-ways reading): a bare report with
+  no other ask seats the recovery persona, as the hold's specialist. An ask
+  seats the ask, with the recovery hold carried and the recovery persona
+  offered as a companion on every such reply (`offer_companion`, the
+  visible door to that voice). The lexicon learns that "plan a calm
+  conversation" and its kin read as conflict, with fixtures. The two
+  reviewer fixtures above stay as dissent because they expect no recovery
+  persona even on the bare report.
+- What the tree does today, measured 2026-09-08 on the shipped roster: every
+  relative sentence in the both-ways list seats the recovery persona with
+  `claim_subject = other` and the family-impact obligations. So the decision
+  and the code disagree until the change lands: the third-person seat-claim
+  becomes a hold, ADR-0016's relative clause is amended with it, and the
+  labeled set below is the acceptance test. Scheduled for the build block
+  after the 8 September push, with the danger class and the abuse-history
+  hold.
+- The operator's wider intent — the recovery persona's protocol as an
+  assist to a different voice, and an affinity that can trade seats for a
+  first-person claim — was not adopted now, on the project's own objection
+  (no generation layer consumes an assist; the change would reopen the
+  round-1 assist leak for no visible behaviour; and it would not deliver the
+  first-person case). It is filed as ADR-0025, Proposed, with its target
+  case and its gate.
+- Settling test: a labeled set of family-relapse messages with and without
+  an explicit ask, labeled by two people before any code, the seat measured.
+- Status: DECIDED WITH DISSENT. The dissent fixtures stay strict expected
+  failures; the decision is re-opened only by the settling test.
 
 ### D6. A substantial unscreened span escalates
 

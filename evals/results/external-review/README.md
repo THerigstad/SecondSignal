@@ -8,6 +8,12 @@ review's independence, and what was done with it. The point of publishing it
 is the point of the repository: a routing and safety layer should be able to
 show its work, including the work that found it wanting.
 
+Every return in this directory is kept exactly as it arrived — "frozen like
+Han Solo, right here in daddy Velour's data dungeon", as the operator put it
+— and nothing in it was edited to make a number look better. Where the
+project disagrees with a reviewer, the disagreement is written down next to
+the return, never into it.
+
 ## Round 1 (design review, 2026-09-02) in one paragraph
 
 Seven decisions — the two-tier minor latch, the register cap, seat-claims,

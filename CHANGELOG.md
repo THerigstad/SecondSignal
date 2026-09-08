@@ -4,6 +4,92 @@ All notable changes to SecondSignal are documented here.
 
 ## [Unreleased]
 
+### Added — the Security Division records and the decision register, 2026-09-08
+
+Writing, not building. Nothing on the request path changed in this batch;
+what changed is what the tree admits about itself.
+
+- **A machine-checked register of architecture decisions**
+  (`docs/adr/index.json`, `tests/test_adr_index.py`, `docs/adr/README.md`).
+  Every record carries a decision status (Proposed, Accepted, Superseded) and
+  a separate implementation status (not-code, none, partial,
+  reference-unwired, built). The suite fails on an unregistered record, a
+  status line that disagrees with the register, an implementation claim
+  with no evidence test or module behind it, a citation from code to a
+  record that does not exist, a citation of a Proposed record without the
+  marker `(Proposed)` beside it, a stale marker, a one-way relationship, a
+  Proposed or unbuilt record the README does not name, or a reserved number
+  that is used. Born the day the new statuses landed, because ADR-0014's
+  hand-maintained status line had been wrong for a week and nothing could
+  notice.
+- **Five Security Division records, all Proposed**: ADR-0019 (the five
+  objects and their clocks, amended: the gate is object one, the narrators
+  sit outside, intake runs after the gate), ADR-0020 (the audit-harness
+  predicates, with five corrections listed as open), ADR-0022 (intake and
+  provenance: after the gate, before routing, read-only on the bytes,
+  fail-closed on the seat when intake fails, a published backend matrix),
+  ADR-0023 (the ledger and the interlock: two named things bound by one
+  invariant, five rules from the reviewers' attacks, the three events kept
+  apart, persistence with a staffing duty, bounded aftermath as presentation
+  state) and ADR-0025 (the operator's assist-and-seat-trade intent, filed
+  with its target case and its gate). Under the project's standing rule none
+  becomes Accepted until a second model family has reviewed the amended
+  text. `docs/adr/index.json` reserves 0021 and 0024 for records not yet
+  written.
+- **The codex files in the two-part shape** (`docs/codex/`): the house block
+  (Part A, v1.1), and the J.R. (v3.1), Orrin (v1.1) and Aya (v1.1) Two-Part
+  Editions, each with a change log naming the review-round-1 rulings it
+  carries, each marked Proposed until review round 2 closes. The Security
+  Division document v1.1 (`docs/notes/security-division-2026-09-08.md`)
+  carries every correction from that round.
+- **A profile guard** (`tests/test_no_security_handoffs.py`): no profile in
+  any format may hand a person to `orrin`, `aya` or `jr`, and no profile
+  file may carry one of those names.
+- **Credit.** The audit-harness reference port (`jr.py`, unwired) follows
+  ADR-0014; the harness framing is credited to Charafeddine Mouzouni, The AI
+  OS letter #96 (29 August 2026). The README names him inline where the
+  framing is used and in an Acknowledgments section.
+- Test suite: 1,070 tests — 190 expected failures (176 documented gaps, 14
+  recorded dissents), the rest passing. The counts in the README, the
+  evaluation page and the badge had been stale since the 7 September push
+  (which added the 26 acceptance fixtures and their gaps and dissents); they
+  now match the tree. The D3 acceptance fixture's dispute note records the 8
+  September ruling; its disposition is unchanged until the code changes.
+- README: a paragraph on legibility under "The idea"; a "what is not built,
+  by record" section under Status naming every Proposed or unbuilt record;
+  the dissent index entry for a relative's relapse moved from Open to
+  decided with dissent. `docs/known-limitations.md`: the latch-lifetime
+  contradiction, the staffing duty, the single-operator common mode, the
+  unmeasured adult false-positive rate, quotation and mention as a chosen
+  over-restriction, the voice and embodiment scope lock, and the weapon-free
+  danger gap named as the next build block. A dated note in the research
+  note's §5.2 pointing at the records that supersede its J.R. row. The
+  external-review README says, in the operator's words, that every return is
+  kept as it arrived.
+
+### Changed — 2026-09-08
+
+- ADR-0014's status line, stale since the reference port entered the tree on
+  2026-09-06, now reads "Accepted; reference port present and deliberately
+  unwired", and its relationship section says so. ADR-0015 records that
+  ADR-0023 (Proposed) amends its hard-tier visibility clause. `jr.py`'s first
+  line marks ADR-0019 and ADR-0020 as Proposed.
+- The dissent log's D3 is decided with dissent: a bare report of a relative's
+  relapse seats the recovery persona; an ask seats the ask with the recovery
+  hold carried and the recovery persona offered. The tree still seats the
+  recovery persona on every relative sentence; the code change, ADR-0016's
+  amendment and the fixtures are the next build block, and the log says so.
+- `docs/roadmap.md` M2 no longer points at a folder that does not exist.
+
+### Removed — 2026-09-08
+
+- `agents/calder/profile.yaml`, a pre-roster artifact from before the JSON
+  roster existed. Nothing read it, and its handoff table still sent
+  "genuine physical-safety or preparedness emergency" to a security
+  character, a handoff the runtime refuses. The JSON roster under
+  `src/secondsignal/profiles/` is the roster; the new profile guard fails if
+  such a row ever returns.
+
 ### Changed — the crisis-gate repairs and the two-builder merge, 2026-09-04 to 2026-09-06
 
 A reviewer given the code returned 26 executable fixtures; 25 failed, twenty
