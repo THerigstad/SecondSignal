@@ -14,6 +14,12 @@ repository does not implement yet.
   cultural-bypass predicates.
 * `vendor_desync_cases.json` — transport events between this layer's verdict
   and a vendor model's own safety behavior.
+* `stall_recovery_cases.json` — orchestration plane: bounded retries by
+  strategy, a watchdog outside the call, partial-work preservation,
+  side-effect replay, a circuit breaker. Model-generated (ChatGPT-6 Astra,
+  9 September 2026), filed 10 September under
+  `docs/notes/stall-and-recovery-proposal-2026-09-10.md`; its retry taxonomy
+  shapes the intake rule's one automatic retry.
 
 They are labeled with `"plane"` and `"runnable_here": false`, and
 `tests/test_eval_cases.py` asserts they are never run as policy cases. When a

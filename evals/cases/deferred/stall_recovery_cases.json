@@ -1,0 +1,221 @@
+{
+  "schema_version": 2,
+  "plane": "orchestration",
+  "runnable_here": false,
+  "model_generated": true,
+  "source": "ChatGPT-6 Astra (Ultra), 9 September 2026, the stall-and-recovery evaluation packet (ss_stall.zip) returned to the operator; filed 10 September 2026 under docs/notes/stall-and-recovery-proposal-2026-09-10.md. Verbatim givens and expectations; the ids and the why lines are the project's.",
+  "description": "Deferred-plane fixtures for an orchestration layer this repository does not contain: bounded retries by strategy fingerprint, a watchdog outside the call, partial-work preservation, side-effect replay, a circuit breaker. Adopted as a description of what the layer must do when it exists; nothing here is built. The retry taxonomy shapes the one automatic retry of the intake failure rule (ADR-0022, 10 September 2026).",
+  "retry_policy": {
+    "max_equivalent_failures": 2,
+    "default_no_progress_timeout_seconds": 90,
+    "max_total_recovery_seconds": 300,
+    "require_material_change_for_retry": true,
+    "auto_retry": [
+      "RATE_LIMIT",
+      "TRANSIENT_NETWORK",
+      "PROVIDER_5XX",
+      "PROVIDER_TIMEOUT"
+    ],
+    "never_blind_retry": [
+      "INVALID_AUTH",
+      "PERMISSION_DENIED",
+      "UNSUPPORTED_INPUT",
+      "INVALID_ARGUMENT",
+      "SAFETY_REFUSAL",
+      "USER_CANCELLED",
+      "CONTEXT_LIMIT"
+    ]
+  },
+  "states": [
+    "QUEUED",
+    "RUNNING",
+    "WAITING_ON_TOOL",
+    "RECOVERING",
+    "STALLED",
+    "PARTIAL_SUCCESS",
+    "BLOCKED_USER_INPUT",
+    "BLOCKED_EXTERNAL_SYSTEM",
+    "FAILED_SAFELY",
+    "COMPLETED",
+    "CANCELLED"
+  ],
+  "incident_row_schema": {
+    "type": "object",
+    "required": [
+      "task_id",
+      "goal",
+      "failed_action",
+      "attempts",
+      "strategies_tried",
+      "last_error",
+      "artifacts_preserved",
+      "recommended_disposition"
+    ],
+    "properties": {
+      "task_id": {
+        "type": "string"
+      },
+      "goal": {
+        "type": "string"
+      },
+      "failed_action": {
+        "type": "string"
+      },
+      "attempts": {
+        "type": "integer"
+      },
+      "strategies_tried": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "last_error": {
+        "type": "string"
+      },
+      "artifacts_preserved": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "safe_to_retry": {
+        "type": "boolean"
+      },
+      "recommended_disposition": {
+        "enum": [
+          "RETRY_DIFFERENTLY",
+          "FALLBACK",
+          "ASK_USER",
+          "WAIT_EXTERNAL",
+          "STOP"
+        ]
+      }
+    }
+  },
+  "cases": [
+    {
+      "id": "stall-001",
+      "name": "equivalent_timeout_stops_after_bound",
+      "given": [
+        {
+          "strategy": "standard",
+          "error": "PROVIDER_TIMEOUT"
+        },
+        {
+          "strategy": "standard",
+          "error": "PROVIDER_TIMEOUT"
+        }
+      ],
+      "expected": {
+        "disposition": "STOP"
+      },
+      "why": "Two identical attempts with the same transient error stop; the intake retry of ADR-0022 (10 September) takes this bound as one automatic retry, never two."
+    },
+    {
+      "id": "stall-002",
+      "name": "materially_different_strategy_is_allowed",
+      "given": [
+        {
+          "strategy": "primary_endpoint",
+          "error": "PROVIDER_TIMEOUT"
+        },
+        {
+          "strategy": "alternate_endpoint",
+          "error": "PROVIDER_TIMEOUT",
+          "materially_changed": true
+        }
+      ],
+      "expected": {
+        "disposition": "RETRY"
+      },
+      "why": "A retry that changes something material is a new attempt, not a repeat."
+    },
+    {
+      "id": "stall-003",
+      "name": "invalid_auth_never_blind_retries",
+      "given": [
+        {
+          "strategy": "standard",
+          "error": "INVALID_AUTH"
+        }
+      ],
+      "expected": {
+        "disposition": "STOP",
+        "attempt_count": 1
+      },
+      "why": "A non-retryable class goes straight to the failure path; the intake rule's retry never fires on it."
+    },
+    {
+      "id": "stall-004",
+      "name": "watchdog_detects_no_progress",
+      "given": {
+        "seconds_since_meaningful_progress": 120,
+        "timeout_seconds": 90
+      },
+      "expected": {
+        "state": "STALLED"
+      },
+      "why": "Liveness is judged from outside the call; a worker never watches itself."
+    },
+    {
+      "id": "stall-005",
+      "name": "healthy_long_job_is_not_killed",
+      "given": {
+        "seconds_since_meaningful_progress": 20,
+        "timeout_seconds": 90
+      },
+      "expected": {
+        "state": "WAITING_ON_TOOL"
+      },
+      "why": "A quiet job inside its window is not a stall; heartbeat traffic is not progress and silence is not death."
+    },
+    {
+      "id": "stall-006",
+      "name": "partial_work_survives_failure",
+      "given": {
+        "checkpoint": [
+          "script",
+          "shot_list",
+          "frame_01"
+        ],
+        "error": "PROVIDER_TIMEOUT"
+      },
+      "expected": {
+        "state": "PARTIAL_SUCCESS",
+        "artifacts_preserved": [
+          "script",
+          "shot_list",
+          "frame_01"
+        ]
+      },
+      "why": "What finished is reported as finished; a failure at the last step is not a failure of the whole."
+    },
+    {
+      "id": "stall-007",
+      "name": "unsafe_side_effect_replay_is_blocked",
+      "given": {
+        "action": "create_customer",
+        "acknowledgement_lost": true,
+        "idempotency_key": null
+      },
+      "expected": {
+        "disposition": "ASK_USER_OR_RECONCILE",
+        "must_not_blind_retry": true
+      },
+      "why": "A lost acknowledgement on a side-effecting action is never replayed blind."
+    },
+    {
+      "id": "stall-008",
+      "name": "circuit_breaker_opens_after_dependency_failure_threshold",
+      "given": {
+        "recent_failures": 5,
+        "threshold": 3
+      },
+      "expected": {
+        "circuit_state": "OPEN"
+      },
+      "why": "A dependency that keeps failing is stopped as a dependency, not retried per call."
+    }
+  ]
+}

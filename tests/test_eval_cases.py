@@ -328,5 +328,5 @@ def test_deferred_plane_fixtures_are_not_run_as_policy_cases() -> None:
     assert deferred.is_dir()
     for path in sorted(deferred.glob("*.json")):
         doc = json.loads(path.read_text(encoding="utf-8"))
-        assert doc.get("plane") in {"generation", "harness", "transport"}, path.name
+        assert doc.get("plane") in {"generation", "harness", "transport", "orchestration"}, path.name
         assert doc.get("runnable_here") is False, path.name
