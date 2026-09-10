@@ -21,7 +21,7 @@ does not implement yet.
   9 September 2026), filed 10 September under
   `docs/notes/stall-and-recovery-proposal-2026-09-10.md`; its retry taxonomy
   shapes the intake rule's one automatic retry.
-* `round2_orchestration_cases.json` — orchestration plane: the eleven
+* `round2_orchestration_cases.json` — orchestration plane: the twelve
   review-round-2 fixtures that test the composition of the gate with
   deterministic intake and an optional backend (ADR-0022): the card committed
   before intake is invoked, intake failure after a proceed, the backend matrix

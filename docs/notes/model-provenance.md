@@ -142,10 +142,11 @@ filed; family; doorway; model and tier.
   recorded), DeepSeek V4 Pro Expert, Qwen 3.8 Max Thinking; Vibe took neither
   the zip nor the paste and was skipped.
 - 2026-09-08 to 10, review round 2 (the Security Division records and
-  ADR-0025), ten returns from eight families, each read for its own
+  ADR-0025), ten returns from nine families, each read for its own
   independence statement, which four of them used to correct their file
-  names: ChatGPT (OpenAI; the Codex desktop task handling the zip; model and
-  setting unattested by the return); Grok (xAI; grok.com; Grok 4.6 Expert);
+  names: ChatGPT twice (OpenAI; the Codex desktop task handling the zip,
+  model and setting unattested by the return; and, by the operator's
+  account, the Chat tab, tier not recorded); Grok (xAI; grok.com; Grok 4.6 Expert);
   DeepSeek (DeepSeek; chat; DeepThink); Qwen (Alibaba; paste parts; Qwen 3.7
   Plus Thinking as filed); Kimi (Moonshot; via Perplexity; Kimi K3 Thinking);
   GLM (Zhipu; via Perplexity; GLM 5.3 Thinking); Nemotron (NVIDIA; via

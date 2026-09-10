@@ -90,8 +90,8 @@
     },
     {
       "file": "review-round.svg",
-      "sha256": "a8de12715f73fd8a871ee1c3862241cf5ef6a8742507164f636fc6495974b081",
-      "generator": "drawn as SVG by the Primary Design Agent (Claude Fable 5.1), 10 September 2026; the numbers on it are from evals/run_fixtures.py and the committed result pages, never typed from memory",
+      "sha256": "f3c2d2cf8b2fdba04a351c583692237c31c22970d07ef101f13a9d12dbfabb28",
+      "generator": "drawn as SVG by the Primary Design Agent (Claude Fable 5.1), 10 September 2026 (the Security Division line corrected the same day at the pre-push check: nine families and fifty-four fixtures, from the returns); the numbers on it are from evals/run_fixtures.py and the committed result pages, never typed from memory",
       "alt_text": "How a review round works: one packet to several model families, blind; returns with fixtures; the fixtures run against the tree and classified; the operator rules on every split; the dissent log and the amended records; the next round reads the amended text."
     },
     {

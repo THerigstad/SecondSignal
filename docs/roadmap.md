@@ -72,7 +72,7 @@ lands with its fixtures or not at all.
    R2-2; Kimi and GLM asked at their own doors. The Accepted flips for the
    Security Division records are the operator's act after that round.
 8. **Intake and provenance (ADR-0022), then the ledger and the interlock
-   (ADR-0023).** With the seventeen round-2 fixtures moving up from
+   (ADR-0023).** With the eighteen round-2 fixtures moving up from
    `evals/cases/deferred/` and GLM's settling test for the failure rule
    (disable intake and run the whole suite). Persistence lands only with a
    published response time in the capability manifest.

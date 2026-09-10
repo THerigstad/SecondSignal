@@ -56,15 +56,16 @@ every claim on it points at a test, a record or a labelled proposal.
   fixture stays byte for byte.
 - **The ten codexes in the two-part shape** (`docs/codex/`): the seven
   family codexes from the operator's System Editions, the three security
-  codexes at v1.2, one house block pinned by hash to its version
+  codexes in their 10 September editions (Orrin and Aya v1.2, J.R. v3.2),
+  one house block pinned by hash to its version
   (`house-block.lock.json`), a machine-readable block on each that a test
   holds equal to the profile, the deny-list lint on every Part B, and the
   cross-codex title check.
 - **Review round 2 ingested** (`evals/cases/round2_2026-09-08/`,
-  `evals/cases/deferred/round2_*.json`): fifty-three fixtures from nine
+  `evals/cases/deferred/round2_*.json`): fifty-four fixtures from ten
   returns, verbatim, each named for its reviewer; thirty-six run on the
   policy plane (30 pass as written, 4 contract-adjusted, 1 disputed, 1
-  known gap), seventeen deferred on the orchestration and persistence
+  known gap), eighteen deferred on the orchestration and persistence
   planes. Seven had failed on the tree before the ingest, each on a gap
   they exposed and closed the same night. The twelve narrator-isolation
   fixtures. The twenty P0-lane fixtures.

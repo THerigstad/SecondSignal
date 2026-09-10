@@ -238,7 +238,7 @@ detection out of it.
   message seats the persona the gate allowed with every write blocked and
   the failure line shown (Grok 5.2 as revised by the ruling of 10 September;
   the 8 September text said "seats nobody silently"). Review round 2's
-  eleven composition fixtures are filed verbatim under
+  twelve composition fixtures are filed verbatim under
   `evals/cases/deferred/round2_orchestration_cases.json`; they move up one
   directory and gain the runner's expectations the day intake exists. The same bytes in two sessions,
   one with a prior hard latch, produce intake labels that differ only where

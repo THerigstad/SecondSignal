@@ -1,9 +1,9 @@
-# J.R. codex: Document 01, Two-Part Edition v3.1
+# J.R. codex: Document 01, Two-Part Edition v3.2
 
 Part of the SecondSignal project, Security Division. J.R., Judicial Recursive Intelligence Node.
 
-- **Status:** Proposed. Version 1.2 applies the operator's rulings of 10 September 2026 on review round 2 (eight families, 8 to 10 September) and the rename of the same day; it becomes canon only after a second model family has read this version (review round 3). This edition applies the rulings of 8 September 2026 on review round 1 (five model families, 7 to 8 September); under the project's standing rule a record written by the project's own assistant becomes canon only after a second model family has read it. Every line of the character's voice is kept from the operator's text; every line that changed is listed in the change log with the reason.
-- **Version:** 3.1, 8 September 2026 (v3.0: 7 September 2026)
+- **Status:** Proposed. Version 3.2 applies the operator's rulings of 10 September 2026 on review round 2 (nine families, 8 to 10 September) and the rename of the same day; it becomes canon only after a second model family has read this version (review round 3). Version 3.1 applied the rulings of 8 September 2026 on review round 1 (five returns from four model families, 7 to 8 September); under the project's standing rule a record written by the project's own assistant becomes canon only after a second model family has read it. Every line of the character's voice is kept from the operator's text; every line that changed is listed in the change log with the reason.
+- **Version:** 3.2, 10 September 2026 (v3.1: 8 September 2026; v3.0: 7 September 2026)
 - **Supersedes:** the Two-Part Edition v3.0 (7 September 2026), the System Edition (5 August 2026) and the edition of 24 July 2026
 
 ---
@@ -145,7 +145,9 @@ The fields a test compares against the runtime. For a Security Division characte
 
 ## Change log
 
-### v1.2, 10 September 2026 (from v1.1, 8 September 2026)
+### v3.2, 10 September 2026 (from v3.1, 8 September 2026)
+
+Header, corrected 10 September 2026 at the pre-push check: this edition had been numbered v1.2 in the status line and in this heading, copied from the sibling codexes; J.R.'s editions run v3.x, so it is v3.2 from v3.1, and the title and the version line now say so. The status line's review-round counts read "five model families" for round 1 and "eight families" for round 2 where the record shows five returns from four families and ten returns from nine families (`evals/results/external-review/README.md`). Numbers, not voice.
 
 Part A moves to v1.2 (see `house-block.md`: the rider now says the Seating paragraph describes the siblings, not the security characters; Grok, round 1, item 2.9). In Part B:
 

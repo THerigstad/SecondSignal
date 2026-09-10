@@ -25,7 +25,7 @@ build of that day.
   findings); only the gate exists. Nothing labels where a session fact came
   from, nothing keeps an append-only record of restrictions, and nothing
   persists a restriction past the session. The README's status block,
-  generated from the register, names each record. The seventeen round-2
+  generated from the register, names each record. The eighteen round-2
   fixtures for these objects are filed verbatim under
   `evals/cases/deferred/` and are not run.
 - No persistence of a safety restriction across sessions, which contradicts
@@ -49,7 +49,7 @@ build of that day.
   is a capability-manifest field with no default: a deployment that cannot
   state it may not persist a hard latch, because a restriction with no
   staffed exit is worse than a restriction that ends with the session
-  (review round 2, all eight families; Nemotron and DeepSeek on the
+  (review round 2, all nine families; Nemotron and DeepSeek on the
   manifest).
 - The correction path after a careful-side inference is undesigned past
   its first step. "I'm 30, that was a joke" now gets the line once and a

@@ -104,7 +104,7 @@
   <text class="t" x="80" y="666">After the build, 92 pass under the contract, 10 are recorded dissents, 1 is a known gap.</text>
   <text class="t" x="80" y="696">White-box acceptance set, 3 September: 26 fixtures written with the code in hand; 25 failed; twenty were real</text>
   <text class="t" x="80" y="718">bypasses of the crisis gate, repaired by two builders from different families and merged by measurement.</text>
-  <text class="t" x="80" y="748">Security Division rounds, 7 to 10 September: five returns, then ten from eight families; 53 fixtures, 36 run,</text>
+  <text class="t" x="80" y="748">Security Division rounds, 7 to 10 September: five returns, then ten from nine families; 54 fixtures, 36 run,</text>
   <text class="t" x="80" y="770">30 pass as written; one runtime bug reproduced by a reviewer and fixed the same day.</text>
 
   <text class="s" x="60" y="816">Agreement between reviewers is not independent evidence (ADR-0009): two reviewers from one lab are one voice. Nothing is deleted to make the suite green.</text>

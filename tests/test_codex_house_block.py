@@ -114,6 +114,19 @@ def test_the_codexes_are_exactly_the_seven_profiles_and_the_three_narrators() ->
 
 
 @pytest.mark.parametrize("path", _codex_files(), ids=lambda p: p.name)
+def test_the_edition_in_the_title_is_the_version_on_the_version_line(path: Path) -> None:
+    """Found at the push-3 pre-push check: two titles still said v1.1 beside a
+    version line at 1.2, and one codex carried a sibling's edition number.
+    The title's edition and the version line are one number."""
+    text = path.read_text(encoding="utf-8")
+    title = text.split("\n", 1)[0]
+    edition = re.search(r"Two-Part Edition v(\d+\.\d+)$", title)
+    version = re.search(r"^- \*\*Version:\*\* (\d+\.\d+), ", text, re.M)
+    assert edition and version, f"{path.name}: title or version line not in the codex shape"
+    assert edition.group(1) == version.group(1), f"{path.name}: title says v{edition.group(1)}, version line says {version.group(1)}"
+
+
+@pytest.mark.parametrize("path", _codex_files(), ids=lambda p: p.name)
 def test_every_codex_carries_the_house_block_word_for_word(path: Path) -> None:
     canon = _canon()
     theirs = _part_a(path.read_text(encoding="utf-8"), "\n---\n\n## Part B")

@@ -62,6 +62,9 @@ names as they were written.
    authority, J.R. holds no token), and has no profile in the roster.
 5. The title a security codex gives itself in its block is the title the
    other two use for it in their Family Linkage.
+6. The edition number in a codex's title is the number on its version
+   line (added at the push-3 pre-push check, which found two titles a
+   version behind and one codex numbered with a sibling's edition).
 
 Review round 2 (ChatGPT, mutations H01 to H06; Kimi's title check) found
 the gaps that items 1, 2, 4 and 5 close; each mutation is a red regression
@@ -69,8 +72,9 @@ in `tests/test_register_mutations.py`.
 
 ## Status
 
-Every codex here is Proposed. The three security editions are v1.2 (10
-September 2026), the seven family editions are v1.0 of the two-part shape
+Every codex here is Proposed. The three security editions are the ones of
+10 September 2026 (Orrin v1.2, Aya v1.2, J.R. v3.2; the numbering is each
+codex's own), the seven family editions are v1.0 of the two-part shape
 (10 September 2026), and the house block is v1.2. Under the project's
 standing rule, a record prepared by the project's own assistant becomes canon
 only after a second model family has read the current version; review round 3

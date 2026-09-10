@@ -352,7 +352,7 @@ spoken: the ask was made, and the seat has to hold it without honoring it
 
 ## Review round 2 (the Security Division records and ADR-0025, dispatched 2026-09-08) — ruled 2026-09-10
 
-Eight families returned ten reviews (the provenance is in
+Nine families returned ten reviews (the provenance is in
 `evals/results/external-review/README.md`). The rulings were taken one at a
 time on 10 September; each entry below records the positions, the decision,
 the reasons, and the settling test. Fixtures from the round enter the suite

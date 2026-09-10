@@ -628,9 +628,9 @@ REPORT_HISTORY_NOTES = {
         "four trees compared on the two-builders scoreboard are not recomputed here."
     ),
     "round2-2026-09-08": (
-        "Thirty-six of the round's fifty-three fixtures run on the policy plane; the "
-        "other seventeen are filed under evals/cases/deferred/ on the orchestration "
-        "plane (intake and backend composition, eleven) and the persistence plane "
+        "Thirty-six of the round's fifty-four fixtures run on the policy plane; the "
+        "other eighteen are filed under evals/cases/deferred/ on the orchestration "
+        "plane (intake and backend composition, twelve) and the persistence plane "
         "(the ledger, its interlock and the session boundary, six), verbatim, and are "
         "not counted here. Measured against the tree at d8c6bf3 (the last commit "
         "before this ingest, after the D3 hold, the P0 lane and the three-token "

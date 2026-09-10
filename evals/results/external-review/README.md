@@ -46,19 +46,20 @@ revision histories (the danger class, the compound card, the abuse-history
 hold, the D3 second look, the house lines).
 
 Round 2 (dispatched 8 September, ruled 10 September) put the amended records
-and ADR-0025 in front of ten returns from eight families: ChatGPT (through
-the Codex desktop task), Grok, DeepSeek, Qwen, Kimi, GLM, Nemotron, Sonar and
-Gemini, each read for its own independence statement, which four of them used
-to correct their file names (`docs/notes/model-provenance.md`). Fifty-three
-fixtures came back. Thirty-six run on the policy plane
+and ADR-0025 in front of ten returns from nine families: ChatGPT twice
+(through the Codex desktop task and, by the operator's account, the Chat
+tab), Grok, DeepSeek, Qwen, Kimi, GLM, Nemotron, Sonar and Gemini, each read
+for its own independence statement, which four of them used to correct their
+file names (`docs/notes/model-provenance.md`). Fifty-four fixtures came back
+(fifty-six objects; two carried no text and were dropped). Thirty-six run on the policy plane
 (`evals/cases/round2_2026-09-08/`): against the tree at `d8c6bf3`, seven
 failed, each on a lexicon or pattern gap the fixture exposed; after the
 round's build, 30 pass as written, 4 are contract adjustments with the
 reviewer's original kept beside them, 1 is a recorded dissent (Qwen's
 compound-card order) and 1 a known gap (Gemini's rope-and-letters sentence,
 the first entry of the labelled set that decides a backend's promotion). The
-other seventeen are filed verbatim under `evals/cases/deferred/` on the
-orchestration plane (intake and backend composition, eleven) and the
+other eighteen are filed verbatim under `evals/cases/deferred/` on the
+orchestration plane (intake and backend composition, twelve) and the
 persistence plane (the ledger, its interlock and the session boundary, six).
 One runtime bug was reproduced by a reviewer and fixed (GLM's three-token
 clock). The numbers:

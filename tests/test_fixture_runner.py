@@ -77,8 +77,8 @@ def test_round1_fixture_report_is_reproducible(tmp_path: Path) -> None:
 
 def test_round2_fixture_report_is_reproducible(tmp_path: Path) -> None:
     """Review round 2 (dispatched 2026-09-08, ingested 2026-09-10): thirty-six
-    of the round's fifty-three fixtures run on the policy plane; the other
-    seventeen are deferred verbatim (orchestration and persistence planes)
+    of the round's fifty-four fixtures run on the policy plane; the other
+    eighteen are deferred verbatim (orchestration and persistence planes)
     and are not part of these totals."""
     output = tmp_path / "fixture-results-round2.md"
 
