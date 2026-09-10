@@ -717,13 +717,14 @@ the words. It grows with every review round.
 
 ## Who built this, and how
 
-SecondSignal is designed and directed by Tyler Herigstad. He does not type the
-code. Every line in this repository was written by AI systems working from
-written task orders, measured against fixtures those systems had not seen,
-reviewed blind by other model families, and merged by him. The task orders,
-the review rounds, the dissents he ruled on and the failures he kept are all
-in this repository. His part is the rules, the rulings and the refusals. The
-tests are the claim.
+SecondSignal is designed and directed by
+[Tyler Herigstad](https://www.linkedin.com/in/tyler-herigstad-1aa97928). He
+does not type the code. Every line in this repository was written by AI
+systems working from written task orders, measured against fixtures those
+systems had not seen, reviewed blind by other model families, and merged by
+him. The task orders, the review rounds, the dissents he ruled on and the
+failures he kept are all in this repository. His part is the rules, the
+rulings and the refusals. The tests are the claim.
 
 With receipts. The crisis response is his rule: face value, one resource
 line, no lecture, the door open both ways
