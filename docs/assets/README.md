@@ -5,7 +5,9 @@ its provenance here and, in full, in [`generation-prompts.json`](generation-prom
 the tool, the family, the door, the date, the prompt as far as it is on
 record, the operator's steering verbatim, and the attempts that were
 rejected. Where a prompt was not written down at the time, the record says
-so; nothing is reconstructed.
+so; nothing is reconstructed. The record is checked: `tests/test_assets.py`
+holds every recorded hash to the committed file and every alt text a page
+uses to the alt text recorded here.
 
 The rules for pictures in this repository, as ruled by the operator on 10
 September 2026: no portraits anywhere near a crisis line; no lock and no
@@ -35,8 +37,9 @@ the reason it was looked at.
   committed. The mark carries no letters and survives a rename.
 - **`confessions-train.png`** (1774 × 887). The picture at the top of
   [`docs/confessions.md`](../confessions.md): a small rust-and-grey toy
-  train, a single long railcar, sitting upright outside the loop of track
-  it was meant to follow. Attempt 1, Grok 4.6, 9 September 2026: rejected,
+  train, a single long railcar, lying straight across the oval loop of
+  track it was meant to follow, one end on each curve, pointing straight
+  ahead where the track bends. Attempt 1, Grok 4.6, 9 September 2026: rejected,
   off-spec on three counts (a caption baked into the image, a pile-up of
   several yellow cars tangled in loops of track, none of the house
   palette); the file is not here and never will be. Attempt 2, ChatGPT

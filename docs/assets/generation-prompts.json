@@ -80,7 +80,8 @@
       ],
       "edits": "lossless PNG optimisation only (oxipng, 10 September 2026): 2,154,763 bytes to 1,899,610, every pixel identical to the file the operator saved (checked by a pixel diff), so it renders on GitHub under the two-megabyte line without loss",
       "caption": "Passes more tests than the last one did.",
-      "alt_text": "A small rust-orange toy train sits on a wooden floor outside an oval loop of track, upright and pointing straight ahead where the track curved."
+      "alt_text": "A small rust-orange toy railcar, one long car, lies straight across an oval loop of track on a wooden floor: its rear wheels on the near curve, its nose over the far one, pointing straight ahead where the track bends.",
+      "alt_text_note": "Alt text corrected 10 September 2026 at the pre-push check: the first wording said the train sat outside the loop; in the picture it lies across it."
     },
     {
       "file": "routing-tree.svg",

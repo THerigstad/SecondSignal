@@ -288,7 +288,7 @@ profile guard against handoffs to security characters
 and one dispute note (the D3 acceptance fixture) now says the operator ruled
 for the reviewer's outcome and the code change is scheduled.
 
-**Numbers, 2026-09-10.** 1,249 tests: 1,056 passing, 193 expected failures
+**Numbers, 2026-09-10.** 1,259 tests: 1,066 passing, 193 expected failures
 (179 documented gaps, 14 recorded dissents), measured in fresh environments
 on Python 3.10, 3.11 and 3.12 the way CI runs them (`pip install -e ".[dev]"`,
 then `pytest`); on one of the three hosts the packaging check skipped

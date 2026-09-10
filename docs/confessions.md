@@ -1,6 +1,6 @@
 # Vibe-coding confessions
 
-![A small rust-orange toy train sits on a wooden floor outside an oval loop of track, upright and pointing straight ahead where the track curved.](assets/confessions-train.png)
+![A small rust-orange toy railcar, one long car, lies straight across an oval loop of track on a wooden floor: its rear wheels on the near curve, its nose over the far one, pointing straight ahead where the track bends.](assets/confessions-train.png)
 
 *Passes more tests than the last one did.*
 

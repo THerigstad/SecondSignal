@@ -17,7 +17,7 @@ points at a test, a record, or a labelled proposal.
 Follow the build. Inspect the design. See what still needs testing.
 
 [![CI](https://github.com/THerigstad/SecondSignal/actions/workflows/ci.yml/badge.svg)](https://github.com/THerigstad/SecondSignal/actions/workflows/ci.yml)
-[![tests](https://img.shields.io/badge/tests-1%2C249%20%C2%B7%20179%20known%20gaps%20%C2%B7%2014%20recorded%20dissents-brightgreen)](docs/evaluation.md)
+[![tests](https://img.shields.io/badge/tests-1%2C259%20%C2%B7%20179%20known%20gaps%20%C2%B7%2014%20recorded%20dissents-brightgreen)](docs/evaluation.md)
 [![python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue)](pyproject.toml)
 [![license](https://img.shields.io/badge/license-MIT%20code%20%C2%B7%20CC%20BY--NC--ND%204.0%20characters-blue)](LICENSE-CONTENT)
 
@@ -115,7 +115,7 @@ git clone https://github.com/THerigstad/SecondSignal.git
 cd SecondSignal
 pip install -e ".[dev]"
 
-pytest                                  # 1,249 tests: 193 expected failures (179 documented gaps, 14 recorded dissents), the rest pass; no network, no API key
+pytest                                  # 1,259 tests: 193 expected failures (179 documented gaps, 14 recorded dissents), the rest pass; no network, no API key
 python -m secondsignal --roster
 python -m secondsignal "I'm panicking, chest tight, can't breathe"
 python -m secondsignal --json "help me plan the launch"
@@ -443,7 +443,7 @@ yet to move it.
 | Fail-closed crisis screen (class lexicon, `unreviewed`) over normalized text, with idiom masks and a receipt on every verdict; the danger lane with verified domestic-violence lines for five locales; the post-separation window and the abuse-history hold; boundary, integrity and facilitation holds; the two-tier careful-side latch and register cap; the house lines; the bounded aftermath; style preferences that ask | Response generation of any kind; the settings surface that stores a confirmed preference; the correction path after a careful-side inference beyond its first step |
 | Declarative roster validated at load, including the stabilizer floor; profiles hashed; aliases; stabilizer resolved by role; ten codexes in the two-part shape, each family codex held equal to its profile by a test | Persistent cross-session memory; persistence of a safety restriction across sessions (a hard latch dies with the session today) |
 | Labeled eval cases run in CI: 415 inventoried in a case manifest, 165 of them external reviewer fixtures kept verbatim, 179 documented gaps and 14 recorded dissents; an expected failure may fail only on the fields it was approved for, so it cannot absorb an unrelated regression; 71 deferred fixtures stored and not run | The audit harness wired in (a reference port, `jr.py`, is in the tree and deliberately unwired); intake and provenance; the ledger and the interlock; Protocol A / B evaluations |
-| English and a native Spanish pack (`unreviewed`; native review in progress) with verified resource rows; a machine-checked register of every design decision, hardened against the mutations its reviewers wrote; 1,249 tests, no network or API key required | Any other language; Spanish integrity, danger and separation detectors; clinical review of any lexicon; multi-turn conversational state beyond the monitors |
+| English and a native Spanish pack (`unreviewed`; native review in progress) with verified resource rows; a machine-checked register of every design decision, hardened against the mutations its reviewers wrote; 1,259 tests, no network or API key required | Any other language; Spanish integrity, danger and separation detectors; clinical review of any lexicon; multi-turn conversational state beyond the monitors |
 
 This repository is the **policy layer only**. It decides who should respond and
 whether anyone should. It does not generate responses. That boundary is

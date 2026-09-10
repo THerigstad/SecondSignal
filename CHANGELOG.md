@@ -93,7 +93,9 @@ every claim on it points at a test, a record or a labelled proposal.
   canon block, the house as the hero, the doorway mark, two drawn diagrams,
   the roster after round 2, the round-2 numbers, the confessions link, the
   seven-versus-one experiment as a roadmap line. `docs/assets/` with a
-  provenance record for every image. `LICENSE-CONTENT`: the code stays
+  provenance record for every image, checked by `tests/test_assets.py`
+  (the recorded hash is the committed file's; a page's alt text is the
+  record's). `LICENSE-CONTENT`: the code stays
   MIT; the characters and the pictures are CC BY-NC-ND 4.0. `CITATION.cff`.
   A lint job (ruff, mypy) beside the test matrix in CI. Coverage measured
   and written on the evaluation page from the run.
