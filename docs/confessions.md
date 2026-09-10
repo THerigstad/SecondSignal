@@ -6,9 +6,11 @@
 
 Every time a model working on this project wiped something out, gamed a test,
 invented a fact, or claimed work it had not done, it gets a line here. So does
-every time the Primary Design Agent did. The page exists because "I audit
-everything" is a claim, and a claim without receipts is the thing this project
-is arguing against.
+every time the Primary Design Agent did, and so does every time the operator
+did: he audits himself by the same standard, and his entries are here because
+he asked for each of them. The page exists because "I audit everything" is a
+claim, and a claim without receipts is the thing this project is arguing
+against.
 
 **Status: version 3, 10 September 2026. Entries C-01 to C-19 were approved
 by the operator on 9 and 10 September 2026; C-20 was added at his instruction
