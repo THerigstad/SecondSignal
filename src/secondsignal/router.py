@@ -840,6 +840,8 @@ def route(
                     f"carries a required disclosure; stabilizer={stabilizer} by role (ADR-0011)"
                 ),
                 roster_hash=rhash,
+                held=holds,
+                obligations=_obligations(holds, roster, stabilizer, subject, aftermath),
                 mode_vetoes=tuple(sorted(vetoes)),
             )
         if streak >= NO_SIGNAL_SEAT_AFTER_TURNS and stabilizer is not None:
@@ -854,6 +856,8 @@ def route(
                     f"(empty turn {streak} of a session; ADR-0011)"
                 ),
                 roster_hash=rhash,
+                held=holds,
+                obligations=_obligations(holds, roster, stabilizer, subject, aftermath),
                 mode_vetoes=tuple(sorted(vetoes)),
             )
         return RoutingDecision(

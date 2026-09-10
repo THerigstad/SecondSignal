@@ -351,17 +351,32 @@ def _mixed_token_is_crisis_form(token: str) -> bool:
     return token[1:] in _MIXED_SCRIPT_CRISIS_FORMS or token[:-1] in _MIXED_SCRIPT_CRISIS_FORMS
 
 _OTHER_PERSON_ACTOR_RE = (
-    r"(?:my (?:partner|roommate|parent|relative|spouse)|"
-    r"the (?:other adult|visitor|neighbor|stranger)|"
+    r"(?:my (?:partner|roommate|parent|relative|spouse|husband|wife|boyfriend|girlfriend|ex|dad|mom|father|mother|"
+    r"brother|sister|son|daughter|stepdad|stepmom|uncle|landlord)|"
+    r"the (?:other adult|visitor|neighbor|stranger|man|guy)|"
     r"another person|someone|somebody|he|she|they)"
 )
+# Present action with the weapon; since 10 September 2026 also a threat made
+# with it ("threatening me with a knife", review round 2, ChatGPT Chat) and
+# a weapon within reach of an intoxicated or raging person ("in the other
+# room with a gun and he's been drinking", Qwen's compound fixture).
 _PRESENT_WEAPON_ACTION_RE = (
-    r"(?:(?:is|are) (?:holding|using|waving|brandishing|pointing)|"
-    r"has|have|holds|uses|waves|brandishes|points)"
+    r"(?:(?:is|are) (?:holding|using|waving|brandishing|pointing|threatening (?:me|us) with|loading)|"
+    r"has|have|holds|uses|waves|brandishes|points|threatens (?:me|us) with|threatening (?:me|us) with|"
+    r"(?:is|are)? ?(?:in the (?:next|other) room|nearby|in the house|in here|right here|downstairs|upstairs) with)"
 )
-_WEAPON_RE = r"(?:(?:a|an|the|his|her|their|our|my) )?(?:loaded )?(?:gun|handgun|pistol|rifle|knife|blade|weapon)s?"
+_WEAPON_RE = r"(?:(?:a|an|the|his|her|their|our|my) )?(?:loaded )?(?:gun|handgun|pistol|rifle|shotgun|knife|blade|weapon|machete|bat)s?"
 _OTHER_PERSON_WEAPON_RE = re.compile(
     rf"\b{_OTHER_PERSON_ACTOR_RE}\b.{{0,80}}?\b{_PRESENT_WEAPON_ACTION_RE}\b\s+{_WEAPON_RE}\b",
+    re.IGNORECASE,
+)
+# The proximity shape ("with a gun" in the next room) fires only beside an
+# intoxication or rage marker in the same message; a weapon in another room
+# on its own is a household, not a danger.
+_WEAPON_PROXIMITY_RE = re.compile(r"\b(?:in the (?:next|other) room|nearby|in the house|in here|right here|downstairs|upstairs) with\b", re.IGNORECASE)
+_RAGE_OR_INTOXICATION_RE = re.compile(
+    r"\b(?:drunk|drinking|been drinking|wasted|high|using|angry|furious|raging|screaming|yelling|out of control|"
+    r"threaten(?:s|ed|ing)?|going to|gonna|says? (?:he|she|they)(?:'ll| will))\b",
     re.IGNORECASE,
 )
 _OTHER_PERSON_WEAPON_EXCLUSION_RE = re.compile(
@@ -462,6 +477,8 @@ def _other_person_weapon_span(text: str) -> tuple[str, int, int] | None:
             continue
         match = _OTHER_PERSON_WEAPON_RE.search(clause)
         if match:
+            if _WEAPON_PROXIMITY_RE.search(match.group(0)) and not _RAGE_OR_INTOXICATION_RE.search(text):
+                continue
             return match.group(0).strip(), clause_match.start() + match.start(), clause_match.start() + match.end()
     return None
 
@@ -1165,7 +1182,7 @@ def evaluate(
             reasons.append(f"integrity event noted, does not waive the gate: {integrity[0]!r}")
         if screen.masked_spans:
             reasons.append("masked spans: " + ", ".join(f"{s.pattern_id}:{s.text!r}" for s in screen.masked_spans))
-        classes = tuple(name for name, _ in screen.evidence)
+        classes = tuple(dict.fromkeys(name for name, _ in screen.evidence))
         kind = _card_kind(classes)
         if kind != "standard":
             reasons.append(f"card: {kind} (danger from another person; line three is the verified domestic-violence line for the declared locale, or the directory line)")

@@ -2283,6 +2283,141 @@
    "disposition": "accepted"
   },
   {
+   "id": "p0-compound-qwen-008",
+   "source": "p0_lane_2026-09-10",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "p0-control-groupchat-013",
+   "source": "p0_lane_2026-09-10",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "p0-control-hunting-014",
+   "source": "p0_lane_2026-09-10",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "p0-control-hyperbole-015",
+   "source": "p0_lane_2026-09-10",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "p0-control-kitchen-016",
+   "source": "p0_lane_2026-09-10",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "p0-control-movie-012",
+   "source": "p0_lane_2026-09-10",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "p0-danger-closet-001",
+   "source": "p0_lane_2026-09-10",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "p0-danger-door-threat-004",
+   "source": "p0_lane_2026-09-10",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "p0-danger-keys-choked-002",
+   "source": "p0_lane_2026-09-10",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "p0-danger-kids-threat-003",
+   "source": "p0_lane_2026-09-10",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "p0-danger-not-allowed-out-006",
+   "source": "p0_lane_2026-09-10",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "p0-danger-threat-knife-007",
+   "source": "p0_lane_2026-09-10",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "p0-danger-violence-kids-005",
+   "source": "p0_lane_2026-09-10",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "p0-gap-immediate-danger-010",
+   "source": "p0_lane_2026-09-10",
+   "plane": "policy",
+   "disposition": "known_gap",
+   "mismatch_fields": [
+    "outcome",
+    "safety"
+   ],
+   "reason": "No stem, no danger signal group; a lexicon gap, recorded so it is not mistaken for a design choice."
+  },
+  {
+   "id": "p0-gap-rope-011",
+   "source": "p0_lane_2026-09-10",
+   "plane": "policy",
+   "disposition": "known_gap",
+   "mismatch_fields": [
+    "outcome",
+    "safety"
+   ],
+   "reason": "Means without a stem: rope, letters, a running motor in a garage. The lexicon has 'engine running in the garage' and 'rope in my hand'; this sentence has neither shape. First entry of the labeled prom"
+  },
+  {
+   "id": "p0-gap-threat-alone-009",
+   "source": "p0_lane_2026-09-10",
+   "plane": "policy",
+   "disposition": "known_gap",
+   "mismatch_fields": [
+    "outcome",
+    "safety"
+   ],
+   "reason": "One danger signal (an explicit threat) in a message with no confinement, no prior violence and no dependents. The two-of-four rule keeps hyperbole out; the cost is this sentence. Labeled set to come."
+  },
+  {
+   "id": "p0-history-020",
+   "source": "p0_lane_2026-09-10",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "p0-history-021",
+   "source": "p0_lane_2026-09-10",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "p0-history-hospital-022",
+   "source": "p0_lane_2026-09-10",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "p0-postsep-017",
+   "source": "p0_lane_2026-09-10",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
    "id": "pending-es419-me-muero-aburrimiento",
    "source": "pending_native_review_es419",
    "plane": "policy",
