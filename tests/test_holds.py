@@ -68,6 +68,10 @@ def test_a_relatives_bare_report_seats_the_recovery_persona_as_the_holds_special
 @pytest.mark.parametrize("text,seat", [
     ("my sibling relapsed yesterday, help me plan a calm conversation that does not shame them", "rowan"),
     ("my sister relapsed and I cannot start the mural", "ellis"),
+    # Review round 2: Gemini's family meeting and ChatGPT's "without a fight"
+    # were bare-report seats until the lexicon read them as conflict work.
+    ("My sister relapsed again yesterday; help me build an agenda for our family meeting so we do not attack her.", "rowan"),
+    ("My partner relapsed last week and I keep thinking about how to bring it up without a fight.", "rowan"),
 ])
 def test_a_relatives_relapse_with_an_ask_seats_the_ask_and_offers_the_recovery_persona(text, seat, roster) -> None:
     """The other half of D3: an ask seats the ask, the recovery hold is

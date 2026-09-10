@@ -24,7 +24,9 @@ alphabetical accident. Every case now carries what it expects and *why*:
 * ``expect.latch_reasons``       reasons that must all be present on the verdict
 * ``expect.held``                hold domains that must all be on the decision
 * ``expect.assist``              the assist id, or null for no assist
-* ``expect.card``                standard (the one card) for escalations
+* ``expect.card``                standard | danger | compound: the card kind on an escalation
+* ``expect.card_order``          the resource lines on the card in the order shown
+                                 (self_harm, other_person_danger); an exact list
 * ``expect.preference_result``   ask_first | refused | accepted
 * ``expect.language_scope``      screened | unscreened
 
@@ -113,6 +115,7 @@ EXPECT_KEYS: frozenset[str] = frozenset({
     "crisis_read", "integrity_event", "disclosures_contain", "latch",
     "latch_reasons", "held", "assist", "card", "preference_result",
     "language_scope", "not_seated", "obligations_contain", "ineligible",
+    "card_order",
 })
 """Every expectation key the runner knows how to check.
 
@@ -196,6 +199,9 @@ def field_failures(case: dict, decision, session) -> dict[str, str]:
     if "card" in expect and expect["card"] is not None:
         check("card", decision.safety.card == expect["card"],
               f"expected {expect['card']}, got {decision.safety.card}")
+    if "card_order" in expect:
+        check("card_order", list(decision.safety.card_order) == list(expect["card_order"]),
+              f"expected {expect['card_order']}, got {list(decision.safety.card_order)}")
     if "preference_result" in expect:
         check("preference_result", decision.safety.preference_result == expect["preference_result"],
               f"expected {expect['preference_result']}, got {decision.safety.preference_result}; "
@@ -322,11 +328,12 @@ def test_every_disputed_case_names_its_justification() -> None:
 
 
 def test_deferred_plane_fixtures_are_not_run_as_policy_cases() -> None:
-    """Generation-, harness- and transport-plane fixtures are stored, labeled,
-    and deliberately not run against the policy layer (ADR-0013)."""
+    """Generation-, harness-, transport-, orchestration- and persistence-plane
+    fixtures are stored, labeled, and deliberately not run against the policy
+    layer (ADR-0013)."""
     deferred = CASE_DIR / "deferred"
     assert deferred.is_dir()
     for path in sorted(deferred.glob("*.json")):
         doc = json.loads(path.read_text(encoding="utf-8"))
-        assert doc.get("plane") in {"generation", "harness", "transport", "orchestration"}, path.name
+        assert doc.get("plane") in {"generation", "harness", "transport", "orchestration", "persistence"}, path.name
         assert doc.get("runnable_here") is False, path.name

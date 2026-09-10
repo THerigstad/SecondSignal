@@ -184,6 +184,7 @@ def _safety_to_dict(verdict: SafetyVerdict) -> dict[str, object]:
         "integrity_event": verdict.integrity_event,
         "language_scope": verdict.language_scope,
         "card": verdict.card,
+        "card_order": list(verdict.card_order),
         "latch": verdict.latch,
         "latch_reasons": list(verdict.latch_reasons),
         "register_caps": list(verdict.register_caps),

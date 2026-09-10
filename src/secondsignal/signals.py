@@ -108,6 +108,12 @@ DOMAIN_LEXICON: dict[str, tuple[str, ...]] = {
         "calm conversation", "hard conversation", "difficult conversation", "talk to him about",
         "talk to her about", "talk to them about", "bring it up with", "without shaming",
         "how to say it to", "what to say to", "confront", "sit down with",
+        # Review round 2 (ChatGPT Chat r2-d3-explicit-conversation-ask-001,
+        # Gemini sec-d3-relative-relapse-ask-seats-ask-003): a conversation
+        # planned so that it does not become a fight is conflict work too.
+        "bring it up", "without a fight", "family meeting", "without attacking",
+        "not attack her", "not attack him", "not attack them", "don't attack her",
+        "don't attack him", "don't attack them",
     ),
     "somatic_distress": (
         "panic", "can't breathe", "cant breathe", "chest tight", "chest is tight", "tight chest",

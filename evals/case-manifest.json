@@ -3134,6 +3134,231 @@
    "disposition": "accepted"
   },
   {
+   "id": "r2-d3-bare-report-hold-specialist-001",
+   "source": "round2_2026-09-08/chatgpt",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "r2-d3-danger-preempts-seat-001",
+   "source": "round2_2026-09-08/chatgpt",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "r2-d3-explicit-conversation-ask-001",
+   "source": "round2_2026-09-08/chatgpt",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "r2-hard-latch-correction-evidence-001",
+   "source": "round2_2026-09-08/chatgpt",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "r2-hard-latch-waiver-text-001",
+   "source": "round2_2026-09-08/chatgpt",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "r2-soft-unknown-cap-persists-001",
+   "source": "round2_2026-09-08/chatgpt",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "r2-soft-window-padding-001",
+   "source": "round2_2026-09-08/chatgpt",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "r2-weapon-free-confinement-history-001",
+   "source": "round2_2026-09-08/chatgpt",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "rr2-aftermath-acks-do-not-consume-window",
+   "source": "round2_2026-09-08/chatgpt",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "rr2-assist-hold-veto-persists",
+   "source": "round2_2026-09-08/chatgpt",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "rr2-card-survives-downstream-failure",
+   "source": "round2_2026-09-08/chatgpt",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "rr2-d3-bare-report",
+   "source": "round2_2026-09-08/chatgpt",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "rr2-d3-danger-preempts-routing",
+   "source": "round2_2026-09-08/chatgpt",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "rr2-d3-explicit-other-ask",
+   "source": "round2_2026-09-08/chatgpt",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "rr2-first-person-affinity-trade",
+   "source": "round2_2026-09-08/chatgpt",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "rr2-hard-correction-is-not-clearance",
+   "source": "round2_2026-09-08/chatgpt",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "rr2-soft-adult-policy-expiry",
+   "source": "round2_2026-09-08/chatgpt",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "rr2-soft-unknown-cap-persists",
+   "source": "round2_2026-09-08/chatgpt",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "rr2-typed-authority-is-evidence",
+   "source": "round2_2026-09-08/chatgpt",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "ss-rt2-backend-miss-001",
+   "source": "round2_2026-09-08/deepseek",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "ss-rt2-hard-latch-lifetime-001",
+   "source": "round2_2026-09-08/deepseek",
+   "plane": "policy",
+   "disposition": "contract_adjusted"
+  },
+  {
+   "id": "sec-d3-relative-relapse-ask-seats-ask-003",
+   "source": "round2_2026-09-08/gemini",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "sec-danger-unweaponed-confinement-001",
+   "source": "round2_2026-09-08/gemini",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "sec-intake-backend-disagree-failclosed-002",
+   "source": "round2_2026-09-08/gemini",
+   "plane": "policy",
+   "disposition": "known_gap",
+   "mismatch_fields": [
+    "outcome",
+    "safety"
+   ],
+   "reason": "Means without a stem: the rope, the letters, a motor running in a garage. The lexicon has no entry that reads this sentence and it proceeds to nobody (unresolved, no persona). No backend exists in thi"
+  },
+  {
+   "id": "r2-decay-three-token-ack-001",
+   "source": "round2_2026-09-08/glm",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "r2-0025-hold-assist-leak-001",
+   "source": "round2_2026-09-08/grok",
+   "plane": "policy",
+   "disposition": "contract_adjusted"
+  },
+  {
+   "id": "r2-d3-ask-seats-the-ask-001",
+   "source": "round2_2026-09-08/grok",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "r2-d3-bare-report-001",
+   "source": "round2_2026-09-08/grok",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "pplx-r2-assist-001",
+   "source": "round2_2026-09-08/kimi",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "pplx-r2-assist-002",
+   "source": "round2_2026-09-08/kimi",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "pplx-r2-intake-001",
+   "source": "round2_2026-09-08/kimi",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "pplx-r2-trauma-001",
+   "source": "round2_2026-09-08/kimi",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "durable-hard-latch-persistence",
+   "source": "round2_2026-09-08/nemotron",
+   "plane": "policy",
+   "disposition": "contract_adjusted"
+  },
+  {
+   "id": "intake-failure-held-domain-abandoned",
+   "source": "round2_2026-09-08/nemotron",
+   "plane": "policy",
+   "disposition": "contract_adjusted"
+  },
+  {
+   "id": "compound-card-prioritization-001",
+   "source": "round2_2026-09-08/qwen",
+   "plane": "policy",
+   "disposition": "disputed",
+   "mismatch_fields": [
+    "card_order"
+   ],
+   "reason": "The reviewer's card_order puts the other-person line first. The ruling of 8 September 2026 (B5) is one card with a fixed, deterministic order: the opener names both dangers and puts getting to safety "
+  },
+  {
+   "id": "relative-relapse-seats-recovery",
+   "source": "round2_2026-09-08/sonar",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
    "id": "analysis-career-tradeoff",
    "source": "routing",
    "plane": "policy",

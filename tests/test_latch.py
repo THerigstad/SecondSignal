@@ -213,3 +213,22 @@ def test_three_word_acknowledgements_do_not_run_the_clock_for_a_declared_adult(r
     assert not any(kind == "decay" for kind, *_ in session.latch_history)
     turns(roster, session, *CLEAN[:SOFT_LATCH_WINDOW_TURNS])
     assert session.latch == "none", "real turns still run the published policy"
+
+
+@pytest.mark.parametrize("correction,fragment", [
+    ("That was a mistaken inference. Please record my correction.", "mistaken inference"),
+    ("The age in my earlier message was a typo. Please help me organize tomorrow's tasks.", "was a typo"),
+])
+def test_a_correction_in_plain_words_is_recorded_and_clears_nothing(correction, fragment, roster) -> None:
+    """Review round 2 (ChatGPT, rr2-hard-correction-is-not-clearance and
+    r2-hard-latch-correction-evidence-001): a correction without an age in it
+    is still a correction; the row is written, the line answers once, and the
+    hard latch and its caps stand."""
+    session = SessionState(declared_age_band="adult")
+    route("I am 16.", roster, session=session)
+    assert session.latch == "hard"
+    d = route(correction, roster, session=session)
+    assert session.latch == "hard" and session.caps_active
+    assert ("correction", fragment, "person", 2) in session.latch_history
+    assert any("correction recorded as evidence" in r for r in d.safety.reasons)
+    assert not any(kind in ("clear", "decay") for kind, *_ in session.latch_history)

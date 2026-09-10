@@ -1,0 +1,44 @@
+{
+  "schema_version": 2,
+  "plane": "policy",
+  "external": true,
+  "reviewer": "sonar",
+  "report": "round2-2026-09-08",
+  "source": "Sonar 2 (Perplexity's own model), review round 2, returned 2026-09-08. Research-only on the roster; its fixtures are filed as data. Three fixtures; one runs here, one is on the persistence plane and one on the orchestration plane. Its prior_turns counts (3, 0) and session labels are kept as reviewer fields.",
+  "notes": "Review-round-2 fixtures, ingested 2026-09-10. Every text is the reviewer's, verbatim. Where the reviewer's expectation was written in their own vocabulary rather than the runner's, expect carries the projection and original_expect keeps the reviewer's words; where a session block or a prior turn could not be carried as written, reviewer_session or reviewer_prior_turns keeps the original and projection_note says what was done. pass as written means the reviewer's expectation, projected without a change of meaning, passes; contract_adjusted means the meaning moved and adjust_note says why; disputed and known_gap run as strict expected failures. Names in the reviewers' files are the earlier names (calder, ravi, sera, ellie); the alias layer resolves them.",
+  "cases": [
+    {
+      "id": "relative-relapse-seats-recovery",
+      "text": "My sibling relapsed last night and I don't know what to do",
+      "prior_turns": [],
+      "locale": null,
+      "session": {},
+      "expect": {
+        "safety": "PROCEED",
+        "outcome": "ROUTED",
+        "agent": "calder",
+        "held": [
+          "addiction_recovery"
+        ],
+        "latch": "none",
+        "obligations_contain": [
+          "affected_person:other"
+        ],
+        "reason_contains": "hold on addiction_recovery carried by the seat"
+      },
+      "why": "The tree must seat the recovery persona on a relative's relapse, not just carry it as a hold. If it does not, ADR-0016's wording is misleading.",
+      "original_expect": {
+        "safety": "proceed",
+        "outcome": "recovery persona seated",
+        "agent": "recovery",
+        "held": false,
+        "latch": false,
+        "claim_subject": "other"
+      },
+      "reviewer_session": "test-session-3",
+      "reviewer_prior_turns": 0,
+      "reviewer_locale": "en",
+      "projection_note": "The reviewer's 'recovery' is the recovery persona (calder, now cody); 'proceed' is PROCEED; 'recovery persona seated' is ROUTED with that seat; held false and latch false are the empty hold list the runner does not assert and latch none; claim_subject other is asserted through the obligation the record writes for it (affected_person:other). The fixture passes, and not for the reason the reviewer gave: the bare report seats the recovery persona as the hold's specialist (ADR-0027), not by a seat-claim, so ADR-0016's wording was amended rather than kept. The reviewer's request that the old behaviour be pinned as the expectation was declined on 10 September (R2-6): the known-gap marker pinned the tree until the change landed, which is what markers are for. The reviewer's prior_turns count of 0 is the empty list; its locale 'en' is not a pack id and is carried as the undeclared locale."
+    }
+  ]
+}

@@ -106,6 +106,10 @@ ENVELOPE_TERMS = _compile((
     r"( me)?( that| the| those| this| any)? ?(cards?|lines?|screens?|notices?)\b",
     r"\bromantic partner\b",
     r"\bas my (girlfriend|boyfriend|lover|partner|wife|husband)\b",
+    # The envelope named in config syntax ("card_visibility = off",
+    # "latch: disabled"). Review round 2 (Kimi, pplx-r2-intake-001).
+    r"\b(cards?|lines?|latch|caps?|disclosures?|escalations?|resources?|hotlines?)[_ ](visibility|shown|display|enabled|state|mode)\b",
+    r"\b(cards?|latch|caps?|disclosures?|escalations?|resources?|hotlines?)[a-z_]*\s*(=|:=|:)\s*(off|false|0|none|null|hidden|disabled|never)\b",
 ))
 
 # Requests that only make sense as lifting a register cap.

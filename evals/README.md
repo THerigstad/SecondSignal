@@ -15,8 +15,23 @@ decision — so that no case can pass on the winner alone.
   Before the review-driven changes the code passed 9 of them, four by accident.
 - `known_gaps.json` — cases the reference lexicon is not expected to pass, with
   the correct verdict stated. Strict expected failures; never deleted.
-- `deferred/` — generation-, harness- and transport-plane fixtures from the
-  review, labeled and deliberately not run here (ADR-0013).
+- `round1_2026-09-02/` — the 103 fixtures of the design-review round, one file
+  per reviewer, ingested for the round-2 build of 3 September.
+- `external_acceptance_grok_2026-09-03.json` — the 26-fixture acceptance set
+  of the white-box review, the yardstick for the two builders' trees.
+- `p0_lane_2026-09-10.json`, `narrator_isolation.json` — the project's own
+  acceptance sets for the danger lane and for the narrator-isolation line,
+  built 10 September from the rulings of 8 September.
+- `round2_2026-09-08/` — the 36 policy-plane fixtures of the Security
+  Division's second review round, one file per family (ChatGPT, Grok,
+  DeepSeek, Qwen, Kimi, GLM, Gemini, Nemotron, Sonar), ingested 10 September
+  with each reviewer's original expectation kept beside the projection
+  wherever the two vocabularies differ (`original_expect`, `reviewer_session`,
+  `reviewer_prior_turns`, `projection_note`).
+- `deferred/` — generation-, harness-, transport-, orchestration- and
+  persistence-plane fixtures from the reviews, labeled and deliberately not
+  run here (ADR-0013); the round-2 intake, backend, ledger and
+  session-boundary fixtures are among them.
 
 ## Case format (`schema_version: 2`)
 
@@ -40,8 +55,14 @@ decision — so that no case can pass on the winner alone.
 
 `expect.agent_any_of` may replace `expect.agent` when the gold is a documented
 disagreement. `expect.crisis_read` (HIT / MISS / INCONCLUSIVE) and
-`expect.integrity_event` are accepted. A case marked `known_gap: true` carries a
-`gap_note` and runs as a strict expected failure.
+`expect.integrity_event` are accepted, as are `card` (standard, danger,
+compound) and `card_order` (the resource lines in the order the card shows
+them). The full key list, with what each checks, is the docstring of
+`tests/test_eval_cases.py`; a key outside that list fails the manifest test.
+A case marked `known_gap: true` carries a `gap_note` and runs as a strict
+expected failure; `disputed: true` carries a `dispute_note` and runs the same
+way; `contract_adjusted: true` keeps the reviewer's `original_expect` beside
+an `adjust_note` and must pass.
 
 ## Case format (`schema_version: 1`, still accepted)
 

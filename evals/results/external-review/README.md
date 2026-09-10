@@ -32,6 +32,77 @@ package, the verdicts and the numbers:
 and the disagreements in
 [`docs/notes/dissent-log.md`](../../../docs/notes/dissent-log.md).
 
+## The Security Division rounds (2026-09-07 to 2026-09-10) in two paragraphs
+
+Round 1 (dispatched 7 September, read 8 September) put the Security Division
+document, the Orrin, Aya and J.R. two-part editions, the house block and the
+draft records ADR-0019 and ADR-0020 in front of five returns from four
+families: ChatGPT-6 Astra (Ultra), Grok 4.6 (Expert) and GrokBot with the code
+tree, DeepSeek V4 Pro (Expert), Qwen 3.8 Max (Thinking); Vibe took neither
+the zip nor the paste and was skipped without a substitute. Its findings
+produced the Security Division document v1.1, ADR-0022 and ADR-0023, and the
+rulings dated 8 September in `docs/notes/dissent-log.md` and in the records'
+revision histories (the danger class, the compound card, the abuse-history
+hold, the D3 second look, the house lines).
+
+Round 2 (dispatched 8 September, ruled 10 September) put the amended records
+and ADR-0025 in front of ten returns from eight families: ChatGPT (through
+the Codex desktop task), Grok, DeepSeek, Qwen, Kimi, GLM, Nemotron, Sonar and
+Gemini, each read for its own independence statement, which four of them used
+to correct their file names (`docs/notes/model-provenance.md`). Fifty-three
+fixtures came back. Thirty-six run on the policy plane
+(`evals/cases/round2_2026-09-08/`): against the tree at `d8c6bf3`, seven
+failed, each on a lexicon or pattern gap the fixture exposed; after the
+round's build, 30 pass as written, 4 are contract adjustments with the
+reviewer's original kept beside them, 1 is a recorded dissent (Qwen's
+compound-card order) and 1 a known gap (Gemini's rope-and-letters sentence,
+the first entry of the labelled set that decides a backend's promotion). The
+other seventeen are filed verbatim under `evals/cases/deferred/` on the
+orchestration plane (intake and backend composition, eleven) and the
+persistence plane (the ledger, its interlock and the session boundary, six).
+One runtime bug was reproduced by a reviewer and fixed (GLM's three-token
+clock). The numbers:
+[`fixture-results-round2-2026-09-10.md`](fixture-results-round2-2026-09-10.md);
+the rulings: `docs/notes/dissent-log.md`, entries R2-1 to R2-6. The returns
+themselves are in the operator's archive, unedited, and are not yet
+committed here; committing them, sanitized under the rules below, is on the
+roadmap for the next push.
+
+## The reviewer roster after round 2 (ruled 2026-09-10)
+
+The standard has three tests: does the family attack the system that exists
+rather than the architecture in the abstract; does it hand back something
+runnable; is it a family not already in the room (ADR-0009: two reviewers
+from one lab are one voice). A family is promoted on runnable fixtures and an
+attack that lands, and an essay moves it to optional.
+
+- **Core panel, seven families:** ChatGPT, Grok, DeepSeek and Qwen (seated
+  after round 1), joined by Kimi\*, GLM\* and Gemini after round 2. Kimi and
+  GLM earned their seats on the reproduced clock bug, the keyless-exit
+  fixture, the two narrator checklists, the integrity-matrix gap and six
+  register holes; Gemini 3.8 Flash on three runnable fixtures, the
+  unweaponed-confinement sentence among them.
+- \* **The asterisk:** Kimi and GLM have only ever reached this project
+  through Perplexity's model picker, with Perplexity's retrieval and
+  instructions in front of them and the picker's versions lagging their own
+  doors. Each is owed one round at its own door (kimi.com, chat.z.ai) before
+  its seat is called permanent; the asterisk comes off then, and the outcome
+  is recorded either way.
+- **Optional, kept for measurement:** Nemotron 3 Ultra, which produced seven
+  fixtures and the best single framing of the intake question ("the held
+  domain is abandoned"). Measurement is checkable, so its door does not
+  matter; it is not asked for judgment.
+- **Research only:** Sonar 2 (Perplexity's own model), for facts with dates
+  and citations. Round 2 confirmed the rule that it is never asked for
+  judgment: it reported files missing that were present and called the
+  register tests robust. Its fixtures are filed as data.
+- **Not for this packet:** Mistral (Vibe), which has refused the material
+  twice on length and attachments; editing the packet to fit one reviewer
+  forfeits the control. Kept for a short packet on the accessibility
+  protocol.
+- **Cannot review:** Claude, the Primary Design Agent, under the standing
+  rule of 7 September that no family reviews its own records.
+
 ## The short version of the first round
 
 One review — Grok 4.6, 2026-09-01 — attacked the system that actually exists
@@ -58,6 +129,10 @@ threat model: [`horizon-findings.md`](horizon-findings.md).
 - [`fixture-results-round1-2026-09-03.md`](fixture-results-round1-2026-09-03.md)
   — the 103 round-1 fixtures, before and after round 2, per reviewer and per
   fixture, with the classification of every one that does not pass as written.
+- [`fixture-results-round2-2026-09-10.md`](fixture-results-round2-2026-09-10.md)
+  — the 36 policy-plane fixtures of the Security Division's second round, per
+  reviewer and per fixture, with the reviewer's original expectation shown
+  beside the observed record wherever the two vocabularies differ.
 - [`grok-2026-09-01/`](grok-2026-09-01/) — the code-directed red-team package:
   eighteen numbered documents, an index, and nine fixture files. Sanitized for
   publication (see below); otherwise as delivered. Start with
@@ -123,9 +198,9 @@ in the published prompt and treated as retired).
 
 ## Reading order for a reviewer of this repository
 
-0. `fixture-results-round1-2026-09-03.md` and `docs/notes/dissent-log.md` —
-   the second round's numbers and the disagreements the project decided
-   against, with reasons.
+0. `fixture-results-round2-2026-09-10.md`, `fixture-results-round1-2026-09-03.md`
+   and `docs/notes/dissent-log.md` — the rounds' numbers and the
+   disagreements the project decided against, with reasons.
 1. `fixture-results-2026-09-02.md` — the first round's numbers.
 2. `grok-2026-09-01/02_EXECUTIVE_VERDICT.md` and `03_INVARIANT_ATTACKS.md` —
    the attacks, then `17_CLAUDE_LIVE_ROUTER_PICKS.md` — the reviewer's

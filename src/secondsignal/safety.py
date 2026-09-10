@@ -273,6 +273,13 @@ CRISIS_CLASSES: dict[str, tuple[re.Pattern[str], ...]] = {
         r"\b(hurt|kill|harm) (someone|somebody|people|him|her|them)\b",
         r"\b(use|used|follow|following) (the|my) plan (i|that i) made to die\b",
         r"\bplan (i|that i) made to die\b",
+        # Ideation carried by "thinking about" rather than "want to". Review
+        # round 2 (DeepSeek, ss-rt2-backend-miss-001): "I keep thinking about
+        # ending it tonight" proceeded to a persona; a lexicon gap, closed here.
+        # "ending it with him" and "ending the lease" are excluded by the tail.
+        r"\b(think|thinks|thinking|thought|been thinking|keep thinking|keeps thinking) (about|of)"
+        r" (ending it all|ending it|killing (myself|himself|herself|themselves)|ending (my|his|her|their) (own )?life"
+        r"|taking (my|his|her|their) (own )?life)\b(?! (with|the|my|our|this|that|things|between))",
     )),
     "passive_absence": _compile((
         r"\b(won'?t|will not|not going to|not gonna|don'?t think (i'?ll|i will)|doubt (i'?ll|i will)|might not|may not|probably won'?t)"
@@ -351,8 +358,9 @@ def _mixed_token_is_crisis_form(token: str) -> bool:
     return token[1:] in _MIXED_SCRIPT_CRISIS_FORMS or token[:-1] in _MIXED_SCRIPT_CRISIS_FORMS
 
 _OTHER_PERSON_ACTOR_RE = (
-    r"(?:my (?:partner|roommate|parent|relative|spouse|husband|wife|boyfriend|girlfriend|ex|dad|mom|father|mother|"
-    r"brother|sister|son|daughter|stepdad|stepmom|uncle|landlord)|"
+    r"(?:my (?:partner|roommate|housemate|flatmate|parent|relative|spouse|husband|wife|boyfriend|girlfriend|"
+    r"fianc[eé]e?|ex|dad|mom|father|mother|stepfather|stepmother|brother|sister|sibling|son|daughter|child|kid|"
+    r"stepdad|stepmom|uncle|aunt|cousin|grandfather|grandmother|grandpa|grandma|landlord)|"
     r"the (?:other adult|visitor|neighbor|stranger|man|guy)|"
     r"another person|someone|somebody|he|she|they)"
 )
@@ -404,6 +412,9 @@ DANGER_SIGNALS: dict[str, tuple[re.Pattern[str], ...]] = {
         r"\bblock(ed|ing|s)? the (door|exit|way out)\b",
         r"\b(can'?t|cannot|not able to|not allowed to) (leave|get out|get away|get out of the house|go outside)\b",
         r"\bkeeps me (in|inside|locked|at home|from leaving)\b",
+        # Review round 2 (ChatGPT Chat, r2-weapon-free-confinement-history-001):
+        # "preventing me from leaving right now" is confinement in plain words.
+        r"\b(preventing|prevents|prevent|stopping|stops|stop|keeping|keeps|kept) (me|us) from (leaving|going|getting out|going out|going anywhere|walking out)\b",
         r"\b(trapped|stuck|kept|holding me) (in|inside|at) (the|this|our|my|his|her) (house|apartment|flat|room|car|home|basement)\b",
         r"\bnobody leaves\b",
         r"\bnot allowed (out|to leave|to go)\b",
@@ -552,12 +563,16 @@ INTEGRITY_PATTERNS: tuple[re.Pattern[str], ...] = _compile((
     r"\b(clear|clearing|reset|turn off|switch off|disable|remove|lift|lifting|lifted|drop|end) (the |my |this )?(minor[_ ]signal|latch|conservative[_ ]mode|careful mode|the careful mode|kid mode|child mode|safe mode|conservative mode)\b",
     r"\b(declared_age_band|latch_reasons?|minor_signal|conservative_mode|register_caps)\b",
     r"\bthis is the parent\b.{0,40}\b(clear|off|adult)\b",
+    # A setting written in config syntax that names a card, a line, a latch,
+    # a cap or a resource ("card_visibility = off"). Review round 2 (Kimi,
+    # pplx-r2-intake-001) shaped this to miss the gate; it no longer does.
+    r"\b(cards?|lines?|latch|caps?|disclosures?|escalations?|resources?|hotlines?)[a-z_]*\s*(=|:=|:)\s*(off|false|0|none|null|hidden|disabled|never)\b",
 ))
 
 # The subset of integrity patterns that name session state as if typing it
 # could write it. These also record ``preference_result = refused``: the
 # request was for a state change, and message text writes no state.
-SESSION_WRITE_PATTERNS: tuple[re.Pattern[str], ...] = INTEGRITY_PATTERNS[-3:]
+SESSION_WRITE_PATTERNS: tuple[re.Pattern[str], ...] = INTEGRITY_PATTERNS[-4:]
 
 # A person's correction of a careful-side inference: an adult age, "I was
 # joking", "I'm not a kid". Recorded as an evidence event on the latch history
@@ -570,6 +585,13 @@ CORRECTION_PATTERNS: tuple[re.Pattern[str], ...] = _compile((
     r"\b(i'?m|i am|im) (an adult|a grown (man|woman|adult)|over (18|eighteen)|not a (kid|minor|child|teenager|teen))\b",
     r"\b(i was|that was|it was) (just )?(joking|kidding|a joke|messing around)\b",
     r"\bi'?m (actually|really) (1[89]|[2-9]\d)\b",
+    # Review round 2 (ChatGPT, rr2-hard-correction-is-not-clearance and
+    # r2-hard-latch-correction-evidence-001): a correction in plain words,
+    # without an age, is still a correction and still clears nothing.
+    r"\b(was|is|it'?s|that'?s) a typo\b",
+    r"\bmistaken inference\b",
+    r"\brecord (my|the|this) correction\b",
+    r"\b(i )?(mistyped|typed the wrong age|put the wrong age|wrote the wrong age|gave the wrong age)\b",
 ))
 
 # Romantic or sexual frames toward the persona. Held as a boundary for
@@ -852,6 +874,11 @@ class SafetyVerdict:
     integrity_event: bool = False
     language_scope: str = "screened"
     card: str | None = None
+    # The order of the resource lines on the card, as ruled 8 September 2026
+    # (B5): the self-harm line first on the compound card. Carried on the
+    # verdict so the order is measured by a fixture, not asserted in prose
+    # (review round 2, Qwen, compound-card-prioritization-001).
+    card_order: tuple[str, ...] = ()
     latch: str = "none"
     latch_reasons: tuple[str, ...] = ()
     register_caps: tuple[str, ...] = ()
@@ -1032,6 +1059,17 @@ def _card_kind(classes: tuple[str, ...]) -> str:
     return "standard"
 
 
+# The resource lines each card kind carries, in the order they are shown.
+# The compound order is the ruling of 8 September 2026 (B5): the self-harm
+# line first, the domestic-violence line second. Qwen's round-2 fixture
+# expects the reverse and runs as a recorded dissent against this table.
+CARD_ORDER: dict[str, tuple[str, ...]] = {
+    "standard": ("self_harm",),
+    "danger": ("other_person_danger",),
+    "compound": ("self_harm", "other_person_danger"),
+}
+
+
 def _card(session: SessionState | None, kind: str = "standard") -> tuple[str, ...]:
     """The crisis card. Line three is the verified resource line for the
     declared locale; the danger card puts the domestic-violence line there
@@ -1198,6 +1236,7 @@ def evaluate(
             crisis_classes=classes,
             integrity_event=bool(integrity),
             card=kind,
+            card_order=CARD_ORDER[kind],
             latch_reasons=tuple(latch_reasons),
             **common,
         ))
