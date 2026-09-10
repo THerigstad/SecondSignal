@@ -34,9 +34,11 @@ saves carries the family and the model and tier the product actually reported
 `Deepseek v4 Pro Expert`). Returns are never renamed or edited after saving.
 
 Dates in this repository are UTC calendar dates, the clock the project's
-records and commits are kept on. The operator works some hours behind that
-clock, so a ruling he gave on an evening can carry the next day's date here;
-where his local time matters, the record says so and gives both.
+records are kept on; the commit timestamps carry the operator's own offset,
+as GitHub stamps them (a correction of 10 September: the sentence first said
+the commits were on that clock too). The operator works some hours behind
+the UTC clock, so a ruling he gave on an evening can carry the next day's
+date here; where his local time matters, the record says so and gives both.
 
 Doorway vocabulary used in this repository:
 
