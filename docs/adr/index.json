@@ -17,7 +17,7 @@
     {
       "number": "0001",
       "file": "0001-impact-events.md",
-      "title": "Impact Events: longitudinal outcome signals",
+      "title": "Impact Events — Longitudinal Outcome Signals",
       "decision": "Accepted",
       "implementation": "none",
       "evidence": [],
@@ -225,7 +225,7 @@
     {
       "number": "0016",
       "file": "0016-seat-versus-hold-routing-tree.md",
-      "title": "Seat versus hold: a seven-layer routing tree with one eligibility gate",
+      "title": "Seat versus hold — a seven-layer routing tree with one eligibility gate",
       "decision": "Accepted",
       "implementation": "built",
       "evidence": [

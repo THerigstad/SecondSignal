@@ -4,8 +4,8 @@
   "runnable_here": false,
   "external": true,
   "report": "round2-2026-09-08",
-  "source": "Review round 2 (dispatched 2026-09-08, ruled 2026-09-10): the fixtures that test the ledger, its interlock and the life of a latch across a session boundary, none of which this repository contains (ADR-0023, Proposed; ADR-0015's lifetime note). Every field is the reviewer's, verbatim; the reviewer is named on each case; the project adds in_session_verdict_2026_09_10 where the same turns were run inside one session, and a note.",
-  "description": "Deferred fixtures for ADR-0023 and the three deaths of a latch: a clearance whose scope is wider than the occurrence it names; two in-flight turns and one head (compare-and-append); a stale head replayed; a hard latch that must survive a session boundary and today does not (the failure is the finding, GLM, Gemini, Nemotron, Kimi, DeepSeek). They gain the runner's expectations the day the ledger exists and move up one directory. Nothing here is deleted to make a suite green.",
+  "source": "Review round 2 (dispatched 2026-09-08, ruled 2026-09-10): the fixtures that test the ledger, its interlock and the life of a latch across a session boundary, none of which this repository contains (ADR-0023 (Proposed), Proposed; ADR-0015's lifetime note). Every field is the reviewer's, verbatim; the reviewer is named on each case; the project adds in_session_verdict_2026_09_10 where the same turns were run inside one session, and a note.",
+  "description": "Deferred fixtures for ADR-0023 (Proposed) and the three deaths of a latch: a clearance whose scope is wider than the occurrence it names; two in-flight turns and one head (compare-and-append); a stale head replayed; a hard latch that must survive a session boundary and today does not (the failure is the finding, GLM, Gemini, Nemotron, Kimi, DeepSeek). They gain the runner's expectations the day the ledger exists and move up one directory. Nothing here is deleted to make a suite green.",
   "cases": [
     {
       "id": "r2-ledger-scope-001",
@@ -44,7 +44,7 @@
         }
       },
       "why": "Rule 1 names an exact occurrence. A session-wide scope is a second occurrence being cleared for free.",
-      "note": "Rule 1 names an exact occurrence; a session-wide scope is a second occurrence being cleared for free. Adopted into ADR-0023's amendments on 10 September (rule 1 rejects any scope wider than the named occurrence)."
+      "note": "Rule 1 names an exact occurrence; a session-wide scope is a second occurrence being cleared for free. Adopted into ADR-0023 (Proposed)'s amendments on 10 September (rule 1 rejects any scope wider than the named occurrence)."
     },
     {
       "id": "r2-ledger-cas-001",
@@ -77,7 +77,7 @@
         }
       },
       "why": "Decide-append-release without compare-and-append is a fork. The interlock must see one head or WITHHOLD.",
-      "note": "Decide, append, release without compare-and-append is a fork. Adopted into ADR-0023's amendments on 10 September (rule 2 is a conditional append; the head must equal the expected head at the commit point; a fork is WITHHOLD)."
+      "note": "Decide, append, release without compare-and-append is a fork. Adopted into ADR-0023 (Proposed)'s amendments on 10 September (rule 2 is a conditional append; the head must equal the expected head at the commit point; a fork is WITHHOLD)."
     },
     {
       "id": "interlock-stale-head",
@@ -117,7 +117,7 @@
         "latch": "none carried across the boundary"
       },
       "why": "Pins today's truth � the latch dies with the session � so the disclosure copy must be written for it; when ADR-0023's persistence lands, this fixture flips and the copy problem disappears with it.",
-      "note": "Pins today's truth: the latch dies with the session. The careful-side line is written for that truth until persistence exists (Kimi's dissent 5.1; docs/known-limitations.md). When ADR-0023's persistence lands, this fixture flips."
+      "note": "Pins today's truth: the latch dies with the session. The careful-side line is written for that truth until persistence exists (Kimi's dissent 5.1; docs/known-limitations.md). When ADR-0023 (Proposed)'s persistence lands, this fixture flips."
     },
     {
       "id": "r2-latch-survives-boundary-001",

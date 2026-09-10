@@ -1,6 +1,6 @@
 # ADR-0020: J.R. v0 predicates
 
-- **Status:** Proposed — drafted by an external reviewer (Grok, 2026-09-03) with a runnable reference implementation; a second family's review (Codex, 2026-09-04) named four corrections that must be verified against the code before this record can be Accepted
+- **Status:** Proposed — reference-unwired; drafted by an external reviewer (Grok, 2026-09-03) with a runnable reference implementation; a second family's review (Codex, 2026-09-04) named four corrections that must be verified against the code before this record can be Accepted
 - **Date:** 2026-09-03
 - **Evidence:** `src/secondsignal/jr.py` (the reference port, deliberately unwired); `tests/test_jr_v0.py` and `tests/test_nd_interruption_stack.py` (synthetic replies; they run today); `evals/cases/deferred/jr_v0_cases.json` (`plane: harness`, `runnable_here: false`)
 - **Depends on:** ADR-0014, ADR-0019

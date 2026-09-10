@@ -255,7 +255,7 @@
       "why": "Future ADR-0025 test only. Two humans prelabel the expected eligible alternate seat/assist using the actual host-declared voice affinity and roster. Compare holds, caps, claim provenance and obligations against the host baseline; do not invent a new hold. Assert the specialist protocol, offer_companion:calder, unchanged safety state, one speaker and exact audited output; the unchanged-eligibility control should expose outranked rather than bypass it.",
       "door": "Codex",
       "original_expect": {},
-      "projection_note": "Filed as the reviewer wrote it, a future ADR-0025 test, and pinned to today's rule so the day the assist from the hold is built the change is visible: a first-person return to use claims the seat (ADR-0016); no assist arrives from any source; the trade half of ADR-0025 was withdrawn by ADR-0026 on 10 September, so the two-human label the reviewer asks for now labels a twin's presentation, never a different seat."
+      "projection_note": "Filed as the reviewer wrote it, a future ADR-0025 (Proposed) test, and pinned to today's rule so the day the assist from the hold is built the change is visible: a first-person return to use claims the seat (ADR-0016); no assist arrives from any source; the trade half of ADR-0025 (Proposed) was withdrawn by ADR-0026 (Proposed) on 10 September, so the two-human label the reviewer asks for now labels a twin's presentation, never a different seat."
     },
     {
       "id": "r2-hard-latch-waiver-text-001",

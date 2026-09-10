@@ -40,7 +40,7 @@
         ],
         "latch": null
       },
-      "projection_note": "The reviewer's agent 'conflict_or_strategist_not_recovery' is projected as agent_any_of over the conflict persona and the strategist with the recovery persona pinned out of seat and assist; the outcome 'seat_is_ask_not_recovery' is the same claim. Built 10 September (ADR-0027, Proposed): this fixture is now the Accepted expectation the reviewer asked for, and the three documents that disagreed say one thing."
+      "projection_note": "The reviewer's agent 'conflict_or_strategist_not_recovery' is projected as agent_any_of over the conflict persona and the strategist with the recovery persona pinned out of seat and assist; the outcome 'seat_is_ask_not_recovery' is the same claim. Built 10 September (ADR-0027 (Proposed), Proposed): this fixture is now the Accepted expectation the reviewer asked for, and the three documents that disagreed say one thing."
     },
     {
       "id": "r2-d3-bare-report-001",
@@ -103,7 +103,7 @@
         "assist_source": "hold"
       },
       "contract_adjusted": true,
-      "adjust_note": "A first-person return to use claims the seat (ADR-0016); the record carries it as seat_claim with claim_subject self, not as a hold, so the reviewer's held: [addiction_recovery] named the right domain in the wrong vocabulary and is not asserted. The reviewer's declared_affinity 'humor_persona' is the humour persona, Nikki, carried as the contract's affinities field; assist_source is not a fixture field because the assist from the hold (ADR-0025) is unbuilt, so today no assist arrives from any source. The leak the reviewer pins, the vetoed humour persona arriving as assist, is asserted as not_seated, which covers seat and assist."
+      "adjust_note": "A first-person return to use claims the seat (ADR-0016); the record carries it as seat_claim with claim_subject self, not as a hold, so the reviewer's held: [addiction_recovery] named the right domain in the wrong vocabulary and is not asserted. The reviewer's declared_affinity 'humor_persona' is the humour persona, Nikki, carried as the contract's affinities field; assist_source is not a fixture field because the assist from the hold (ADR-0025 (Proposed)) is unbuilt, so today no assist arrives from any source. The leak the reviewer pins, the vetoed humour persona arriving as assist, is asserted as not_seated, which covers seat and assist."
     }
   ]
 }

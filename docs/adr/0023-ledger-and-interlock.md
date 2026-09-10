@@ -1,6 +1,6 @@
 # ADR-0023: The ledger and the interlock are two named things bound by one invariant, and nothing weakens a restriction without a clearance row
 
-- **Status:** Proposed — drafted 2026-09-08 from the rulings on review round 1; not yet reviewed by a second model family, so it stays Proposed until review round 2 closes
+- **Status:** Proposed — none; drafted 2026-09-08 from the rulings on review round 1; not yet reviewed by a second model family, so it stays Proposed until review round 2 closes
 - **Date:** 2026-09-08
 - **Evidence:** the Security Division document v1.1 (`docs/notes/security-division-2026-09-08.md`, §5); review round 1 (Grok 2.2, 4.a and tests 5.1, 5.4; ChatGPT 2.4, 4a, attacks A2, A4, F6 and test 5.1; GrokBot 4a and D1; Qwen 2.3, 2.4, 4a and tests 5.1, 5.8; DeepSeek 4a and disagreement 5); the 31 August audits (ChatGPT threat model §14.5, the five-stage separation; the Grok harvest's "append-only, hash-chained ledger"); what exists in the tree today (`tests/test_latch.py`, `tests/test_guards.py::test_dependency_latch_is_session_scoped_and_unresettable_by_text`)
 - **Depends on:** ADR-0015 (the two-tier latch); ADR-0005 (safety state is separate from personal memory); ADR-0010 (the gate fails closed)

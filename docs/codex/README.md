@@ -43,15 +43,29 @@ names as they were written.
 ## What the suite checks (`tests/test_codex_house_block.py`)
 
 1. Part A is byte-identical to `house-block.md` in every codex, minus the
-   rider, which the three security codexes carry exactly once.
+   rider, which the three security codexes carry exactly once; and the
+   canonical block is pinned by hash to its version in
+   `house-block.lock.json`, so every copy changed at once without a new
+   version fails too. A new version is issued by bumping the version line,
+   writing the change-log entry and re-locking, in one diff.
 2. A family codex's machine-readable block equals its profile: id, aliases,
    short form, domains, modes, regulation window, contraindications,
-   handoffs, voice as written. Every profile has a codex.
+   handoffs, voice as written. Every profile has a codex, and the set of
+   codexes is exactly the seven profiles plus the three narrators.
 3. No Part B claims a power the house never granted: a power word
-   (override, waive, approve, clear the latch, write memory, summoned by, a
-   ping, rule on welfare) is allowed only in a sentence that denies it.
-4. A security codex declares no seat, no writes, no verdicts, and has no
-   profile in the roster.
+   (override, waive, approve, grant, clear or lift a latch, restriction, hold
+   or cap in any form, "may clear", write memory, summoned by, a ping, rule
+   on welfare) is allowed only in a sentence that denies it.
+4. A security codex's block is parsed exactly, a duplicate key is refused,
+   it declares no seat, no writes, no verdicts, carries no routing field at
+   all, names its own denial (Orrin clears no latch, Aya grants no
+   authority, J.R. holds no token), and has no profile in the roster.
+5. The title a security codex gives itself in its block is the title the
+   other two use for it in their Family Linkage.
+
+Review round 2 (ChatGPT, mutations H01 to H06; Kimi's title check) found
+the gaps that items 1, 2, 4 and 5 close; each mutation is a red regression
+in `tests/test_register_mutations.py`.
 
 ## Status
 

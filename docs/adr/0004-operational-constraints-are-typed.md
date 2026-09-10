@@ -1,6 +1,6 @@
 # ADR-0004: Operational constraints are typed
 
-- **Status:** Accepted — planned (precursor built)
+- **Status:** Accepted — partial; planned, with a precursor built
 - **Date:** 2026-09-01
 - **Evidence:** Constraint Weakening; MasDrift
 

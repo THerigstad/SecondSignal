@@ -1,6 +1,6 @@
 # ADR-0002: User authority is source-anchored
 
-- **Status:** Accepted — planned (not yet implemented)
+- **Status:** Accepted — none; planned, not yet implemented
 - **Date:** 2026-09-01
 - **Evidence:** MasDrift; Bounded Agents; Constraint Weakening
 

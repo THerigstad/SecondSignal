@@ -1,6 +1,6 @@
 # ADR-0019: Security triad clocks and the unnamed commit monitor
 
-- **Status:** Proposed — drafted by an external reviewer (Grok, 2026-09-03), accepted in principle by the operator on 2026-09-07, amended on 2026-09-08; the amendment has not yet been reviewed by a second model family, so the record stays Proposed until review round 2 closes
+- **Status:** Proposed — none; drafted by an external reviewer (Grok, 2026-09-03), accepted in principle by the operator on 2026-09-07, amended on 2026-09-08; the amendment has not yet been reviewed by a second model family, so the record stays Proposed until review round 2 closes
 - **Date:** 2026-09-03; amended 2026-09-08
 - **Evidence:** the reviewer's white-box thread of 2026-09-03 (`evals/results/external-review/round1-2026-09-02/`); the Security Division document of 2026-09-07 (`docs/notes/security-division-2026-09-08.md`, v1.1); review round 1 on that document (five model families, 2026-09-07 to 08), whose findings are carried in that document's v1.1 change log and in the codex change logs under `docs/codex/`
 - **Supersedes in part:** the J.R. row of `docs/research/research-to-architecture-2026-08.md` §5.2

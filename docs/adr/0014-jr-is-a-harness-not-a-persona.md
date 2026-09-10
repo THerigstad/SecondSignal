@@ -1,6 +1,6 @@
 # ADR-0014: The audit function is a harness, not a persona
 
-- **Status:** Accepted; reference port present and deliberately unwired (`src/secondsignal/jr.py`)
+- **Status:** Accepted — reference-unwired; a reference port is present and deliberately unwired (`src/secondsignal/jr.py`)
 - **Date:** 2026-09-02
 - **Evidence:** External red-team review (Grok 4.6, 2026-09-01), docs 08 and 11, `fixtures/jr_harness_cases.json`, `fixtures/jr_eval_protocol.md`; Charafeddine, letter 96, "Agent = Model + Harness" (2026-08-29)
 

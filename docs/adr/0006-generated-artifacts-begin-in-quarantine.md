@@ -1,6 +1,6 @@
 # ADR-0006: Generated artifacts begin in quarantine
 
-- **Status:** Accepted — planned (not yet implemented)
+- **Status:** Accepted — none; planned, not yet implemented
 - **Date:** 2026-09-01
 - **Evidence:** EVOMAL; SHE; VCE-Skill; PAST-Bench
 

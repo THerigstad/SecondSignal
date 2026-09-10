@@ -1,6 +1,6 @@
 # ADR-0008: Human value is evaluated separately from autonomous performance
 
-- **Status:** Accepted — partially realized
+- **Status:** Accepted — partial; partially realized
 - **Date:** 2026-09-01
 - **Evidence:** CentaurBench; Unaccountable Delegation; Human-Centered Proactive Agents
 

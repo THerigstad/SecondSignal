@@ -184,7 +184,7 @@
       "why": "Third-person use is a hold, not an automatic calder seat-claim.",
       "disputed": false,
       "dispute_note": "A relative's relapse claims the recovery seat (the operator's standing rule: anything recovery-related leans to the recovery persona; a mediator who ignores recovery dynamics is the worse failure). The record carries claim_subject=other and the family-impact obligations a hold would have carried, so the reviewer's concern (family stories all become the recovery persona with nothing acknowledged) is met by the record, not by demoting the claim. Grok, Qwen and Vibe asked for a hold; ChatGPT and DeepSeek for the seat. The seat the reviewer accepts includes the one taken.",
-      "resolved_note": "Resolved 2026-09-10: the routing change of D3 (ADR-0027, Proposed) makes a relative's return to use a hold, which is what this fixture asked for. ChatGPT's round-2 correction (2.10) noted that the fixture allowed the recovery persona and asked only that the claim be a hold; re-run under the new rule, it passes. The dispute note below is kept as the history of the eight days it stood as a dissent."
+      "resolved_note": "Resolved 2026-09-10: the routing change of D3 (ADR-0027 (Proposed)) makes a relative's return to use a hold, which is what this fixture asked for. ChatGPT's round-2 correction (2.10) noted that the fixture allowed the recovery persona and asked only that the claim be a hold; re-run under the new rule, it passes. The dispute note below is kept as the history of the eight days it stood as a dissent."
     },
     {
       "id": "grok-hold-001",

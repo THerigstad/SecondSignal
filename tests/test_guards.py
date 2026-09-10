@@ -254,6 +254,25 @@ def test_security_characters_are_not_routable(roster):
     assert "orrin" not in {s.agent_id for s in d.ranked}
 
 
+# 11b. The reference port stays unwired: nothing on the request path imports it.
+def test_router_cli_and_safety_import_nothing_from_the_audit_port():
+    """ADR-0014 says the audit function is reference-unwired; the register
+    records it; review round 2 (Kimi, Grok E2) asked for the tree to check
+    it rather than say it. The package re-exports the port's names for
+    callers who want to read it; the request path may not import them."""
+    import ast
+    package = Path(__file__).resolve().parents[1] / "src" / "secondsignal"
+    for name in ("router.py", "cli.py", "safety.py", "signals.py", "preferences.py", "profiles.py", "lexicon.py", "normalize.py"):
+        tree = ast.parse((package / name).read_text(encoding="utf-8"))
+        for node in ast.walk(tree):
+            if isinstance(node, ast.ImportFrom):
+                assert (node.module or "") not in {"jr", "secondsignal.jr", ".jr"}, f"{name} imports from jr"
+                assert not (node.level and node.module == "jr"), f"{name} imports from jr"
+            if isinstance(node, ast.Import):
+                assert not any(alias.name.endswith("jr") for alias in node.names), f"{name} imports jr"
+        assert "audit(" not in (package / name).read_text(encoding="utf-8"), f"{name} calls audit()"
+
+
 # 12. The gate is roster-invariant.
 def test_gate_takes_no_roster():
     assert "roster" not in inspect.signature(evaluate).parameters

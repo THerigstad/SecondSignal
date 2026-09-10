@@ -1,6 +1,6 @@
 # ADR-0025: The assist from the hold, and an affinity that can trade seats
 
-- **Status:** Proposed — the operator's design intent, recorded 2026-09-08 with its target case and its gate; not adopted, not built, and not to be built before a generation layer exists. Amended 2026-09-10 by ADR-0026: proposal 2 (the affinity that can trade seats) is withdrawn; proposal 1 (the assist from the hold) stands
+- **Status:** Proposed — none; the operator's design intent, recorded 2026-09-08 with its target case and its gate; not adopted, not built, and not to be built before a generation layer exists. Amended 2026-09-10 by ADR-0026: proposal 2 (the affinity that can trade seats) is withdrawn; proposal 1 (the assist from the hold) stands
 - **Date:** 2026-09-08
 - **Evidence:** the dissent log entry D3 (`docs/notes/dissent-log.md`), decided-with-dissent on 2026-09-08; the round-1 assist-leak fixtures under `evals/cases/round1_2026-09-02/`; the both-ways measurement of 3 September recorded in the same log; the operator's standing rule that anything recovery-related leans to the recovery persona (ADR-0016)
 - **Depends on:** ADR-0016 (seat versus hold; the assist passes the same gate as the seat)

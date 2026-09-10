@@ -4,7 +4,7 @@
   "runnable_here": false,
   "model_generated": true,
   "source": "ChatGPT-6 Astra (Ultra), 9 September 2026, the stall-and-recovery evaluation packet (ss_stall.zip) returned to the operator; filed 10 September 2026 under docs/notes/stall-and-recovery-proposal-2026-09-10.md. Verbatim givens and expectations; the ids and the why lines are the project's.",
-  "description": "Deferred-plane fixtures for an orchestration layer this repository does not contain: bounded retries by strategy fingerprint, a watchdog outside the call, partial-work preservation, side-effect replay, a circuit breaker. Adopted as a description of what the layer must do when it exists; nothing here is built. The retry taxonomy shapes the one automatic retry of the intake failure rule (ADR-0022, 10 September 2026).",
+  "description": "Deferred-plane fixtures for an orchestration layer this repository does not contain: bounded retries by strategy fingerprint, a watchdog outside the call, partial-work preservation, side-effect replay, a circuit breaker. Adopted as a description of what the layer must do when it exists; nothing here is built. The retry taxonomy shapes the one automatic retry of the intake failure rule (ADR-0022 (Proposed), 10 September 2026).",
   "retry_policy": {
     "max_equivalent_failures": 2,
     "default_no_progress_timeout_seconds": 90,
@@ -110,7 +110,7 @@
       "expected": {
         "disposition": "STOP"
       },
-      "why": "Two identical attempts with the same transient error stop; the intake retry of ADR-0022 (10 September) takes this bound as one automatic retry, never two."
+      "why": "Two identical attempts with the same transient error stop; the intake retry of ADR-0022 (Proposed) (10 September) takes this bound as one automatic retry, never two."
     },
     {
       "id": "stall-002",

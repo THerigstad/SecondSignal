@@ -1,6 +1,6 @@
 # ADR-0026: Twins: every persona has two presentations and one routing contract
 
-- **Status:** Proposed — the operator's ruling of 2026-09-10, recorded with its motivating cases, its invariants and its gate; not built; replaces the seat-trade half of ADR-0025 by construction and leaves the other half standing
+- **Status:** Proposed — none; the operator's ruling of 2026-09-10, recorded with its motivating cases, its invariants and its gate; not built; replaces the seat-trade half of ADR-0025 by construction and leaves the other half standing
 - **Date:** 2026-09-10
 - **Evidence:** the operator's two motivating cases, quoted below; review round 2's objection to ADR-0025's principle (Gemini 3.8 Flash, 2026-09-08, recorded in `docs/notes/dissent-log.md`) and its gate findings (Grok, DeepSeek, Kimi, Nemotron, ChatGPT, GLM, same round); the round-1 assist-leak fixtures under `evals/cases/round1_2026-09-02/`; `tests/test_holds.py` (the assist channel as built today)
 - **Depends on:** ADR-0016 (the seat and the hold are decided before any presentation is chosen), ADR-0017 (a presentation choice is a style preference: declared or confirmed, never inferred, never touching the envelope), ADR-0012 (eligibility is one gate)

@@ -1,6 +1,6 @@
 # ADR-0017: Style preferences are declared or confirmed, never inferred into policy, and never touch the safety envelope
 
-- **Status:** Accepted — built (policy layer); the settings surface that stores a confirmed preference is not built
+- **Status:** Accepted — partial; built in the policy layer, while the settings surface that stores a confirmed preference is not built
 - **Date:** 2026-09-03
 - **Evidence:** Round-1 external design review (2026-09-02), Decision 7, accepted with change by all five reviewers; 9 reviewer fixtures under `evals/cases/round1_2026-09-02/`; `tests/test_preferences.py`
 

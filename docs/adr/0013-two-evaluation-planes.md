@@ -1,6 +1,6 @@
 # ADR-0013: Two evaluation planes, one honest runner
 
-- **Status:** Accepted — built (policy plane); generation and harness planes stored, not run
+- **Status:** Accepted — partial; built on the policy plane, the generation and harness planes stored and not run
 - **Date:** 2026-09-02
 - **Evidence:** External red-team review (Grok 4.6, 2026-09-01), docs 07, 09 §1–2, 11, 12, 18 §6; the review's fixture files
 

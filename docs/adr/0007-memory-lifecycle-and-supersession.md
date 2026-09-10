@@ -1,6 +1,6 @@
 # ADR-0007: Memory is episodic, versioned, and lifecycle-governed
 
-- **Status:** Accepted — planned (not yet implemented)
+- **Status:** Accepted — none; planned, not yet implemented
 - **Date:** 2026-09-01
 - **Evidence:** SCALE-QA / TSIM; PAST-Bench; Reversible Forgetting
 

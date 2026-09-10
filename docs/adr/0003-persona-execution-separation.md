@@ -1,6 +1,6 @@
 # ADR-0003: Persona and execution are separated
 
-- **Status:** Accepted — partially realized
+- **Status:** Accepted — partial; partially realized
 - **Date:** 2026-09-01
 - **Evidence:** Persona–Execution Separation; SHE; Bounded Agents
 

@@ -1,6 +1,6 @@
 # ADR-0001: Impact Events — Longitudinal Outcome Signals
 
-**Status:** Accepted (design locked; implementation deferred)
+- **Status:** Accepted — none; design locked, implementation deferred
 **Date:** 2026-08-30
 **Deciders:** System owner, PM/system design
 **Implementation target:** Post-M2 (after all agent profiles + eval suite at ~50 cases)

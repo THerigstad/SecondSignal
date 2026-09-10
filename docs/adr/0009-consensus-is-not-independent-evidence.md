@@ -1,6 +1,6 @@
 # ADR-0009: Multi-agent consensus is not independent evidence
 
-- **Status:** Accepted — principle in force
+- **Status:** Accepted — not-code; a principle in force
 - **Date:** 2026-09-01
 - **Evidence:** Patterns and Problems in Emerging Multiagent Systems; MasDrift; Safety Does Not Compose
 

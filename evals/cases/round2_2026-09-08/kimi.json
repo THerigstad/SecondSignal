@@ -74,7 +74,7 @@
         "affinity_state": "asked_not_confirmed"
       },
       "reviewer_locale": "en-US",
-      "projection_note": "An affinity 'asked, not confirmed' is, in this contract, an affinity that is not declared: the house asks until the person confirms and never infers one, so the session block is empty and the reviewer's block is kept beside it. The strategist is pinned out of seat and assist. Under ADR-0026 (Proposed, 10 September) a voice choice is a twin's presentation and never a seat trade, so the larger privilege the reviewer warns of no longer exists to require a confirmed state; the round-2 entry R2-5 records that."
+      "projection_note": "An affinity 'asked, not confirmed' is, in this contract, an affinity that is not declared: the house asks until the person confirms and never infers one, so the session block is empty and the reviewer's block is kept beside it. The strategist is pinned out of seat and assist. Under ADR-0026 (Proposed) (Proposed, 10 September) a voice choice is a twin's presentation and never a seat trade, so the larger privilege the reviewer warns of no longer exists to require a confirmed state; the round-2 entry R2-5 records that."
     },
     {
       "id": "pplx-r2-intake-001",

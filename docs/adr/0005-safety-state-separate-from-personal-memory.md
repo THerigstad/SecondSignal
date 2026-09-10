@@ -1,6 +1,6 @@
 # ADR-0005: Safety state is separate from personal memory
 
-- **Status:** Accepted — partially realized
+- **Status:** Accepted — partial; partially realized
 - **Date:** 2026-09-01
 - **Evidence:** Safety Does Not Compose; Reversible Forgetting; Human-Centered Proactive Agents
 

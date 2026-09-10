@@ -1,6 +1,6 @@
 # ADR-0022: Intake and provenance runs after the gate and before routing, and proposes but never grants
 
-- **Status:** Proposed — drafted 2026-09-08 from the rulings on review round 1; not yet reviewed by a second model family, so it stays Proposed until review round 2 closes
+- **Status:** Proposed — none; drafted 2026-09-08 from the rulings on review round 1; not yet reviewed by a second model family, so it stays Proposed until review round 2 closes
 - **Date:** 2026-09-08
 - **Evidence:** the Security Division document v1.1 (`docs/notes/security-division-2026-09-08.md`, §4); review round 1 (Grok 2.1 and tests 5.2, 5.3; ChatGPT 2.2, 2.11 and tests 5.4, 5.5; GrokBot 4b); the 31 August audits that first split intake from authority (ChatGPT threat model §14; the Grok harvest's "deterministic-as-possible compiler"); what already exists in the tree without an owner (`INTEGRITY_PATTERNS` and `SESSION_WRITE_PATTERNS` in `src/secondsignal/safety.py`; `tests/test_guards.py`)
 - **Depends on:** ADR-0014 (the gate runs first); ADR-0018 (one normalizer, before every lexicon); ADR-0002 (authority is source-anchored)

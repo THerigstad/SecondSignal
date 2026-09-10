@@ -58,7 +58,7 @@
         "held": [],
         "latch": null
       },
-      "projection_note": "The reviewer's outcome CARD is the preempted outcome with the standard card; latch null is none. The reviewer's premise was a lexicon hit: on 10 September this text was a lexicon miss and proceeded to a persona, so 'thinking about ending it' entered the direct-ideation class and the fixture passes. No backend exists in this repository, so nothing can downgrade the gate's verdict; the rule the reviewer states is the hit/miss row of ADR-0022's matrix."
+      "projection_note": "The reviewer's outcome CARD is the preempted outcome with the standard card; latch null is none. The reviewer's premise was a lexicon hit: on 10 September this text was a lexicon miss and proceeded to a persona, so 'thinking about ending it' entered the direct-ideation class and the fixture passes. No backend exists in this repository, so nothing can downgrade the gate's verdict; the rule the reviewer states is the hit/miss row of ADR-0022 (Proposed)'s matrix."
     }
   ]
 }
