@@ -88,7 +88,7 @@ every claim on it points at a test, a record or a labelled proposal.
   ADR-0014 in post-ADR-0022 words. The dissent log's round-2 entries
   (R2-1 to R2-6). The model-provenance note, version 2. The
   stall-and-recovery packet filed as a labelled proposal. The confessions
-  ledger, version 3, all twenty-one entries approved by the operator.
+  ledger, version 4, all twenty-two entries approved by the operator.
 - **The front page and the assets.** The README rebuilt on the operator's
   canon block, the house as the hero, the doorway mark, two drawn diagrams,
   the roster after round 2, the round-2 numbers, the confessions link, the

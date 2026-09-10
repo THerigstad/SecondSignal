@@ -12,15 +12,16 @@ he asked for each of them. The page exists because "I audit everything" is a
 claim, and a claim without receipts is the thing this project is arguing
 against.
 
-**Status: version 3, 10 September 2026. Entries C-01 to C-19 were approved
+**Status: version 4, 10 September 2026. Entries C-01 to C-19 were approved
 by the operator on 9 and 10 September 2026; C-20 was added at his instruction
 on 10 September, and its wording stays his to edit; C-21 was added at his
 instruction the same day, after the pre-push check that produced it, and its
-wording was read by him before the push.** The operator approves each entry
-individually before it is published or linked from the README. Entries are
-written by the project's Primary Design Agent (Claude), which is also the
-subject of four of the first twelve and seven of the last nine; the other two
-are the operator's.
+wording was read by him before the push; C-22 was added at his instruction
+the same night, after the sweep that ran when the push had landed.** The
+operator approves each entry individually before it is published or linked
+from the README. Entries are written by the project's Primary Design Agent
+(Claude), which is also the subject of four of the first twelve and eight of
+the last ten; the other two are the operator's.
 
 ## Read this before the entries
 
@@ -472,7 +473,7 @@ the runner's, for treating an unrecognized instruction as an absent one.
 
 *A coder would never have let a runner shrug at a key it did not recognize. A coder treats an unknown key as an error, because a coder has met himself before.*
 
-## The Primary Design Agent's own, nine more
+## The Primary Design Agent's own, ten more
 
 These five come from the accounting of 6 September 2026, when the operator
 asked for every mistake of that evening to be listed. Sixteen were listed; the
@@ -485,7 +486,9 @@ The sixth, C-18, is about this page itself, and it is here because the
 operator said so. The seventh and eighth, C-19 and C-20, are the operator's
 own, and he asked for each of them as it came up. The ninth, C-21, is from
 the check that ran before push 3 went out, and the operator ruled that it
-earns its place because it was caught, not although.
+earns its place because it was caught, not although. The tenth, C-22, is from
+the sweep that ran after push 3 had landed, and the operator asked for it the
+same night.
 
 ### C-13. A push plan that told the operator to run git
 
@@ -788,6 +791,63 @@ method, not an excuse for the miss.
 
 *A coder would never have let fourteen files agree on a number and called the agreement a check. A coder knows that fourteen copies of one guess are one guess.*
 
+### C-22. The word the operator excluded was on GitHub for eight days
+
+**The ask.** The operator's exclusion list for the repository, given before
+the first push and standing since: nothing from his email, nothing about the
+legal matter in any form, no addresses, no account identifiers, no personal
+names or anecdotes, no location terms. The name of his email product was on
+that list as a word; that is the operator's account, given the night this
+was reported, and it stands. The sweep that gated the first pushes was
+written by the Primary Design Agent to look for the address form of it, the
+word with an at-sign in front, which is not the instruction; it is the
+instruction narrowed to what its author expected to find.
+
+**What happened.** The 1 September review package from Grok (twenty-nine
+files) was sanitized before its push on 2 September: names became "the
+operator", the bridge and the pilot locale lost their names, an income line
+was neutralized, and the reviewer's own disclaimer was rewritten so that no
+excluded name appeared even as a denial; the word "litigation" was caught by
+the final scan and removed before it reached the history. The product's name
+was not, and stayed in three files, five times: twice in `01_FOLDER_TRIAGE.md`
+in the names of two archived PDFs the reviewer listed (the audits had been
+delivered as email prints), once in `17_CLAUDE_LIVE_ROUTER_PICKS.md` and
+twice in `18_GROK_TO_CLAUDE_MASTER.md`, where the reviewer restates the
+exclusion rule it was given, with the word in it. Every sweep since
+read the files being pushed, not the tree, and never opened those three
+files again. The word sat on the private repository from 2 September to
+10 September, through four pushes, each with its own clean sweep of the
+files it carried.
+
+**How it was caught.** By the sweep that ran after push 3 landed, the first
+sweep to read every file on GitHub rather than the files being pushed, with
+the bare word on its list. The list had grown to the operator's word in the
+meantime; the tree had never been read against it.
+
+**What it cost.** Nothing to safety and nothing to the legal matter: the
+name of a product is not an address or an identifier, no address appears
+anywhere in the tree, and the repository was private throughout. The
+operator's own accounting, when it was reported: not catastrophic in fact,
+catastrophic in principle, because the word he named got in, and the gap
+that admitted it "could have just as easily been" something that mattered.
+What it leaves on the public record, in his words, is the mark of "a little
+new and maybe not very experienced": the dumb mistake, as his old math
+teacher would have called it.
+
+**What changed.** A term the operator names is swept as the word he named,
+in every form, never as the form its author expects; the sweep's list is
+written into the project's record, term by term, beside each push's kit, so
+the next sweep starts from the list and not from memory. And every push is
+followed by a sweep of the whole tree as it stands on GitHub, not only of
+the files pushed, so a word admitted once is read again every time. The five occurrences stay, by the operator's ruling of the same night:
+a reviewer's return is never edited after it is saved, the word is not an
+identifier, and this entry is the record.
+
+**Grade of the ask: clear.** The operator named the constraint and the word.
+The narrowing was the Primary Design Agent's, and so was the eight days.
+
+*A coder would never have searched for the address when the instruction said the word. A coder searches for what he was told, not for what he expects to find.*
+
 ## The refusals that were right
 
 A page that records only failures teaches the wrong lesson, so the same
@@ -845,6 +905,9 @@ A packet's first line names the door it runs in and the door beside it that it
 does not.
 A count on a page is re-derived from the files before the page is called done;
 nothing is called done that is not done.
+A term the operator names is swept as the word he named, in every form, and
+every push is followed by a sweep of the whole tree as it stands on GitHub, not
+only of the files pushed.
 
 ## What is not on this page yet
 
