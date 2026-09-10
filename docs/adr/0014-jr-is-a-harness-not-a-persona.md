@@ -32,11 +32,15 @@ request path.
   rule, rule on welfare, write memory, or approve itself. `jr_harness` is a
   pure function from an `AuditRequest` to an `AuditVerdict`. It has no
   personality and no seat.
-- **Where it sits.** Safety gate, then optional harness intake (injection,
-  waiver language, forged pings), then the router, then exactly one seated
-  agent, then harness review of that agent's output, then the audit log. The
-  harness never picks the next agent. If the crisis gate has already fired,
-  the harness does not run; the gate has the floor.
+- **Where it sits.** Safety gate, then intake and provenance (ADR-0022
+  (Proposed): the injection, waiver-language and forged-ping detectors live
+  in the gate today and intake gathers their provenance; it is not part of
+  the harness), then the router, then exactly one seated agent, then harness
+  review of that agent's output, then the audit log. The harness never picks
+  the next agent. If the crisis gate has already fired, the harness does not
+  run; the gate has the floor. (Reworded 10 September 2026: the 2 September
+  text assigned intake to the harness in pre-ADR-0022 words; review round 2,
+  Grok and Kimi.)
 - **Typed verdicts.** `PASS | FAIL | ESCALATE | INCONCLUSIVE`, one per layer,
   composed worst-layer-wins. A high-risk `INCONCLUSIVE` is `ESCALATE`, never
   `PASS`. The cultural layer composes to `INCONCLUSIVE` until two humans have

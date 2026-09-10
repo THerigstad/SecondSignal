@@ -1,6 +1,6 @@
 # ADR-0025: The assist from the hold, and an affinity that can trade seats
 
-- **Status:** Proposed — none; the operator's design intent, recorded 2026-09-08 with its target case and its gate; not adopted, not built, and not to be built before a generation layer exists. Amended 2026-09-10 by ADR-0026: proposal 2 (the affinity that can trade seats) is withdrawn; proposal 1 (the assist from the hold) stands
+- **Status:** Proposed — none; the operator's design intent, recorded 2026-09-08 with its target case and its gate; not adopted, not built, and not to be built before a generation layer exists. Amended 2026-09-10 by ADR-0026: proposal 2 (the affinity that can trade seats) is withdrawn; proposal 1 (the assist from the hold) stands, with the five gate predicates review round 2 asked for stated in the record the same day
 - **Date:** 2026-09-08
 - **Evidence:** the dissent log entry D3 (`docs/notes/dissent-log.md`), decided-with-dissent on 2026-09-08; the round-1 assist-leak fixtures under `evals/cases/round1_2026-09-02/`; the both-ways measurement of 3 September recorded in the same log; the operator's standing rule that anything recovery-related leans to the recovery persona (ADR-0016)
 - **Depends on:** ADR-0016 (seat versus hold; the assist passes the same gate as the seat)
@@ -92,13 +92,51 @@ This record is built only when all of the following hold:
   has visible behaviour to measure.
 - The round-1 assist-leak fixtures stay green under the new source: no
   persona vetoed on a hold can arrive by the assist channel, from an
-  affinity or from a hold.
+  affinity or from a hold (Grok's round-2 fixture `r2-0025-hold-assist-leak-001`
+  pins the hold as a source; it runs today against the affinity source).
 - A labeled set of first-person recovery messages with declared affinities,
   labeled by two people before any code, fixes the expected seat and assist
-  for each.
+  for each. The precondition this sentence hides is stated (GLM, round 2):
+  the second labeller does not exist yet; the single-operator limitation in
+  `docs/known-limitations.md` names it, and no label written by one hand
+  satisfies this gate.
 - The both-ways measurement is repeated: every D3 sentence in the dissent
   log is run before and after, and any change in seat, hold or obligations
   is listed in the record before the flip to Accepted.
+
+### The five predicates the gate checks (added 2026-09-10)
+
+Review round 2 found the gate strong on the leak it was written for and
+thin on the door it opens, and named the missing predicate five ways (Grok
+5.6, DeepSeek, Kimi 5.2, Nemotron disagreement 4, ChatGPT 4.g). Stated
+here so the day the assist is built the test is already written:
+
+1. **Eligibility against the claimed domain.** The persona that carries a
+   hold-source assist, and the persona it is emitted beside, each pass
+   `eligible()` against the held domain and every other hold on the turn,
+   not only against the residual ask.
+2. **Content provenance.** The gate checks what the assist field carries,
+   not only which channel it arrived by: a versioned protocol with exact
+   bindings to the specialist's profile, never free text, so a
+   humour-capable sibling never carries a recovery protocol it was not
+   vetted for (GLM).
+3. **Subject classification.** A third-person claim ("my sister") never
+   enters this path; `claim_subject` is checked before any assist is
+   considered, so a misclassified subject cannot route a relative's case
+   into a first-person rule (Kimi).
+4. **Every source, every hold.** The assist-leak fixtures run for every
+   source (affinity, hold) and for turns with more than one hold; a persona
+   vetoed on any one of them may not arrive by any channel (ChatGPT's
+   release list).
+5. **One visible speaker, no narrator in any channel.** The seated persona
+   is the only speaker; the assist is never spoken as a second voice; no
+   security narrator can appear in the assist field; and after review, a
+   mutation of any of the five is a red test (ChatGPT).
+
+Kimi's second predicate, that an unconfirmed affinity is enough for a
+tie-break and never for a seat, no longer applies to this record: the seat
+trade is withdrawn, and under ADR-0026 a voice choice is a presentation
+under ADR-0017's confirmed-or-declared rule, never a seat.
 
 ## Consequences if Accepted
 

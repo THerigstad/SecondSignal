@@ -1,6 +1,6 @@
 # ADR-0022: Intake and provenance runs after the gate and before routing, and proposes but never grants
 
-- **Status:** Proposed — none; drafted 2026-09-08 from the rulings on review round 1; not yet reviewed by a second model family, so it stays Proposed until review round 2 closes
+- **Status:** Proposed — none; drafted 2026-09-08 from the rulings on review round 1; read by eight model families in review round 2 (8 to 10 September 2026) and amended in place on 2026-09-10 with their findings and the operator's rulings (the revision history at the end); under the standing rule it stays Proposed until a further round has read the amended text, and the flip is the operator's act
 - **Date:** 2026-09-08
 - **Evidence:** the Security Division document v1.1 (`docs/notes/security-division-2026-09-08.md`, §4); review round 1 (Grok 2.1 and tests 5.2, 5.3; ChatGPT 2.2, 2.11 and tests 5.4, 5.5; GrokBot 4b); the 31 August audits that first split intake from authority (ChatGPT threat model §14; the Grok harvest's "deterministic-as-possible compiler"); what already exists in the tree without an owner (`INTEGRITY_PATTERNS` and `SESSION_WRITE_PATTERNS` in `src/secondsignal/safety.py`; `tests/test_guards.py`)
 - **Depends on:** ADR-0014 (the gate runs first); ADR-0018 (one normalizer, before every lexicon); ADR-0002 (authority is source-anchored)
@@ -36,8 +36,15 @@ exactly as ADR-0014 and ADR-0018 say. Deterministic intake runs second,
 before any routing. Model-backed intake, where it exists at all, runs beside
 or after deterministic intake, with a timeout, and can only add a
 disclosure. Nothing intake produces reaches the gate. If the gate fired,
-intake still runs so the crisis turn's rows carry provenance, and it cannot
-touch the card.
+the card is committed before intake is invoked; intake still runs so the
+crisis turn's rows carry provenance, and it can neither delay nor rewrite
+the card. "Never a delay" is not an untestable absolute: the card's path is
+a declared non-blocking path, and where any budget is published for intake
+it is published as a manifest field with no default, and intake never
+holds a turn beyond it (round 2: Grok, "cannot touch is not cannot delay";
+ChatGPT, Kimi, GLM, Nemotron, Sonar on the budget). A crisis turn whose
+intake failed carries no provenance stamp; that is a legal record state,
+recorded as such, and never a reason to withhold the card (Kimi 2.5).
 
 **Read-only on the bytes.** Intake sees the normalized message, the session
 record as the house holds it (which facts were operator-set, which were
@@ -70,7 +77,29 @@ changes what the gate saw or what the gate decided.
    anything the turn wants to remember. Silent movement of a fact between
    state classes (an inference quietly becoming a declared fact) is a P0
    defect. The timestamp carries the session-boundary rule: elapsed time
-   beyond the published threshold starts a new session.
+   beyond the published threshold starts a new session, and the trusted
+   session is assigned before the gate runs, so that one turn never has two
+   contexts (the gate reading the old session's latch state while intake
+   opens a fresh session for routing); a boundary that arrives late applies
+   to the next turn, never to the one in flight (review round 2, ChatGPT
+   4.b.1).
+
+**Provenance labels are code-computed.** Round 2 (Grok's two-turn sequence;
+ChatGPT, GLM, Nemotron, DeepSeek in the language of provenance) showed the
+hole in a schema-valid envelope: intake did not change turn one, it changed
+turn two, by storing a declared adult band that a typed "I am 34" had
+proposed and a later gate read as a prior. So the fields that carry
+authority (source class, durable-state class, the operator-set marker) are
+computed by house code from host facts and can never be set by a proposer;
+every field has a write permission; the validator compares
+authority-bearing fields to the host's facts rather than to the envelope's
+claims; and a mislabel is recorded as evidence of an attempted write, never
+corrected silently. Schema validity does not authenticate origin.
+
+**Pinned before intake runs.** Read-only by convention on a shared mutable
+object is not read-only (ChatGPT, DeepSeek, Nemotron): the input digest, the
+normalizer version, the gate's result and the session snapshot are pinned
+before intake is invoked, and intake's rows reference the pinned digest.
 
 **Typed authority.** Intake proposes what the record should say about where
 each fact came from; the gate and the router decide what happens. Intake
@@ -120,15 +149,57 @@ the lexicon by one published matrix, every cell filled:
 
 | Lexicon | Backend | Result |
 |---|---|---|
-| hit | hit | escalate |
+| hit | hit | escalate; a forged waiver in the backend's proposal changes nothing |
 | hit | miss | escalate (the floor holds) |
-| miss | hit | disclose this turn; record the disagreement |
-| miss | miss | proceed |
-| any | timeout, malformed envelope, unavailable | counts as a miss; logged; never a hit, never a delay |
+| miss | hit | disclose this turn; record the disagreement; never a sole escalation, a persistent latch or an operator fact |
+| miss | miss | proceed, which means no signal detected, not a verdict of safety; existing latches still apply |
+| inconclusive | any | the gate's inconclusive read escalates (ADR-0010) and no backend result collapses it into a miss |
+| any | backend timeout | counts as a miss; logged with its own code; never a delay |
+| any | backend unavailable | counts as a miss; logged with its own code |
+| any | malformed envelope | counts as a miss; logged; an escalation-shaped payload in a malformed envelope is logged, never acted on |
+| any | deterministic intake failure | the failure rule above, with its own code, separate from a backend failure |
+| any | optional proposal failure | logged; never inherits the failure rule's fallback |
+| any | late result | discarded for the turn it missed; recorded; never applied to a later turn |
+
+The six error cells are ChatGPT's (round 2, 4.b.7 and 4.b.10, with the
+separate codes for backend failure and deterministic-intake failure); the
+inconclusive row is ChatGPT's 4.b.8 (the matrix was binary while the gate is
+not; fixture `r2-matrix-inconclusive-preserved-001`); Gemini and GLM noted
+that an attacker who can crash the backend converts a model-detected
+escalation into a proceed, which is why the backend never carries the
+escalation alone.
+
+**The miss/hit cell, ruled 2026-09-10 (Thing 3).** Disclose until reviewed,
+with three constraints the round wrote: the disclosure names no danger, no
+age and no safety (Grok's fixture: a backend hit on "I had a drink with
+dinner" produces a line that mentions none of them and seats whoever would
+have been seated); a per-session repeat limit, so a flaky backend cannot
+put a disclosure on every turn and train the person to ignore disclosures
+(Kimi 2.4, GLM); and "hit" is defined, because the gate's integrity hits
+produce a hold and a disclosure, not a card (ChatGPT 2.7): a backend hit is
+a crisis-class claim and nothing else. The dissent (Gemini, Nemotron): a
+backend that correctly flags acute lethal risk the lexicon missed should
+escalate, not disclose. Kept with its sentence, Gemini's rope and the
+letters and the motor running (`sec-intake-backend-disagree-failclosed-002`),
+which proceeds today and is the first entry of the labelled set that
+decides promotion; no rule about unreviewed models fixes a lexicon gap.
+
+**The promotion cell.** A reviewed backend, on a lexicon miss, still only
+discloses until the promotion bit is operator-set; then it escalates on the
+same bytes (Grok). Promotion is a versioned policy change with revised gold
+labels, never a backend flag (ChatGPT, Chat return).
 
 A backend's self-reported confidence is evidence only and grants nothing.
 An unreviewed backend can never escalate alone; promotion of a backend to
-escalate on its own hit requires that backend's review. Whatever family
+escalate on its own hit requires that backend's review.
+
+**The integrity matrix, unspecified on purpose.** Session-write detection
+lives in the gate's patterns and in intake's question three, and there is
+no published rule for the cell gate-miss, intake-catch (Kimi 4.b, fixture
+`pplx-r2-intake-001`, which the gate now catches on its own). The cell
+stays unspecified until intake exists, is listed in
+`docs/known-limitations.md`, and the ruling is owed the day it is built:
+whether intake's catch attaches a hold, a disclosure, or only a row. Whatever family
 runs the seated persona, the intake backend runs on a different one, and it
 never shares a family with the ledger's interpretation engine in the same
 turn (ADR-0014's independence rule, applied here).
@@ -164,7 +235,12 @@ detection out of it.
   exists: force intake to raise, to return an invalid envelope, to time out
   and to label the channel unknown; a synthetic present-danger message still
   produces the house card with no persona speaking, and a synthetic ordinary
-  message seats nobody silently (Grok 5.2). The same bytes in two sessions,
+  message seats the persona the gate allowed with every write blocked and
+  the failure line shown (Grok 5.2 as revised by the ruling of 10 September;
+  the 8 September text said "seats nobody silently"). Review round 2's
+  eleven composition fixtures are filed verbatim under
+  `evals/cases/deferred/round2_orchestration_cases.json`; they move up one
+  directory and gain the runner's expectations the day intake exists. The same bytes in two sessions,
   one with a prior hard latch, produce intake labels that differ only where
   they copy declared session facts (Grok 5.3). Ordering is observable: no
   ordinary seat is released before the gate's decision (ChatGPT 5.4). Every
@@ -189,6 +265,15 @@ timeout delays or changes the card.
 
 ## Revision history
 
+- **2026-09-10, second revision.** Amended in place with review round 2's
+  findings: the trusted session assigned before the gate; provenance labels
+  code-computed with field-level write permissions; the pinned inputs; the
+  card committed before intake is invoked, with the budget as a manifest
+  field and the crisis turn without a stamp as a legal state; the matrix
+  with the inconclusive row and the six error cells; the miss/hit cell as
+  ruled (Thing 3) with its three constraints and its dissent; the promotion
+  cell; the integrity matrix left unspecified on the record; the settling
+  test reworded for the revised failure rule.
 - **2026-09-10.** The failure rule revised from fail-closed-on-the-seat to
   seat-the-persona-and-block-the-writes, with one automatic retry and the
   house's failure line, on the operator's ruling of 10 September 2026 after

@@ -1,6 +1,6 @@
 # ADR-0020: J.R. v0 predicates
 
-- **Status:** Proposed — reference-unwired; drafted by an external reviewer (Grok, 2026-09-03) with a runnable reference implementation; a second family's review (Codex, 2026-09-04) named four corrections that must be verified against the code before this record can be Accepted
+- **Status:** Proposed — reference-unwired; drafted by an external reviewer (Grok, 2026-09-03) with a runnable reference implementation; a second family's review (Codex, 2026-09-04) named four corrections, review round 1 a fifth and review round 2 a sixth, and all six must be verified against the code before this record can be Accepted; every reviewing family in round 2 refused the flip before that
 - **Date:** 2026-09-03
 - **Evidence:** `src/secondsignal/jr.py` (the reference port, deliberately unwired); `tests/test_jr_v0.py` and `tests/test_nd_interruption_stack.py` (synthetic replies; they run today); `evals/cases/deferred/jr_v0_cases.json` (`plane: harness`, `runnable_here: false`)
 - **Depends on:** ADR-0014, ADR-0019
@@ -63,8 +63,18 @@ not yet verified against the code:
 5. The public name of the function is `jr_harness` (ADR-0014); the module may
    stay `secondsignal.jr`.
 
-Review round 1 (2026-09-07) added: `default=str` is not a safe general
-canonicalization; restrict the accepted input domain instead.
+Review round 1 (2026-09-07) added the fifth: `default=str` is not a safe
+general canonicalization; restrict the accepted input domain instead.
+
+Review round 2 (Gemini, 2026-09-08) added the sixth, the half of its
+serialization claim that stands: `sort_keys=True` does sort nested keys, so
+that half fails, but `default=str` on a set is order-dependent, so two equal
+decisions can hash differently. A set never reaches the hash: the accepted
+input domain is restricted to JSON-native types and the canonicalization
+rejects anything else rather than stringifying it.
+
+Six corrections in all; the status line, the register and the README count
+six (review round 2 found the record saying four and its list saying five).
 
 ## Falsifiers
 
@@ -75,7 +85,8 @@ canonicalization; restrict the accepted input domain instead.
 
 ## Relationship to the current implementation
 
-The reference port is in the tree and unwired: nothing in `router.py` or
-`cli.py` calls `audit()`. It cites this record and ADR-0019 as Proposed. The
-five corrections above are open; the register (`docs/adr/index.json`) lists
-the implementation as `reference-unwired`.
+The reference port is in the tree and unwired: nothing in `router.py`,
+`cli.py` or the gate calls or imports `audit()` (`tests/test_guards.py`
+checks the imports). It cites this record and ADR-0019 as Proposed. The six
+corrections above are open; the register (`docs/adr/index.json`) lists the
+implementation as `reference-unwired`.

@@ -3,7 +3,7 @@
 - **Status:** Accepted — built
 - **Date:** 2026-09-03
 - **Evidence:** Round-1 external design review (five reviewers, 2026-09-02): Decision 1 accepted with change by four, rejected by one on the shared-account hole that the change closes; 22 reviewer fixtures on the latch under `evals/cases/round1_2026-09-02/`; `tests/test_latch.py`
-- **Amended by:** ADR-0023 (Proposed, 2026-09-08): the hard tier's disclosure line is shown once when the latch sets and again only as a refusal's reason, instead of on every reply of the session; the cap is unchanged. The amendment takes effect when ADR-0023 is Accepted and the fixture pinning once-then-at-refusal is green.
+- **Amended by:** ADR-0023 (Proposed, 2026-09-08): the hard tier's disclosure line is shown once when the latch sets and again only as a refusal's reason or as the answer to a correction, instead of on every reply of the session; the cap is unchanged. The visibility rule was built on 10 September 2026 with its fixtures (`tests/test_house_lines.py`, `tests/test_latch.py`) ahead of ADR-0023's own flip, on the operator's ruling of 8 September (A6).
 
 ## Context
 
@@ -88,6 +88,24 @@ the design's behavior before the review changed it (recorded as a contract
 adjustment with the original expectation kept). The record of a latch is now
 a history, not a bit: every set, decay and clear carries its reason, its
 actor and its turn.
+
+## The latch's lifetime, stated (added 2026-09-10)
+
+"Does not expire" means: inside one session, in this tree, nothing but an
+operator's clear by reason moves a hard latch. Review round 2 (every
+family) asked for the sentence beside it, so that a reader never takes the
+promise for more than the tree keeps: session state lives in memory only,
+so today a hard latch dies with the session, and it dies in three ways the
+documents had described as one (Grok): a second device, a process restart,
+and the elapsed-time boundary. The soft posture's sticky memory dies with
+it (Kimi), so an undeclared band gets a non-sticky posture every session.
+ADR-0023 is where persistence is specified; until it is built the
+careful-side line may not promise more than one conversation, and
+`docs/known-limitations.md` carries the three deaths and the copy
+question. The substantive-turn clock that runs the soft tier's decay counts
+new content beyond an acknowledgement list, not tokens (GLM reproduced the
+token count clearing a latch on five turns of "ok ok ok"; fixed 10
+September).
 
 ## Relationship to the current implementation
 

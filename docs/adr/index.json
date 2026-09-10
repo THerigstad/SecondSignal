@@ -300,7 +300,7 @@
       "modules": [
         "src/secondsignal/jr.py"
       ],
-      "notes": "The reference port implements these predicates on synthetic records and is unwired. Five corrections are listed inside the record and must be verified against the code before the decision can flip to Accepted."
+      "notes": "The reference port implements these predicates on synthetic records and is unwired. Six corrections are listed inside the record and must be verified against the code before the decision can flip to Accepted."
     },
     {
       "number": "0022",
