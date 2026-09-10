@@ -5,7 +5,7 @@ All notable changes to SecondSignal are documented here.
 ## [0.2.0] — 2026-09-10
 
 The magazine issue: the build of 10 September 2026 and the public flip. The
-danger lane every reviewing family put first; the eight-family review round
+danger lane every reviewing family put first; the nine-family review round
 ingested verbatim; the guards hardened against the round's own mutations;
 the family renamed through an alias layer and its ten codexes in the tree;
 the records amended in the reviewers' words; the front page rebuilt so that
