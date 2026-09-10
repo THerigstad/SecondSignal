@@ -89,6 +89,55 @@ and the assist to any persona contraindicated on the held domain (ADR-0016).
 explicitly rather than deflected. Deflection reads as coyness, which in this
 context is an escalation.
 
+## The house lines, and the rules they obey
+
+Every fixed line a person can see is text this layer supplies, never a
+persona's improvisation: the crisis card, the line on the turn after it, the
+careful-side lines, the boundary, dependency, integrity and facilitation
+lines, the style offer, the failure line and the post-separation line. They
+live in `HOUSE_LINES_EN` in `src/secondsignal/safety.py` and, for Spanish, in
+the es-419 pack as native prose, never a translation. A wording change is a
+policy change and shows up as a diff in `tests/test_house_lines.py`. The
+rules every line has to obey, each with the test or the ruling behind it:
+
+- **The house has no "I".** The characters have stepped aside when a line
+  appears, so nobody is there to say it. Mechanical since 10 September 2026:
+  `test_no_house_line_speaks_in_the_first_person`.
+- **The friend test, in two passes** (the operator's technique, 8 September
+  2026): first write the sentence the way a friend would say it to a friend,
+  then strip the person out of it so the house can say it.
+- **Options are few, concrete, and handed over**, never left for the person to
+  generate. The card's last line names two doors (in person, on your phone)
+  because a person at their lowest capacity is not given an open field.
+- **The diner rule** (10 September 2026): a person is never spoken to like an
+  engineer. No line names a mechanism: nothing was "checked", no "intake",
+  no "gate". The failure line says what happened and offers the one door
+  that helps: `test_the_failure_line_names_no_mechanism_and_offers_a_door`.
+  The language-scope line is the one line that names the screening, on
+  purpose, because the person needs to know the language is not covered.
+- **No spatial or anthropomorphic phrasing, nothing quotable as proof of a
+  relationship.** "This is not a relationship" is the load-bearing clause of
+  the boundary line and is pinned verbatim.
+- **The card never invites dismissal.** No line asks the person to declare
+  the card unnecessary; the repair line asks them to say it was read wrong:
+  `test_the_card_never_invites_dismissal`.
+- **A correction is evidence, not a key.** A person who says they are an
+  adult, or that they were joking, is answered by the careful-side line,
+  which says the correction is recorded; the latch history gains a row; the
+  latch does not move (ADR-0015; ruling of 8 September 2026).
+- **The careful-side line is shown once, then goes quiet** while the cap
+  persists, and returns only as the reason a capped ask was refused or a
+  correction was heard (A6, 8 September 2026). The cap never changes with
+  the line.
+- **The resource line is never rewritten or paraphrased**; digits print in
+  full; hours are a claim, and a row that cannot say 24/7 does not.
+- **Say what happens next.** Every line states what the house is doing:
+  stepping aside, keeping going, staying careful, refusing this one thing.
+  No shame language, no urgency, no forced pace.
+- **Trauma-informed by construction**: face value, no lecture, one resource
+  once, the door open both ways so "read wrong, keep going" costs nothing.
+  The operator's crisis-response canon of 4 September 2026, locked.
+
 ## What this does not do
 
 - It is not a content filter. It does not evaluate generated text, because it

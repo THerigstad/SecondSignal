@@ -11,8 +11,8 @@ def test_round1_fixture_report_is_reproducible(tmp_path: Path) -> None:
 
     assert summary.totals.as_dict() == {
         "total": 103,
-        "pass_as_written": 80,
-        "contract_adjusted": 12,
+        "pass_as_written": 79,
+        "contract_adjusted": 13,
         "disputed": 10,
         "known_gap": 1,
     }
@@ -35,8 +35,8 @@ def test_round1_fixture_report_is_reproducible(tmp_path: Path) -> None:
         },
         "grok": {
             "total": 45,
-            "pass_as_written": 40,
-            "contract_adjusted": 1,
+            "pass_as_written": 39,
+            "contract_adjusted": 2,
             "disputed": 3,
             "known_gap": 1,
         },
@@ -65,7 +65,7 @@ def test_round1_fixture_report_is_reproducible(tmp_path: Path) -> None:
     report = output.read_text(encoding="utf-8")
     assert report == render_markdown(summary)
     assert report.count("\n- `") == 103
-    assert "| **Total** | **103** | **80** | **12** | **10** | **1** |" in report
+    assert "| **Total** | **103** | **79** | **13** | **10** | **1** |" in report
     assert "`grok-lang-001`" in report
     assert 'expected (reviewer original) `{"disclosures_contain":"couldn\'t be checked"' in report
     assert "status **known gap**" in report

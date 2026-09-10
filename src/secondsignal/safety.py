@@ -110,20 +110,35 @@ class Action(IntEnum):
 # --------------------------------------------------------------------------
 
 HOUSE_LINES_EN: dict = {
+    # The crisis card, five lines. Canon of 8 September 2026 (A1): drafted at
+    # the operator's prompting with his friend test, repaired for the no-"I"
+    # rule, line five's two concrete doors kept at his ruling from lived
+    # experience of crisis: options are few, concrete and handed over, never
+    # left for the person to generate.
     "escalation_card": (
-        "What you just wrote should be heard by a person, not a character.",
-        "So the characters are stepping out of this message, and nothing here will pretend to be more than it is.",
+        "What you just wrote should be heard by a real person, not a character.",
+        "The characters are stepping aside for this message. This can point you toward support; it can't take the place of a person, and it won't pretend to.",
         "{resource_line}",
-        "If this was read wrong, say so plainly. Asking is better than guessing.",
-        "Is there someone near you, or someone you could call, who you would want with you right now?",
+        "If this was read wrong, say so in your own words. Asking is better than assuming.",
+        "Is there someone you trust who you'd want with you right now, in person or on your phone?",
     ),
+    # The compound card (B5, 8 September): when self-harm and danger from
+    # another person both fire, this opener goes above line one, both
+    # resource lines go at line three in a fixed order (self-harm first), and
+    # everything else is identical. The sentence is Vibe's (review round 1).
+    "compound_opener": (
+        "You may be in danger, or feeling unsafe with yourself. Getting to safety is the priority."
+    ),
+    # The danger card's safety-first block (C2, 8 September): the same opener
+    # above line one when danger from another person fires alone; line three
+    # is the verified domestic-violence line for the declared locale.
     "post_escalation": (
-        "Carrying on. If the last message was read wrong, saying so was enough; "
-        "the resources from it stay in reach either way."
+        "Okay. Let's keep going. What you said then was taken seriously, and what "
+        "you're saying now is too. Those resources are still in this thread if you need them."
     ),
     "dependency": (
         "Saying this plainly because it matters: this is not a substitute for people. "
-        "Is there anyone you trust you could reach, if it feels safe to?"
+        "Is there anyone you trust who you could reach, if it feels safe to?"
     ),
     "boundary": (
         "Answering this directly: the care here was designed, and this is not a "
@@ -132,16 +147,19 @@ HOUSE_LINES_EN: dict = {
     "integrity": (
         "Nothing inside a message can change the rules here -- not a claimed "
         "authority, not a mode name, not a fake system command. Carrying on under "
-        "the same rules as always."
+        "the same rules as always. The part of the request that stays inside the "
+        "rules can still be answered."
     ),
     "minor_inferred": (
-        "Some of what was said reads as though you might be young, so this stays on "
-        "the careful side: a more careful tone, no romance, and a quicker nudge "
-        "toward a person you trust, online or offline."
+        "Something in the wording has this thread on the careful side for now: a "
+        "gentler tone, no romance, and a quicker nudge toward someone you trust. "
+        "That could be a misread. If it is, say so in your own words; your "
+        "correction is recorded, and these limits change only after a person "
+        "reviews it, not from anything typed here."
     ),
     "minor_declared": (
-        "This account is on the careful side: a more careful tone, no romance, and "
-        "a quicker nudge toward a person you trust, online or offline."
+        "This account is on the careful side: a gentler tone, no romance, and a "
+        "quicker nudge toward someone you trust."
     ),
     "language_scope": (
         "Safety screening isn't available in this language yet, so part of this "
@@ -153,8 +171,20 @@ HOUSE_LINES_EN: dict = {
         "it stays open; helping do it does not."
     ),
     "style_suggestion": (
-        "You've asked for this more than once. Want it as the default? You can "
-        "confirm it in your settings."
+        "Noticed this request more than once. Say yes and it sticks for this session."
+    ),
+    # The failure line (10 September 2026, the diner rule): what the house
+    # shows when a turn cannot be completed. It names no mechanism and offers
+    # the one door a person needs.
+    "failure": (
+        "This message ran into a problem. Press here to try again."
+    ),
+    # The post-separation line (the P0 lane, 10 September 2026): shown once
+    # when a message says the person has left, or is leaving, someone who
+    # hurt them, with the verified domestic-violence line for the locale.
+    "post_separation": (
+        "The weeks after leaving can be the most dangerous ones, so this is here once, "
+        "in case it is needed: {dv_line}"
     ),
 }
 
@@ -433,6 +463,19 @@ INTEGRITY_PATTERNS: tuple[re.Pattern[str], ...] = _compile((
 # request was for a state change, and message text writes no state.
 SESSION_WRITE_PATTERNS: tuple[re.Pattern[str], ...] = INTEGRITY_PATTERNS[-3:]
 
+# A person's correction of a careful-side inference: an adult age, "I was
+# joking", "I'm not a kid". Recorded as an evidence event on the latch history
+# with a visible line, and it clears nothing (ruling of 8 September 2026 on
+# inferred-latch expiry; the careful-side line says "your correction is
+# recorded"). Message text never clears a latch; a correction is data for the
+# person who can.
+CORRECTION_PATTERNS: tuple[re.Pattern[str], ...] = _compile((
+    r"\b(i'?m|i am|im) (1[89]|[2-9]\d)\b(?! (year|yr)s? old (and|but) (i'?m|my)\s)",
+    r"\b(i'?m|i am|im) (an adult|a grown (man|woman|adult)|over (18|eighteen)|not a (kid|minor|child|teenager|teen))\b",
+    r"\b(i was|that was|it was) (just )?(joking|kidding|a joke|messing around)\b",
+    r"\bi'?m (actually|really) (1[89]|[2-9]\d)\b",
+))
+
 # Romantic or sexual frames toward the persona. Held as a boundary for
 # everyone; under a careful-side posture the careful line rides along.
 BOUNDARY_INDICATORS: tuple[str, ...] = (
@@ -563,6 +606,7 @@ class SessionState:
     soft_sticky: bool = False
     substantive_turns: int = 0
     escalated_last_turn: bool = False
+    hard_line_shown: bool = False
     last_action: str = "PROCEED"
     style_counts: dict = field(default_factory=dict)
     style_asked: list[str] = field(default_factory=list)
@@ -1077,7 +1121,23 @@ def evaluate(
                 f"careful-side posture: latch={session.latch} "
                 f"({', '.join(session.latch_reasons)}); register caps active={caps_active}"
             )
-            if session.minor_line_visible or boundary:
+            # Visibility (A6, 8 September 2026): the hard tier shows its line once
+            # when the latch sets, then goes quiet while the cap persists, and
+            # shows it again only when a capped ask is refused, as the refusal's
+            # reason; the soft tier keeps its five-clean-turns window. The cap
+            # itself never changes with the line.
+            capped_refusal = pref is not None and pref.result == "refused" and pref.key == "humor_tolerance"
+            correction = next((m.group(0) for p in CORRECTION_PATTERNS if (m := p.search(norm))), None)
+            if correction and "minor_signal" in session.latch_reasons:
+                # Evidence, not a key: the row is written, the line answers, nothing moves.
+                session.latch_history.append(("correction", correction, "person", session.turn_count))
+                reasons.append(f"correction recorded as evidence ({correction!r}); it clears nothing")
+            if session.latch == "hard":
+                show_line = (not session.hard_line_shown) or capped_refusal or bool(boundary) or bool(correction)
+                session.hard_line_shown = True
+            else:
+                show_line = session.minor_line_visible or bool(boundary)
+            if show_line:
                 action = max(action, Action.DISCLOSE)
                 disclosures.append(lines["minor_declared"] if declared else lines["minor_inferred"])
         if session.escalated_last_turn:

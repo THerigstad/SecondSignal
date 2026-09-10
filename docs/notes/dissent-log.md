@@ -372,3 +372,38 @@ through the case manifest with the reviewer named on each.
   green throughout. Both records go to review round 3 as a pair.
 - Status: the dissent is recorded as answered by construction, not as
   overruled; it is the reason ADR-0026 exists.
+
+### R2-1. Intake failure on an ordinary turn: withhold the seat, or seat and block the writes — DECIDED (2026-09-10)
+
+- The question: when deterministic intake fails after the gate has said
+  proceed, ADR-0022's original clause seated nobody and showed a line saying
+  the message could not be checked.
+- Positions: for the original rule, DeepSeek ("fail closed on the seat"),
+  Kimi ("the only hard dependency is the deliberate fail-closed on the seat,
+  which is disclosed"), Qwen, and ChatGPT with conditions (bounded truthful
+  copy, restrictions preserved, a reachable resource and correction path, no
+  fabricated classification). Against: GLM, who wrote the opposite rule blind
+  and held it ("fail open on the seat and fail closed on writes; a seat
+  without intake's stamp is no worse than the present system, while silence
+  is strictly worse for a distressed person"); Grok ("the failure rule speaks
+  and unseats; write it as a house act"); Nemotron ("the held domain is
+  abandoned: no acknowledgment, no offer of the specialist, no resource
+  line"); Gemini (a denial-of-companion surface an attacker can trigger).
+- The decision: GLM's rule with ChatGPT's conditions and Grok's honesty
+  edit: the persona the gate allowed is seated, every write for the turn is
+  blocked, the failure is logged, one automatic retry precedes the failure
+  path for transient classes, and the person sees "This message ran into a
+  problem. Press here to try again." The operator added the diner rule: a
+  person is never spoken to like an engineer, so the retired line, which
+  asked the person to wonder who had failed to check what, is gone.
+- The reasons, the operator's: the retired wording caused the anxiety it was
+  meant to prevent ("Checked by whom?"); a person in a diner wants "we've got
+  you" and a way back, not the kitchen's staffing problems; a companion and
+  the hold's obligations are worth more to a distressed person than a
+  fail-closed seat that protects nothing intake was ever load-bearing for.
+- Dissent kept: the original rule, with ChatGPT's control fixture
+  `rr2-intake-failure-withholds-seat`.
+- Settling test: GLM's instrument, disable intake and run the whole suite;
+  green means intake is not load-bearing for safety. Runs the day intake is
+  built. Until then the failure line and its diner-rule test are what the
+  tree carries.

@@ -86,12 +86,33 @@ memory, not preferences, not the latch, not a profile, not a rule. Every
 intake row carries a machine reason code at the point of creation, so
 nobody parses prose to derive one.
 
-**Failure rule.** If deterministic intake raises, returns an invalid
-envelope, times out, or labels the channel unknown *after* the gate said
-proceed, the house fails closed on the seat: nobody is seated, a plain
-house line saying the message could not be checked ships (the existing
-`language_scope` line is the model for its shape), no persona speaks. If
-the gate fired, the card ships regardless of intake's state.
+**Failure rule** (revised 2026-09-10 on the operator's ruling after review
+round 2; the original clause is kept under Revision history). If
+deterministic intake raises, returns an invalid envelope, returns a valid
+envelope with empty rows, times out, or labels the channel unknown *after*
+the gate said proceed, the house retries intake once, automatically, and
+only for a transient failure class (a timeout, a transient transport error;
+the taxonomy is the one filed in
+`docs/notes/stall-and-recovery-proposal-2026-09-10.md`). If the retry fails,
+or the failure is not transient, the persona the gate allowed is seated and
+speaks; every write for the turn is blocked, so no memory, no preference and
+no durable state is written from a turn whose provenance is unknown; the
+failure is logged with its class; and the person sees the house's failure
+line, "This message ran into a problem. Press here to try again.", never a
+line that names a mechanism. Every hold, cap and latch stands exactly as it
+would have; the resource line stays reachable; the line claims no check that
+did not happen. If the gate fired, the card is committed before intake is
+invoked, and intake's state can neither delay nor rewrite it. This is a
+house act, written as one: intake stays voiceless and unseats nobody; the
+house seats, blocks the writes, and speaks the line.
+
+The rule it replaced, fail closed on the seat, is kept as the recorded
+dissent with its control fixture (`rr2-intake-failure-withholds-seat`). The
+settling test, proposed by the family that held the dissent: disable intake
+and run the whole suite; if the suite stays green, intake was never
+load-bearing for safety, and failing the seat on its loss protects nothing
+while costing the person the companion and every hold obligation. That test
+runs the day intake exists.
 
 **The backend clause.** The signal extractor's second backend (the
 `RequestSignals` contract) is an intake backend. Its result composes with
@@ -165,3 +186,20 @@ reads its output to alter a decision; an intake row grants a permission; a
 typed sentence lands in the record as operator-set; a backend's hit without
 a lexicon hit escalates before that backend has been reviewed; a backend
 timeout delays or changes the card.
+
+## Revision history
+
+- **2026-09-10.** The failure rule revised from fail-closed-on-the-seat to
+  seat-the-persona-and-block-the-writes, with one automatic retry and the
+  house's failure line, on the operator's ruling of 10 September 2026 after
+  review round 2 (positions: for the original rule, DeepSeek, Kimi, Qwen and
+  ChatGPT with conditions; against, GLM, Grok, Nemotron and Gemini; the
+  operator took GLM's rule with ChatGPT's conditions and added the diner
+  rule, that a person is never spoken to like an engineer). The original
+  clause read: "If deterministic intake raises, returns an invalid envelope,
+  times out, or labels the channel unknown after the gate said proceed, the
+  house fails closed on the seat: nobody is seated, a plain house line saying
+  the message could not be checked ships (the existing language_scope line is
+  the model for its shape), no persona speaks. If the gate fired, the card
+  ships regardless of intake's state." The record is Proposed and was revised
+  in place; the register note carries the date.

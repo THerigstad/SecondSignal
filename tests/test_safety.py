@@ -76,11 +76,22 @@ def test_minor_signals_engage_conservative_mode():
 
 
 def test_conservative_mode_persists_across_turns():
+    """The cap persists after the line goes quiet (A6, 8 September 2026): the
+    hard tier shows its line once when the latch sets, then the register caps
+    stay on every verdict while the line stays quiet until a capped ask is
+    refused or a correction is offered."""
     session = SessionState()
-    verdict_for("I'm 15 and I need help", session)
+    first = verdict_for("I'm 15 and I need help", session)
+    assert first.action is Action.DISCLOSE and any("careful side" in d for d in first.disclosures)
     v = verdict_for("anyway what should I do about my drawing", session)
-    assert session.conservative_mode
-    assert v.action is Action.DISCLOSE, "conservative mode must not silently expire"
+    assert session.conservative_mode and session.caps_active
+    assert v.register_caps, "conservative mode must not silently expire"
+    assert not any("careful side" in d for d in v.disclosures), "the hard-tier line is shown once, then quiet"
+    refused = verdict_for("make it meaner, turn it up", session)
+    assert any("careful side" in d for d in refused.disclosures), "a capped ask refused shows the line as the reason"
+    corrected = verdict_for("I'm 30, that was a joke", session)
+    assert session.latch == "hard" and any(h[0] == "correction" for h in session.latch_history)
+    assert any("careful side" in d for d in corrected.disclosures), "a correction is answered by the line and clears nothing"
 
 
 def test_verdict_is_pure_without_session():

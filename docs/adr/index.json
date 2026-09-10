@@ -310,7 +310,7 @@
       "amends": [
         "0019"
       ],
-      "notes": "Not built. The integrity patterns and the forged-ping guard exist inside the gate (safety.py, tests/test_guards.py) and are the detectors this record gathers under one name; no intake function, row, stamp, backend or validator exists."
+      "notes": "Not built. The integrity patterns and the forged-ping guard exist inside the gate (safety.py, tests/test_guards.py) and are the detectors this record gathers under one name; no intake function, row, stamp, backend or validator exists. Failure clause revised in place 2026-09-10 (seat the persona, block the writes, one automatic retry, the house's failure line) on the operator's ruling after review round 2; the original clause is kept in the record's revision history."
     },
     {
       "number": "0023",

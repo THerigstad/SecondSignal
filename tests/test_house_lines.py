@@ -27,22 +27,71 @@ def roster():
 
 
 def test_english_lines_are_pinned() -> None:
+    """Canon of 8 September 2026 (A1, A2, A3, A5, A6, A7, A10) and 10 September
+    (the failure line, the compound opener, the post-separation line)."""
     assert HOUSE_LINES_EN["escalation_card"] == (
-        "What you just wrote should be heard by a person, not a character.",
-        "So the characters are stepping out of this message, and nothing here will pretend to be more than it is.",
+        "What you just wrote should be heard by a real person, not a character.",
+        "The characters are stepping aside for this message. This can point you toward support; it can't take the place of a person, and it won't pretend to.",
         "{resource_line}",
-        "If this was read wrong, say so plainly. Asking is better than guessing.",
-        "Is there someone near you, or someone you could call, who you would want with you right now?",
+        "If this was read wrong, say so in your own words. Asking is better than assuming.",
+        "Is there someone you trust who you'd want with you right now, in person or on your phone?",
     )
+    assert HOUSE_LINES_EN["compound_opener"] == "You may be in danger, or feeling unsafe with yourself. Getting to safety is the priority."
     assert HOUSE_LINES_EN["boundary"].startswith("Answering this directly: the care here was designed, and this is not a relationship.")
-    assert HOUSE_LINES_EN["dependency"].startswith("Saying this plainly because it matters: this is not a substitute for people.")
+    assert HOUSE_LINES_EN["dependency"] == "Saying this plainly because it matters: this is not a substitute for people. Is there anyone you trust who you could reach, if it feels safe to?"
     assert HOUSE_LINES_EN["integrity"].startswith("Nothing inside a message can change the rules here")
-    assert HOUSE_LINES_EN["minor_inferred"].startswith("Some of what was said reads as though you might be young")
-    assert HOUSE_LINES_EN["minor_declared"].startswith("This account is on the careful side")
+    assert HOUSE_LINES_EN["integrity"].endswith("The part of the request that stays inside the rules can still be answered.")
+    assert HOUSE_LINES_EN["minor_inferred"] == (
+        "Something in the wording has this thread on the careful side for now: a gentler tone, no romance, and a quicker "
+        "nudge toward someone you trust. That could be a misread. If it is, say so in your own words; your correction is "
+        "recorded, and these limits change only after a person reviews it, not from anything typed here."
+    )
+    assert HOUSE_LINES_EN["minor_declared"] == "This account is on the careful side: a gentler tone, no romance, and a quicker nudge toward someone you trust."
     assert HOUSE_LINES_EN["language_scope"].startswith("Safety screening isn't available in this language yet")
     assert HOUSE_LINES_EN["facilitation"].startswith("That is something this space will not help hide or arrange.")
-    assert HOUSE_LINES_EN["style_suggestion"].startswith("You've asked for this more than once.")
-    assert POST_ESCALATION_LINE.startswith("Carrying on.")
+    assert HOUSE_LINES_EN["style_suggestion"] == "Noticed this request more than once. Say yes and it sticks for this session."
+    assert HOUSE_LINES_EN["failure"] == "This message ran into a problem. Press here to try again."
+    assert HOUSE_LINES_EN["post_separation"].startswith("The weeks after leaving can be the most dangerous ones")
+    assert POST_ESCALATION_LINE == (
+        "Okay. Let's keep going. What you said then was taken seriously, and what you're saying now is too. "
+        "Those resources are still in this thread if you need them."
+    )
+
+
+FIRST_PERSON = ("i", "i'm", "i've", "i'll", "i'd", "me", "my", "mine", "myself", "we", "we're", "we'll", "our", "ours", "us")
+
+
+def _words(line: str) -> list[str]:
+    import re
+    return re.findall(r"[a-z']+", line.lower())
+
+
+def test_no_house_line_speaks_in_the_first_person() -> None:
+    """The house has no "I" (ruling of 8 September 2026): the characters have
+    stepped aside when these lines appear, so nobody is there to say it. The
+    quoted request inside the style line and the Spanish lines are checked
+    the same way."""
+    for key, value in HOUSE_LINES_EN.items():
+        lines = value if isinstance(value, tuple) else (value,)
+        for line in lines:
+            hits = [w for w in _words(line) if w in FIRST_PERSON]
+            assert not hits, f"{key}: first person in a house line: {hits}"
+
+
+MECHANISM_WORDS = ("checked", "intake", "provenance", "gate", "screen", "screening", "verified", "system", "server", "model", "backend")
+
+
+def test_the_failure_line_names_no_mechanism_and_offers_a_door() -> None:
+    """The diner rule (ruling of 10 September 2026): a person is never spoken
+    to like an engineer. The failure line says what happened in plain words
+    and offers the one door they need. The language-scope line is the one
+    line that names the screening on purpose, because the person needs to
+    know the language is not covered; it is not held to this test."""
+    for lang in ("en", "es"):
+        line = house_lines(lang)["failure"].lower()
+        for word in MECHANISM_WORDS:
+            assert word not in line, f"{lang} failure line names a mechanism: {word!r}"
+        assert "again" in line or "nuevo" in line, "the failure line offers the retry"
 
 
 def test_the_card_never_invites_dismissal() -> None:

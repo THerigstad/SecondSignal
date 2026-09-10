@@ -4,7 +4,7 @@
   "status": "unreviewed",
   "language": "es",
   "window": 4,
-  "note": "Latin American Spanish crisis screen: native speech-act classes and native idiom masks, written as Spanish, not translated from the English list. Voseo forms (querés, tenés, podés) are listed alongside tuteo. Status stays unreviewed until two native reviewers from different countries sign; masks are reviewed with more suspicion than hits. Peninsular slang is not stuffed into this pack.",
+  "note": "Latin American Spanish crisis screen: native speech-act classes and native idiom masks, written as Spanish, not translated from the English list. Voseo forms (querés, tenés, podés) are listed alongside tuteo. Status stays unreviewed until two native reviewers from different countries sign; masks are reviewed with more suspicion than hits. Peninsular slang is not stuffed into this pack. The English card and four English lines changed on 8 and 10 September 2026 (A1, A2, A6, A7, A10 of the operator's rulings); the Spanish lines stand as written until a native speaker rewrites them, and three new lines (compound_opener, failure, post_separation) were written natively on 10 September and carry the same unreviewed status.",
   "negation": [
     "no",
     "nunca",
@@ -296,6 +296,7 @@
       "Si esto se leyó mal, dilo con claridad. Preguntar es mejor que adivinar.",
       "¿Hay alguien cerca, o alguien a quien puedas llamar, con quien quisieras estar ahora mismo?"
     ],
+    "compound_opener": "Puede que estés en peligro, o que no te sientas a salvo contigo mismo. Ponerte a salvo es lo primero.",
     "post_escalation": "Seguimos. Si el mensaje anterior se leyó mal, con decirlo bastó; los recursos de ese mensaje siguen a la mano de todos modos.",
     "dependency": "Lo digo con claridad porque importa: esto no sustituye a las personas. ¿Hay alguien en quien confíes con quien puedas hablar, si te sientes seguro haciéndolo?",
     "boundary": "Respondo de frente: el cuidado que hay aquí fue diseñado, y esto no es una relación. El marco romántico se detiene aquí.",
@@ -304,6 +305,8 @@
     "minor_declared": "Esta cuenta está en modo cuidadoso: un tono más cuidadoso, sin romance, y un recordatorio más pronto de acudir a una persona de confianza, en línea o en persona.",
     "language_scope": "La revisión de seguridad todavía no está disponible en este idioma, así que parte de este mensaje no pudo comprobarse. Si algo de esto es sobre estar en peligro, dilo con claridad, o usa los recursos de tu región.",
     "facilitation": "Eso es algo que este espacio no va a ayudar a ocultar ni a organizar. Hablar de ello sigue abierto; ayudar a hacerlo no.",
-    "style_suggestion": "Has pedido esto más de una vez. ¿Quieres que quede como predeterminado? Puedes confirmarlo en tus ajustes."
+    "style_suggestion": "Has pedido esto más de una vez. ¿Quieres que quede como predeterminado? Puedes confirmarlo en tus ajustes.",
+    "failure": "Este mensaje tuvo un problema. Toca aquí para intentar de nuevo.",
+    "post_separation": "Las semanas después de irse pueden ser las más peligrosas, así que esto queda aquí una vez, por si hace falta: {dv_line}"
   }
 }
