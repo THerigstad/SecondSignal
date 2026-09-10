@@ -238,7 +238,7 @@
         ],
         "assist": "willow"
       },
-      "why": "The affinity must not select a grief- contraindicated strategist as assist when a safe grief assist exists. [2026-09-06: the key was written 'reason_ contains' with a space, so the runner ignored it and this row asserted nothing about the reason for eleven days. Spelling repaired; the reviewer's expectation is unchanged and now runs, and it passes. Found by the case manifest on its first run.]"
+      "why": "The affinity must not select a grief- contraindicated strategist as assist when a safe grief assist exists. [2026-09-06: the key was written 'reason_ contains' with a space, so the runner ignored it and this row asserted nothing about the reason for four days (this note said 'eleven days' until 10 September 2026; the ingest and repair dates in this file say four). Spelling repaired; the reviewer's expectation is unchanged and now runs, and it passes. Found by the case manifest on its first run.]"
     },
     {
       "id": "gpt-d5-frustration",

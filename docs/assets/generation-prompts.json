@@ -1,0 +1,105 @@
+{
+  "note": "Every generated image in docs/assets/ is recorded here with the tool that made it, the door it went through, the date, the prompt as far as it is on record, and the operator's steering verbatim. Where a prompt was not written down, this file says so rather than reconstructing it. Attempts that were rejected are recorded without their files. Hashes are of the files as committed.",
+  "palette": {
+    "ivory": "#F5F1E8",
+    "charcoal": "#252823",
+    "rust": "#A64527",
+    "sage": "#9B9B7F",
+    "status": "working tokens, chosen 9 September 2026, revisitable; the mark carries no letters and survives a rename"
+  },
+  "assets": [
+    {
+      "file": "secondsignal-house.png",
+      "sha256": "d0ece991850ba44047b799b71f9466faaf60280165fff6a8b703a3bd2e131251",
+      "pixels": "1774 x 887, RGB",
+      "generator": "ChatGPT's built-in image generation, run by the operator through the Codex desktop app",
+      "family": "OpenAI",
+      "date": "8 September 2026, 5:45 PM the operator's local time; chosen by him from five variants generated between 5:24 PM and 7:03 PM that day",
+      "prompt": null,
+      "prompt_recorded": false,
+      "prompt_note": "The prompt that produced this image was typed in the operator's session and was not saved with the strategy packet the image arrived in; ChatGPT's own literal description of the image, written for a reader without vision, is the nearest thing to a record and is kept below. Nothing is reconstructed.",
+      "literal_description_by_the_generator": "The view is a wide panorama, twice as wide as tall. A single-story pale concrete house bends in a shallow arc. Seven separate, tall rectangular open rooms face a broad gravel courtyard. Their tops are square, not rounded arches. Each room contains a modest arrangement of chairs, tables, books or plants; all interiors have consistent warm amber lighting. There are no people, names, captions, logos or interface graphics. A long low rectangular stone bench sits horizontally near the center foreground. Natural shrubs, boulders and low garden lights frame the courtyard. A large tree enters from the upper left; evergreens and layered mountains stand behind the house. The sky is dusk peach with gray clouds.",
+      "edits": "none; the file is byte-identical to the copy in the packet (its manifest hash matches)",
+      "invariants": "no portraits in the hero, no labels inside the image, no lock and no shield, ever; the seven rooms, the shared lighting, the empty courtyard, the bench and the panorama stay",
+      "alt_text": "Seven open rooms in a shallow concrete arc, each lit the same warm amber, facing an empty gravel courtyard with one stone bench at dusk. Nobody is seated: which room lights up is decided outside the rooms."
+    },
+    {
+      "file": "secondsignal-mark.svg and secondsignal-mark-dark.svg",
+      "sha256": {
+        "secondsignal-mark.svg": "f3f6ed4842ead89c084740b1e99c096ce78525284c8690097dc2f7a0fcfd59c8",
+        "secondsignal-mark-dark.svg": "43e80f64392f371e4ff86a3dcc2b62b27ebc83c50638989f751435c1b6601754"
+      },
+      "generator": "drawn as SVG by the Primary Design Agent (Claude Fable 5.1) on 9 September 2026 from the concept geometry in ChatGPT's strategy packet: an outer doorway around x 20 to 80, y 18 to 82, an inner doorway around x 36 to 64, y 42 to 82, stroke width about 6, corners subtly rounded, open at the bottom, the two on one baseline",
+      "concept": "the nested-doorway symbol was proposed by ChatGPT-6 Astra (Ultra) on 9 September 2026 with its built-in image generation; the raster concept files it produced (a brand board, a transparent lockup, a square dark icon) are in the operator's archive and are not committed, because the vector is the asset and the rasters were generated concepts, not editable artwork",
+      "concept_prompts_verbatim": [
+        {
+          "id": "brand_board_prompt",
+          "prompt": "Use case: logo-brand\nCreate a refined professional brand identity presentation board for SecondSignal, an AI assistance system centered on user agency. This is an original logo exploration. Landscape, high resolution, editorial Swiss clarity with warmth.\nDesign ONE coherent very simple memorable symbol: two offset open rectangular doorway outlines, charcoal outer threshold and smaller burnt-rust second threshold, their negative space forming a clear inviting passage. Geometric monoline strokes, subtly softened corners, open at bottom, no house roof, no literal letter S, no lightning bolts. Keep the mark compact and excellent in one color. Pair with exact wordmark \"SecondSignal\" in an elegant modern humanist geometric sans serif, medium weight, warm charcoal, careful kerning. No generic robot/brain/heart/shield or OpenAI knot.\nBoard on warm off-white #F5F1E8. Upper two thirds: oversized horizontal lockup with symbol at left and wordmark at right, generous space, editorial tagline below exact \"More ways forward.\" Lower third: three neatly spaced demonstrations of the SAME symbol: large charcoal-only on cream; cream-only on charcoal square; rust-accent version beside a small restrained palette of cream, charcoal, rust, sage. Tiny labels only if necessary. Flat vector-like graphic edges, no gradients, shadows, paper mockup, gloss, embossed effects, decorative fake text or charts.\nMood: quiet, capable, humane, architectural, serious. The second opening suggests another available perspective, not a promise of protection. No claims of tested safety. Output one beautiful usable concept board."
+        },
+        {
+          "id": "brand_board_fix_prompt",
+          "prompt": "Edit this brand board. Keep the exact layout, nested doorway logo design, wordmark spelling SecondSignal and tagline More ways forward. CRITICAL FIX: make the background fully opaque solid warm ivory #F5F1E8 and every graphic sharp high-contrast flat print artwork. Remove ALL darkness/vignette, ALL blur, ALL glow, ALL shadow. The wordmark and outer doorway must be SOLID dark charcoal #252823, clearly readable. Inner doorway SOLID burnt rust #A64527. Tagline solid charcoal. Bottom left charcoal symbol directly on ivory. Bottom middle ivory symbol on a crisp solid charcoal square. Bottom right charcoal/rust symbol directly on ivory. The palette circles should be solid flat swatches. This is a clean daylight graphic-design PDF-style brand sheet, NOT a glowing dark image. All strokes and lettering fully opaque crisp edges. No texture, no effects."
+        },
+        {
+          "id": "lockup_final_prompt",
+          "prompt": "Make a standalone horizontal logo asset faithfully matching the main logo in this reference brand sheet. Only the charcoal and rust nested open-doorway symbol at left, and exact text \"SecondSignal\" at right in the same geometric sans wordmark. No tagline and nothing else. Background is perfectly SOLID OPAQUE flat warm ivory #F5F1E8 edge to edge. Fully opaque ink charcoal #252823 and rust #A64527, crisp flat shapes. No checkerboard, NO transparency, no textures or photographic effects, no shadows or gradients. Horizontal canvas about 3:1, composition centered with 8 percent padding. Clean flat digital graphic usable immediately on an ivory webpage."
+        },
+        {
+          "id": "symbol_prompt",
+          "prompt": "Use case: logo-brand. Create a square app icon for SecondSignal matching the nested doorway symbol in the reference sheet. ONLY the icon, NO letters, no words. Solid charcoal #252823 full square background. Center a large ivory #F5F1E8 monoline squared doorway arch, open at the bottom with subtly rounded corners. Nest a smaller rust #A64527 doorway within it, also open at bottom, same stroke width, same baseline. Match the reference proportions faithfully. The negative space is charcoal. Flat, sharp solid graphic shapes, generous clear border 20 percent all around. This is a modern warm architectural brand symbol. No shadow, texture, glow, vignette, gradient or 3D. Square high resolution."
+        }
+      ],
+      "alt_text": "SecondSignal mark: two nested open doorways on one baseline"
+    },
+    {
+      "file": "confessions-train.png",
+      "sha256": "c1c23c30c1a959fbb3eb1d991a452e953ea3059683f80c69a96a851da674e1a0",
+      "pixels": "1774 x 887, RGB",
+      "generator": "ChatGPT (Work) 6 Astra, Extra High, run by the operator",
+      "family": "OpenAI",
+      "date": "9 September 2026, 7:52 PM the operator's local time (10 September 2026 UTC)",
+      "prompt": null,
+      "prompt_recorded": false,
+      "prompt_note": "The first prompt was written by the Primary Design Agent for the operator to paste, and its specification is on record: one small toy train in the house's rust and grey, on a wooden floor, that has left one loop of track and sits upright pointing straight ahead where the track curved; a single long railcar rather than three short cars; no text, no watermark, no logos; a 2:1 frame. The verbatim wording lives in the operator's session and is not in the repository. The operator's own steering, which produced the final image, is verbatim below.",
+      "operator_steering_verbatim": "I love the angle, the colors, the composition... but the train needs to sit on the track awkwardly, similarly to the train in this meme. Keeep the rust and grey colors and everything from the original image, but make the train a straight, single car, like the one on the screenshot. I cannot steal IP, so make sure that the image does not directly steal.",
+      "reference_note": "A third-party meme (a toy train that cannot take a curve) was shown to the generator as a pose reference only, with the instruction not to copy it. The result shares the joke, not the frame: nothing of the reference's photograph, set or caption is in this image.",
+      "attempts": [
+        {
+          "attempt": 1,
+          "generator": "Grok 4.6 at grok.com, run by the operator, 9 September 2026 (his local evening)",
+          "family": "xAI",
+          "operator_steering_verbatim": "This is the meme that I am referring to. The train moves on the track, but it looks truly awful, the mechanics don't make sense, yet the train still travels around the track... ish... I like the angles that you were working with before.",
+          "outcome": "rejected, off-spec on three counts: a caption baked into the image, a pile-up of several yellow cars tangled in loops of track instead of one small rust train that has left one loop, and none of the house palette. The file is not in the repository and never will be; the record of the attempt is.",
+          "file": null
+        },
+        {
+          "attempt": 2,
+          "generator": "ChatGPT (Work) 6 Astra, Extra High",
+          "outcome": "chosen; the file above"
+        }
+      ],
+      "edits": "lossless PNG optimisation only (oxipng, 10 September 2026): 2,154,763 bytes to 1,899,610, every pixel identical to the file the operator saved (checked by a pixel diff), so it renders on GitHub under the two-megabyte line without loss",
+      "caption": "Passes more tests than the last one did.",
+      "alt_text": "A small rust-orange toy train sits on a wooden floor outside an oval loop of track, upright and pointing straight ahead where the track curved."
+    },
+    {
+      "file": "routing-tree.svg",
+      "sha256": "c4b728a8de15ff47db0a0e1e34e9e6a0c560b435643a54d9e38654ccd4faffcf",
+      "generator": "drawn as SVG by the Primary Design Agent (Claude Fable 5.1), 10 September 2026, from ADR-0016 and ADR-0027 (Proposed); the four palette tokens; system font stack; no raster",
+      "alt_text": "The seat-versus-hold routing tree: the gate first, then seat-claiming domains, holds, ask fit, dysregulation, declared affinities, and the shadow seat and assist, with one eligibility gate beside them and a routing decision at the end."
+    },
+    {
+      "file": "review-round.svg",
+      "sha256": "a8de12715f73fd8a871ee1c3862241cf5ef6a8742507164f636fc6495974b081",
+      "generator": "drawn as SVG by the Primary Design Agent (Claude Fable 5.1), 10 September 2026; the numbers on it are from evals/run_fixtures.py and the committed result pages, never typed from memory",
+      "alt_text": "How a review round works: one packet to several model families, blind; returns with fixtures; the fixtures run against the tree and classified; the operator rules on every split; the dissent log and the amended records; the next round reads the amended text."
+    },
+    {
+      "file": "social-preview.png",
+      "sha256": "f1274508108f9f4aa215d6eadcfd446d33c2e41f5910a9c5a0b1ff5b94d186f4",
+      "pixels": "1280 x 640, RGB",
+      "generator": "composed by the Primary Design Agent on 10 September 2026 from secondsignal-house.png scaled to 1280 x 640 and secondsignal-mark-dark.svg on a translucent charcoal square at the lower left; for the repository's social preview (the picture a link to this repository unfurls with); not used in the README; no text, no portraits",
+      "alt_text": "The seven-room house at dusk with the SecondSignal doorway mark in the corner."
+    }
+  ]
+}

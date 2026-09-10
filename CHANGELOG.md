@@ -2,6 +2,115 @@
 
 All notable changes to SecondSignal are documented here.
 
+## [0.2.0] — 2026-09-11
+
+The magazine issue: the build of 10 September 2026 and the public flip. The
+danger lane every reviewing family put first; the eight-family review round
+ingested verbatim; the guards hardened against the round's own mutations;
+the family renamed through an alias layer and its ten codexes in the tree;
+the records amended in the reviewers' words; the front page rebuilt so that
+every claim on it points at a test, a record or a labelled proposal.
+
+### Added — 2026-09-10
+
+- **The danger lane** (`safety.py`, `signals.py`, `lexicon.py`,
+  `packs/resources.json`; `tests/test_danger_lane.py`;
+  `evals/cases/p0_lane_2026-09-10.json`). Danger from another person without
+  a weapon is a fail-closed class: four signal groups (present confinement,
+  prior violence, fear for dependents, an explicit threat to life), any two
+  in one message, with a fiction, news and game frame exclusion. The weapon
+  lane widened to a threat made with the weapon, a weapon within reach of a
+  raging or intoxicated person, and the whole household as the actor. The
+  danger card carries the verified domestic-violence line for five declared
+  locales (verified by a human on 8 September 2026, with the sources and the
+  day on record) and a directory line elsewhere; the compound card, when
+  self-harm and danger both fire, opens with the sentence that names both
+  and lists the self-harm line first (B5), and the order is a field on the
+  verdict (`card_order`). The post-separation window shows the same line
+  once a session with the abuse hold carried. The abuse-history hold.
+- **The house lines of 8 September** as canon (`HOUSE_LINES_EN`,
+  `tests/test_house_lines.py`): the five-line card, the after-card line,
+  the dependency line, the integrity line, the careful-side lines for an
+  inferred and a declared band with the hard tier's visibility rule (once,
+  then quiet, again only as a refusal's reason or a correction's answer),
+  the style line, the failure line ("This message ran into a problem. Press
+  here to try again."), and the post-separation line. The Spanish pack
+  carries the three new lines natively and unreviewed.
+- **A relative's return to use is a hold, not a seat-claim**
+  (ADR-0027, Proposed, built; ADR-0016 amended in place; `tests/test_holds.py`).
+  The bare report still seats the recovery persona as the hold's
+  specialist; an ask seats the ask with the recovery hold carried and the
+  recovery persona offered. The conflict lexicon reads a conversation to be
+  planned as conflict work.
+- **The bounded aftermath and the substantive-turn clock.** Two substantive
+  turns after any card carry `no_joke` and the restated resource line; a
+  turn is substantive only with new content beyond an acknowledgement list,
+  which closes the bug a reviewer reproduced (five turns of "ok ok ok"
+  cleared a declared adult's soft latch). A correction of a careful-side
+  inference is a latch-history row and clears nothing.
+- **The alias layer** (`profiles.py`, `tests/test_aliases.py`). The family
+  is Cody (was Calder), Ellis (was Ellie; short form Elli), Seren (was
+  Sera), Rowan (was Ravi), and Nikki, Willow and Vandal unchanged, so that
+  each name reads naturally for either twin (ADR-0026, Proposed). Every
+  earlier name resolves everywhere an id is accepted; every external
+  fixture stays byte for byte.
+- **The ten codexes in the two-part shape** (`docs/codex/`): the seven
+  family codexes from the operator's System Editions, the three security
+  codexes at v1.2, one house block pinned by hash to its version
+  (`house-block.lock.json`), a machine-readable block on each that a test
+  holds equal to the profile, the deny-list lint on every Part B, and the
+  cross-codex title check.
+- **Review round 2 ingested** (`evals/cases/round2_2026-09-08/`,
+  `evals/cases/deferred/round2_*.json`): fifty-three fixtures from nine
+  returns, verbatim, each named for its reviewer; thirty-six run on the
+  policy plane (30 pass as written, 4 contract-adjusted, 1 disputed, 1
+  known gap), seventeen deferred on the orchestration and persistence
+  planes. Seven had failed on the tree before the ingest, each on a gap
+  they exposed and closed the same night. The twelve narrator-isolation
+  fixtures. The twenty P0-lane fixtures.
+- **The guards hardened against the round's twenty-six mutations**
+  (`tests/test_adr_index.py`, `tests/test_codex_house_block.py`,
+  `tests/test_no_security_handoffs.py`, `tests/test_register_mutations.py`).
+  Status lines in one grammar parsed on both axes; vocabularies frozen;
+  evidence must be a real, unskipped test function; JSON fixtures cited
+  too; titles compared; relationships named in prose; docs scanned for
+  stale status claims; the README's status block generated from the
+  register (`docs/adr/render_status.py`) and no decision word allowed
+  outside it; profiles JSON only and walked whole; the request path
+  imports nothing from the unwired audit port. Every mutation, and every
+  control, is a red regression.
+- **Records.** ADR-0026 (twins: two presentations, one routing contract);
+  ADR-0027; ADR-0022 and ADR-0023 amended in place with the round's
+  findings in the families' words and a revision history each; ADR-0019
+  with the gate as the dependency; ADR-0020 with six corrections; ADR-0025
+  with its five gate predicates; ADR-0015 with the latch's lifetime stated;
+  ADR-0014 in post-ADR-0022 words. The dissent log's round-2 entries
+  (R2-1 to R2-6). The model-provenance note, version 2. The
+  stall-and-recovery packet filed as a labelled proposal. The confessions
+  ledger, version 2, all twenty entries approved by the operator.
+- **The front page and the assets.** The README rebuilt on the operator's
+  canon block, the house as the hero, the doorway mark, two drawn diagrams,
+  the roster after round 2, the round-2 numbers, the confessions link, the
+  seven-versus-one experiment as a roadmap line. `docs/assets/` with a
+  provenance record for every image. `LICENSE-CONTENT`: the code stays
+  MIT; the characters and the pictures are CC BY-NC-ND 4.0. `CITATION.cff`.
+  A lint job (ruff, mypy) beside the test matrix in CI. Coverage measured
+  and written on the evaluation page from the run.
+
+### Changed — 2026-09-10
+
+- ADR-0025's seat-trade half withdrawn in favour of ADR-0026; the assist
+  from the hold stands, unbuilt, behind its gate.
+- The Security Division note's stale lines corrected with a dated change
+  log entry; the round-1 report page regenerated after its counts drifted;
+  the two committed report pages are now asserted equal to the runner's
+  output.
+- `docs/known-limitations.md` and `docs/roadmap.md` rewritten for the day:
+  the three deaths of a latch, the published time as a manifest field with
+  no default, the fourth common mode, the correction path as an open item,
+  the lines that ask too much, the integrity matrix's unspecified cell, and
+  the next build blocks in order.
+
 ## [0.1.0] — 2026-09-08
 
 The first tagged release: the policy layer as it stands after the external

@@ -1,0 +1,112 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 860" width="1200" height="860" role="img" aria-labelledby="t d">
+  <title id="t">How a review round works here</title>
+  <desc id="d">One packet goes to several model families at once, each blind to the others. Each returns a verdict and executable fixtures. The fixtures are run against the tree and every one is classified: pass as written, contract-adjusted with the reviewer's original kept, disputed and kept as a strict expected failure with the reasons in the dissent log, or a known gap. The operator rules on every split, never by head count; the records are amended in the reviewers' words; and the next round reads the amended text. Nothing is deleted to make the suite green.</desc>
+  <style>
+    .bg { fill: #F5F1E8; }
+    .box { fill: #F5F1E8; stroke: #252823; stroke-width: 2; }
+    .dark { fill: #252823; }
+    .rust { fill: #A64527; }
+    .t { font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #252823; font-size: 15px; }
+    .h { font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #252823; font-size: 22px; font-weight: 600; }
+    .n { font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #A64527; font-size: 14px; font-weight: 700; letter-spacing: 0.4px; }
+    .w { font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #F5F1E8; font-size: 16px; font-weight: 600; }
+    .wl { font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #F5F1E8; font-size: 15px; }
+    .m { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; fill: #252823; font-size: 13px; }
+    .s { font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #6b6b58; font-size: 14px; }
+    .arrow { stroke: #252823; stroke-width: 2; fill: none; marker-end: url(#a); }
+    .arrowr { stroke: #A64527; stroke-width: 2; fill: none; marker-end: url(#ar); }
+    .sagel { stroke: #9B9B7F; stroke-width: 2; fill: none; }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#252823"/></marker>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#A64527"/></marker>
+  </defs>
+  <rect class="bg" x="0" y="0" width="1200" height="860"/>
+
+  <text class="h" x="60" y="52">How a review round works here</text>
+  <text class="s" x="60" y="78">One packet, several model families, each blind to the others. A fixture is worth keeping even when it is wrong: a wrong fixture becomes a recorded dissent.</text>
+
+  <!-- row 1: packet -> families -> returns -> run -->
+  <rect class="dark" x="60" y="120" width="250" height="86" rx="6"/>
+  <text class="w" x="80" y="148">the packet</text>
+  <text class="wl" x="80" y="172">the records, the code context,</text>
+  <text class="wl" x="80" y="194">a fixture contract, one ask</text>
+
+  <path class="arrow" d="M 310 163 H 356"/>
+  <rect class="box" x="360" y="100" width="130" height="36" rx="6"/><text class="t" x="376" y="124">family A</text>
+  <rect class="box" x="360" y="145" width="130" height="36" rx="6"/><text class="t" x="376" y="169">family B</text>
+  <rect class="box" x="360" y="190" width="130" height="36" rx="6"/><text class="t" x="376" y="214">family C …</text>
+  <text class="s" x="360" y="252">blind first: each writes its own</text>
+  <text class="s" x="360" y="270">contract before reading further</text>
+
+  <path class="arrow" d="M 490 163 H 536"/>
+  <rect class="box" x="540" y="120" width="270" height="86" rx="6"/>
+  <text class="n" x="560" y="145">RETURNS</text>
+  <text class="t" x="560" y="170">a verdict, an independence</text>
+  <text class="t" x="560" y="192">statement, executable fixtures</text>
+
+  <path class="arrow" d="M 810 163 H 856"/>
+  <rect class="dark" x="860" y="120" width="280" height="86" rx="6"/>
+  <text class="w" x="880" y="148">run against the tree</text>
+  <text class="wl" x="880" y="172">every fixture verbatim, each</text>
+  <text class="wl" x="880" y="194">named for its reviewer</text>
+
+  <!-- row 2: classification -->
+  <path class="arrow" d="M 1000 206 V 252"/>
+  <rect class="box" x="560" y="256" width="580" height="176" rx="6"/>
+  <text class="n" x="580" y="281">EVERY FIXTURE IS CLASSIFIED</text>
+  <text class="m" x="580" y="308" xml:space="preserve">pass as written    the reviewer's expectation holds</text>
+  <text class="m" x="580" y="330" xml:space="preserve">contract-adjusted  the contract moved; the original is kept</text>
+  <text class="m" x="580" y="352" xml:space="preserve">disputed           decided against; a strict expected failure</text>
+  <text class="m" x="580" y="374" xml:space="preserve">known gap          not built yet; a strict expected failure</text>
+  <text class="s" x="580" y="402">A manifest names the fields each expected failure may fail on,</text>
+  <text class="s" x="580" y="420">and nothing else, so a regression cannot hide inside one.</text>
+
+  <!-- rulings -->
+  <path class="arrow" d="M 560 344 H 532"/>
+  <rect class="rust" x="270" y="300" width="258" height="86" rx="6"/>
+  <text class="w" x="290" y="328">the operator rules</text>
+  <text class="wl" x="290" y="352">on every split, with reasons,</text>
+  <text class="wl" x="290" y="374">never by head count</text>
+
+  <!-- dissent log -->
+  <path class="arrow" d="M 390 386 V 452"/>
+  <rect class="box" x="270" y="456" width="258" height="86" rx="6"/>
+  <text class="n" x="290" y="481">THE DISSENT LOG</text>
+  <text class="t" x="290" y="506">the fixture, the reviewer's words,</text>
+  <text class="t" x="290" y="528">the decision, what would change it</text>
+
+  <!-- records amended -->
+  <path class="arrow" d="M 270 499 H 234"/>
+  <rect class="box" x="60" y="456" width="170" height="86" rx="6"/>
+  <text class="n" x="80" y="481">THE RECORDS</text>
+  <text class="t" x="80" y="506">amended in the</text>
+  <text class="t" x="80" y="528">families' words</text>
+
+  <!-- loop back -->
+  <path class="arrowr" d="M 100 456 V 210"/>
+  <text class="s" x="112" y="300">the next round reads</text>
+  <text class="s" x="112" y="318">the amended text;</text>
+  <text class="s" x="112" y="336">a record written by the</text>
+  <text class="s" x="112" y="354">project's own assistant</text>
+  <text class="s" x="112" y="372">stays Proposed till then</text>
+
+  <!-- suite -->
+  <path class="arrow" d="M 850 432 V 476"/>
+  <rect class="dark" x="560" y="480" width="580" height="62" rx="6"/>
+  <text class="w" x="580" y="507">into the suite</text>
+  <text class="wl" x="580" y="530">every case runs on every commit; a marker that stops being true fails the run</text>
+
+  <!-- footer facts -->
+  <rect x="60" y="584" width="1080" height="200" rx="6" fill="none" stroke="#9B9B7F" stroke-width="2" stroke-dasharray="6 5"/>
+  <text class="h" x="80" y="616" style="font-size:18px">What the rounds have produced so far</text>
+  <text class="t" x="80" y="644">Design review, 2 September 2026: 103 fixtures from five families; 9 passed against the tree as it stood.</text>
+  <text class="t" x="80" y="666">After the build, 92 pass under the contract, 10 are recorded dissents, 1 is a known gap.</text>
+  <text class="t" x="80" y="696">White-box acceptance set, 3 September: 26 fixtures written with the code in hand; 25 failed; twenty were real</text>
+  <text class="t" x="80" y="718">bypasses of the crisis gate, repaired by two builders from different families and merged by measurement.</text>
+  <text class="t" x="80" y="748">Security Division rounds, 7 to 10 September: five returns, then ten from eight families; 53 fixtures, 36 run,</text>
+  <text class="t" x="80" y="770">30 pass as written; one runtime bug reproduced by a reviewer and fixed the same day.</text>
+
+  <text class="s" x="60" y="816">Agreement between reviewers is not independent evidence (ADR-0009): two reviewers from one lab are one voice. Nothing is deleted to make the suite green.</text>
+  <text class="s" x="60" y="838">The returns are catalogued with their provenance in evals/results/external-review/; the disagreements are in docs/notes/dissent-log.md.</text>
+</svg>

@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If you refer to this repository, please cite it as below."
+title: "SecondSignal: a model-agnostic routing and safety policy layer for a seven-voice AI assistant"
+abstract: "The policy layer of SecondSignal: a deterministic routing tree with seat-claims, holds and obligations, a fail-closed crisis screen over normalized text, a two-tier careful-side latch, and a machine-checked register of architecture decisions, with an evaluation program of labelled fixtures from external model reviewers kept verbatim as passes, contract adjustments, recorded dissents and known gaps."
+type: software
+authors:
+  - family-names: Herigstad
+    given-names: Tyler
+version: 0.2.0
+date-released: 2026-09-11
+license: MIT
+repository-code: "https://github.com/THerigstad/SecondSignal"
+keywords:
+  - multi-agent
+  - routing
+  - ai-safety
+  - conversational-ai
+  - policy-layer

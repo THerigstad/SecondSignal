@@ -1,0 +1,37 @@
+SecondSignal: license for the characters and the pictures
+
+The code in this repository is licensed under the MIT License (see LICENSE).
+
+The following are NOT covered by the MIT License and are licensed instead
+under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0
+International License (CC BY-NC-ND 4.0):
+
+  - the character documents under docs/codex/ (the ten codexes and the house
+    block), which are the operator's creative work: the characters Nikki,
+    Cody, Vandal, Seren, Rowan, Ellis, Willow, Orrin, Aya and J.R., their
+    voices, histories, creeds and signature words;
+  - the images under docs/assets/ (the house, the doorway mark, the train,
+    the diagrams and the social-preview card).
+
+Copyright (c) 2026 Tyler Herigstad.
+
+Under CC BY-NC-ND 4.0 you may copy and redistribute this material in any
+medium or format for noncommercial purposes, provided that you give
+appropriate credit, provide a link to the license, and indicate whether
+changes were made; you may not use the material for commercial purposes;
+and if you remix, transform or build upon the material, you may not
+distribute the modified material. No additional restrictions may be
+applied. These terms are a summary; the license itself governs.
+
+The full legal code of the license is at:
+  https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode
+and the human-readable deed at:
+  https://creativecommons.org/licenses/by-nc-nd/4.0/
+
+What this split means in practice: the policy layer (src/, tests/, evals/,
+the records under docs/adr/ and the notes) is open under MIT, and anyone may
+build on it; the family and its pictures stay the operator's, and may be
+read, quoted and shared with credit but not sold, altered or built into
+another product. The profile JSON files under src/secondsignal/profiles/
+are routing data and are part of the code; the names in them are the
+characters', and the characters are not.

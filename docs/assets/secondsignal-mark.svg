@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" role="img" aria-label="SecondSignal mark: two nested open doorways on one baseline">
+  <title>SecondSignal mark</title>
+  <desc>Two nested, open-bottom doorway outlines sharing one baseline: a larger outer threshold and a smaller inner one. Another way through.</desc>
+  <path d="M 23 82 V 24.5 Q 23 21 26.5 21 H 73.5 Q 77 21 77 24.5 V 82" fill="none" stroke="#252823" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 39 82 V 47 Q 39 44 42 44 H 58 Q 61 44 61 47 V 82" fill="none" stroke="#A64527" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

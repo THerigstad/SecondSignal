@@ -75,3 +75,12 @@ September 2026), the seven family editions are v1.0 of the two-part shape
 standing rule, a record prepared by the project's own assistant becomes canon
 only after a second model family has read the current version; review round 3
 reads all ten together.
+
+## License
+
+The codexes are the operator's creative work and are licensed under
+CC BY-NC-ND 4.0 ([`LICENSE-CONTENT`](../../LICENSE-CONTENT)), not under the
+MIT license that covers the code. They may be read, quoted and shared with
+credit; not sold, altered, or built into another product. The machine-readable
+block at the end of each family codex mirrors a profile the router reads,
+and the profiles are code.

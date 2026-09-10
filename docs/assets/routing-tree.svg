@@ -1,0 +1,108 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" width="1200" height="900" role="img" aria-labelledby="t d">
+  <title id="t">The seat-versus-hold routing tree (ADR-0016)</title>
+  <desc id="d">A message enters the gate first. If the gate fires, the house card is shown and no persona is seated. Otherwise the request passes down seven layers: seat-claiming domains, holds and their obligations, ask fit, dysregulation, declared affinities, then the shadow seat and the assist. One eligibility gate answers for seat, shadow and assist alike, with four named reasons: vetoed, below floor, capped, outranked. The output is a routing decision that explains itself.</desc>
+  <style>
+    .bg { fill: #F5F1E8; }
+    .box { fill: #F5F1E8; stroke: #252823; stroke-width: 2; }
+    .card { fill: #A64527; stroke: #A64527; stroke-width: 2; }
+    .gate { fill: #252823; }
+    .t { font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #252823; font-size: 15px; }
+    .h { font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #252823; font-size: 22px; font-weight: 600; }
+    .n { font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #A64527; font-size: 14px; font-weight: 700; letter-spacing: 0.4px; }
+    .w { font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #F5F1E8; font-size: 16px; font-weight: 600; }
+    .wl { font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #F5F1E8; font-size: 15px; }
+    .m { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; fill: #252823; font-size: 13px; }
+    .s { font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #6b6b58; font-size: 14px; }
+    .arrow { stroke: #252823; stroke-width: 2; fill: none; marker-end: url(#a); }
+    .arrowr { stroke: #A64527; stroke-width: 2; fill: none; marker-end: url(#ar); }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#252823"/></marker>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#A64527"/></marker>
+  </defs>
+  <rect class="bg" x="0" y="0" width="1200" height="900"/>
+
+  <text class="h" x="60" y="52">Seat versus hold: the routing tree, top to bottom</text>
+  <text class="s" x="60" y="78">ADR-0016 (Accepted, built), amended by ADR-0027 for a relative's return to use. Seat is who speaks; hold is what whoever speaks must carry.</text>
+
+  <!-- message -->
+  <rect class="box" x="60" y="106" width="330" height="44" rx="6"/>
+  <text class="t" x="80" y="134">the message, normalized first (ADR-0018)</text>
+  <path class="arrow" d="M 225 150 V 176"/>
+
+  <!-- gate -->
+  <rect class="gate" x="60" y="178" width="330" height="62" rx="6"/>
+  <text class="w" x="80" y="204">1   the gate  ·  safety.evaluate</text>
+  <text class="wl" x="80" y="228">runs first, on the bytes; fails closed</text>
+
+  <!-- card branch -->
+  <path class="arrowr" d="M 390 209 H 466"/>
+  <rect class="card" x="470" y="178" width="330" height="62" rx="6"/>
+  <text class="w" x="490" y="204">HUMAN_ESCALATION</text>
+  <text class="wl" x="490" y="228">the house card; no persona is seated</text>
+  <text class="s" x="820" y="203">the router never sees the turn;</text>
+  <text class="s" x="820" y="223">two aftermath turns, humour off</text>
+
+  <path class="arrow" d="M 225 240 V 266"/>
+
+  <!-- layer 2 -->
+  <rect class="box" x="60" y="268" width="740" height="60" rx="6"/>
+  <text class="n" x="80" y="291">2   SEAT-CLAIMING DOMAINS</text>
+  <text class="t" x="80" y="314">"I relapsed" claims the recovery persona; somatic distress claims the stabilizer. The rest: outranked.</text>
+  <path class="arrow" d="M 225 328 V 354"/>
+
+  <!-- layer 3 -->
+  <rect class="box" x="60" y="356" width="740" height="82" rx="6"/>
+  <text class="n" x="80" y="379">3   HOLDS</text>
+  <text class="t" x="80" y="402">Grief, abuse, eating distress, a relative's relapse: carried by whoever sits, as obligations.</text>
+  <text class="m" x="80" y="426" xml:space="preserve">acknowledge:grief   no_joke   no_challenge   offer_companion:willow   offer_human_help</text>
+  <path class="arrow" d="M 225 438 V 464"/>
+
+  <!-- layer 4 -->
+  <rect class="box" x="60" y="466" width="740" height="60" rx="6"/>
+  <text class="n" x="80" y="489">4   ASK FIT</text>
+  <text class="t" x="80" y="512">The score is taken on the ask minus the held domains; carrying the hold too earns a small, named bonus.</text>
+  <path class="arrow" d="M 225 526 V 552"/>
+
+  <!-- layer 5 -->
+  <rect class="box" x="60" y="554" width="740" height="60" rx="6"/>
+  <text class="n" x="80" y="577">5   DYSREGULATION</text>
+  <text class="t" x="80" y="600">The stabilizer is preferred and challenge penalized (ADR-0012); no assist while acutely dysregulated.</text>
+  <path class="arrow" d="M 225 614 V 640"/>
+
+  <!-- layer 6 -->
+  <rect class="box" x="60" y="642" width="740" height="60" rx="6"/>
+  <text class="n" x="80" y="665">6   DECLARED AFFINITIES</text>
+  <text class="t" x="80" y="688">Declared by the person at the operator level, never inferred; tie-breaks among the eligible, never a rescue.</text>
+  <path class="arrow" d="M 225 702 V 728"/>
+
+  <!-- layer 7 -->
+  <rect class="box" x="60" y="730" width="740" height="60" rx="6"/>
+  <text class="n" x="80" y="753">7   SHADOW SEAT AND ASSIST</text>
+  <text class="t" x="80" y="776">The shadow is recorded, never seated; the assist names every candidate it reached and why each lost.</text>
+
+  <!-- one gate, right column -->
+  <rect x="830" y="268" width="310" height="270" rx="6" fill="none" stroke="#9B9B7F" stroke-width="2" stroke-dasharray="6 5"/>
+  <text class="h" x="850" y="298" style="font-size:18px">One gate: eligible()</text>
+  <text class="t" x="850" y="326">Seat, shadow and assist all ask the</text>
+  <text class="t" x="850" y="348">same function, and it is the only</text>
+  <text class="t" x="850" y="370">function that says no. Its answers:</text>
+  <text class="m" x="850" y="402" xml:space="preserve">vetoed       a contraindication</text>
+  <text class="m" x="850" y="422" xml:space="preserve">             on the ask or a hold</text>
+  <text class="m" x="850" y="446" xml:space="preserve">below_floor  the caller is under</text>
+  <text class="m" x="850" y="466" xml:space="preserve">             the agent's window</text>
+  <text class="m" x="850" y="490" xml:space="preserve">capped       every mode it offers</text>
+  <text class="m" x="850" y="510" xml:space="preserve">             is vetoed this turn</text>
+  <text class="m" x="850" y="530" xml:space="preserve">outranked    a claim it lacks</text>
+
+  <!-- decision -->
+  <path class="arrow" d="M 800 760 H 826"/>
+  <rect class="box" x="830" y="730" width="310" height="112" rx="6" style="stroke:#A64527"/>
+  <text class="n" x="850" y="753">ROUTINGDECISION</text>
+  <text class="t" x="850" y="776">seat · held · obligations · assist</text>
+  <text class="t" x="850" y="798">the rule that produced it, every</text>
+  <text class="t" x="850" y="820">candidate's status, the roster hash</text>
+  <text class="s" x="850" y="838">A zero in the trace says which "no" it means.</text>
+
+  <text class="s" x="60" y="874">The same request routes differently on three named things only: the person's state, a held domain, a declared affinity. Message text never holds a key to any of them.</text>
+</svg>

@@ -287,3 +287,34 @@ profile guard against handoffs to security characters
 (`tests/test_codex_house_block.py`); no fixture was added or re-dispositioned,
 and one dispute note (the D3 acceptance fixture) now says the operator ruled
 for the reviewer's outcome and the code change is scheduled.
+
+**Numbers, 2026-09-10.** 1,239 tests: 1,046 passing, 193 expected failures
+(179 documented gaps, 14 recorded dissents), measured in fresh environments
+on Python 3.10, 3.11 and 3.12 the way CI runs them (`pip install -e ".[dev]"`,
+then `pytest`); on one of the three hosts the packaging check skipped
+because that host's build backend could not build a wheel without
+isolation, which the check names as a machine fault. Statement coverage of `src/secondsignal` under the suite, measured
+with pytest-cov on the same run: 92 percent (the command-line entry point is
+exercised by the installed-wheel check as a subprocess and counts as
+uncovered; every other module is between 89 and 100 percent). The manifest
+inventories 415 policy-plane cases, 165 of them from external reviewers
+(round 1's 103, the acceptance set's 26, round 2's 36), and 71 deferred
+fixtures on the generation, harness, transport, orchestration and
+persistence planes are stored and not run. The 10 September build added the
+danger lane (the danger class, the widened weapon lane, the verified
+domestic-violence lines, the post-separation window, the abuse-history
+hold), the house lines of 8 September with the failure line, D3 as a hold
+(ADR-0027 (Proposed)), the bounded aftermath and the substantive-turn clock,
+the twelve narrator-isolation fixtures, the twenty P0-lane fixtures, and the
+thirty-six round-2 fixtures
+([`fixture-results-round2-2026-09-10.md`](../evals/results/external-review/fixture-results-round2-2026-09-10.md):
+30 pass as written, 4 contract-adjusted, 1 disputed, 1 known gap; seven had
+failed on the tree before the ingest, each on a gap they exposed). It also
+hardened the three guard tests against the twenty-six mutations review
+round 2 wrote, every one now a red regression
+(`tests/test_register_mutations.py`), and pinned the house block to its
+version by hash. The round-1 report page was regenerated: its counts had
+drifted by one after the round-2 dispositions of the same day, which is
+why both committed report pages are now asserted equal to the runner's
+output on every run. The badge on the README is written from these numbers
+and from nothing else.

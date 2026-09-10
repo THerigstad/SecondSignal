@@ -32,7 +32,7 @@ from .router import (
 from .safety import Action, SafetyVerdict, SessionState, crisis_read, crisis_screen, evaluate
 from .signals import RequestSignals, extract
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 __all__ = [
     "AgentProfile",
