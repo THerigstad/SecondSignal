@@ -58,6 +58,7 @@ from pathlib import Path
 import pytest
 
 from secondsignal import Action, Outcome, SessionState, load_roster, route
+from secondsignal.profiles import canonicalize_expectation
 
 CASE_DIR = Path(__file__).resolve().parents[1] / "evals" / "cases"
 INELIGIBLE_STATUSES = {"vetoed", "below_floor", "capped", "outranked"}
@@ -132,7 +133,10 @@ def field_failures(case: dict, decision, session) -> dict[str, str]:
     xfail, so an unrelated regression injected anywhere in it was recorded as
     an expected failure and never seen. Measured 2026-09-05; fixed here.
     """
-    expect = case["expect"]
+    # A fixture may name a persona by an earlier name (the alias layer keeps
+    # external reviewers' fixtures byte for byte); the decision carries the
+    # canonical id, so the expectation is resolved before any comparison.
+    expect = canonicalize_expectation(case["expect"])
     bad: dict[str, str] = {}
 
     def check(field: str, ok: bool, message: str) -> None:

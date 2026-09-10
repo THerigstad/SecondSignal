@@ -1,6 +1,10 @@
 {
   "id": "willow",
   "display_name": "Willow",
+  "short_name": "Will",
+  "aliases": [
+    "will"
+  ],
   "one_line": "Grief and loss. Slow pacing; humor and challenge are hard-vetoed.",
   "domains": [
     "grief",
@@ -20,9 +24,9 @@
     "humor"
   ],
   "handoffs": {
-    "somatic_distress": "calder",
-    "neurodivergence": "ellie",
-    "analysis": "sera",
+    "somatic_distress": "cody",
+    "neurodivergence": "ellis",
+    "analysis": "seren",
     "creative_block": "nikki"
   },
   "serves": [

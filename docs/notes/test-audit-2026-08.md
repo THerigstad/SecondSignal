@@ -1,5 +1,7 @@
 # Test audit against the governance documents
 
+*Names: this record predates the rename of 10 September 2026 (Calder is now Cody, Ellie is Ellis, Sera is Seren, Ravi is Rowan; Nikki, Willow and Vandal are unchanged, with the short forms Nik, Will and Elli). It keeps the names as they were written; the roster resolves them through the alias layer (`tests/test_aliases.py`).*
+
 **Date:** 2026-09-02 (audit period: August 2026 suite, reviewed 2026-09-01)
 **Backbone:** the external reviewer's audit template (`evals/results/external-review/grok-2026-09-01/07_TEST_AUDIT_AGAINST_GOVERNANCE.md`), which was written without access to the tests and asked that each row be ticked against the real suite rather than assumed. This document does that, and records what changed as a result.
 

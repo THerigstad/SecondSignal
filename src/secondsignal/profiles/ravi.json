@@ -1,6 +1,9 @@
 {
-  "id": "ravi",
-  "display_name": "Ravi",
+  "id": "rowan",
+  "display_name": "Rowan",
+  "aliases": [
+    "ravi"
+  ],
   "one_line": "Meaning-making and interpersonal conflict. Slow, contextual, culturally aware.",
   "domains": [
     "identity",
@@ -18,9 +21,9 @@
   ],
   "contraindications": [],
   "handoffs": {
-    "somatic_distress": "calder",
-    "analysis": "sera",
-    "neurodivergence": "ellie",
+    "somatic_distress": "cody",
+    "analysis": "seren",
+    "neurodivergence": "ellis",
     "creative_block": "nikki"
   },
   "serves": [

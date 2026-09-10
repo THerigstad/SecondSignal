@@ -38,11 +38,11 @@ def statuses(decision) -> dict[str, str]:
 def test_first_person_return_to_use_claims_the_seat_for_the_recovery_persona(text, roster) -> None:
     decision = route(text, roster, session=SessionState())
     assert decision.seat_claim == "addiction_recovery"
-    assert decision.agent_id == "calder"
+    assert decision.agent_id == "cody"
     assert "seat-claiming" in decision.reason
     st = statuses(decision)
     assert st["nikki"] == "vetoed" and st["vandal"] == "vetoed"        # contraindicated
-    assert all(st[a] == "outranked" for a in ("ellie", "ravi", "willow"))
+    assert all(st[a] == "outranked" for a in ("ellis", "rowan", "willow"))
 
 
 @pytest.mark.parametrize("text", [
@@ -60,7 +60,7 @@ def test_a_relatives_relapse_claims_the_seat_and_records_whose_it_is(text, roste
     assert signals.evidence["domain:addiction_recovery:person"] == ("third",)
     decision = route(text, roster, session=SessionState())
     assert decision.seat_claim == "addiction_recovery" and decision.claim_subject == "other"
-    assert decision.agent_id == "calder"
+    assert decision.agent_id == "cody"
     assert "affected_person:other" in decision.obligations
     assert "acknowledge:addiction_recovery" in decision.obligations and "no_joke" in decision.obligations
 
@@ -96,7 +96,7 @@ def test_acute_danger_outranks_every_claim(roster) -> None:
     assert decision.safety.action is Action.HUMAN_ESCALATION
     assert decision.preempted and decision.agent_id is None
     assert decision.ranked == ()
-    assert decision.shadow_agent_id == "calder"   # recorded, never seated
+    assert decision.shadow_agent_id == "cody"   # recorded, never seated
 
 
 # --- holds and obligations (layer 3) --------------------------------------------------
@@ -108,8 +108,8 @@ def test_grief_attaches_obligations_and_vetoes_the_contraindicated(roster) -> No
     assert "acknowledge:grief" in decision.obligations and "no_joke" in decision.obligations
     assert any(o.startswith("offer_companion:") for o in decision.obligations)
     st = statuses(decision)
-    assert st["sera"] == "vetoed" and st["vandal"] == "vetoed"
-    assert "cannot honor hold: grief" in next(s for s in decision.ranked if s.agent_id == "sera").rationale[0]
+    assert st["seren"] == "vetoed" and st["vandal"] == "vetoed"
+    assert "cannot honor hold: grief" in next(s for s in decision.ranked if s.agent_id == "seren").rationale[0]
 
 
 def test_a_requested_mode_counts_against_a_contraindicated_persona_even_when_the_turn_vetoes_it(roster) -> None:
@@ -118,7 +118,7 @@ def test_a_requested_mode_counts_against_a_contraindicated_persona_even_when_the
     the ask was made and the seat has to hold it without honoring it."""
     decision = route("my grandmother died and I want someone to make it funny", roster, session=SessionState())
     assert statuses(decision)["willow"] == "vetoed"
-    assert decision.agent_id == "ravi"
+    assert decision.agent_id == "rowan"
 
 
 def test_the_seat_is_scored_on_the_ask_and_the_hold_is_carried(roster) -> None:
@@ -127,9 +127,9 @@ def test_the_seat_is_scored_on_the_ask_and_the_hold_is_carried(roster) -> None:
         roster, session=SessionState(),
     )
     assert decision.held == ("grief",)
-    assert decision.agent_id == "calder"            # carries the ask (career) and the hold
-    assert "carries the hold" in " ".join(next(s for s in decision.ranked if s.agent_id == "calder").rationale)
-    assert statuses(decision)["sera"] == "vetoed"   # cannot honor the hold, however well she fits the deck
+    assert decision.agent_id == "cody"            # carries the ask (career) and the hold
+    assert "carries the hold" in " ".join(next(s for s in decision.ranked if s.agent_id == "cody").rationale)
+    assert statuses(decision)["seren"] == "vetoed"   # cannot honor the hold, however well she fits the deck
 
 
 def test_a_hold_with_no_other_ask_seats_the_hold_specialist(roster) -> None:
@@ -167,9 +167,9 @@ def test_every_hold_domain_has_obligations() -> None:
 def test_an_affinity_never_pulls_a_contraindicated_persona_into_the_assist(roster) -> None:
     session = SessionState(affinities=("prefers_female_voice",))
     decision = route("I relapsed after my brother died", roster, session=session)
-    assert decision.agent_id == "calder"
+    assert decision.agent_id == "cody"
     assert decision.assist_agent_id == "willow"     # the eligible female voice
-    assert "sera excluded (contraindication" in decision.assist_reason
+    assert "seren excluded (contraindication" in decision.assist_reason
 
 
 def test_an_affinity_for_challenge_yields_no_assist_under_a_grief_hold(roster) -> None:
@@ -200,12 +200,12 @@ def test_the_assist_is_never_the_seat_and_never_inferred(roster) -> None:
 
 def test_eligible_names_every_reason_it_says_no(roster) -> None:
     grief = extract("my grandmother died")
-    assert eligible(roster["sera"], grief, holds=("grief",))[0] == "vetoed"
+    assert eligible(roster["seren"], grief, holds=("grief",))[0] == "vetoed"
     assert eligible(roster["willow"], extract("make it funny"))[0] == "vetoed"
     assert eligible(roster["vandal"], extract("I'm falling apart and overwhelmed and can't think"))[0] == "below_floor"
     assert eligible(roster["vandal"], extract("roast me"), mode_vetoes=frozenset({"humor", "challenge"}))[0] == "capped"
     assert eligible(roster["nikki"], extract("help me"), claims=("addiction_recovery",))[0] == "outranked"
-    assert eligible(roster["calder"], extract("help me plan the week"))[0] == "scored"
+    assert eligible(roster["cody"], extract("help me plan the week"))[0] == "scored"
 
 
 # --- stabilizer by role (ADR-0011) ------------------------------------------------------------

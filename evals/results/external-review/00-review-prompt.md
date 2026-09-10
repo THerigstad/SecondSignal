@@ -1,5 +1,7 @@
 # The review prompt, as sent
 
+*Names: this record predates the rename of 10 September 2026 (Calder is now Cody, Ellie is Ellis, Sera is Seren, Ravi is Rowan; Nikki, Willow and Vandal are unchanged, with the short forms Nik, Will and Elli). It keeps the names as they were written; the roster resolves them through the alias layer (`tests/test_aliases.py`).*
+
 > **Provenance.** This is the prompt that produced the seven architecture reviews
 > indexed in [`README.md`](README.md) (2026-08-31). It was sent, unchanged apart
 > from the recipient's name, to ChatGPT, DeepSeek, Google Gemini, Grok, Qwen,

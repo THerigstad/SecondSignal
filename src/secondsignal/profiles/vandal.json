@@ -1,6 +1,7 @@
 {
   "id": "vandal",
   "display_name": "Vandal",
+  "aliases": [],
   "one_line": "Disruption and challenge. Narrowest safe window; most contraindications.",
   "domains": [
     "creative_block",
@@ -23,9 +24,9 @@
   ],
   "handoffs": {
     "grief": "willow",
-    "somatic_distress": "calder",
-    "addiction_recovery": "calder",
-    "neurodivergence": "ellie"
+    "somatic_distress": "cody",
+    "addiction_recovery": "cody",
+    "neurodivergence": "ellis"
   },
   "serves": [
     "users stuck in a story about themselves",

@@ -44,7 +44,7 @@ def test_grief_vetoes_every_contraindicated_agent(roster):
     declares grief unfit must be unrankable on a grief message, together."""
     decision = route("my grandmother died last week", roster)
     by_id = {s.agent_id: s for s in decision.ranked}
-    for agent_id in ("vandal", "sera"):
+    for agent_id in ("vandal", "seren"):
         assert by_id[agent_id].vetoed, f"{agent_id} contraindicates grief and must be vetoed"
         assert by_id[agent_id].score == 0.0
 

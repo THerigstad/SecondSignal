@@ -2,6 +2,8 @@
 
 # SecondSignal — Round 1 external design review packet
 
+*Names: this record predates the rename of 10 September 2026 (Calder is now Cody, Ellie is Ellis, Sera is Seren, Ravi is Rowan; Nikki, Willow and Vandal are unchanged, with the short forms Nik, Will and Elli). It keeps the names as they were written; the roster resolves them through the alias layer (`tests/test_aliases.py`).*
+
 Copy everything below the line into each reviewing system as one message. It is self-contained. Send the same text to each reviewer separately; do not tell one reviewer what another said.
 
 ---

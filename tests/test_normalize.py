@@ -16,6 +16,7 @@ from pathlib import Path
 import pytest
 
 from secondsignal import Action, SessionState, load_roster, route
+from secondsignal.lexicon import PACKS
 from secondsignal.normalize import (
     NORMALIZE_FORMS,
     SKELETON,
@@ -25,7 +26,6 @@ from secondsignal.normalize import (
     normalize,
     skeleton_hash,
 )
-from secondsignal.lexicon import PACKS
 from secondsignal.safety import crisis_screen, evaluate
 from secondsignal.signals import extract
 

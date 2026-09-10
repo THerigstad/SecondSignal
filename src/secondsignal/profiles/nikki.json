@@ -1,6 +1,10 @@
 {
   "id": "nikki",
   "display_name": "Nikki",
+  "short_name": "Nik",
+  "aliases": [
+    "nik"
+  ],
   "one_line": "Creative activation and identity work. High energy; requires a regulation floor.",
   "domains": [
     "creative_block",
@@ -21,10 +25,10 @@
     "addiction_recovery"
   ],
   "handoffs": {
-    "somatic_distress": "calder",
+    "somatic_distress": "cody",
     "grief": "willow",
-    "addiction_recovery": "calder",
-    "analysis": "sera"
+    "addiction_recovery": "cody",
+    "analysis": "seren"
   },
   "serves": [
     "blocked artists",

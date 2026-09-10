@@ -38,6 +38,12 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 
+from .profiles import known_persona_names
+
+# Every name a persona answers to (ids, aliases, short forms), read from the
+# profile directory so a rename never leaves a stale literal here.
+_PERSONA_NAMES = "|".join(re.escape(n) for n in known_persona_names())
+
 __all__ = [
     "ALLOWED_KEYS",
     "PreferenceEvent",
@@ -88,8 +94,8 @@ ENVELOPE_TERMS = _compile((
     r"\blatch\b",
     r"\b(careful|conservative|minor|safe|kid|child) mode\b",
     r"\bescalat(e|ion|ions)\b",
-    r"\b(always|only|just) (seat|use|give me|route (me )?to) (calder|ellie|nikki|ravi|sera|vandal|willow)\b",
-    r"\bseat (calder|ellie|nikki|ravi|sera|vandal|willow)\b",
+    r"\b(always|only|just) (seat|use|give me|route (me )?to) (" + _PERSONA_NAMES + r")\b",
+    r"\bseat (" + _PERSONA_NAMES + r")\b",
     r"\b(no|without|skip|drop|remove|hide|turn off|disable|stop) (the |those |these |all |any )?(warnings?|lines?|cards?|disclaimers?|disclosures?|resources?|checks?|hotlines?|numbers?)\b",
     r"\b(never|don'?t|do not|stop) (show|showing|send|sending|give|giving|attach|attaching) (me )?(that|the|those|any) (crisis|safety|warning|boundary|dependency|hotline|resource)",
     # A person who has just seen the crisis card calls it "the card", not

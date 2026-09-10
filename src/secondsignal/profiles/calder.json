@@ -1,6 +1,9 @@
 {
-  "id": "calder",
-  "display_name": "Calder",
+  "id": "cody",
+  "display_name": "Cody",
+  "aliases": [
+    "calder"
+  ],
   "one_line": "Stabilizer. Low-affect, high-presence; safe across the full regulation range.",
   "domains": [
     "grief",
@@ -22,9 +25,9 @@
   "contraindications": [],
   "handoffs": {
     "creative_block": "nikki",
-    "neurodivergence": "ellie",
-    "analysis": "sera",
-    "identity": "ravi"
+    "neurodivergence": "ellis",
+    "analysis": "seren",
+    "identity": "rowan"
   },
   "serves": [
     "veterans",

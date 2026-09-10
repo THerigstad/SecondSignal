@@ -34,6 +34,7 @@ from secondsignal import (  # noqa: E402
     load_roster,
     route,
 )
+from secondsignal.profiles import canonicalize_expectation  # noqa: E402
 
 CASE_DIR = PROJECT_ROOT / "evals" / "cases"
 DEFAULT_OUTPUT = (
@@ -274,6 +275,9 @@ def check_case(
     expect = case["expect"]
     if not isinstance(expect, dict):
         raise ValueError(f"{case.get('id', '<unknown>')}: expect must be an object")
+    # Names in a fixture may be a persona's earlier name; the decision record
+    # carries the canonical id. Resolve here, never in the fixture file.
+    expect = canonicalize_expectation(expect)
 
     failures: list[str] = []
 

@@ -700,7 +700,7 @@ def _assist(
                 (affinity == "prefers_female_voice" and profile.voice == "f")
                 or (affinity == "prefers_male_voice" and profile.voice == "m")
                 or (affinity == "prefers_challenge" and "challenge" in profile.modes)
-                or affinity == f"prefers_{profile.id}"
+                or affinity in {f"prefers_{name}" for name in profile.names}
             )
             if not matches:
                 continue

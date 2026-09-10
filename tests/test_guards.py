@@ -106,8 +106,8 @@ def test_user_preference_cannot_undo_a_veto(roster):
 # 6. A specialist request inside a mixed grief+work message cannot seat Sera.
 def test_grief_under_a_strategic_ask_cannot_seat_the_strategist(roster):
     d = route("the investor deck is due at 9 and I keep flashing on my dad's funeral", roster)
-    assert d.agent_id != "sera"
-    assert {s.agent_id: s.status for s in d.ranked}["sera"] == "vetoed"
+    assert d.agent_id != "seren"
+    assert {s.agent_id: s.status for s in d.ranked}["seren"] == "vetoed"
 
 
 # 7. Affinity / last_agent / warmth cannot appear in the score.
@@ -137,7 +137,7 @@ def test_session_history_cannot_flip_a_clean_route(roster):
     for _ in range(12):
         route("you're so warm, I love talking with you about my art", roster, session=session)
     d = route("three options for leaving this job, with costs, in a numbered list", roster, session=session)
-    assert d.agent_id == "sera"
+    assert d.agent_id == "seren"
 
 
 # 8. impact_event cannot appear in the score (ADR-0001 firewall).
@@ -146,7 +146,7 @@ def test_impact_events_cannot_reach_the_score(roster):
         names = {f.name for f in dataclasses.fields(cls)}
         assert not any("impact" in n for n in names), (cls.__name__, names)
     session = SessionState()
-    session.impact_events_by_agent = {"sera": 400, "nikki": 0}  # an ad-hoc attribute must be inert
+    session.impact_events_by_agent = {"seren": 400, "nikki": 0}  # an ad-hoc attribute must be inert
     d = route("I've been staring at this project for three days and haven't started", roster, session=session)
     assert d.agent_id == "nikki"
     assert not any("impact" in r for s in d.ranked for r in s.rationale)
@@ -223,21 +223,21 @@ def test_caller_below_an_agents_floor_is_ineligible_not_penalized(roster):
 
 def test_roster_without_a_stabilizer_fails_to_load(tmp_path):
     with pytest.raises(ValueError, match="no stabilizer"):
-        load_roster(_roster_without("calder", tmp_path))
+        load_roster(_roster_without("cody", tmp_path))
 
 
 def test_narrowing_the_stabilizers_floor_fails_to_load(tmp_path):
     def edit(data):
         data["regulation_window"] = [0.1, 1.0]
     with pytest.raises(ValueError, match="no stabilizer"):
-        load_roster(_roster_edit(tmp_path, "calder", edit))
+        load_roster(_roster_edit(tmp_path, "cody", edit))
 
 
 def test_contraindicating_the_stabilizer_fails_to_load(tmp_path):
     def edit(data):
         data["contraindications"] = ["humor"]
     with pytest.raises(ValueError, match="no stabilizer"):
-        load_roster(_roster_edit(tmp_path, "calder", edit))
+        load_roster(_roster_edit(tmp_path, "cody", edit))
 
 
 def test_a_wide_window_with_vetoes_does_not_satisfy_the_floor(roster):
@@ -263,7 +263,7 @@ def test_gate_verdict_identical_across_rosters(roster):
     texts = ["I want to die", "roast me", "hey", "are you attracted to me", "je veux mourir ce soir"]
     for text in texts:
         base = evaluate(text, extract(text), SessionState()).action
-        for sub in ({"calder": roster["calder"]}, dict(reversed(list(roster.items())))):
+        for sub in ({"cody": roster["cody"]}, dict(reversed(list(roster.items())))):
             d = route(text, sub, session=SessionState())
             assert d.safety.action is base, (text, sub.keys())
 
@@ -323,7 +323,7 @@ def test_zero_has_three_named_meanings(roster):
     assert {s.status for s in vetoed if s.score == 0.0} >= {"vetoed"}
     below = score_agent(roster["vandal"], extract("spiraling, falling apart, overwhelmed, losing it"))
     assert below.status == "below_floor" and below.score == 0.0
-    empty = score_agent(roster["calder"], extract("hey"))
+    empty = score_agent(roster["cody"], extract("hey"))
     assert empty.status == "no_signal" and empty.score == 0.0
 
 

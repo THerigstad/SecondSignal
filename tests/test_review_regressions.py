@@ -38,7 +38,7 @@ def test_slang_ideation_reaches_the_gate(roster):
 
 def test_business_language_reaches_the_strategist_not_the_stabilizer(roster):
     """Pre-review: no topic matched and Calder won by sort order."""
-    assert route("The art is finally flowing. I need a shop, a funnel, and a launch date.", roster).agent_id == "sera"
+    assert route("The art is finally flowing. I need a shop, a funnel, and a launch date.", roster).agent_id == "seren"
 
 
 def test_a_roster_without_a_stabilizer_cannot_load(tmp_path):
@@ -48,9 +48,9 @@ def test_a_roster_without_a_stabilizer_cannot_load(tmp_path):
     target.mkdir()
     for path in sorted(DEFAULT_PROFILE_DIR.glob("*.json")):
         data = json.loads(path.read_text(encoding="utf-8"))
-        if data["id"] == "calder":
+        if data["id"] == "cody":
             continue
-        data["handoffs"] = {k: v for k, v in data.get("handoffs", {}).items() if v != "calder"}
+        data["handoffs"] = {k: v for k, v in data.get("handoffs", {}).items() if v != "cody"}
         (target / path.name).write_text(json.dumps(data), encoding="utf-8")
     with pytest.raises(ValueError):
         load_roster(target)

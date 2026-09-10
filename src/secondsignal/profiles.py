@@ -26,21 +26,35 @@ roster that violates them must not be able to start (ADR-0012):
 Every profile is hashed when loaded, and the roster hash travels with each
 routing decision, so a replayed trace can be matched to the exact profiles
 that produced it and a silent profile edit is visible.
+
+Names are an alias layer (ADR-0026 (Proposed) motivated it; the layer itself
+is built). A profile has one canonical ``id`` and may declare ``aliases``:
+earlier names it was known by, and its short form. The roster resolves an
+alias anywhere it accepts an id, so a fixture written by an external reviewer
+under an earlier name still names the same persona, byte for byte, and the
+decision record always carries the canonical id. Two profiles may never share
+a name in any form; the roster refuses to load if they do.
 """
 
 from __future__ import annotations
 
 import hashlib
 import json
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from pathlib import Path
+from typing import Any
 
 __all__ = [
     "AgentProfile",
+    "Roster",
     "load_profile",
     "load_roster",
     "roster_hash",
     "find_stabilizers",
+    "known_persona_names",
+    "default_aliases",
+    "canonical_id",
+    "canonicalize_expectation",
     "DEFAULT_PROFILE_DIR",
 ]
 
@@ -75,7 +89,13 @@ class AgentProfile:
             analysis cannot drift away from the definition.
         voice: Declared voice register of the persona ("f", "m" or ""), used
             only to honour a *declared* affinity such as prefers_female_voice.
-            Never inferred about the caller; never a routing score.
+            Never inferred about the caller; never a routing score. Under
+            ADR-0026 (Proposed) this becomes the "as written" default of a
+            presentation block rather than a routing input of any kind.
+        aliases: Other names that resolve to this profile: earlier canonical
+            names and the short form. Lower-case, unique across the roster.
+        short_name: The short form of the display name, if the persona has
+            one ("Nik", "Will", "Elli"). Presentation only.
         source_hash: First 12 hex digits of the SHA-256 of the profile file as
             loaded. Empty for profiles built in memory.
     """
@@ -91,7 +111,14 @@ class AgentProfile:
     serves: tuple[str, ...] = ()
     risks: tuple[str, ...] = ()
     voice: str = ""
+    aliases: tuple[str, ...] = ()
+    short_name: str = ""
     source_hash: str = ""
+
+    @property
+    def names(self) -> tuple[str, ...]:
+        """Every name that resolves to this profile: the id first, then aliases."""
+        return (self.id, *self.aliases)
 
     def accepts(self, regulation: float) -> bool:
         low, high = self.regulation_window
@@ -117,6 +144,8 @@ def _profile_from_dict(data: dict, source_hash: str = "") -> AgentProfile:
         serves=tuple(data.get("serves", ())),
         risks=tuple(data.get("risks", ())),
         voice=str(data.get("voice", "")),
+        aliases=tuple(str(a).strip().lower() for a in data.get("aliases", ()) if str(a).strip()),
+        short_name=str(data.get("short_name", "")),
         source_hash=source_hash,
     )
 
@@ -126,6 +155,120 @@ def load_profile(path: str | Path) -> AgentProfile:
     raw = Path(path).read_bytes()
     digest = hashlib.sha256(raw).hexdigest()[:12]
     return _profile_from_dict(json.loads(raw.decode("utf-8")), source_hash=digest)
+
+
+class Roster(dict):
+    """An id -> profile map that also answers to every profile's aliases.
+
+    ``roster["calder"]`` and ``roster["cody"]`` are the same profile once
+    ``cody`` declares ``calder`` as an alias; iteration, ``keys()``,
+    ``values()`` and ``len()`` see canonical ids only, so nothing is counted
+    twice. ``resolve`` turns any known name into the canonical id and is the
+    one place a name is normalized; an unknown name raises ``KeyError`` unless
+    ``strict`` is false, in which case it is returned unchanged so a fixture
+    that names a persona that does not exist fails on the comparison, not on
+    the lookup.
+    """
+
+    def _index(self) -> dict[str, str]:
+        index: dict[str, str] = {}
+        for pid, profile in dict.items(self):
+            index[pid] = pid
+            for alias in getattr(profile, "aliases", ()):
+                index.setdefault(alias, pid)
+        return index
+
+    def resolve(self, name: str | None, *, strict: bool = True) -> str | None:
+        if name is None:
+            return None
+        key = str(name).strip().lower()
+        index = self._index()
+        if key in index:
+            return index[key]
+        if strict:
+            raise KeyError(name)
+        return name
+
+    def __getitem__(self, name: str) -> AgentProfile:
+        return dict.__getitem__(self, self.resolve(name))
+
+    def __contains__(self, name: object) -> bool:  # type: ignore[override]
+        if not isinstance(name, str):
+            return False
+        return self.resolve(name, strict=False) in dict.keys(self)
+
+    def get(self, name: object, default: Any = None) -> Any:  # type: ignore[override]
+        try:
+            return self[str(name)]
+        except KeyError:
+            return default
+
+    def aliases(self) -> dict[str, str]:
+        """alias -> canonical id, for every alias in the roster."""
+        return {alias: pid for alias, pid in self._index().items() if alias != pid}
+
+
+def known_persona_names(directory: str | Path | None = None) -> tuple[str, ...]:
+    """Every name any persona in the profile directory answers to, sorted,
+    lower-case: canonical ids, aliases and short forms. Used by pattern
+    builders that must recognise a persona named in a message (for example a
+    request to always seat one), without loading or validating the roster."""
+    directory = Path(directory or DEFAULT_PROFILE_DIR)
+    names: set[str] = set()
+    for path in sorted(directory.glob("*.json")):
+        data = json.loads(path.read_text(encoding="utf-8"))
+        names.add(str(data["id"]).lower())
+        names.update(str(a).strip().lower() for a in data.get("aliases", ()) if str(a).strip())
+        short = str(data.get("short_name", "")).strip().lower()
+        if short:
+            names.add(short)
+    return tuple(sorted(names))
+
+
+def default_aliases(directory: str | Path | None = None) -> dict[str, str]:
+    """alias -> canonical id for the profile directory, read without loading
+    or validating the roster. The fixture runners use it so a case written
+    under an earlier name compares against the canonical id the decision
+    record carries."""
+    directory = Path(directory or DEFAULT_PROFILE_DIR)
+    aliases: dict[str, str] = {}
+    for path in sorted(directory.glob("*.json")):
+        data = json.loads(path.read_text(encoding="utf-8"))
+        pid = str(data["id"]).lower()
+        for alias in data.get("aliases", ()):
+            alias = str(alias).strip().lower()
+            if alias:
+                aliases[alias] = pid
+    return aliases
+
+
+def canonical_id(name: Any, aliases: dict[str, str] | None = None) -> Any:
+    """The canonical id for `name` if it is a known alias, else `name` unchanged
+    (including None). Unknown names pass through so a fixture that names a
+    persona that does not exist fails on the comparison, visibly."""
+    if not isinstance(name, str):
+        return name
+    table = default_aliases() if aliases is None else aliases
+    return table.get(name.strip().lower(), name)
+
+
+_EXPECTATION_NAME_FIELDS = ("agent", "assist")
+_EXPECTATION_NAME_LISTS = ("agent_any_of", "not_seated", "ineligible")
+
+
+def canonicalize_expectation(expect: dict, aliases: dict[str, str] | None = None) -> dict:
+    """Return a copy of a fixture's ``expect`` block with every persona name
+    resolved to its canonical id. The fixture file itself is never rewritten:
+    external reviewers' fixtures stay byte for byte as they were returned."""
+    table = default_aliases() if aliases is None else aliases
+    out = dict(expect)
+    for key in _EXPECTATION_NAME_FIELDS:
+        if key in out:
+            out[key] = canonical_id(out[key], table)
+    for key in _EXPECTATION_NAME_LISTS:
+        if key in out and isinstance(out[key], (list, tuple)):
+            out[key] = [canonical_id(v, table) for v in out[key]]
+    return out
 
 
 def find_stabilizers(roster: dict[str, AgentProfile]) -> list[str]:
@@ -144,6 +287,15 @@ def validate_roster(roster: dict[str, AgentProfile]) -> None:
     """Raise ValueError if the roster violates a load-time invariant."""
     if not roster:
         raise ValueError("roster is empty")
+    seen: dict[str, str] = {}
+    for profile in roster.values():
+        for name in profile.names:
+            if name in seen and seen[name] != profile.id:
+                raise ValueError(
+                    f"name {name!r} is claimed by both {seen[name]!r} and {profile.id!r}; "
+                    "no two agents may share a name in any form"
+                )
+            seen[name] = profile.id
     for profile in roster.values():
         for condition, target in profile.handoffs.items():
             if target not in roster:
@@ -169,13 +321,20 @@ def load_roster(directory: str | Path | None = None) -> dict[str, AgentProfile]:
             discovering a dangling handoff -- or a missing floor -- mid-session.
     """
     directory = Path(directory or DEFAULT_PROFILE_DIR)
-    roster: dict[str, AgentProfile] = {}
+    roster = Roster()
 
     for path in sorted(directory.glob("*.json")):
         profile = load_profile(path)
-        if profile.id in roster:
+        if profile.id in dict.keys(roster):
             raise ValueError(f"duplicate agent id {profile.id!r} in {path}")
-        roster[profile.id] = profile
+        dict.__setitem__(roster, profile.id, profile)
 
     validate_roster(roster)
+    # Handoff targets may be written under an alias; the loaded contract
+    # carries canonical ids so the decision record never shows two names for
+    # one persona.
+    for pid, profile in list(dict.items(roster)):
+        normalized = {condition: roster.resolve(target) for condition, target in profile.handoffs.items()}
+        if normalized != profile.handoffs:
+            dict.__setitem__(roster, pid, replace(profile, handoffs=normalized))
     return roster

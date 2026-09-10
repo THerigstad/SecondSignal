@@ -1,5 +1,7 @@
 # Dissent log
 
+*Names: entries written before 10 September 2026 use the family's earlier names (Calder, now Cody; Ellie, now Ellis; Sera, now Seren; Ravi, now Rowan; Nikki, Willow and Vandal unchanged). They are kept as written; later entries use the current names; the roster resolves both through the alias layer (`tests/test_aliases.py`).*
+
 Whenever an external reviewer's test disagrees with a decision the project
 took, the disagreement is recorded here with the decision's reasons, and the
 reviewer's fixture stays in the suite as a strict expected failure

@@ -26,6 +26,7 @@ sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "tests"))
 
 import test_eval_cases as runner  # noqa: E402
+
 from secondsignal import load_roster  # noqa: E402
 
 MANIFEST_PATH = ROOT / "evals" / "case-manifest.json"

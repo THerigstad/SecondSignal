@@ -1,5 +1,7 @@
 # Fixture results, before and after
 
+*Names: this record predates the rename of 10 September 2026 (Calder is now Cody, Ellie is Ellis, Sera is Seren, Ravi is Rowan; Nikki, Willow and Vandal are unchanged, with the short forms Nik, Will and Elli). It keeps the names as they were written; the roster resolves them through the alias layer (`tests/test_aliases.py`).*
+
 **Fixtures:** the 25 executable cases from the external red-team review (Grok 4.6, 2026-09-01), written without access to the code. **Before:** the policy layer as of the 2026-09-01 research batch (50 tests passing). **After:** the tree with ADR-0010 through ADR-0013 applied (2026-09-02). Every case now also asserts the *reason* the decision was produced; a pass on the winner alone no longer counts.
 
 ## Totals

@@ -1,5 +1,7 @@
 # SecondSignal Research-to-Architecture Report
 
+*Names: this record predates the rename of 10 September 2026 (Calder is now Cody, Ellie is Ellis, Sera is Seren, Ravi is Rowan; Nikki, Willow and Vandal are unchanged, with the short forms Nik, Will and Elli). It keeps the names as they were written; the roster resolves them through the alias layer (`tests/test_aliases.py`).*
+
 ## Human-Centered Recursive and Multi-Agent Design, Safety, Memory, Evaluation, and Ethics
 
 **Research window:** August 4–27, 2026  

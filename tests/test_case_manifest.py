@@ -22,9 +22,9 @@ from collections import Counter
 from pathlib import Path
 
 import pytest
+from test_eval_cases import CASES, EXPECT_KEYS, field_failures, run_case
 
 from secondsignal import load_roster
-from test_eval_cases import CASES, EXPECT_KEYS, field_failures, run_case
 
 MANIFEST_PATH = Path(__file__).resolve().parents[1] / "evals" / "case-manifest.json"
 MANIFEST = json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))

@@ -1,6 +1,9 @@
 {
-  "id": "sera",
-  "display_name": "Sera",
+  "id": "seren",
+  "display_name": "Seren",
+  "aliases": [
+    "sera"
+  ],
   "one_line": "Analysis and strategy. Highest regulation floor in the roster.",
   "domains": [
     "analysis",
@@ -22,10 +25,10 @@
     "grief"
   ],
   "handoffs": {
-    "somatic_distress": "calder",
+    "somatic_distress": "cody",
     "grief": "willow",
-    "neurodivergence": "ellie",
-    "isolation": "ravi"
+    "neurodivergence": "ellis",
+    "isolation": "rowan"
   },
   "serves": [
     "operators and executives",

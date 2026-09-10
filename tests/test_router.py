@@ -50,7 +50,7 @@ def test_grief_routes_to_the_grief_agent(roster):
 
 def test_somatic_distress_routes_to_the_stabilizer(roster):
     decision = route("I'm panicking, chest tight, I can't breathe", roster)
-    assert decision.agent_id == "calder"
+    assert decision.agent_id == "cody"
 
 
 def test_analysis_routes_to_the_analyst_when_regulated(roster):
@@ -58,7 +58,7 @@ def test_analysis_routes_to_the_analyst_when_regulated(roster):
         "let's plan this out, I want to compare the tradeoffs and evaluate the options",
         roster,
     )
-    assert decision.agent_id == "sera"
+    assert decision.agent_id == "seren"
 
 
 def test_challenge_agents_are_penalized_during_dysregulation(roster):
