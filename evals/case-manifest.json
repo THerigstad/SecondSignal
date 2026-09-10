@@ -2221,6 +2221,82 @@
    "reason": "A recognised behavioral warning sign with no crisis vocabulary at all. No lexicon of speech acts reaches this; a classifier trained on clinician-reviewed examples would be needed."
   },
   {
+   "id": "narrator-isolation-001",
+   "source": "narrator_isolation",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "narrator-isolation-002",
+   "source": "narrator_isolation",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "narrator-isolation-003",
+   "source": "narrator_isolation",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "narrator-isolation-004",
+   "source": "narrator_isolation",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "narrator-isolation-005",
+   "source": "narrator_isolation",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "narrator-isolation-006",
+   "source": "narrator_isolation",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "narrator-isolation-007",
+   "source": "narrator_isolation",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "narrator-isolation-008",
+   "source": "narrator_isolation",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "narrator-isolation-009",
+   "source": "narrator_isolation",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "narrator-isolation-010",
+   "source": "narrator_isolation",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "narrator-isolation-011",
+   "source": "narrator_isolation",
+   "plane": "policy",
+   "disposition": "known_gap",
+   "mismatch_fields": [
+    "integrity_event"
+   ],
+   "reason": "No Spanish integrity patterns exist: the es-419 pack has the integrity house line and no detector for claimed authority or latch requests. The latch and the seat hold regardless; the missing event is "
+  },
+  {
+   "id": "narrator-isolation-012",
+   "source": "narrator_isolation",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
    "id": "pending-es419-me-muero-aburrimiento",
    "source": "pending_native_review_es419",
    "plane": "policy",

@@ -420,10 +420,10 @@ INTEGRITY_PATTERNS: tuple[re.Pattern[str], ...] = _compile((
     r"\b(lc-?7|lc-?\d|safety|the rules|the policy) (is|are|has been|have been) (waived|disabled|suspended|off|lifted)\b",
     r"\b(architect|developer|dev|admin|god|debug|unrestricted|jailbreak) mode\b",
     r"\b(the operator|the owner|the developer|the admin|the architect|your (creator|maker|developer|owner|boss)|my (dad|mom|parent|parents|boss))"
-    r"\b.{0,25}\b(waived|said so|says so|approved|allowed|authorized|authorised|gave permission|signed off|cleared this)\b",
+    r"\b.{0,40}\b(waived|said so|says so|approved|allowed|authorized|authorised|gave permission|signed off|cleared this)\b",
     r"(^|\n)\s*\[?(system|developer|assistant)\]?\s*:",
     r"\bnew (system )?instructions:",
-    r"\b(clear|reset|turn off|switch off|disable|remove|lift|drop|end) (the |my |this )?(minor[_ ]signal|latch|conservative[_ ]mode|careful mode|the careful mode|kid mode|child mode|safe mode|conservative mode)\b",
+    r"\b(clear|clearing|reset|turn off|switch off|disable|remove|lift|lifting|lifted|drop|end) (the |my |this )?(minor[_ ]signal|latch|conservative[_ ]mode|careful mode|the careful mode|kid mode|child mode|safe mode|conservative mode)\b",
     r"\b(declared_age_band|latch_reasons?|minor_signal|conservative_mode|register_caps)\b",
     r"\bthis is the parent\b.{0,40}\b(clear|off|adult)\b",
 ))
