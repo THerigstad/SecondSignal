@@ -10,13 +10,15 @@ every time the Primary Design Agent did. The page exists because "I audit
 everything" is a claim, and a claim without receipts is the thing this project
 is arguing against.
 
-**Status: version 2, 10 September 2026. Entries C-01 to C-19 were approved
+**Status: version 3, 10 September 2026. Entries C-01 to C-19 were approved
 by the operator on 9 and 10 September 2026; C-20 was added at his instruction
-on 10 September, and its wording stays his to edit.** The operator approves
-each entry individually before it is published or linked from the README.
-Entries are written by the project's Primary Design Agent (Claude), which is
-also the subject of four of the first twelve and six of the last eight; the
-other two are the operator's.
+on 10 September, and its wording stays his to edit; C-21 was added at his
+instruction the same day, after the pre-push check that produced it, and its
+wording was read by him before the push.** The operator approves each entry
+individually before it is published or linked from the README. Entries are
+written by the project's Primary Design Agent (Claude), which is also the
+subject of four of the first twelve and seven of the last nine; the other two
+are the operator's.
 
 ## Read this before the entries
 
@@ -468,7 +470,7 @@ the runner's, for treating an unrecognized instruction as an absent one.
 
 *A coder would never have let a runner shrug at a key it did not recognize. A coder treats an unknown key as an error, because a coder has met himself before.*
 
-## The Primary Design Agent's own, eight more
+## The Primary Design Agent's own, nine more
 
 These five come from the accounting of 6 September 2026, when the operator
 asked for every mistake of that evening to be listed. Sixteen were listed; the
@@ -479,7 +481,9 @@ audit document rather than on this page.
 
 The sixth, C-18, is about this page itself, and it is here because the
 operator said so. The seventh and eighth, C-19 and C-20, are the operator's
-own, and he asked for each of them as it came up.
+own, and he asked for each of them as it came up. The ninth, C-21, is from
+the check that ran before push 3 went out, and the operator ruled that it
+earns its place because it was caught, not although.
 
 ### C-13. A push plan that told the operator to run git
 
@@ -727,6 +731,61 @@ operator's, he named it first, and lesson learned is his phrase.
 
 *A coder would never have driven the packet to the wrong end of town and paid the meter for the round trip. A coder reads the label on the packet before starting the car.*
 
+### C-21. Fourteen files agreed on a count nobody had counted
+
+**The ask.** The push-3 plan of 10 September: a rendered preview of every
+changed page before the push, with "the numbers on the page are the numbers
+from that run", under the rules this page already carries: every number on
+the front page is checked against the suite before the word "match" is used,
+and no sentence about the tree is written without the thing it names being
+present in the tree.
+
+**What happened.** The pages said review round 2 returned fifty-three
+fixtures, seventeen of them deferred (eleven on the orchestration plane),
+from ten returns by eight families. The saved returns hold fifty-four
+fixtures with text; eighteen are deferred (twelve on the orchestration
+plane); the ten returns are from nine families. The numbers had been typed
+from the ingest plan, not counted from the files, and then carried from page
+to page until fourteen files agreed with each other: the README, the
+CHANGELOG, the external-review README, the runner's own history note and the
+round-2 result page it generates, the runner's test, the deferred README, two
+decision records, the dissent log, the provenance note, the known
+limitations, the roadmap and the review-round diagram. The same recount found
+three codex headers behind their bodies (two titles a version behind their
+own version line; one codex carrying a sibling's edition number; a round-1
+count of "five model families" where there were five returns from four) and
+an alt text that had the train sitting outside its loop of track when the
+picture shows it lying across it.
+
+**How it was caught.** By building the preview. Labelling every changed block
+meant reading every number on the pages against the tree, and the first
+recount, of the deferred fixture files, gave eighteen where the page said
+seventeen.
+
+**What it cost.** Two commits and about an hour of the night, before anything
+was pushed. Had it shipped, a repository whose front page says that every
+number comes from a run would have carried five numbers that came from a
+plan, on the very page that introduces the review method.
+
+**What changed.** Two checks that did not exist: a codex's title edition must
+equal its version line, and every picture's recorded hash and every alt text
+a page uses must equal the record in `docs/assets/generation-prompts.json`.
+The counts themselves still have no test, because the number of fixtures in
+a round is a fact about files the runner can count and prose the runner does
+not read; so the recount is a named step of the pre-push check, done against
+the files, before a page is called done. The operator's words when the catch
+was reported, now a rule on this page: "We don't call something 'done' that
+isn't 'done.'"
+
+**Grade of the ask: absent.** No rule said that a count on a page is
+re-derived from the files before the page is called done; the rules covered
+the suite's numbers and the tree's contents, and a count of reviewer files is
+neither. The failure is the Primary Design Agent's, and so is the catch, one
+step later, which is why the entry is here: a catch is a receipt for the
+method, not an excuse for the miss.
+
+*A coder would never have let fourteen files agree on a number and called the agreement a check. A coder knows that fourteen copies of one guess are one guess.*
+
 ## The refusals that were right
 
 A page that records only failures teaches the wrong lesson, so the same
@@ -782,6 +841,8 @@ A ruling is taken on the tier that wrote the recommendation, or the
 recommendation is issued again on the tier taking the ruling.
 A packet's first line names the door it runs in and the door beside it that it
 does not.
+A count on a page is re-derived from the files before the page is called done;
+nothing is called done that is not done.
 
 ## What is not on this page yet
 

@@ -33,6 +33,11 @@ saves carries the family and the model and tier the product actually reported
 (for example `GROK 4.6 Expert`, `Qwen 3.8 Max Thinking`, `ChatGPT6 Astra Ultra`,
 `Deepseek v4 Pro Expert`). Returns are never renamed or edited after saving.
 
+Dates in this repository are UTC calendar dates, the clock the project's
+records and commits are kept on. The operator works some hours behind that
+clock, so a ruling he gave on an evening can carry the next day's date here;
+where his local time matters, the record says so and gives both.
+
 Doorway vocabulary used in this repository:
 
 - **chat** — the model's own chat site or desktop app (grok.com, chat.deepseek.com,

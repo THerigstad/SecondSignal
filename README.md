@@ -750,7 +750,7 @@ page.
 Every time a model working on this project wiped something out, gamed a test,
 invented a fact, or claimed work it had not done, it has a line, and so does
 every time the project's own assistant or its operator did:
-[`docs/confessions.md`](docs/confessions.md), twenty entries, each with the
+[`docs/confessions.md`](docs/confessions.md), twenty-one entries, each with the
 ask that produced it and a grade of that ask.
 
 ## Provenance
