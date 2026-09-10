@@ -35,10 +35,10 @@ add a record field, a fixture family and a review target for no visible
 change. D3 was therefore decided on the seat question alone: the bare
 report seats the recovery persona; an ask seats the ask, with the recovery
 hold carried and the recovery persona offered as a companion. That second
-half is a change to ADR-0016's third-person claim (today's tree seats the
-recovery persona on every relative sentence, measured 2026-09-08) and is
-built, with ADR-0016's amendment and its fixtures, in the block after push
-2. The assist intent was filed here so it keeps a name and a test instead
+half is a change to ADR-0016's third-person claim (the tree seated the
+recovery persona on every relative sentence until 2026-09-10, measured
+2026-09-08) and was built on 2026-09-10 as ADR-0027, with ADR-0016's
+amendment and its fixtures. The assist intent was filed here so it keeps a name and a test instead
 of living in a chat.
 
 ## Proposal

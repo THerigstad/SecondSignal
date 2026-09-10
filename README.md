@@ -423,6 +423,10 @@ implemented. The records the tree does not yet honor, and the reasons, are:
   [ADR-0026](docs/adr/0026-twins-two-presentations-one-routing-contract.md)
   (twins: every persona has two presentations and one routing contract),
   Proposed, not built, which meets the same case without moving the seat.
+- [ADR-0027](docs/adr/0027-a-relatives-return-to-use-is-a-hold.md) (a
+  relative's return to use is a hold, not a seat-claim) is built and
+  Proposed: the operator's ruling of 8 September, in the tree since
+  10 September, awaiting a second family's read of the record.
 - Four Accepted records have no code behind them by design and are
   design contracts for layers this repository does not contain:
   [ADR-0001](docs/adr/0001-impact-events.md) (impact events),

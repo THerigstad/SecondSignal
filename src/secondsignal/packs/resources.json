@@ -1,6 +1,6 @@
 {
-  "version": 1,
-  "note": "Crisis resource rows keyed by DECLARED locale, never by network location or guessed country. Every row names its official source and the date a human opened that page. Digits are rendered by this layer only; a persona never paraphrases or shortens a number (800-911-2000 is printed in full, never as 911). Hours are a claim: a row that cannot honestly say 24/7 does not. The unknown row carries no short code.",
+  "version": 2,
+  "note": "Crisis resource rows keyed by DECLARED locale, never by network location or guessed country. Every row names its official source and the date a human opened that page. Digits are rendered by this layer only; a persona never paraphrases or shortens a number (800-911-2000 is printed in full, never as 911). Hours are a claim: a row that cannot honestly say 24/7 does not. The unknown row carries no short code. Version 2 (2026-09-10) adds a dv block to every row: the domestic-violence line for the danger card and the post-separation line, verified by the operator on 2026-09-08 from the official pages (screenshots retained), with hours copied as the page stated them; the default row points to the directory and names no number.",
   "rows": {
     "US": {
       "voice": "988",
@@ -12,6 +12,20 @@
       "lines": {
         "en": "If you are in the United States, you can call or text 988 to reach the Suicide & Crisis Lifeline. If you are in immediate danger, call 911 or your local emergency number.",
         "es": "Si estás en Estados Unidos, puedes llamar al 988 y presionar 2 para atención en español, o enviar la palabra AYUDA por mensaje de texto al 988. Si estás en peligro inmediato, llama al 911."
+      },
+      "dv": {
+        "voice": "1-800-799-7233",
+        "text": "START to 88788",
+        "chat": "https://www.thehotline.org/",
+        "hours": "24/7",
+        "source": "https://www.thehotline.org/",
+        "last_verified": "2026-09-08",
+        "verified_by": "the operator, from the official page, screenshots retained; record: the project's DV verification results of 2026-09-08",
+        "emergency": "911",
+        "lines": {
+          "en": "If you are in the United States, you can call the National Domestic Violence Hotline at 1-800-799-7233, text START to 88788, or chat at thehotline.org, any time, day or night. If you are in immediate danger, call 911.",
+          "es": "Si estás en Estados Unidos, puedes llamar a la Línea Nacional contra la Violencia Doméstica al 1-800-799-7233, enviar la palabra START por mensaje de texto al 88788, o chatear en thehotline.org, a cualquier hora. Si estás en peligro inmediato, llama al 911."
+        }
       }
     },
     "ES": {
@@ -23,6 +37,21 @@
       "lines": {
         "en": "If you are in Spain, you can call 024, the Ministry of Health's free, confidential line for people with suicidal thoughts and for those close to them, 24 hours a day. If you are in immediate danger, call 112.",
         "es": "Si estás en España, puedes llamar al 024, la línea gratuita y confidencial del Ministerio de Sanidad para personas con pensamientos suicidas y para sus allegados, las 24 horas. Si estás en peligro inmediato, llama al 112."
+      },
+      "dv": {
+        "voice": "016",
+        "whatsapp": "600 000 016",
+        "email": "016-online@igualdad.gob.es",
+        "text_phone": "900 116 016",
+        "hours": "24/7 (information and immediate psychosocial care); legal advice 08:00-22:00",
+        "source": "https://violenciagenero.igualdad.gob.es/informacion-3/recursos/telefono016/",
+        "last_verified": "2026-09-08",
+        "verified_by": "the operator, from the official page, screenshots retained; record: the project's DV verification results of 2026-09-08",
+        "emergency": "112",
+        "lines": {
+          "en": "If you are in Spain, you can call 016 at any hour, write to 600 000 016 on WhatsApp, or use the chat at violenciagenero.igualdad.gob.es; the line is free and answers in many languages. If you are in immediate danger, call 112.",
+          "es": "Si estás en España, puedes llamar al 016 a cualquier hora, escribir por WhatsApp al 600 000 016, o usar el chat en violenciagenero.igualdad.gob.es; es gratuito y atiende en muchos idiomas. Si estás en peligro inmediato, llama al 112."
+        }
       }
     },
     "MX": {
@@ -35,6 +64,18 @@
       "lines": {
         "en": "If you are in Mexico, you can call the Línea de la Vida at 800-911-2000, free, 24 hours a day, for mental health, substance use and suicidal thoughts. If you are in immediate danger, call 911.",
         "es": "Si estás en México, puedes llamar a la Línea de la Vida al 800-911-2000, gratuita, las 24 horas, para salud mental, consumo de sustancias y pensamientos suicidas. Si estás en peligro inmediato, llama al 911."
+      },
+      "dv": {
+        "voice": "079 opción 1",
+        "hours": "24/7, 365 days",
+        "source": "https://www.gob.mx/mujeres/prensa/linea-de-las-mujeres-079-opcion-1-ofrece-atencion-integral-para-las-mujeres-citlalli-hernandez?idiom=es",
+        "last_verified": "2026-09-08",
+        "verified_by": "the operator, from the official page, screenshots retained; record: the project's DV verification results of 2026-09-08",
+        "emergency": "911",
+        "lines": {
+          "en": "If you are in Mexico, you can call the Línea de las Mujeres at 079 and choose option 1, free, any hour of any day. If you are in immediate danger, call 911.",
+          "es": "Si estás en México, puedes llamar a la Línea de las Mujeres al 079, opción 1, gratis, a cualquier hora, todos los días. Si estás en peligro inmediato, llama al 911."
+        }
       }
     },
     "CL": {
@@ -48,6 +89,19 @@
       "lines": {
         "en": "If you are in Chile, you can call *4141 from any mobile phone, free, 24 hours a day, to reach a psychologist through the Ministry of Health's line. If you are in immediate danger, call 131 for an ambulance or 133 for the police.",
         "es": "Si estás en Chile, puedes llamar al *4141 desde cualquier celular, gratis, las 24 horas, para hablar con un psicólogo de la línea del Ministerio de Salud. Si estás en peligro inmediato, llama al 131 (ambulancia) o al 133 (Carabineros)."
+      },
+      "dv": {
+        "voice": "1455",
+        "hours": "08:00-24:00, every day including holidays; not a 24-hour line",
+        "source": "https://www.chileatiende.gob.cl/fichas/11937-fono-de-orientacion-en-violencia-contra-las-mujeres-1455",
+        "last_verified": "2026-09-08",
+        "verified_by": "the operator, from the official page, screenshots retained; record: the project's DV verification results of 2026-09-08",
+        "emergency": "131 (ambulance) / 133 (police)",
+        "emergency_note": "national numbers; not stated on the 1455 page",
+        "lines": {
+          "en": "If you are in Chile, you can call 1455, free, between 8:00 and midnight any day; it is not a 24-hour line. If you are in immediate danger, call 133 for the police or 131 for an ambulance.",
+          "es": "Si estás en Chile, puedes llamar al 1455, gratis, entre las 8:00 y las 00:00 horas cualquier día; no es una línea de 24 horas. Si estás en peligro inmediato, llama al 133 (Carabineros) o al 131 (ambulancia)."
+        }
       }
     },
     "AR": {
@@ -60,6 +114,21 @@
       "lines": {
         "en": "If you are in Argentina, the Centro de Asistencia al Suicida answers on 135 (Buenos Aires city and greater Buenos Aires) or 0800 345 1435 from anywhere in the country, from 8:00 to midnight; it is not a 24-hour line. If you are in immediate danger, call 911.",
         "es": "Si estás en Argentina, el Centro de Asistencia al Suicida atiende en el 135 (Ciudad y Gran Buenos Aires) o en el 0800 345 1435 desde todo el país, de 8:00 a 24:00; no es una línea de 24 horas. Si estás en peligro inmediato, llama al 911."
+      },
+      "dv": {
+        "voice": "144",
+        "app": "the Línea 144 app",
+        "whatsapp": "available; number not recorded on the page opened",
+        "hours": "24/7, 365 days",
+        "source": "https://www.argentina.gob.ar/linea-144",
+        "last_verified": "2026-09-08",
+        "verified_by": "the operator, from the official page, screenshots retained; record: the project's DV verification results of 2026-09-08",
+        "emergency": "911",
+        "emergency_note": "from the crisis row; not re-verified by the 2026-09-08 pass",
+        "lines": {
+          "en": "If you are in Argentina, you can call 144, free, any hour of any day, or use the Línea 144 app. If you are in immediate danger, call 911.",
+          "es": "Si estás en Argentina, podés llamar al 144, gratis, a cualquier hora, todos los días, o usar la app de la Línea 144. Si estás en peligro inmediato, llamá al 911."
+        }
       }
     },
     "default": {
@@ -71,6 +140,17 @@
       "lines": {
         "en": "If you are in immediate danger, contact your local emergency services. To find a crisis line in your country: https://findahelpline.com",
         "es": "Si estás en peligro inmediato, contacta a los servicios de emergencia de tu zona. Para encontrar una línea de crisis en tu país: https://findahelpline.com"
+      },
+      "dv": {
+        "directory": "https://findahelpline.com",
+        "hours": null,
+        "source": "https://findahelpline.com",
+        "last_verified": "2026-09-08",
+        "emergency": "local emergency services",
+        "lines": {
+          "en": "If you are in immediate danger, contact your local emergency services. To find a domestic violence or abuse line in your country: https://findahelpline.com",
+          "es": "Si estás en peligro inmediato, contacta a los servicios de emergencia de tu zona. Para encontrar una línea de violencia doméstica o abuso en tu país: https://findahelpline.com"
+        }
       }
     }
   }

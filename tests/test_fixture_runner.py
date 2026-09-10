@@ -21,9 +21,9 @@ def test_round1_fixture_report_is_reproducible(tmp_path: Path) -> None:
     } == {
         "chatgpt": {
             "total": 15,
-            "pass_as_written": 13,
+            "pass_as_written": 12,
             "contract_adjusted": 1,
-            "disputed": 1,
+            "disputed": 2,
             "known_gap": 0,
         },
         "deepseek": {
@@ -35,9 +35,9 @@ def test_round1_fixture_report_is_reproducible(tmp_path: Path) -> None:
         },
         "grok": {
             "total": 45,
-            "pass_as_written": 39,
+            "pass_as_written": 40,
             "contract_adjusted": 2,
-            "disputed": 3,
+            "disputed": 2,
             "known_gap": 1,
         },
         "qwen": {

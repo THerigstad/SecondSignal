@@ -46,23 +46,43 @@ def test_first_person_return_to_use_claims_the_seat_for_the_recovery_persona(tex
 
 
 @pytest.mark.parametrize("text", [
-    "my sibling relapsed yesterday, help me plan a calm conversation that does not shame them",
     "a parent relapsed last month and nobody at home will talk about it",
     "my dad relapsed last night and I don't know what to do",
 ])
-def test_a_relatives_relapse_claims_the_seat_and_records_whose_it_is(text, roster) -> None:
-    """The operator's standing rule: anything recovery-related leans to the
-    recovery persona, a relative's relapse included. The record says whose
-    it is, and the family-impact obligations ride along. Three reviewers
-    wanted a hold instead; their fixtures stay as dissent."""
+def test_a_relatives_bare_report_seats_the_recovery_persona_as_the_holds_specialist(text, roster) -> None:
+    """D3, decided with dissent 8 September 2026, built 10 September (ADR-0027 (Proposed)):
+    a relative's return to use is a hold, not a seat-claim. With no
+    other ask in the message the hold's specialist still wins the seat, the
+    record says whose relapse it is, and the family-impact obligations ride."""
     signals = extract(text)
-    assert seat_claims(signals) == ("addiction_recovery",)
+    assert seat_claims(signals) == ()
     assert signals.evidence["domain:addiction_recovery:person"] == ("third",)
     decision = route(text, roster, session=SessionState())
-    assert decision.seat_claim == "addiction_recovery" and decision.claim_subject == "other"
+    assert decision.seat_claim is None and decision.claim_subject == "other"
     assert decision.agent_id == "cody"
+    assert "addiction_recovery" in decision.held
     assert "affected_person:other" in decision.obligations
     assert "acknowledge:addiction_recovery" in decision.obligations and "no_joke" in decision.obligations
+
+
+@pytest.mark.parametrize("text,seat", [
+    ("my sibling relapsed yesterday, help me plan a calm conversation that does not shame them", "rowan"),
+    ("my sister relapsed and I cannot start the mural", "ellis"),
+])
+def test_a_relatives_relapse_with_an_ask_seats_the_ask_and_offers_the_recovery_persona(text, seat, roster) -> None:
+    """The other half of D3: an ask seats the ask, the recovery hold is
+    carried, and the recovery persona is offered as a companion in every such
+    reply (the visible door to that voice). The lexicon reads "plan a calm
+    conversation" as conflict work, which is the fix the both-ways measurement
+    of 3 September asked for."""
+    decision = route(text, roster, session=SessionState())
+    assert decision.agent_id == seat
+    assert decision.seat_claim is None and decision.claim_subject == "other"
+    assert "addiction_recovery" in decision.held
+    assert "offer_companion:cody" in decision.obligations
+    assert "affected_person:other" in decision.obligations
+    st = statuses(decision)
+    assert st["nikki"] == "vetoed" and st["vandal"] == "vetoed"        # contraindicated on the hold
 
 
 def test_a_first_person_claim_records_self(roster) -> None:

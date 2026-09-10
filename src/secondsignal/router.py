@@ -381,20 +381,26 @@ def seat_claims(signals: RequestSignals) -> tuple[str, ...]:
         claims.append("somatic_distress")
     if "addiction_recovery" in signals.domains:
         terms = set(signals.evidence.get("domain:addiction_recovery", ()))
-        # A return to use claims the seat whether it is the caller's or a
-        # relative's: the operator's standing rule is that anything
-        # recovery-related leans to the recovery persona, and a mediator who
-        # ignores recovery dynamics is the worse failure. Whose it is travels
-        # on the decision as ``claim_subject`` (ADR-0016; three reviewers
-        # dissented, see docs/notes/dissent-log.md).
-        if terms & SEAT_CLAIM_TERMS:
+        # A first-person return to use claims the seat. A relative's return to
+        # use is a hold, not a seat-claim (D3, decided with dissent on
+        # 8 September 2026; built 10 September; ADR-0027 (Proposed) amends
+        # ADR-0016): the bare report still seats the recovery persona as the
+        # hold's specialist, and an ask seats the ask with the recovery hold
+        # carried and the recovery persona offered as a companion. Whose it
+        # is travels on the decision as ``claim_subject`` either way.
+        person = signals.evidence.get("domain:addiction_recovery:person", ("first",))
+        if terms & SEAT_CLAIM_TERMS and person != ("third",):
             claims.append("addiction_recovery")
     return tuple(claims)
 
 
 def claim_subject(signals: RequestSignals, claims: tuple[str, ...]) -> str | None:
-    """``self`` or ``other`` for a recovery claim; None without one."""
-    if "addiction_recovery" not in claims:
+    """``self`` or ``other`` for a return to use, whether it claimed the seat
+    (first person) or is carried as a hold (a relative's); None otherwise."""
+    if "addiction_recovery" not in signals.domains:
+        return None
+    terms = set(signals.evidence.get("domain:addiction_recovery", ()))
+    if not terms & SEAT_CLAIM_TERMS:
         return None
     person = signals.evidence.get("domain:addiction_recovery:person", ("first",))
     return "other" if person == ("third",) else "self"
@@ -647,8 +653,11 @@ def _obligations(
     roster: dict[str, AgentProfile],
     seated: str | None,
     subject: str | None = None,
+    aftermath: bool = False,
 ) -> tuple[str, ...]:
     out: list[str] = []
+    if aftermath:
+        out.append("no_joke")
     if subject == "other":
         # A relative's relapse claims the recovery seat and still owes the
         # family-impact acknowledgement a hold would have carried.
@@ -782,6 +791,11 @@ def route(
         mode_vetoes |= set(CAPPED_MODES)
     if holds:
         mode_vetoes |= {"challenge", "humor"}
+    # Bounded aftermath (C3): humour is off for a fixed count of substantive
+    # turns after any card; the verdict's reasons say how many remain.
+    aftermath = bool(session is not None and session.aftermath_turns > 0 and not session.escalated_last_turn)
+    if aftermath:
+        mode_vetoes.add("humor")
     vetoes = frozenset(mode_vetoes)
 
     scored = sorted(
@@ -806,7 +820,7 @@ def route(
             seat_claim=claims[0] if claims else None,
             claim_subject=subject,
             held=holds,
-            obligations=_obligations(holds, roster, None, subject),
+            obligations=_obligations(holds, roster, None, subject, aftermath),
             mode_vetoes=tuple(sorted(vetoes)),
         )
 
@@ -880,7 +894,7 @@ def route(
             seat_claim=claims[0] if claims else None,
             claim_subject=subject,
             held=holds,
-            obligations=_obligations(holds, roster, fallback, subject),
+            obligations=_obligations(holds, roster, fallback, subject, aftermath),
             mode_vetoes=tuple(sorted(vetoes)),
         )
 
@@ -909,7 +923,7 @@ def route(
         seat_claim=claims[0] if claims else None,
         claim_subject=subject,
         held=holds,
-        obligations=_obligations(holds, roster, selected.agent_id, subject),
+        obligations=_obligations(holds, roster, selected.agent_id, subject, aftermath),
         assist_agent_id=assist_id,
         assist_reason=assist_reason,
         mode_vetoes=tuple(sorted(vetoes)),

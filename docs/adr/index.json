@@ -236,7 +236,10 @@
         "src/secondsignal/router.py",
         "src/secondsignal/signals.py"
       ],
-      "notes": ""
+      "notes": "Amended 2026-09-10 by ADR-0027: a relative's return to use is a hold, not a seat-claim (D3).",
+      "amended_by": [
+        "0027"
+      ]
     },
     {
       "number": "0017",
@@ -351,6 +354,25 @@
         "0025"
       ],
       "notes": "The operator's ruling of 2026-09-10. Not built. Replaces ADR-0025's seat trade by construction (the specialist keeps the seat; only the presentation changes); the rename to twin-neutral names (Cody, Vandal, Nikki, Willow, Ellis, Seren, Rowan) is built as an alias layer in the same push. Flips to Accepted after review round 3 reads it beside the amended ADR-0025."
+    },
+    {
+      "number": "0027",
+      "file": "0027-a-relatives-return-to-use-is-a-hold.md",
+      "title": "A relative's return to use is a hold, not a seat-claim",
+      "decision": "Proposed",
+      "implementation": "built",
+      "evidence": [
+        "tests/test_holds.py::test_a_relatives_bare_report_seats_the_recovery_persona_as_the_holds_specialist",
+        "tests/test_holds.py::test_a_relatives_relapse_with_an_ask_seats_the_ask_and_offers_the_recovery_persona"
+      ],
+      "modules": [
+        "src/secondsignal/router.py",
+        "src/secondsignal/signals.py"
+      ],
+      "amends": [
+        "0016"
+      ],
+      "notes": "The operator's ruling of 2026-09-08 (D3, decided with dissent), built 2026-09-10. Proposed because the record's text is the assistant's; flips to Accepted after review round 3 reads it."
     }
   ],
   "reserved": [

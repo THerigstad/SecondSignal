@@ -66,12 +66,14 @@ from .lexicon import (
     screen_packs,
     tokenize,
 )
+from .lexicon import dv_line as _dv_line_for
 from .lexicon import patterns_hash as _patterns_hash
 from .lexicon import resource_line as _resource_line_for
 from .normalize import analyze
 from .preferences import STYLE_ASK_COOLDOWN_TURNS, STYLE_ASK_THRESHOLD, PreferenceEvent
 from .preferences import assess as assess_preference
-from .signals import RequestSignals
+from .signals import DANGER_FRAME_EXCLUSION_RE as _DANGER_FRAME_EXCLUSION_RE
+from .signals import RequestSignals, post_separation_context
 
 __all__ = [
     "Action",
@@ -370,6 +372,83 @@ _OTHER_PERSON_WEAPON_EXCLUSION_RE = re.compile(
 _WEAPON_CLAUSE_RE = re.compile(r"[^.!?,:;\n\u2013\u2014]+")
 
 
+# --------------------------------------------------------------------------
+# Danger from another person without a weapon (the P0 lane, C2, ruled
+# 8 September 2026, built 10 September). Four signal groups; any two distinct
+# groups in one message fail closed to the danger card. The class carries no
+# invented number: line three of its card is the verified domestic-violence
+# line for the declared locale, or the plain directory line. Fiction, news
+# and game frames are excluded; past tense is not, because prior violence is
+# one of the four signals and is past by nature.
+# --------------------------------------------------------------------------
+DANGER_SIGNALS: dict[str, tuple[re.Pattern[str], ...]] = {
+    "confinement": _compile((
+        r"\b(locked|locks|locking|lock) me (in|inside|up|in here|in the)\b",
+        r"\b(won'?t|will not|wont|doesn'?t|does not|isn'?t going to|is not going to|refuses to) let me (leave|go|out|leave the house|go anywhere)\b",
+        r"\b(took|has|took away|hid|hides|has got|keeps) (my|the) (keys|car keys|phone|wallet|passport|money|id|cards?)\b",
+        r"\bblock(ed|ing|s)? the (door|exit|way out)\b",
+        r"\b(can'?t|cannot|not able to|not allowed to) (leave|get out|get away|get out of the house|go outside)\b",
+        r"\bkeeps me (in|inside|locked|at home|from leaving)\b",
+        r"\b(trapped|stuck|kept|holding me) (in|inside|at) (the|this|our|my|his|her) (house|apartment|flat|room|car|home|basement)\b",
+        r"\bnobody leaves\b",
+        r"\bnot allowed (out|to leave|to go)\b",
+    )),
+    "prior_violence": _compile((
+        r"\b(hit|hits|punched|punches|choked|chokes|strangled|strangles|kicked|kicks|slapped|slaps|beat|beats|shoved|shoves|threw|throws|dragged|drags|grabbed|pinned|pins) me\b",
+        r"\bput (his|her|their) hands on me\b",
+        r"\bhands (around|on) my (throat|neck)\b",
+        r"\b(last time|the last time|the time before|before,?) (he|she|they) (hit|hurt|choked|beat|attacked|went off|lost it|put)\b",
+        r"\b(ended up|put me|landed me|landed) in the (hospital|er|emergency room|a&e)\b",
+        r"\b(bruises|a black eye|broke my (arm|nose|rib|ribs|wrist|jaw)|split my lip|busted my lip)\b",
+        r"\b(got|gets|been|was|were) violent\b",
+        r"\bhurt me (again|before|last (time|night|week)|when)\b",
+        r"\bhe (hurt|hurts) me\b|\bshe (hurt|hurts) me\b|\bthey (hurt|hurts) me\b",
+    )),
+    "dependents": _compile((
+        r"\b(scared|afraid|worried|terrified|frightened|fear|fearing) for (the|my|our) (kids|children|kid|child|baby|daughter|son|girls|boys|little ones|babies)\b",
+        r"\b(hurt|take|touch|harm|go after|get to) (the|my|our) (kids|children|kid|child|baby|daughter|son|girls|boys|little ones)\b",
+        r"\b(the|my|our) (kids|children|baby|daughter|son) (are|is) (scared|terrified|hiding|crying|not safe|in danger)\b",
+        r"\bwhat (he|she|they)('?ll| will| would|'?d) do to (the|my|our) (kids|children|baby|daughter|son)\b",
+    )),
+    "threat": _compile((
+        r"\bthreaten(ed|ing|s)? (me|us|to (kill|hurt|shoot|stab|burn|find|take|end)|me with|us with)\b",
+        r"\bthreatening me with\b",
+        r"\b(says?|said|swears?|swore|promised|told me) (he|she|they)('?ll| will| would|'?d| is going to| was going to| are going to) (kill|hurt|shoot|stab|find|bury|end|destroy|ruin) (me|us|the kids|my kids|our kids|my family|the baby)\b",
+        r"\bnobody leaves (this house|here|this place|this apartment|this home) alive\b",
+        r"\bif (i|you|we) (leave|go|tell|call|walk out|try to leave|ever leave)[^.!?]{0,30}(he|she|they)('?ll| will|'?d| would| is going to)\b",
+        r"\b(kill|hurt|find|shoot|stab) (me|us) if\b",
+        r"\b(going to|gonna|about to) kill (me|us)\b",
+        r"\b(he|she|they) (will|would|'ll|'d|is going to|are going to|might) kill (me|us)\b",
+        r"\bwants? (me|us) dead\b",
+    )),
+}
+
+
+def _other_person_danger(text: str) -> tuple[tuple[str, str], ...]:
+    """The distinct danger signals present in one message, as (group, matched).
+
+    Two distinct groups make the class fire. One alone is a message the seat
+    can carry with a hold; two together is a person who may not be able to
+    leave, and the house speaks first.
+    """
+    if _DANGER_FRAME_EXCLUSION_RE.search(text):
+        return ()
+    found: list[tuple[str, str]] = []
+    for group, patterns in DANGER_SIGNALS.items():
+        for pattern in patterns:
+            m = pattern.search(text)
+            if m:
+                found.append((group, m.group(0).strip()))
+                break
+    return tuple(found)
+
+
+def _post_separation(text: str) -> tuple[str, str] | None:
+    """The separation-plus-abuser-context pair, shared with the extractor so
+    the abuse hold and the disclosure come from one reading."""
+    return post_separation_context(text)
+
+
 def _other_person_weapon_span(text: str) -> tuple[str, int, int] | None:
     """Find present other-person possession/use of a weapon in one clause.
 
@@ -540,6 +619,26 @@ MINOR_WEAK_TERMS: tuple[str, ...] = (
 )
 SOFT_LATCH_WINDOW_TURNS = 5      # substantive turns the disclosure stays visible
 SUBSTANTIVE_TURN_MIN_TOKENS = 3  # "ok" does not run the clock
+AFTERMATH_TURNS = 2              # substantive turns after any card with humour off (C3)
+
+# Words that carry no new content. A turn is substantive only when it has
+# SUBSTANTIVE_TURN_MIN_TOKENS tokens beyond these: "ok ok ok" is one
+# acknowledgement three times, not three tokens of substance. Review round 2
+# (GLM, r2-decay-three-token-ack-001) reproduced the clock counting tokens
+# instead of substance and clearing a declared adult's soft latch on five
+# turns of "ok ok ok"; fixed 10 September 2026.
+ACKNOWLEDGEMENT_TOKENS: frozenset[str] = frozenset({
+    "ok", "okay", "k", "kk", "okok", "yes", "yeah", "yep", "yup", "ya", "no", "nope", "sure",
+    "fine", "right", "alright", "cool", "thanks", "thank", "you", "thx", "ty", "got", "it",
+    "mhm", "mm", "hmm", "uh", "huh", "oh", "ah", "yea", "true", "fair", "noted", "cheers",
+    "please", "pls", "lol", "haha", "hehe", "and", "so", "well", "then", "now", "go", "on",
+})
+
+
+def is_substantive(masked: str) -> bool:
+    """A turn with new content beyond an acknowledgement list."""
+    content = [tok for tok, _, _ in tokenize(masked) if tok.lower().strip("'") not in ACKNOWLEDGEMENT_TOKENS]
+    return len(content) >= SUBSTANTIVE_TURN_MIN_TOKENS
 
 REGISTER_CAPS: tuple[str, ...] = ("no_romance", "no_sexual", "no_roast", "no_challenge", "dependency_threshold=1")
 CAPPED_MODES: frozenset[str] = frozenset({"challenge", "humor"})
@@ -607,6 +706,8 @@ class SessionState:
     substantive_turns: int = 0
     escalated_last_turn: bool = False
     hard_line_shown: bool = False
+    aftermath_turns: int = 0
+    post_separation_shown: bool = False
     last_action: str = "PROCEED"
     style_counts: dict = field(default_factory=dict)
     style_asked: list[str] = field(default_factory=list)
@@ -701,9 +802,11 @@ class SessionState:
         masked, _ = apply_masks(norm)
         self.turn_count += 1
         self.history.append(norm)
-        substantive = len(tokenize(masked)) >= SUBSTANTIVE_TURN_MIN_TOKENS
+        substantive = is_substantive(masked)
         if substantive:
             self.substantive_turns += 1
+            if self.aftermath_turns > 0 and not self.escalated_last_turn:
+                self.aftermath_turns -= 1
         self.dependency_hits += sum(1 for t in DEPENDENCY_INDICATORS if t in masked)
         self._observe_minor(masked, substantive)
 
@@ -827,6 +930,14 @@ def crisis_screen(text: str) -> CrisisScreen:
         evidence.append(("other_person_weapon", matched))
         hit_spans.append(Span(matched, "en:other_person_weapon", start, end, "hit", "en", "other_person_weapon"))
 
+    danger = _other_person_danger(masked)
+    if len({group for group, _ in danger}) >= 2:
+        matched = "; ".join(f"{group}: {text}" for group, text in danger)
+        evidence.append(("other_person_danger", matched))
+        for group, text in danger:
+            start = masked.find(text)
+            hit_spans.append(Span(text, f"en:other_person_danger:{group}", max(start, 0), max(start, 0) + len(text), "hit", "en", "other_person_danger"))
+
     pack_hits, pack_inconclusive = screen_packs(masked)
     for span in pack_hits:
         evidence.append((span.domain, span.text))
@@ -883,10 +994,46 @@ def _resource_line(session: SessionState | None) -> str:
     return _resource_line_for(locale, language)
 
 
-def _card(session: SessionState | None) -> tuple[str, ...]:
-    lines = house_lines(session.declared_language if session else None)["escalation_card"]
+DANGER_CLASSES: frozenset[str] = frozenset({"other_person_weapon", "other_person_danger"})
+
+
+def _dv_line(session: SessionState | None) -> str:
+    locale = session.locale if session else None
+    language = session.declared_language if session else None
+    return _dv_line_for(locale, language)
+
+
+def _card_kind(classes: tuple[str, ...]) -> str:
+    """standard (self-harm), danger (another person, no self-harm class), or
+    compound (both), per the rulings of 8 September 2026 (B5, C2)."""
+    danger = any(c in DANGER_CLASSES for c in classes)
+    self_harm = any(c not in DANGER_CLASSES for c in classes)
+    if danger and self_harm:
+        return "compound"
+    if danger:
+        return "danger"
+    return "standard"
+
+
+def _card(session: SessionState | None, kind: str = "standard") -> tuple[str, ...]:
+    """The crisis card. Line three is the verified resource line for the
+    declared locale; the danger card puts the domestic-violence line there
+    instead; the compound card carries the opener above line one and both
+    resource lines at line three in a fixed order, self-harm first."""
+    lines = house_lines(session.declared_language if session else None)
+    card = list(lines["escalation_card"])
     resource = _resource_line(session)
-    return tuple(line.replace("{resource_line}", resource) for line in lines)
+    dv = _dv_line(session)
+    three = card.index("{resource_line}")
+    if kind == "danger":
+        card[three] = dv
+        card = [lines["compound_opener"]] + card
+    elif kind == "compound":
+        card[three:three + 1] = [resource, dv]
+        card = [lines["compound_opener"]] + card
+    else:
+        card[three] = resource
+    return tuple(card)
 
 
 def _unscreened(norm: str, mixed_script_tokens: int) -> tuple[str, tuple[str, ...]]:
@@ -1018,13 +1165,22 @@ def evaluate(
             reasons.append(f"integrity event noted, does not waive the gate: {integrity[0]!r}")
         if screen.masked_spans:
             reasons.append("masked spans: " + ", ".join(f"{s.pattern_id}:{s.text!r}" for s in screen.masked_spans))
+        classes = tuple(name for name, _ in screen.evidence)
+        kind = _card_kind(classes)
+        if kind != "standard":
+            reasons.append(f"card: {kind} (danger from another person; line three is the verified domestic-violence line for the declared locale, or the directory line)")
+        if session is not None:
+            # Bounded aftermath (C3, 8 September 2026): humour off and the
+            # resources within reach for a fixed count of substantive turns
+            # after any card, renewed by any new card, clearing nothing.
+            session.aftermath_turns = AFTERMATH_TURNS
         return _finish(SafetyVerdict(
             action=Action.HUMAN_ESCALATION,
             reasons=tuple(reasons),
-            disclosures=_card(session),
-            crisis_classes=tuple(name for name, _ in screen.evidence),
+            disclosures=_card(session, kind),
+            crisis_classes=classes,
             integrity_event=bool(integrity),
-            card="standard",
+            card=kind,
             latch_reasons=tuple(latch_reasons),
             **common,
         ))
@@ -1151,6 +1307,29 @@ def evaluate(
             holds.append(domain)
     if "addiction_recovery" in signals.domains:
         holds.append("addiction_recovery")
+
+    # The post-separation window (the P0 lane): leaving, or having left,
+    # someone who hurt them, with no present danger in the message. The abuse
+    # hold is carried and the verified domestic-violence line is shown once a
+    # session, as a disclosure, never as a card.
+    separation = _post_separation(norm)
+    if separation:
+        if "abuse" not in holds:
+            holds.append("abuse")
+        reasons.append(f"post-separation window: {separation[0]!r} with {separation[1]!r}; abuse hold carried")
+        if session is None or not session.post_separation_shown:
+            action = max(action, Action.DISCLOSE)
+            disclosures.append(lines["post_separation"].replace("{dv_line}", _dv_line(session)))
+            if session is not None:
+                session.post_separation_shown = True
+
+    # Aftermath (C3): for a bounded count of substantive turns after a card,
+    # humour is off and the resource line stays within reach.
+    if session is not None and session.aftermath_turns > 0 and not session.escalated_last_turn:
+        reasons.append(f"aftermath: {session.aftermath_turns} substantive turn(s) left with humour off; resources within reach")
+        if not any(_resource_line(session) == d for d in disclosures):
+            disclosures.append(_resource_line(session))
+        action = max(action, Action.DISCLOSE)
 
     # Style monitor: ask once, never during a hold or an escalation aftermath.
     if session is not None:

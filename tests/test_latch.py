@@ -199,3 +199,17 @@ def test_clearing_one_reason_leaves_the_other_in_force(roster) -> None:
     session._set_latch("hard", "operator_declared")
     session.clear_latch("checked", which="minor_signal")
     assert session.latch == "hard" and session.latch_reasons == ["operator_declared"]
+
+
+def test_three_word_acknowledgements_do_not_run_the_clock_for_a_declared_adult(roster) -> None:
+    """Review round 2 (GLM): the clock counted tokens, not substance, so five
+    turns of "ok ok ok" cleared a declared adult's soft latch. Substance is
+    new content beyond an acknowledgement list."""
+    session = SessionState(declared_age_band="adult")
+    route("my homework is due tomorrow and I need help", roster, session=session)
+    assert session.latch == "soft"
+    turns(roster, session, "ok ok ok", "yes yes ok", "okay okay okay", "sure sure sure", "ok ok ok", "fine fine fine")
+    assert session.latch == "soft", "acknowledgements are not substantive turns"
+    assert not any(kind == "decay" for kind, *_ in session.latch_history)
+    turns(roster, session, *CLEAN[:SOFT_LATCH_WINDOW_TURNS])
+    assert session.latch == "none", "real turns still run the published policy"

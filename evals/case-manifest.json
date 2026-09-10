@@ -7,11 +7,7 @@
    "id": "grok-r2-danger-history-001",
    "source": "external_acceptance_grok_2026-09-03",
    "plane": "policy",
-   "disposition": "known_gap",
-   "mismatch_fields": [
-    "held"
-   ],
-   "reason": "No abuse-history hold exists yet: past harm plus an exit ask does not become a hold, and a resource row for danger from another person requires a human-verified line first. Recorded as an open questio"
+   "disposition": "accepted"
   },
   {
    "id": "grok-r2-danger-weapon-001",
@@ -63,12 +59,7 @@
    "id": "grok-r2-hold-relapse-ask-001",
    "source": "external_acceptance_grok_2026-09-03",
    "plane": "policy",
-   "disposition": "disputed",
-   "mismatch_fields": [
-    "agent",
-    "held"
-   ],
-   "reason": "Dissent D3, decided with dissent on 2026-09-08 (docs/notes/dissent-log.md): the operator ruled that an ask seats the ask with the recovery hold carried, which is the outcome this fixture expects; the "
+   "disposition": "accepted"
   },
   {
    "id": "grok-r2-latch-spacing-001",
@@ -363,12 +354,7 @@
    "id": "gap-danger-from-another-person-history",
    "source": "known_gaps",
    "plane": "policy",
-   "disposition": "known_gap",
-   "mismatch_fields": [
-    "held",
-    "obligations_contain"
-   ],
-   "reason": "Same gap as gap-danger-from-another-person-weapon, stated as history rather than a present weapon: 'put me in the hospital', 'almost killed my kid' are not in the abuse lexicon, so nothing is held and"
+   "disposition": "accepted"
   },
   {
    "id": "gap-danger-from-another-person-weapon",
@@ -2396,7 +2382,12 @@
    "id": "gpt-d3-third-person",
    "source": "round1_2026-09-02/chatgpt",
    "plane": "policy",
-   "disposition": "accepted"
+   "disposition": "disputed",
+   "mismatch_fields": [
+    "agent",
+    "reason_contains"
+   ],
+   "reason": "Dissent D3, decided with dissent on 2026-09-08 and built on 2026-09-10 (ADR-0027, Proposed; docs/notes/dissent-log.md): a relative's return to use is a hold, not a seat-claim; an ask seats the ask wit"
   },
   {
    "id": "gpt-d4-assist-veto",
@@ -2799,12 +2790,7 @@
    "id": "grok-seat-004",
    "source": "round1_2026-09-02/grok",
    "plane": "policy",
-   "disposition": "disputed",
-   "mismatch_fields": [
-    "held",
-    "reason_contains"
-   ],
-   "reason": "A relative's relapse claims the recovery seat (the operator's standing rule: anything recovery-related leans to the recovery persona; a mediator who ignores recovery dynamics is the worse failure). Th"
+   "disposition": "accepted"
   },
   {
    "id": "grok-sub-001",

@@ -79,7 +79,8 @@ DOMAIN_LEXICON: dict[str, tuple[str, ...]] = {
     ),
     "creative_block": (
         "blocked", "creative block", "can't write", "cant write", "stuck on",
-        "blank page", "no ideas", "uninspired", "can't start", "cant start",
+        "blank page", "no ideas", "uninspired", "can't start", "cant start", "cannot start",
+        "can't begin", "cannot begin", "can't finish", "cannot finish", "the mural", "the canvas",
         "haven't started", "havent started", "staring at the canvas", "staring at the page",
         "staring at this", "haven't made a mark", "first mark",
     ),
@@ -101,6 +102,12 @@ DOMAIN_LEXICON: dict[str, tuple[str, ...]] = {
         "what she said", "what he said", "what they said", "thing she said", "thing he said",
         "replaying", "keep replaying", "divorce", "breakup", "broke up", "falling out",
         "estranged", "cut me off", "ghosted", "make it right with", "apologize to",
+        # A conversation to be planned with someone is conflict work (D3,
+        # 8 September 2026: the lexicon learns that "plan a calm conversation"
+        # and its kin read as conflict).
+        "calm conversation", "hard conversation", "difficult conversation", "talk to him about",
+        "talk to her about", "talk to them about", "bring it up with", "without shaming",
+        "how to say it to", "what to say to", "confront", "sit down with",
     ),
     "somatic_distress": (
         "panic", "can't breathe", "cant breathe", "chest tight", "chest is tight", "tight chest",
@@ -178,6 +185,83 @@ FIRST_PERSON_SUBJECTS: frozenset[str] = frozenset({"i", "i've", "ive", "i'm", "i
 
 # Domains that must be carried by whoever takes the seat (ADR-0016).
 HOLD_DOMAINS: tuple[str, ...] = ("grief", "abuse", "eating_distress", "addiction_recovery")
+
+
+_ABUSE_HISTORY_RE = re.compile(
+    r"\b(?:(?:he|she|they|my (?:ex|partner|husband|wife|boyfriend|girlfriend|dad|mom|father|mother|stepdad|stepmom|brother|sister|uncle))"
+    r" (?:used to|would|kept|keeps|started to|began to) (?:hit|beat|choke|strangle|hurt|abuse|control|threaten|scare|terrorize|terrorise) (?:me|us)"
+    r"|(?:was|were|been|being) (?:abused|beaten|hit|choked|assaulted|hurt) (?:by|for years|for months|as a)"
+    r"|years of (?:abuse|violence|hitting|control)"
+    r"|(?:abusive|violent) (?:ex|relationship|marriage|partner|husband|wife|boyfriend|girlfriend|home|household|childhood)"
+    r"|my abuser|the abuse|restraining order|protective order|protection order|no[- ]contact order"
+    r"|(?:put|landed|ended up|had me|sent me) (?:me )?in the (?:hospital|er|emergency room|a&e)"
+    r"|(?:bruises|a black eye|broke my (?:arm|nose|rib|ribs|wrist|jaw)))\b",
+    re.IGNORECASE,
+)
+_PARTNER_WORD_RE = re.compile(
+    r"\b(?:partner|husband|wife|boyfriend|girlfriend|ex|my ex|spouse|fianc[eé]e?|the man i live with|the woman i live with)\b",
+    re.IGNORECASE,
+)
+_EXIT_ASK_RE = re.compile(
+    r"\b(?:get out|get away|leave|leaving|escape|somewhere to go|somewhere safe|a way out|pack(?:ing)? (?:a|my) bag|move out|stay with)\b",
+    re.IGNORECASE,
+)
+_INJURY_RE = re.compile(
+    r"\b(?:hospital|emergency room|the er|a&e|bruise|bruises|stitches|black eye|broke my|hurt me|choked me|hit me|beat me)\b",
+    re.IGNORECASE,
+)
+
+
+# Fiction, news and game frames: a danger signal inside one of these is a
+# story, not a person; shared by the gate's danger class and the extractor.
+DANGER_FRAME_EXCLUSION_RE = re.compile(
+    r"\b(?:novel|film|movie|story|book|show|series|episode|news|article|headline|video game|game|character|"
+    r"screenplay|script|scene|plot|fiction|fanfic|roleplay|role-play|rp|dream|dreamt|dreamed|nightmare)\b",
+    re.IGNORECASE,
+)
+
+# The post-separation window (the P0 lane): a message that says the person
+# has left, or is leaving, someone who hurt them, without present danger in
+# the same message. Not a card: a disclosure with the verified domestic-
+# violence line, shown once a session, and the abuse hold carried.
+SEPARATION_RE = re.compile(
+    r"\b(i|we|i'?ve|we'?ve|i finally|we finally|i just|we just|i'?m|i am|we'?re|we are|i'?m going to|i am going to|going to|gonna|planning to|trying to|about to|managed to|had to)"
+    r" (left|leave|leaving|got away from|got out from|escaped|escaping|moved out|moved away from|walked out on|broke up with|broke it off with|"
+    r"filed for divorce from|divorced|separated from|kicked out|ended it with|cut off|pack(ed|ing) up and le(ft|ave))\b",
+    re.IGNORECASE,
+)
+ABUSER_CONTEXT_RE = re.compile(
+    r"\b(abus(e|ed|ive|er)|violent|hit me|hurt me|choked me|beat me|controlling|control(led|s) (me|everything)|"
+    r"restraining order|protective order|protection order|no[- ]contact order|stalk(s|ing|ed)?|keeps showing up|"
+    r"shows up at|won'?t leave me alone|threat(s|en|ened|ening)|scared of (him|her|them)|afraid of (him|her|them)|"
+    r"my abuser|the abuse|domestic violence|dv shelter|shelter)\b",
+    re.IGNORECASE,
+)
+
+
+
+
+def post_separation_context(norm: str) -> tuple[str, str] | None:
+    """(separation phrase, abuser-context phrase) when both are in one message
+    and no fiction frame is; the post-separation window of the P0 lane."""
+    if DANGER_FRAME_EXCLUSION_RE.search(norm):
+        return None
+    sep = SEPARATION_RE.search(norm)
+    ctx = ABUSER_CONTEXT_RE.search(norm)
+    if sep and ctx:
+        return sep.group(0).strip(), ctx.group(0).strip()
+    return None
+
+
+def _abuse_history(norm: str) -> tuple[str, ...]:
+    """Past harm phrases, or the partner-injury-exit triple, in one message."""
+    hits: list[str] = []
+    m = _ABUSE_HISTORY_RE.search(norm)
+    if m:
+        hits.append(m.group(0))
+    if _PARTNER_WORD_RE.search(norm) and _INJURY_RE.search(norm) and _EXIT_ASK_RE.search(norm):
+        hits.append("partner+injury+exit")
+    return tuple(hits)
 
 MODE_LEXICON: dict[str, tuple[str, ...]] = {
     "humor": (
@@ -355,6 +439,19 @@ def extract(text: str, *, turn_index: int = 0) -> RequestSignals:
         person = claim_person(norm, evidence["domain:addiction_recovery"])
         if person:
             evidence["domain:addiction_recovery:person"] = (person,)
+
+    # The abuse-history hold (B10, the P0 lane, 10 September 2026): past harm
+    # by a partner or relative is a hold on whoever sits, whether the message
+    # says "abuse" or not. Two shapes: a history phrase, or a partner word
+    # with an injury and an exit ask in the same message.
+    history = _abuse_history(norm)
+    separation = post_separation_context(norm)
+    if separation:
+        history = history + (f"post-separation: {separation[0]} / {separation[1]}",)
+    if history:
+        domains.add("abuse")
+        evidence["domain:abuse"] = tuple(evidence.get("domain:abuse", ())) + tuple(history)
+        evidence["domain:abuse:history"] = tuple(history)
 
     modes: set[str] = set()
     for mode, terms in MODE_LEXICON.items():

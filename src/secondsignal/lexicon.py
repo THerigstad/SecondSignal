@@ -51,6 +51,7 @@ __all__ = [
     "PACK_DIR",
     "PACKS",
     "RESOURCES",
+    "dv_line",
     "load_pack",
     "load_resources",
     "apply_masks",
@@ -356,5 +357,17 @@ def resource_line(locale: str | None, language: str | None = None) -> str:
     the row carries it, otherwise in English. Never inferred from anything."""
     _, row = resource_row(locale)
     lines = row["lines"]
+    lang = (language or "en").split("-")[0].lower()
+    return lines.get(lang, lines["en"])
+
+
+def dv_line(locale: str | None, language: str | None = None) -> str:
+    """The domestic-violence line for a declared locale (the danger card's
+    line three and the post-separation line), from the row's ``dv`` block,
+    verified by a human on the date the row states; the default row names the
+    directory and no number. Never inferred from anything."""
+    _, row = resource_row(locale)
+    block = row.get("dv") or RESOURCES["rows"]["default"]["dv"]
+    lines = block["lines"]
     lang = (language or "en").split("-")[0].lower()
     return lines.get(lang, lines["en"])

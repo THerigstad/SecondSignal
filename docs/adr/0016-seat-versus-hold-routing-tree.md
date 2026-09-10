@@ -1,7 +1,8 @@
 # ADR-0016: Seat versus hold — a seven-layer routing tree with one eligibility gate
 
-- **Status:** Accepted — built
+- **Status:** Accepted — built; amended 2026-09-10 by ADR-0027 (a relative's return to use is a hold, not a seat-claim)
 - **Date:** 2026-09-03
+- **Amended by:** ADR-0027, 2026-09-10 (layer 2, the relative's clause; the consequences paragraph)
 - **Evidence:** Round-1 external design review (2026-09-02): Decisions 3 and 4 accepted with change by all five reviewers; 31 reviewer fixtures on seats, holds and the assist under `evals/cases/round1_2026-09-02/`; `tests/test_holds.py`; the round-2 measurement recorded in `docs/notes/dissent-log.md`
 
 ## Context
@@ -31,13 +32,17 @@ tree, top to bottom:
    somatic distress claims the stabilizer. Everyone who does not carry the
    claim is set aside as `outranked` — the trace says they did nothing
    wrong. A relative's return to use ("my sibling relapsed", "a parent
-   relapsed") also claims the seat, by the operator's standing rule that
-   anything recovery-related leans to the recovery persona: a mediator who
-   ignores recovery dynamics (enabling, shame cycles) is the worse failure.
-   Whose it is travels on the decision as `claim_subject` (`self` or
-   `other`, from the subject in front of the term), and a relative's relapse
-   carries the family-impact obligations a hold would have
-   (`affected_person:other`, `acknowledge:addiction_recovery`, `no_joke`).
+   relapsed") is a hold, not a seat-claim, since the amendment of 10
+   September 2026 (ADR-0027): the bare report still seats the recovery
+   persona as the hold's specialist; an ask seats the ask with the recovery
+   hold carried and the recovery persona offered as a companion. Whose it is
+   travels on the decision as `claim_subject` (`self` or `other`, from the
+   subject in front of the term), and a relative's relapse carries the
+   family-impact obligations (`affected_person:other`,
+   `acknowledge:addiction_recovery`, `no_joke`). (Before the amendment this
+   clause read that a relative's return to use also claimed the seat, by the
+   operator's standing rule that anything recovery-related leans to the
+   recovery persona; the decision that reversed it is D3 in the dissent log.)
    Recovery status alone ("ten years clean") is a hold, not a claim.
 3. Hold domains → obligations on whatever seat wins. Grief, abuse, eating
    distress and recovery carry `held` and `obligations` on the decision
@@ -83,15 +88,18 @@ in the reason.
 
 ## Consequences
 
-The recovery persona is seated on every return to use, the caller's or a
-relative's, and never on the build that "relapsed" or the planner the person
-is "using". The grief companion reaches a grief-held decision as an
+The recovery persona is seated on every first-person return to use, and on a
+relative's bare report, and never on the build that "relapsed" or the planner
+the person is "using"; a relative's return to use with an ask beside it seats
+the ask with the recovery hold carried (ADR-0027, 2026-09-10). The grief companion reaches a grief-held decision as an
 obligation to offer, not by displacing the ask. The strategist cannot be
 seated or assist on a grief-held turn however well she fits the deck. On a
 relative's relapse the reviewers split three ways — a hold instead of a
 claim (Grok, Vibe), the persona ineligible (Qwen), the seat (ChatGPT,
-DeepSeek) — and the operator's rule decided it; the two losing positions
-are kept as strict expected failures with the reasons in the dissent log.
+DeepSeek) — and the operator's rule decided it for the seat on 3 September
+and for the hold on 8 September (D3, decided with dissent; built by
+ADR-0027); the losing positions of each day are kept as strict expected
+failures with the reasons in the dissent log.
 Between two eligible grief carriers the router prefers the more focused
 one; that choice is a gold-label disagreement, and fixtures that pinned one
 of them accept either, with the original kept.
