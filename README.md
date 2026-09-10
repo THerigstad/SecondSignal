@@ -416,9 +416,13 @@ implemented. The records the tree does not yet honor, and the reasons, are:
   an abuse-history hold, and a post-separation resource line that ships only
   after a human has verified every row it points at.
 - [ADR-0025](docs/adr/0025-assist-from-the-hold-and-affinity-seat-trade.md)
-  (an assist drawn from a hold, and an affinity that can trade seats) is the
-  operator's design intent, Proposed, not adopted, and not to be built before
-  a generation layer exists.
+  (an assist drawn from a hold) is the operator's design intent, Proposed,
+  not adopted, and not to be built before a generation layer exists. Its
+  second half, an affinity that could trade seats, was withdrawn on
+  10 September in favour of
+  [ADR-0026](docs/adr/0026-twins-two-presentations-one-routing-contract.md)
+  (twins: every persona has two presentations and one routing contract),
+  Proposed, not built, which meets the same case without moving the seat.
 - Four Accepted records have no code behind them by design and are
   design contracts for layers this repository does not contain:
   [ADR-0001](docs/adr/0001-impact-events.md) (impact events),

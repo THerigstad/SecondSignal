@@ -1,10 +1,11 @@
 # ADR-0025: The assist from the hold, and an affinity that can trade seats
 
-- **Status:** Proposed — the operator's design intent, recorded 2026-09-08 with its target case and its gate; not adopted, not built, and not to be built before a generation layer exists
+- **Status:** Proposed — the operator's design intent, recorded 2026-09-08 with its target case and its gate; not adopted, not built, and not to be built before a generation layer exists. Amended 2026-09-10 by ADR-0026: proposal 2 (the affinity that can trade seats) is withdrawn; proposal 1 (the assist from the hold) stands
 - **Date:** 2026-09-08
 - **Evidence:** the dissent log entry D3 (`docs/notes/dissent-log.md`), decided-with-dissent on 2026-09-08; the round-1 assist-leak fixtures under `evals/cases/round1_2026-09-02/`; the both-ways measurement of 3 September recorded in the same log; the operator's standing rule that anything recovery-related leans to the recovery persona (ADR-0016)
 - **Depends on:** ADR-0016 (seat versus hold; the assist passes the same gate as the seat)
-- **Would amend, if Accepted:** ADR-0016 (the assist's source and the seat-claim rule for the first-person case)
+- **Would amend, if Accepted:** ADR-0016 (the assist's source; the seat-claim change that proposal 2 would have made is withdrawn)
+- **Amended by:** ADR-0026 (twins: two presentations, one routing contract), 2026-09-10
 
 ## Context
 
@@ -42,7 +43,17 @@ of living in a chat.
 
 ## Proposal
 
-Two changes, taken together, when a generation layer exists to consume them:
+> **Amendment of 2026-09-10.** Proposal 2 below is withdrawn in favour of
+> [ADR-0026](0026-twins-two-presentations-one-routing-contract.md), which
+> meets the target case without moving the seat: every persona gains two
+> presentations with one routing contract, so the recovery protocol is heard
+> in the voice the person asked for while the recovery persona keeps its
+> seat. Review round 2's objection to the principle of a trade (preference
+> outranking domain safety) is answered by that construction. Proposal 1
+> stands as written, with the gate below. The withdrawn text is kept so the
+> record shows what was proposed and why it was set aside.
+
+Two changes, originally taken together, when a generation layer exists to consume them:
 
 1. **The assist from the hold.** When a hold is carried and its specialist
    is not seated, the specialist's protocol may be emitted as an assist to
@@ -50,7 +61,7 @@ Two changes, taken together, when a generation layer exists to consume them:
    who is planning a calm conversation, for example. The assist passes the
    same gate as the seat (ADR-0016); a hold-source assist is subordinate to
    the seat and never becomes the speaker.
-2. **An affinity that can trade seats, first person only.** When the person
+2. **An affinity that can trade seats, first person only** (withdrawn 2026-09-10; see the amendment note above). When the person
    carries a first-person seat-claim and a declared affinity names a
    different, eligible sibling, the affinity may take the seat with the
    claimed specialist's protocol carried as an assist, so the person hears
@@ -67,7 +78,11 @@ weapon or a person in danger is a crisis lane, not a seat, exactly as today.
 The first-person case, stated by the operator on 2 September and again on 8
 September: a woman in her own recovery, with a declared preference for a
 female voice, hears the recovery protocol in a female voice, with the
-recovery persona offered beside it. Working name: SiblingAssist.
+recovery persona offered beside it. Working name: SiblingAssist. Since
+2026-09-10 the case is met by ADR-0026 (the recovery persona's own
+presentation, not a sibling's seat); what remains of this record is the
+assist from the hold, whose target case is the strategist planning a calm
+conversation with the recovery protocol beside it.
 
 ## Gate
 
@@ -87,8 +102,10 @@ This record is built only when all of the following hold:
 
 ## Consequences if Accepted
 
-ADR-0016 is amended, not superseded: the seat-claim rule gains the
-first-person trade, and the assist gains the hold as a second source. The
+ADR-0016 is amended, not superseded: the assist gains the hold as a second
+source. (Before the amendment of 2026-09-10 this paragraph also gave the
+seat-claim rule a first-person trade; that consequence is withdrawn with
+proposal 2.) The
 dissent-log entry D3 is re-opened for the sentences whose seat changes. The
 README says what the assist can do only after the generation layer shows it.
 

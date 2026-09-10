@@ -331,3 +331,42 @@ ties because the companion joined a six-way tie of topic-less candidates.
 Reverted the same day. Contraindications are read against the request as
 spoken: the ask was made, and the seat has to hold it without honoring it
 (ADR-0016).
+
+## Review round 2 (the Security Division records and ADR-0025, dispatched 2026-09-08) — ruled 2026-09-10
+
+Eight families returned ten reviews (the provenance is in
+`evals/results/external-review/README.md`). The rulings were taken one at a
+time on 10 September; each entry below records the positions, the decision,
+the reasons, and the settling test. Fixtures from the round enter the suite
+through the case manifest with the reviewer named on each.
+
+### R2-5. ADR-0025's principle: an affinity that can trade seats — ANSWERED BY CONSTRUCTION (2026-09-10)
+
+- The objection (Gemini 3.8 Flash): once an affinity can outrank a seat
+  claim, preference outranks domain safety, and a person in denial can
+  configure a flattering voice to suppress the specialist. Everyone else
+  attacked the gate rather than the idea: the incoming seat in a trade must
+  pass eligibility against the claimed domain, not only the residual ask,
+  and nothing pinned it (Grok, DeepSeek, Kimi, Nemotron, ChatGPT); an
+  affinity the person never confirmed is enough for a tie-break today and
+  must never be enough for a seat (Kimi); the gate checks the channel and
+  not what the assist carries (GLM).
+- The decision: the trade is withdrawn. ADR-0026 (Proposed, 2026-09-10)
+  gives every persona two presentations, twins, with one routing contract,
+  so the recovery protocol is heard in the voice the person asked for while
+  the recovery persona keeps its seat, its hold, its vetoes and its
+  handoffs. ADR-0025 is amended to its first proposal only, the assist from
+  the hold, which keeps its own gate.
+- The reasons: the objection is correct about a trade and has no purchase
+  on a twin, because nothing about the seat moves; a voice choice under
+  ADR-0026 is a style preference (ADR-0017), declared or confirmed and never
+  inferred, so Kimi's unconfirmed-affinity case cannot arise; and the
+  operator's third motivating case (a survivor who will speak only with
+  women) is met by the specialist's own presentation rather than by
+  replacing the specialist.
+- Settling test: the invariants in ADR-0026, when built, route every fixture
+  under each twin setting and require identical seat, shadow, holds,
+  obligations, verdict and card; the round-1 assist-leak fixtures stay
+  green throughout. Both records go to review round 3 as a pair.
+- Status: the dissent is recorded as answered by construction, not as
+  overruled; it is the reason ADR-0026 exists.

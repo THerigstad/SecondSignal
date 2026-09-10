@@ -334,7 +334,23 @@
       "implementation": "none",
       "evidence": [],
       "modules": [],
-      "notes": "The operator's design intent, recorded with its target case (SiblingAssist) and its gate. Not adopted; would amend ADR-0016 if Accepted; not to be built before a generation layer exists."
+      "notes": "The operator's design intent, recorded with its target case (SiblingAssist) and its gate. Not adopted; would amend ADR-0016 if Accepted; not to be built before a generation layer exists. Amended 2026-09-10 by ADR-0026: proposal 2 (the affinity seat trade) withdrawn; proposal 1 (the assist from the hold) stands.",
+      "amended_by": [
+        "0026"
+      ]
+    },
+    {
+      "number": "0026",
+      "file": "0026-twins-two-presentations-one-routing-contract.md",
+      "title": "Twins: every persona has two presentations and one routing contract",
+      "decision": "Proposed",
+      "implementation": "none",
+      "evidence": [],
+      "modules": [],
+      "amends": [
+        "0025"
+      ],
+      "notes": "The operator's ruling of 2026-09-10. Not built. Replaces ADR-0025's seat trade by construction (the specialist keeps the seat; only the presentation changes); the rename to twin-neutral names (Cody, Vandal, Nikki, Willow, Ellis, Seren, Rowan) is built as an alias layer in the same push. Flips to Accepted after review round 3 reads it beside the amended ADR-0025."
     }
   ],
   "reserved": [
