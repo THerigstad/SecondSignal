@@ -39,6 +39,9 @@ All notable changes to SecondSignal are documented here.
 
 ### Fixed — 2026-09-11
 
+- **The demonstration page carries link-preview tags** (its title, the first
+  fixed statement, and the house picture from the site itself), so a link
+  to it unfurls with the house.
 - **The demonstration page boots in a background tab.** Its boot waited
   for the two pictures to finish decoding, which a hidden tab never does;
   found in the operator's browser after the push, fixed the same night
