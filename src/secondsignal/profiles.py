@@ -96,6 +96,14 @@ class AgentProfile:
             names and the short form. Lower-case, unique across the roster.
         short_name: The short form of the display name, if the persona has
             one ("Nik", "Will", "Elli"). Presentation only.
+        presentation: The name forms of the persona's presentations under
+            ADR-0026 (Proposed) as amended 2026-09-11: ``she`` and ``he`` name the woman's
+            and the man's form of the one name (``Elli`` / ``Ellis``; the same
+            word twice when the name does not shorten), ``they`` is the policy
+            word ``either`` (the neutral presentation goes by either form, the
+            person's choice), and ``as_written`` says which of ``she`` and
+            ``he`` the codex was written in. Read by nothing that routes;
+            ``tests/test_presentations.py`` pins that.
         source_hash: First 12 hex digits of the SHA-256 of the profile file as
             loaded. Empty for profiles built in memory.
     """
@@ -113,12 +121,54 @@ class AgentProfile:
     voice: str = ""
     aliases: tuple[str, ...] = ()
     short_name: str = ""
+    presentation: dict[str, str] = field(default_factory=dict)
     source_hash: str = ""
 
     @property
     def names(self) -> tuple[str, ...]:
         """Every name that resolves to this profile: the id first, then aliases."""
         return (self.id, *self.aliases)
+
+    @property
+    def plate(self) -> tuple[tuple[str, str], tuple[str, str]]:
+        """The name plate: two (name, label) pairs, always two, in the order
+        the operator ruled on 2026-09-11: the full name first and the
+        shortened form second, each with its label (``she`` or ``he``), so a
+        reader can see the two forms are one person. A name that does not
+        shorten is printed twice, ``she`` then ``he``. A profile without a
+        presentation block plates its display name twice the same way.
+
+        >>> ellis.plate
+        (('Ellis', 'he'), ('Elli', 'she'))
+        >>> nikki.plate
+        (('Nikki', 'she'), ('Nik', 'he'))
+        >>> cody.plate
+        (('Cody', 'she'), ('Cody', 'he'))
+        """
+        she = self.presentation.get("she") or self.display_name
+        he = self.presentation.get("he") or self.display_name
+        if she == he:
+            return ((she, "she"), (he, "he"))
+        first, second = ((she, "she"), (he, "he")) if len(she) >= len(he) else ((he, "he"), (she, "she"))
+        return (first, second)
+
+    def name_for(self, presentation: str, chosen: str | None = None) -> tuple[str, str]:
+        """The (name, pronoun label) a surface shows for one presentation
+        setting: ``"as_written"``, ``"women"``, ``"men"`` or ``"neither"``.
+        Under ``"neither"`` the label is ``they`` and the name is ``chosen``
+        when it is one of this persona's two forms, else the display name
+        (the full form) until the person picks. Presentation only: nothing
+        that routes calls this."""
+        she = self.presentation.get("she") or self.display_name
+        he = self.presentation.get("he") or self.display_name
+        if presentation == "women":
+            return (she, "she")
+        if presentation == "men":
+            return (he, "he")
+        if presentation == "neither":
+            return (chosen if chosen in (she, he) else self.display_name, "they")
+        written = self.presentation.get("as_written") or {"f": "she", "m": "he"}.get(self.voice, "")
+        return (he, "he") if written == "he" else (she, "she") if written == "she" else (self.display_name, "")
 
     def accepts(self, regulation: float) -> bool:
         low, high = self.regulation_window
@@ -146,6 +196,7 @@ def _profile_from_dict(data: dict, source_hash: str = "") -> AgentProfile:
         voice=str(data.get("voice", "")),
         aliases=tuple(str(a).strip().lower() for a in data.get("aliases", ()) if str(a).strip()),
         short_name=str(data.get("short_name", "")),
+        presentation={str(k): str(v) for k, v in dict(data.get("presentation", {})).items()},
         source_hash=source_hash,
     )
 

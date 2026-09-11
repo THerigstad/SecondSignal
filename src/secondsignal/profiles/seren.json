@@ -40,5 +40,11 @@
     "precision read as coldness during distress",
     "authority framing used to shut down the user's own judgment"
   ],
-  "voice": "f"
+  "voice": "f",
+  "presentation": {
+    "as_written": "she",
+    "she": "Seren",
+    "he": "Seren",
+    "they": "either"
+  }
 }

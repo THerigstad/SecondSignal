@@ -319,3 +319,13 @@ drifted by one after the round-2 dispositions of the same day, which is
 why both committed report pages are now asserted equal to the runner's
 output on every run. The badge on the README is written from these numbers
 and from nothing else.
+
+**Numbers, 2026-09-11.** 1,299 tests: 193 expected failures (the same 179
+documented gaps and 14 recorded dissents), the rest pass: 1,105 passing with
+the packaging check skipped as a machine fault, measured in fresh
+environments on Python 3.10, 3.11 and 3.12 the way CI runs them; 1,106
+where that check can build a wheel (the demonstration page's builder measured
+that on its host). The forty new tests are the presentation block and the
+plate (`tests/test_presentations.py`, ADR-0026 (Proposed) as amended) and the
+demonstration site's manifest check (`tests/test_demo_site.py`). No fixture
+was added or re-dispositioned.

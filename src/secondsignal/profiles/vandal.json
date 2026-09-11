@@ -38,5 +38,11 @@
     "being recruited into cruelty toward a third party",
     "challenge landing as contempt when the user is closer to the edge than they disclosed"
   ],
-  "voice": "m"
+  "voice": "m",
+  "presentation": {
+    "as_written": "he",
+    "she": "Vandal",
+    "he": "Vandal",
+    "they": "either"
+  }
 }

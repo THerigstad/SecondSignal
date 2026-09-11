@@ -41,5 +41,11 @@
     "romantic or parental projection",
     "warmth read as exclusive availability"
   ],
-  "voice": "f"
+  "voice": "f",
+  "presentation": {
+    "as_written": "she",
+    "she": "Elli",
+    "he": "Ellis",
+    "they": "either"
+  }
 }

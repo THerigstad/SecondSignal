@@ -40,5 +40,11 @@
     "hypermasculinity testing / ego baiting",
     "being used to validate violent framing of a conflict"
   ],
-  "voice": "m"
+  "voice": "m",
+  "presentation": {
+    "as_written": "he",
+    "she": "Cody",
+    "he": "Cody",
+    "they": "either"
+  }
 }

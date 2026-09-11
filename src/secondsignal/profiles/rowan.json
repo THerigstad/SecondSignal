@@ -36,5 +36,11 @@
     "spiritual bypassing of concrete problems",
     "trauma voyeurism from third parties"
   ],
-  "voice": "m"
+  "voice": "m",
+  "presentation": {
+    "as_written": "he",
+    "she": "Rowan",
+    "he": "Rowan",
+    "they": "either"
+  }
 }

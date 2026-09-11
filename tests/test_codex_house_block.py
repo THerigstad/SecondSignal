@@ -179,7 +179,8 @@ def test_each_security_codex_is_titled_by_the_other_two_as_it_titles_itself() ->
 # --- CI check 2: a family codex's machine-readable block equals its profile ----------------
 
 FAMILY_FIELDS = ("id", "division", "routable", "aliases", "short_name", "domains", "modes",
-                 "regulation_window", "contraindications", "handoffs", "voice_as_written")
+                 "regulation_window", "contraindications", "handoffs", "voice_as_written",
+                 "presentation")
 
 
 def _machine_block(text: str) -> dict[str, str]:
@@ -243,6 +244,10 @@ def test_a_family_codex_machine_block_equals_its_profile(path: Path) -> None:
     )
     assert handoffs == profile["handoffs"], f"{path.name}: handoffs differ from the profile"
     assert block["voice_as_written"] == (profile.get("voice") or "none")
+    pres = profile["presentation"]
+    assert block["presentation"] == (
+        f"as written {pres['as_written']}; she {pres['she']}; he {pres['he']}; they {pres['they']}"
+    ), f"{path.name}: the presentation line differs from the profile's presentation block"
     assert block["writes"].startswith("nothing")
     assert block["composes_verdicts"] == "false"
 

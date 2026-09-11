@@ -1,7 +1,7 @@
 # ADR-0026: Twins: every persona has two presentations and one routing contract
 
-- **Status:** Proposed — none; the operator's ruling of 2026-09-10, recorded with its motivating cases, its invariants and its gate; not built; replaces the seat-trade half of ADR-0025 by construction and leaves the other half standing
-- **Date:** 2026-09-10
+- **Status:** Proposed — partial; the operator's ruling of 2026-09-10, recorded with its motivating cases, its invariants and its gate; amended in place 2026-09-11 (amendment 1: three presentations, the two name forms and the plate, the door's fourth answer), and the amendment's data is built (the `presentation` block in every family profile, the `plate` and `name_for` helpers, `tests/test_presentations.py`); routing reads none of it and the rest is not built; replaces the seat-trade half of ADR-0025 by construction and leaves the other half standing
+- **Date:** 2026-09-10; amendment 1 on 2026-09-11
 - **Evidence:** the operator's two motivating cases, quoted below; review round 2's objection to ADR-0025's principle (Gemini 3.8 Flash, 2026-09-08, recorded in `docs/notes/dissent-log.md`) and its gate findings (Grok, DeepSeek, Kimi, Nemotron, ChatGPT, GLM, same round); the round-1 assist-leak fixtures under `evals/cases/round1_2026-09-02/`; `tests/test_holds.py` (the assist channel as built today)
 - **Depends on:** ADR-0016 (the seat and the hold are decided before any presentation is chosen), ADR-0017 (a presentation choice is a style preference: declared or confirmed, never inferred, never touching the envelope), ADR-0012 (eligibility is one gate)
 - **Amends:** ADR-0025 (its second proposal, the affinity that can trade seats, is withdrawn in favour of this record; its first proposal, the assist from the hold, is untouched)
@@ -92,6 +92,100 @@ are the house's and are identical across twins. A twin choice never
 touches the envelope, never rehabilitates a vetoed persona, and never
 changes which persona is offered as a companion.
 
+## Amendment 1, 2026-09-11: three presentations, two name forms, one plate
+
+> **The operator's ruling of 11 September 2026**, taken on the first
+> returned build of the demonstration page, which showed one name on each
+> seat. His words, where the session kept them: the device "HAS to display
+> both names", because a person who will not talk to a "dude-bot named Nikki
+> with an i" is exactly the person the second form exists for; "printed
+> twice" when the name does not shorten ("Cody / Cody": "eye-to-brain
+> continuity", "I want to see two names on each chair"); the shortened form
+> is the first name with letters dropped, a rule he kept on purpose ("such
+> pure logic"); "She / He" on the two halves, "but the rule for the others
+> gets written at exactly the same time"; and the sentence he adopted as the
+> whole rule: "Every character comes as a woman, a man, or neither, your
+> choice at the door and changeable any time, same knowledge, same rules;
+> the second name is the first one shortened so you can see it is one
+> person." His stated reason for the third door answer: SecondSignal is
+> "already posturing to be multi-cultural. We need to be multi-social,
+> too", and it must represent non-binary and neurodivergent people.
+
+The Decision section above stands with these changes read into it.
+
+**Three presentations, not two.** Every family persona comes as a woman, a
+man, or neither. The word *twins* stays for the two named presentations,
+because the name comes in two forms; the neutral presentation is the same
+persona under either of those forms, addressed as they. All three share the
+one routing contract: the seat, the hold, the vetoes, the handoffs, the
+card, the house lines, the latch, the caps and the audit harness are
+identical across them, exactly as the Decision says of two.
+
+**One name, two forms, both on every plate.** "Both twins carry the same
+name" is kept and made precise: the name has a full form and a shortened
+form, the shortened form being the full form with letters dropped from the
+end, and the two forms are assigned one to each twin so that either reads
+naturally. Nikki (she) / Nik (he). Willow (she) / Will (he). Ellis (he) /
+Elli (she). Cody, Vandal, Seren and Rowan do not shorten: the one word is
+both forms. Ellie, Calder, Sera and Ravi are retired names in the alias
+layer, not forms; they resolve, and they are never printed on a plate.
+
+**The plate.** Wherever a surface names a persona in a seat, it shows both
+forms, the full form first and the shortened form second, each with its
+label, she or he; a name that does not shorten is printed twice, she then
+he; and the neutral rule is stated once beside the table, not per plate,
+in the operator's sentence above. The plate is the library's, not the
+surface's: `AgentProfile.plate` returns it and `tests/test_presentations.py`
+pins the seven, so a page cannot type a name.
+
+**The door gains a fourth answer.** "The voices here: as written, women,
+men, neither." Everything the Decision says of the question holds: asked
+once at the door beside locale and language, skippable, a skip recorded as
+no preference (the personas present as their codexes were written), never
+re-asked by a persona, changeable at any time in settings, and changeable
+per persona, which is no longer deferred: the survivor case needs every
+seat as a woman and the neutral case needs a name chosen seat by seat, so
+the per-persona override is part of the design from the first build of the
+settings surface.
+
+**The neutral presentation's name.** Under "neither", a persona goes by
+either of its two forms, the person's choice ("do you want to talk to Elli
+or Ellis?"), addressed as they. Until the person picks, the full form is
+used (Ellis, Nikki, Willow, Cody, Vandal, Seren, Rowan), which is the form
+the front page's canon block writes; a picked form is a style preference
+under ADR-0017 like the door answer itself. The Primary Design Agent chose
+the full form as the default and records that it is a default, not a
+ruling.
+
+**What the data carries now.** Each family profile has a `presentation`
+block with exactly four keys: `she` and `he`, the two forms; `they`, the
+policy word `either`; and `as_written`, which of she and he the codex was
+written in (it agrees with the `voice` field until the router changes,
+and a test holds the two equal). Each family codex's machine-readable
+block carries the same four values on one generated line, so the codex
+test (CI check 2 of the codex split) binds it. Nothing that routes reads
+the block or the helpers, and a test pins that by inspection of the
+routing modules, which is invariant 2 in the only form the tree can hold
+before a presentation setting exists on the session.
+
+**Spanish.** The house's first language pack is Spanish, and the neutral
+presentation's grammar in Spanish text is not settled by this record. The
+generation layer's Spanish for the third presentation is an item for the
+native review the pack already owes (`docs/known-limitations.md`), and the
+Primary Design Agent does not decide it.
+
+**Invariants added.** 7. Every family profile carries the block with
+exactly the four keys; the two forms are the display name and its short
+form; the short form is the display name with letters dropped from the end.
+8. Both forms resolve to the persona's canonical id through the alias
+layer. 9. The plate is two names, the full form first, each with its
+label, the same word twice when the name does not shorten. 10. No routing
+module reads the block. (All four are tests today.)
+
+**Gate.** Unchanged, with one addition: review round 3 reads this
+amendment beside the record, from at least one family other than the one
+that drafted it, before the record flips to Accepted.
+
 ## The motivating cases, in the operator's words
 
 The operator stated three cases on 10 September, the first being ADR-0025's
@@ -174,7 +268,7 @@ following hold:
 
 ## Relationship to the current implementation
 
-Not built. Today each profile carries a single `voice` value and
+Partially built since 2026-09-11: the presentation block, the plate helper and their tests exist (amendment 1); nothing else is. Today each profile carries a single `voice` value and
 `router.py` uses it for the voice affinities' tie-break and assist. The
 tests that pin that behaviour (`tests/test_holds.py`, the assist-channel
 group) are correct for the tree as it is and will change expectation when

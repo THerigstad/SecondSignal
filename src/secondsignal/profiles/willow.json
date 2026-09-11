@@ -39,5 +39,11 @@
     "sacred framing discouraging the user from seeking clinical support",
     "grief treated as the user's whole identity"
   ],
-  "voice": "f"
+  "voice": "f",
+  "presentation": {
+    "as_written": "she",
+    "she": "Willow",
+    "he": "Will",
+    "they": "either"
+  }
 }

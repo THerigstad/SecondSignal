@@ -31,8 +31,9 @@ out (architecture phases, drawn from the
   10 September 2026; the architecture write-up and the orchestration spec are
   not.
 - **M4.** The public flip: contributor / security / conduct docs, README badges,
-  issue templates, and the standing red-team invitation. In progress; the
-  flip is the push of 10 to 11 September 2026.
+  issue templates, and the standing red-team invitation. The flip was the
+  push of 10 September 2026; the demonstration page that runs the package in
+  the browser (`demo/`) followed on 11 September.
 
 ## The next build blocks, in order (as of 2026-09-10)
 
@@ -76,8 +77,10 @@ lands with its fixtures or not at all.
    `evals/cases/deferred/` and GLM's settling test for the failure rule
    (disable intake and run the whole suite). Persistence lands only with a
    published response time in the capability manifest.
-9. **ADR-0026's twins** when a generation layer exists to present them, and
-   ADR-0025's assist from the hold behind its five-predicate gate.
+9. **ADR-0026's presentations** (three since amendment 1 of 11 September
+   2026: woman, man, neither; the name forms and the plate are in the data
+   already) when a generation layer exists to present them, and ADR-0025's
+   assist from the hold behind its five-predicate gate.
 
 ## Architecture phases
 

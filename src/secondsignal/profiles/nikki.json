@@ -40,5 +40,11 @@
     "sexualization attempts",
     "high energy misread as pressure to perform"
   ],
-  "voice": "f"
+  "voice": "f",
+  "presentation": {
+    "as_written": "she",
+    "she": "Nikki",
+    "he": "Nik",
+    "they": "either"
+  }
 }

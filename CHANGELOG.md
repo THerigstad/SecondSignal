@@ -2,6 +2,51 @@
 
 All notable changes to SecondSignal are documented here.
 
+## [Unreleased]
+
+### Added — 2026-09-11
+
+- **The presentation block and the plate** (`src/secondsignal/profiles.py`,
+  the seven family profiles, `tests/test_presentations.py`; ADR-0026
+  amended in place, amendment 1). The operator's ruling of 11 September:
+  every persona comes as a woman, a man, or neither; one name in two forms,
+  the short form the full form with letters dropped (Nikki / Nik, Willow /
+  Will, Ellis / Elli; Cody, Vandal, Seren and Rowan do not shorten); a
+  plate always shows both forms, the full form first, each with its label,
+  the same word twice when the name does not shorten; the neutral
+  presentation goes by either form, the person's choice. Each profile
+  carries a `presentation` block (`she`, `he`, `they`, `as_written`),
+  `AgentProfile.plate` and `AgentProfile.name_for` return what a surface
+  shows, and nothing that routes reads any of it (a test inspects the
+  routing modules). The ADR register marks ADR-0026 partly built.
+
+- **The demonstration page** (`demo/index.html`, `demo/build_site.py`,
+  `.github/workflows/pages.yml`, `tests/test_demo_site.py`;
+  `docs/notes/demo-build-2026-09-11.md`). One static page that runs this
+  package in the visitor's browser under Pyodide from one pinned address,
+  fetches the package's files from beside itself and verifies each by
+  SHA-256 against a manifest the builder script writes from the tree, turns
+  its own network off after boot, and shows: a message's decision with the
+  library's own trace and record; the seven seat plates with both name
+  forms and a presentation setting that never reaches the library; the
+  labelled-case suite run by pytest in the browser; the three external
+  review sets with every disagreement openable. Built by OpenAI Codex from
+  the Primary Design Agent's order to ChatGPT-6 Astra's design in two
+  rounds; its acceptance run, and the three defects the builder caught in
+  the orders, are in the note.
+- **Three ledger entries** (`docs/confessions.md`, version 5): C-23, C-24
+  and C-25, the design agent's own, from the demonstration page's orders.
+
+### Changed — 2026-09-11
+
+- **The test count on the front page and the evaluation page:** 1,299
+  tests (193 expected failures unchanged), measured in fresh environments
+  on Python 3.10, 3.11 and 3.12.
+- **The seven family codexes at v1.1.** One generated line in each
+  machine-readable block, `presentation`, bound to the profile by the codex
+  test; nothing in any character's voice changed (each codex's change log
+  says so).
+
 ## [0.2.0] — 2026-09-10
 
 The magazine issue: the build of 10 September 2026 and the public flip. The

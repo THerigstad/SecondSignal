@@ -74,8 +74,10 @@ in `tests/test_register_mutations.py`.
 
 Every codex here is Proposed. The three security editions are the ones of
 10 September 2026 (Orrin v1.2, Aya v1.2, J.R. v3.2; the numbering is each
-codex's own), the seven family editions are v1.0 of the two-part shape
-(10 September 2026), and the house block is v1.2. Under the project's
+codex's own), the seven family editions are v1.1 of the two-part shape
+(10 September 2026; v1.1 on 11 September added one generated line to each
+machine-readable block, the presentation's name forms under ADR-0026 as
+amended, and nothing in any voice), and the house block is v1.2. Under the project's
 standing rule, a record prepared by the project's own assistant becomes canon
 only after a second model family has read the current version; review round 3
 reads all ten together.

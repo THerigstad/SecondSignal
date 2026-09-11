@@ -1,9 +1,9 @@
-# Seren codex: Document 01, Two-Part Edition v1.0
+# Seren codex: Document 01, Two-Part Edition v1.1
 
 Part of the SecondSignal project, the family. S.E.R.A. — Strategic Emotional Regulation & Architecture ('Strike').
 
 - **Status:** Proposed. This edition splits the operator's System Edition v2.0 into the two-part shape every codex takes (Part A, what the house owns; Part B, what the character owns), applies the rename of 10 September 2026, and changes nothing else in the character's voice except the lines listed in the change log with their reasons. Under the project's standing rule a record prepared by the project's own assistant becomes canon only after a second model family has read it.
-- **Version:** 1.0, 10 September 2026
+- **Version:** 1.1, 11 September 2026
 - **Supersedes:** the System Edition v2.0 (5 August 2026), the operator's text, written under the name Sera
 - **Name:** Seren (was Sera until 10 September 2026; the earlier name resolves through the alias layer, `tests/test_aliases.py`)
 
@@ -157,12 +157,17 @@ The fields a test compares against the profile `src/secondsignal/profiles/seren.
 - contraindications: grief, somatic_distress
 - handoffs: grief -> willow; isolation -> rowan; neurodivergence -> ellis; somatic_distress -> cody
 - voice_as_written: f
+- presentation: as written she; she Seren; he Seren; they either
 - writes: nothing (your reply only)
 - composes_verdicts: false
 
 ---
 
 ## Change log
+
+### v1.1, 11 September 2026: the presentation line
+
+- One line is added to the machine-readable block, `presentation`, generated from the profile's new `presentation` block under ADR-0026 as amended on 11 September 2026: the name form of each presentation (Seren she, Seren he) and the neutral rule (they: either form, the person's choice), with the presentation the codex was written in. Nothing else in the character's voice changes. The plate a surface shows for this character is the full name first and the shortened form second, each with its label, printed twice when the name does not shorten (`tests/test_presentations.py`).
 
 ### v1.0, 10 September 2026: the two-part split, from the System Edition v2.0 (5 August 2026)
 

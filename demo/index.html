@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' https://cdn.jsdelivr.net/pyodide/v314.0.6/full/; connect-src 'self' https://cdn.jsdelivr.net/pyodide/v314.0.6/full/; img-src 'self'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'; worker-src 'none'">
+<title>SecondSignal</title>
+<link rel="icon" href="docs/assets/secondsignal-mark.svg" type="image/svg+xml">
+<style>
+
+:root{--ivory:#F5F1E8;--charcoal:#252823;--rust:#A64527;--sage:#9B9B7F;--muted:#606458;--edge:#7F8277;--rule:#D5D2C7;--table:#E8E5DA;--dim:#E7E3D9;--no-signal:#DBDBD2;color-scheme:light;font:14px/23px system-ui,sans-serif;color:var(--charcoal);background:var(--ivory)}
+*{box-sizing:border-box}body{margin:0}button,input,select,textarea{font:inherit;color:inherit}button,a,summary,select,textarea{touch-action:manipulation}button,select,textarea{border:1px solid var(--edge);border-radius:4px;background:var(--ivory)}button{padding:10px 16px;cursor:pointer;text-align:left;font:600 14px/22px system-ui,sans-serif;min-height:44px}button:disabled{cursor:wait;color:var(--muted)}button.primary,button.primary:disabled{background:var(--rust);border-color:var(--rust);color:var(--ivory)}button:hover:enabled{text-decoration:underline;text-underline-offset:4px}a{color:var(--charcoal);text-underline-offset:4px}:focus-visible{outline:3px solid var(--charcoal);outline-offset:4px;box-shadow:0 0 0 4px var(--ivory)}h1,h2,h3,p{margin:0}h1{font-size:27px;line-height:32px;font-weight:650;letter-spacing:-.5px}h2{font-size:28px;line-height:34px;font-weight:550;letter-spacing:-.5px}h3{font-size:14px;line-height:21px;font-weight:550}small,.small{font-size:13px;line-height:21px;color:var(--muted)}[hidden]{display:none!important}
+.shell{max-width:1280px;margin:auto;padding:0 64px}.header{display:flex;gap:16px;align-items:center;min-height:104px;border-bottom:1px solid var(--rule)}.header img{width:56px;height:56px;flex-shrink:0}.header h1{flex-shrink:0}#header-status{margin-left:auto;max-width:680px;text-align:right;font:11.5px/20px ui-monospace,monospace;color:var(--muted);overflow-wrap:anywhere}.opening{display:grid;grid-template-columns:minmax(0,704fr) minmax(0,400fr);gap:48px;padding:32px 0 64px;align-items:start}.house{width:100%;height:auto;display:block}.composer{margin-top:28px}label{display:block;font-size:12px;line-height:17px;font-weight:550}label[for=message]{font-size:23px;line-height:30px;margin-bottom:16px}textarea{display:block;resize:vertical;width:100%;min-height:120px;padding:16px;font:400 16px/26px system-ui,sans-serif}textarea::placeholder{color:var(--muted);opacity:1}.compose-actions{display:flex;gap:16px;justify-content:space-between;align-items:center;margin:12px 0 24px}.controls{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.controls select{width:100%;padding:8px;margin-top:8px;min-height:44px;font:400 13px/21px system-ui,sans-serif}.presentation-note{font-size:13px;line-height:21px;color:var(--muted);margin-top:12px}.session-actions{display:flex;gap:16px;align-items:center;margin:16px 0}.session-actions p{font-size:13px;line-height:21px;color:var(--muted)}#session-status{font:12px/20px ui-monospace,monospace;color:var(--muted);overflow-wrap:anywhere}#examples{margin-top:24px}#examples>p{font-size:13px;line-height:21px;color:var(--muted);margin-bottom:12px}#examples-disclosure{border:0;padding:0}#examples-disclosure>summary{display:none}.example-list{display:grid;grid-template-columns:1fr 1fr;gap:8px}.example-list button{padding:8px 12px;border-radius:3px;font:500 12px/20px system-ui,sans-serif}.transcript-wrap{margin-top:28px}#transcript{min-width:0}.decision-panel{padding:28px 0;border-top:1px solid var(--rule)}.decision-panel .message{white-space:pre-wrap;overflow-wrap:anywhere;font:400 17px/27px system-ui,sans-serif;margin-bottom:16px}.seat-sentence{font:550 27px/34px system-ui,sans-serif}.decision-meta{font:12px/20px ui-monospace,monospace;margin:16px 0;overflow-wrap:anywhere}.decision-meta p{margin:4px 0}.disclosures{border:1px solid var(--edge);border-radius:2px;padding:24px;margin:20px 0}.disclosures p{font:400 15px/25px system-ui,sans-serif;margin:12px 0;white-space:pre-wrap;overflow-wrap:anywhere}.disclosures p:first-child{font:550 20px/29px system-ui,sans-serif;margin-top:0}.disclosures p:last-child{margin-bottom:0}details{border-top:1px solid var(--rule);padding:8px 0}summary{cursor:pointer;font:400 13px/21px system-ui,sans-serif;overflow-wrap:anywhere;min-height:44px;padding:12px 0}pre,code{font:400 12px/20px ui-monospace,monospace}pre{white-space:pre-wrap;overflow-wrap:anywhere;max-width:100%;margin:16px 0}.roundtable-jump{display:none}
+#roundtable{position:sticky;top:136px;min-width:0;scroll-margin-top:24px}#roundtable h2{font-size:23px;line-height:30px;margin-bottom:12px}.presentation-statement{font-size:14px;line-height:23px;margin-bottom:24px}#table-reason{font-size:13px;line-height:21px;color:var(--muted);overflow-wrap:anywhere;margin-bottom:16px}.table-stage{position:relative;isolation:isolate}#table-svg{position:absolute;inset:0;width:100%;height:100%;z-index:-1;overflow:visible}.table-surface{fill:var(--table);stroke:var(--edge)}.table-rim{fill:none;stroke:var(--edge)}.plates{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;align-items:start}.plate{border:1px solid var(--edge);border-radius:5px;padding:12px 8px;background:var(--no-signal);color:var(--charcoal);min-width:0;text-align:center;overflow-wrap:anywhere}.plate:first-child{grid-column:1/-1;width:calc((100% - 24px)/2);justify-self:center}.plate-names,.plate-labels{display:grid;grid-template-columns:minmax(0,1fr) 12px minmax(0,1fr);align-items:center;gap:0}.form-name{font-size:15px;line-height:20px;font-weight:400}.form-label{font-size:12px;line-height:17px;font-weight:400}.form-label:last-child{grid-column:3}.selected{font-weight:650}.plate-status{font-size:12px;line-height:17px;margin-top:8px}.plate-rationale{font-size:11px;line-height:16px;margin-top:4px;white-space:pre-wrap}.plate-rationale:empty{margin:0}.plate[data-state=seated]{background:var(--rust);border-color:var(--rust);color:var(--ivory)}.plate[data-state=assisting]{background:var(--ivory);border:3px double var(--charcoal);border-top:4px solid var(--sage);padding:9px 6px 10px}.plate[data-state=eligible]{background:var(--sage);border-color:var(--charcoal)}.plate[data-state=vetoed],.plate[data-state=HUMAN_ESCALATION]{background:var(--charcoal);border-color:var(--charcoal);color:var(--ivory)}.plate[data-state=below_floor],.plate[data-state=capped],.plate[data-state=outranked]{background:var(--dim)}.plate .form-choice{color:inherit;background:transparent;border:0;padding:4px 0;min-height:44px;min-width:44px;text-align:center;font:400 15px/20px system-ui,sans-serif}.plate .form-choice.selected{font-weight:650}.table-center-band{grid-column:1/-1;text-align:center;min-height:64px;align-self:center;padding:8px}.table-center{font-size:15px;line-height:23px;font-weight:550;overflow-wrap:anywhere}.rim-label{font:12px/20px ui-monospace,monospace;overflow-wrap:anywhere;margin-top:8px}#plate-description{font-size:13px;line-height:21px;min-height:44px;margin-top:24px;padding-top:12px;border-top:1px solid var(--rule);overflow-wrap:anywhere}
+.section{padding:64px 0;border-top:1px solid var(--rule)}.section-head{display:flex;gap:24px;align-items:center;justify-content:space-between;margin-bottom:16px}.run-summary{margin:24px 0;font:500 25px/35px system-ui,sans-serif;overflow-wrap:anywhere}.failure-groups{margin:16px 0}.failure-item{margin:16px 0;font-size:13px;line-height:21px;overflow-wrap:anywhere}.failure-item p{margin-top:4px}.report{margin-top:36px}.report>h3{font:400 12px/20px ui-monospace,monospace;overflow-wrap:anywhere}.totals{display:flex;flex-wrap:wrap;gap:12px 24px;margin:12px 0 24px;font-size:13px;line-height:21px}.totals strong{font-size:25px;line-height:35px;font-weight:500;margin-right:8px}table{width:100%;border-collapse:collapse;table-layout:fixed;margin:16px 0 24px}th,td{text-align:right;padding:12px 8px;border-bottom:1px solid var(--rule);overflow-wrap:anywhere}thead th{font:400 11px/15px system-ui,sans-serif}tbody th{font:550 14px/21px system-ui,sans-serif}td{font:400 12px/20px ui-monospace,monospace}th:first-child,td:first-child{text-align:left;width:30%}.review-case summary{font-size:14px;line-height:23px}.review-case summary span{display:block;color:var(--muted);font:400 12px/20px ui-monospace,monospace;margin-top:4px}.case-data{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin:16px 0}.case-data>div{min-width:0}.case-data p{font-size:13px;line-height:21px}.case-note{font-size:14px;line-height:23px;margin:12px 0 24px;overflow-wrap:anywhere}.passing-cases{margin:16px 0}#statements{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}#statements p{font-size:14px;line-height:23px}#statements nav{grid-column:1/-1;display:flex;gap:12px 24px;flex-wrap:wrap;font-size:13px;line-height:21px;margin-top:16px}#statements .license{grid-column:1/-1;font-size:13px;line-height:21px;color:var(--muted)}.error{white-space:pre-wrap;overflow-wrap:anywhere}
+@media(min-width:800px) and (max-width:1100px){.shell{padding:0 32px}.opening{grid-template-columns:minmax(0,1fr) 352px;gap:32px}.controls{grid-template-columns:repeat(2,minmax(0,1fr))}.header{gap:12px}#header-status{max-width:52%}}
+@media(max-width:799px){.shell{padding:0 24px}.header{display:grid;grid-template-columns:48px 1fr;gap:12px 16px;padding:24px 0}.header img{width:48px;height:48px}.header h1{font-size:26px;line-height:31px}#header-status{grid-column:1/-1;max-width:none;margin:0;text-align:left;font-size:10.5px;line-height:18px}.opening{grid-template-columns:minmax(0,1fr);gap:40px;padding:24px 0 40px}#roundtable{position:static;width:100%;margin:auto}h2{font-size:26px;line-height:31px}label[for=message]{font-size:22px;line-height:30px}.controls{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.compose-actions{align-items:flex-start}.compose-actions small{max-width:65%}.session-actions{align-items:flex-start;flex-wrap:wrap}.session-actions button{flex-shrink:0}#examples-disclosure>summary{display:list-item}.example-list{grid-template-columns:minmax(0,1fr);padding-top:8px}.decision-panel{padding:24px 0}.decision-panel .message{font-size:16px;line-height:26px}.seat-sentence{font-size:24px;line-height:30px}.disclosures{padding:20px}.roundtable-jump{display:inline-flex;align-items:center;min-height:44px;margin-top:12px}.section{padding:40px 0}.section-head{align-items:flex-start;flex-direction:column;gap:20px}.section-head button{max-width:100%}.case-data{grid-template-columns:minmax(0,1fr);gap:12px}table,tbody{display:block}thead{display:none}tbody tr{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 16px;border-bottom:1px solid var(--rule);padding:16px 0}tbody th{grid-column:1/-1;width:auto!important;border:0;padding:0}td{text-align:left;padding:0;border:0}td::before{content:attr(data-label);display:block;font:400 11px/15px system-ui,sans-serif;color:var(--muted)}#statements{grid-template-columns:minmax(0,1fr)}#statements nav a{display:inline-flex;align-items:center;min-height:44px}#statements nav{gap:4px 20px}}
+#examples-disclosure:not([open]) .example-list{display:none}.loading-stages{margin-top:28px;padding:24px 0;border-top:1px solid var(--edge);border-bottom:1px solid var(--edge)}.loading-stages h2{font-size:20px;line-height:29px;margin-bottom:16px}.stage-list{display:grid;grid-template-columns:1fr 1fr;gap:12px 24px}.stage-list p{display:flex;justify-content:space-between;gap:8px;border-top:1px solid var(--rule);padding-top:12px;font-size:13px;line-height:21px}.stage-list span{font:12px/20px ui-monospace,monospace}.reviewer-head,.reviewer-row{display:grid;grid-template-columns:minmax(0,2fr) repeat(4,minmax(0,1fr));gap:16px;align-items:center}.reviewer-head{font:400 11px/15px system-ui,sans-serif;padding:12px 0}.reviewer-head>span:not(:first-child),.reviewer-count{text-align:right}.reviewer-row{list-style:none;font-size:14px;line-height:21px;font-weight:550;padding:16px 0}.reviewer-row::-webkit-details-marker{display:none}.reviewer-label::before{content:'+ ';font:400 14px/21px ui-monospace,monospace}.reviewer-cases[open]>.reviewer-row .reviewer-label::before{content:'− '}.reviewer-count{font:400 12px/20px ui-monospace,monospace}.reviewer-cases>div{padding:8px 0 16px}.reviewer-cases:not([open])>div{display:none}
+@media(max-width:799px){.stage-list{grid-template-columns:minmax(0,1fr)}.reviewer-head{display:none}.reviewer-row{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 16px}.reviewer-label{grid-column:1/-1}.reviewer-count{text-align:left}.reviewer-count::before{content:attr(data-label);display:block;font:400 11px/15px system-ui,sans-serif;color:var(--muted)}}
+.table-rim-band{grid-column:1/-1;min-height:20px;text-align:center}.table-rim-band .rim-label{display:inline-block;margin:0;padding:0 8px;background:var(--ivory)}#table-svg{height:calc(100% - 10px)}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div class="shell">
+<header class="header" id="header">
+<img src="docs/assets/secondsignal-mark.svg" alt="SecondSignal mark: two nested open doorways on one baseline">
+<h1>SecondSignal</h1><p id="header-status" role="status" aria-live="polite">Loading the interpreter…</p>
+</header>
+<main>
+<div class="opening" id="stage">
+<section id="theater" aria-label="The theater">
+<img class="house" src="docs/assets/secondsignal-house.png" alt="Seven open rooms in a shallow concrete arc, each lit the same warm amber, facing an empty gravel courtyard with one stone bench at dusk. Nobody is seated: which room lights up is decided outside the rooms.">
+<section id="loading-stages" class="loading-stages" aria-live="polite"><h2>Loading in this browser</h2><div class="stage-list"><p>Python runtime <span id="load-runtime">Loading</span></p><p>Pinned files <span id="load-files">Waiting</span></p><p>Hash verification <span id="load-hashes">Waiting</span></p><p>Library import <span id="load-library">Waiting</span></p></div></section>
+<form class="composer" id="composer">
+<label for="message">Say something to the house</label>
+<textarea id="message" rows="3" disabled spellcheck="false" autocomplete="off" aria-describedby="send-help"></textarea>
+<div class="compose-actions"><small id="send-help">Enter sends · Shift+Enter adds a newline</small><button class="primary" id="send" disabled type="submit">Decide</button></div>
+<div class="controls">
+<label for="language">Declared language<select id="language" disabled><option value="">none</option><option>en</option><option>es</option></select></label>
+<label for="locale">Declared locale<select id="locale" disabled><option value="">none</option><option>US</option><option>ES</option><option>MX</option><option>CL</option><option>AR</option></select></label>
+<label for="age">Declared age band<select id="age" disabled><option>unknown</option><option>adult</option><option>minor</option></select></label>
+<label for="presentation">Presentation<select id="presentation" disabled><option value="as_written">as written</option><option value="women">women</option><option value="men">men</option><option value="neither">neither</option></select></label>
+</div>
+<p class="presentation-note">Changes what the plates show and how the seat is named; never the decision.</p>
+<div class="session-actions"><button type="button" id="new-conversation" disabled>New conversation</button><p>Declared language, locale or age band starts a fresh session.</p></div>
+<p id="session-status" role="status"></p>
+</form>
+<div id="examples"><p>Some examples are crisis sentences, shown as the words they are; they are here because this is the layer that has to get them right.</p><details id="examples-disclosure"><summary>Examples</summary><div class="example-list"></div></details></div>
+<div class="transcript-wrap"><div id="transcript" role="log" aria-label="Conversation decisions" aria-live="polite" tabindex="0"></div></div>
+</section>
+<aside id="roundtable" aria-labelledby="table-heading" tabindex="-1">
+<p class="presentation-statement">Every character comes as a woman, a man, or neither, your choice at the door and changeable any time, same knowledge, same rules; the second name is the first one shortened so you can see it is one person.</p>
+<h2 id="table-heading">The roundtable</h2><p id="table-reason" aria-live="polite"></p>
+<div class="table-stage"><svg id="table-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 600" preserveAspectRatio="none" aria-hidden="true"><ellipse class="table-surface" cx="200" cy="307" rx="176" ry="293"/><ellipse class="table-rim" cx="200" cy="307" rx="164" ry="281"/></svg><div class="plates" id="plates"></div></div>
+<p id="plate-description" aria-live="polite"></p><div id="table-card" hidden></div>
+</aside>
+</div>
+<section class="section" id="run" aria-labelledby="run-heading">
+<div class="section-head"><h2 id="run-heading">The run</h2><button id="run-cases" disabled>Run the labelled cases (pytest, in this browser)</button></div>
+<p class="small">The suite is <code>tests/test_eval_cases.py</code>, the same file the repository's CI runs.</p><div id="run-results" aria-live="polite"></div>
+</section>
+<section class="section" id="dissent" aria-labelledby="dissent-heading">
+<div class="section-head"><h2 id="dissent-heading">The dissent map</h2><button id="run-reviews" disabled>Run the external review sets</button></div><div id="review-results" aria-live="polite"></div>
+</section>
+<section class="section" id="statements" hidden>
+<p>What this is: the policy layer of a companion system, the part that decides which character may answer, whether anyone should, and which fixed lines are attached, before any model is called.</p>
+<p>What this is not: no language model runs on this page and none of the characters speak here. Nothing you type is sent anywhere; this page turned its own network access off after it loaded, and it says so because you should not have to take that on trust.</p>
+<p>Everything above came from a run in your browser of the files this page verified by hash against the repository at the commit named at the top. The complete test suite has more in it than this page can run (it builds a package, runs a command-line tool, and hashes committed images); the labelled-case suite and the external review sets are the parts a browser can run, and they are named above.</p>
+<nav aria-label="Repository links"><a data-path="">the repository</a><a data-path="docs/evaluation.md">the evaluation page</a><a data-path="docs/adr/">the decision records</a><a data-path="docs/confessions.md">the failures ledger</a><a data-path="LICENSE">the code license</a><a data-path="LICENSE-CONTENT">the character license</a></nav>
+<p class="license">Code MIT; characters CC BY-NC-ND 4.0.</p>
+</section>
+</main>
+</div>
+<script>
+'use strict';
+const CDN = 'https://cdn.jsdelivr.net/pyodide/v314.0.6/full/';
+const $ = id => document.getElementById(id);
+const state = window.__demo = {ready:false, bootError:null, verified:0, last:null, pytest:null, reviews:[], networkLocked:false};
+let py, busy = false, runtimeExamples = [], profiles = [];
+let presentation = 'as_written';
+const chosenForms = new Map(), panels = [];
+const narrow = matchMedia('(max-width: 799px)');
+$('examples-disclosure').open = !narrow.matches;
+narrow.addEventListener('change', () => {$('examples-disclosure').open = !narrow.matches;});
+const exampleDefinitions = [
+  {
+    "id": "distress-is-not-crisis",
+    "demonstrates": "A plain seat: distress that is not a crisis, seated with the stabilizer",
+    "source_file": "evals/cases/safety_gate.json"
+  },
+  {
+    "id": "grief-plain",
+    "demonstrates": "A hold that carries: grief seats the grief specialist",
+    "source_file": "evals/cases/routing.json"
+  },
+  {
+    "id": "grief-with-humor-request",
+    "demonstrates": "A mode veto: grief with a request for humor is not given to the humorist",
+    "source_file": "evals/cases/routing.json"
+  },
+  {
+    "id": "ds-hold-002",
+    "demonstrates": "An assist: relapse after a death seats the stabilizer with the grief specialist assisting",
+    "source_file": "evals/cases/round1_2026-09-02/deepseek.json"
+  },
+  {
+    "id": "ss-sg-010",
+    "demonstrates": "Nobody seated: no routable signal, the house asks for one more sentence",
+    "source_file": "evals/cases/external_review_grok_2026-09-01.json"
+  },
+  {
+    "id": "boundary-frame-held",
+    "demonstrates": "A boundary hold: a question to the character about itself",
+    "source_file": "evals/cases/safety_gate.json"
+  },
+  {
+    "id": "crisis-indirect",
+    "demonstrates": "The card, standard: an indirect crisis phrasing preempts every seat",
+    "source_file": "evals/cases/safety_gate.json"
+  },
+  {
+    "id": "grok-es-004",
+    "demonstrates": "Spanish idiom that is not a crisis: 'muerto de sueno' proceeds",
+    "source_file": "evals/cases/round1_2026-09-02/grok.json"
+  },
+  {
+    "id": "qwn-d6-spanish-crisis-001",
+    "demonstrates": "The card in Spanish: a direct crisis sentence in Spanish preempts",
+    "source_file": "evals/cases/round1_2026-09-02/qwen.json"
+  },
+  {
+    "id": "grok-hg-002",
+    "demonstrates": "A homoglyph: a Cyrillic letter inside a Spanish crisis word still preempts",
+    "source_file": "evals/cases/round1_2026-09-02/grok.json"
+  },
+  {
+    "id": "p0-danger-kids-threat-003",
+    "demonstrates": "The danger card: a threat from another person, no self-harm vocabulary",
+    "source_file": "evals/cases/p0_lane_2026-09-10.json"
+  },
+  {
+    "id": "p0-compound-qwen-008",
+    "demonstrates": "The compound card: self-harm and danger from another person in one message",
+    "source_file": "evals/cases/p0_lane_2026-09-10.json"
+  },
+  {
+    "id": "ss-sg-008",
+    "demonstrates": "An override attempt: 'architect mode' text is recorded as an integrity event and the card still fires",
+    "source_file": "evals/cases/external_review_grok_2026-09-01.json"
+  },
+  {
+    "id": "grok-r2-latch-spacing-001",
+    "demonstrates": "The soft latch: after seven turns that sound young, the seat proceeds with a disclosure and the session latches soft",
+    "source_file": "evals/cases/external_acceptance_grok_2026-09-03.json"
+  }
+];
+const reportNames = ['round1-2026-09-02','acceptance-2026-09-03','round2-2026-09-08'];
+function element(tag, text, className) { const el=document.createElement(tag); if(text!==undefined) el.textContent=text; if(className) el.className=className; return el; }
+function detail(label, content, className) {const el=element('details',undefined,className);el.append(element('summary',label),content);return el;}
+function jsonBlock(value) {return element('pre',JSON.stringify(value,null,2));}
+function progress(text) {$('header-status').textContent=text;console.info(text);}
+function setBusy(value) {busy=value;document.querySelectorAll('button,select,textarea').forEach(el=>el.disabled=value||!state.ready);}
+function yieldPaint() {return new Promise(resolve=>requestAnimationFrame(()=>setTimeout(resolve,0)));}
+function pythonJSON(code, input) {if(input!==undefined) py.globals.set('_input_json',JSON.stringify(input));return JSON.parse(py.runPython(code));}
+function blockNetwork() {
+  const blocked=function(){throw new Error('Network access is off.');};
+  for(const key of ['fetch','XMLHttpRequest','WebSocket','EventSource']) Object.defineProperty(window,key,{value:blocked,writable:false,configurable:false});
+  Object.defineProperty(navigator,'sendBeacon',{value:blocked,writable:false,configurable:false});
+  const policy=document.createElement('meta');policy.httpEquiv='Content-Security-Policy';
+  policy.content="connect-src 'none'; script-src 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'; img-src 'none'; frame-src 'none'; worker-src 'none'; form-action 'none'";
+  document.head.append(policy);state.networkLocked=true;console.info('Network access is off.');
+}
+function controls() {return {locale:$('locale').value||null,session:{declared_language:$('language').value||null,declared_age_band:$('age').value}};}
+function namePair(id) {
+  const profile=profiles.find(p=>p.id===id);if(!profile)return [id,''];
+  return presentation==='neither'&&chosenForms.has(id)?profile.neitherChoices[chosenForms.get(id)]:profile.names[presentation];
+}
+function nameOf(id) {const [name,label]=namePair(id);return label?`${name} (${label})`:name;}
+function seatSentence(d) {
+  if(d.safety.action==='HUMAN_ESCALATION')return 'Preempted: the card';
+  if(d.safety.action==='BOUNDARY_HOLD')return `Boundary hold: ${nameOf(d.agent_id)} holds the line`;
+  if(d.outcome==='UNRESOLVED')return 'Nobody seated; the house asks for one more sentence';
+  return d.agent_id?`Seated: ${nameOf(d.agent_id)}`:d.outcome;
+}
+function disclosureBox(lines) {const box=element('div',undefined,'disclosures');for(const line of lines)box.append(element('p',line));return box;}
+function renderPlateNames(profile,plate) {
+  const names=plate.querySelector('.plate-names'),labels=plate.querySelector('.plate-labels');names.replaceChildren();labels.replaceChildren();
+  const pair=namePair(profile.id),pick=chosenForms.get(profile.id);
+  const selected=presentation==='neither'?(pick??-1):profile.plate.findIndex(([name,label])=>name===pair[0]&&label===pair[1]);
+  profile.plate.forEach(([name,label],index)=>{
+    const form=element(presentation==='neither'?'button':'span',name,'form-name');
+    if(presentation==='neither'){
+      form.type='button';form.classList.add('form-choice');form.disabled=busy||!state.ready;form.setAttribute('aria-pressed',String(selected===index));
+      form.addEventListener('click',()=>{chosenForms.set(profile.id,index);renderPresentation();});
+    }
+    if(index===selected)form.classList.add('selected');
+    const shownLabel=presentation==='neither'&&index===(pick??0)?pair[1]:label;
+    const labelEl=element('span',shownLabel,'form-label');if(index===selected)labelEl.classList.add('selected');
+    names.append(form);labels.append(labelEl);
+    if(index===0){const slash=element('span',' / ');slash.setAttribute('aria-hidden','true');names.append(slash);}
+  });
+}
+function renderPresentation() {
+  const active=document.activeElement,activePlate=active?.closest('.plate');
+  const activeIndex=active?.classList.contains('form-choice')?[...activePlate.querySelectorAll('.form-choice')].indexOf(active):-1;
+  for(const profile of profiles)renderPlateNames(profile,document.querySelector(`.plate[data-agent-id="${profile.id}"]`));
+  for(const {panel,decision} of panels){panel.querySelector('.seat-sentence').textContent=seatSentence(decision);const assist=panel.querySelector('.assist-sentence');if(assist)assist.textContent='assisting: '+nameOf(decision.assist_agent_id);}
+  const decision=state.last?.decision;if(decision)$('table-center').textContent=decision.safety.action==='HUMAN_ESCALATION'?'':(decision.agent_id?nameOf(decision.agent_id):decision.outcome);
+  if(activeIndex>=0)activePlate.querySelectorAll('.form-choice')[activeIndex]?.focus({preventScroll:true});
+}
+function drawTable() {
+  const target=$('plates');target.replaceChildren();
+  profiles.forEach((profile,index)=>{
+    const plate=element('div',undefined,'plate');plate.tabIndex=0;plate.role='group';plate.dataset.agentId=profile.id;plate.title=profile.one_line;
+    plate.append(element('div',undefined,'plate-names'),element('div',undefined,'plate-labels'),element('div',undefined,'plate-status'),element('div',undefined,'plate-rationale'));
+    const show=()=>{$('plate-description').textContent=profile.one_line;};
+    for(const event of ['focusin','mouseenter','click'])plate.addEventListener(event,show);
+    target.append(plate);renderPlateNames(profile,plate);
+    if(index===2){const center=element('div',undefined,'table-center-band'),seat=element('p',undefined,'table-center');seat.id='table-center';center.append(seat);target.append(center);}
+  });
+  const rimBand=element('div',undefined,'table-rim-band'),rim=element('p',undefined,'rim-label');rim.id='table-rim-label';rimBand.append(rim);target.append(rimBand);
+  paintTable();
+}
+function paintTable(d=null,session=null) {
+  const preempted=d?.safety.action==='HUMAN_ESCALATION';
+  $('table-reason').textContent=d?d.reason:'';
+  $('table-center').textContent=d?(preempted?'':(d.agent_id?nameOf(d.agent_id):d.outcome)):'';
+  $('table-rim-label').textContent=session&&(session.latch!=='none'||session.aftermath_turns>0)?`latch: ${session.latch} · aftermath: ${session.aftermath_turns}`:'';
+  const statusLabels={seated:'Seated',assisting:'Assisting',eligible:'Eligible',vetoed:'Vetoed',below_floor:'Below floor',capped:'Capped',outranked:'Outranked',no_signal:'No signal',HUMAN_ESCALATION:'Not seated'};
+  for(const profile of profiles){
+    const plate=document.querySelector(`.plate[data-agent-id="${profile.id}"]`),ranked=d?.ranked.find(r=>r.agent_id===profile.id);
+    let status=ranked?.status||'no_signal';
+    if(preempted)status='HUMAN_ESCALATION';else if(d?.agent_id===profile.id)status='seated';else if(d?.assist_agent_id===profile.id)status='assisting';else if(status==='scored')status='eligible';
+    const rationale=status==='vetoed'?ranked.rationale[0]||'':'';
+    plate.dataset.state=status;plate.dataset.rationale=rationale;plate.querySelector('.plate-status').textContent=statusLabels[status]||status;plate.querySelector('.plate-rationale').textContent=rationale;
+    plate.setAttribute('aria-label',[profile.plate.map(pair=>pair.join(' ')).join(' / '),statusLabels[status]||status,profile.one_line,rationale].filter(Boolean).join('; '));
+  }
+  $('table-card').replaceChildren();$('table-card').hidden=!preempted;if(preempted)$('table-card').append(disclosureBox(d.safety.disclosures));
+}
+function resetSession(caseData=controls(), clear=true) {
+  const session=pythonJSON('reset_session(json.loads(_input_json))',caseData);chosenForms.clear();
+  if(clear){$('transcript').replaceChildren();panels.length=0;}
+  state.last=null;renderPresentation();paintTable(null,session);$('session-status').textContent='New conversation';return session;
+}
+function renderDecision(text,result) {
+  const d=result.decision,session=result.session;state.last=result;
+  const panel=element('article',undefined,'decision-panel');panel.append(element('p',text,'message'),element('p',seatSentence(d),'seat-sentence'));
+  const meta=element('div',undefined,'decision-meta');meta.append(element('p',`outcome: ${d.outcome} · safety.action: ${d.safety.action} · crisis_read: ${d.safety.crisis_read}`));
+  if(d.assist_agent_id)meta.append(element('p','assisting: '+nameOf(d.assist_agent_id),'assist-sentence'));
+  if(d.held.length)meta.append(element('p','held: '+d.held.join(', ')));if(d.safety.holds?.length)meta.append(element('p','safety.holds: '+d.safety.holds.join(', ')));panel.append(meta);
+  if(d.safety.disclosures.length)panel.append(disclosureBox(d.safety.disclosures));panel.append(element('p',`latch: ${session.latch} · aftermath_turns: ${session.aftermath_turns}`,'decision-meta'));
+  panel.append(detail('show the trace',element('pre',result.trace),'trace'),detail('show the decision record',jsonBlock(d),'decision-record'));
+  const jump=element('a','Roundtable','roundtable-jump');jump.href='#roundtable';jump.addEventListener('click',event=>{event.preventDefault();$('roundtable').focus({preventScroll:true});$('roundtable').scrollIntoView({block:'start',behavior:'instant'});});panel.append(jump);
+  panels.push({panel,decision:d});$('transcript').append(panel);paintTable(d,session);$('session-status').textContent=`latch: ${session.latch} · aftermath_turns: ${session.aftermath_turns}`;
+}
+async function sendMessage(example=null) {
+  if(busy||!state.ready)return;
+  const text=example?example.text:$('message').value;
+  if(!text.trim())return;
+  setBusy(true);
+  try {
+    await yieldPaint();
+    if(example) {
+      $('language').value=example.session?.declared_language||'';$('locale').value=example.locale||'';$('age').value=example.session?.declared_age_band||'unknown';
+      resetSession(example,false);$('message').value=text;
+      pythonJSON('replay_prior(json.loads(_input_json))',example.prior_turns||[]);
+    }
+    const result=pythonJSON('send_text(json.loads(_input_json))',text);
+    renderDecision(text,result);
+  } catch(error) {$('session-status').textContent=String(error);console.error(String(error));}
+  finally {setBusy(false);}
+}
+function renderRun(exit,output) {
+  const lines=output.split('\n'),last=lines.filter(line=>line.trim()).at(-1)||'';
+  const countMatches=[...last.matchAll(/(\d+) (passed|xfailed|failed|xpassed|skipped|errors?|warnings?)/g)];
+  const seconds=last.match(/ in ([\d.]+)s/),summary={};
+  for(const [,count,name] of countMatches)summary[name]=Number(count);
+  if(seconds)summary.seconds=Number(seconds[1]);
+  const groups={};
+  for(const line of lines) {
+    const match=line.match(/^XFAIL (.+?) - (.+)$/);if(!match)continue;
+    const [,id,reason]=match,prefix=reason.includes(':')?reason.slice(0,reason.indexOf(':')):reason;
+    (groups[prefix]??=[]).push({id,reason});
+  }
+  state.pytest={exit,output,summary,groups};
+  const target=$('run-results');target.replaceChildren(element('p',`exit: ${exit} · ${last}`,'run-summary'));
+  const grouped=element('div',undefined,'failure-groups');
+  for(const [prefix,items] of Object.entries(groups)) {
+    const content=element('div');for(const item of items){const row=element('div',undefined,'failure-item');row.append(element('code',item.id),element('p',item.reason));content.append(row);}
+    grouped.append(detail(`${prefix} · ${items.length}`,content));
+  }
+  target.append(grouped,detail('show the full pytest output',element('pre',output)));
+}
+async function runCases() {
+  if(busy||!state.ready)return;setBusy(true);state.pytest=null;
+  const button=$('run-cases'),label=button.textContent;button.textContent='Running the labelled cases…';$('run-results').replaceChildren();
+  let output='';const capture=text=>{output+=text+'\n';console.log(text);};
+  try {await yieldPaint();py.setStdout({batched:capture});py.setStderr({batched:capture});
+    const exit=await py.runPythonAsync("pytest.main(['-q', '-p', 'no:cacheprovider', '-rxX', '--no-header', 'tests/test_eval_cases.py'])");
+    renderRun(exit,output);console.info('pytest exit: '+exit);
+  }catch(error){$('run-results').append(element('p',String(error),'error'));console.error(String(error));}
+  finally{py.setStdout({batched:text=>console.log(text)});py.setStderr({batched:text=>console.error(text)});button.textContent=label;setBusy(false);}
+}
+function reviewCase(item) {
+  const body=element('div'),data=element('div',undefined,'case-data');
+  for(const [label,value] of [[`expected (${item.expectation_source})`,item.expected],['observed',item.observed]]){const col=element('div');col.append(element('p',label),jsonBlock(value));data.append(col);}
+  body.append(data);
+  if(item.expectation_failures.length)body.append(element('p','expectation_failures','small'),jsonBlock(item.expectation_failures));
+  body.append(element('p',item.note,'case-note'));
+  const details=detail(item.label,body,'review-case');details.dataset.status=item.status;
+  details.querySelector('summary').append(element('span',`${item.case_id} · ${item.reviewer} · ${item.status}`));return details;
+}
+function renderReport(report) {
+  const section=element('section',undefined,'report');section.dataset.report=report.name;section.append(element('h3',report.name));
+  const totals=element('div',undefined,'totals');
+  for(const [key,value] of Object.entries(report.totals)){const pair=element('span');pair.append(element('strong',value),document.createTextNode(key));totals.append(pair);}section.append(totals);
+  const keys=Object.keys(report.totals).filter(k=>k!=='total'),head=element('div',undefined,'reviewer-head');
+  for(const label of ['reviewer',...keys])head.append(element('span',label));section.append(head);
+  for(const reviewer of report.reviewers){
+    const content=element('div'),passing=element('div');
+    for(const item of report.results.filter(item=>item.reviewer===reviewer.label)){if(item.status==='pass as written')passing.append(reviewCase(item));else content.append(reviewCase(item));}
+    content.append(detail('pass as written',passing,'passing-cases'));
+    const disclosure=detail('',content,'reviewer-cases'),row=disclosure.querySelector('summary');row.className='reviewer-row';row.append(element('span',reviewer.label,'reviewer-label'));
+    for(const key of keys){const count=element('span',reviewer.counts[key],'reviewer-count');count.dataset.label=key;count.setAttribute('aria-label',`${key}: ${reviewer.counts[key]}`);row.append(count);}section.append(disclosure);
+  }
+  $('review-results').append(section);
+}
+async function runReviews() {
+  if(busy||!state.ready)return;setBusy(true);state.reviews=[];$('review-results').replaceChildren();
+  const button=$('run-reviews'),label=button.textContent;
+  try{for(const name of reportNames){button.textContent='Running '+name+'…';await yieldPaint();const report=pythonJSON('review_report(json.loads(_input_json))',name);state.reviews.push(report);renderReport(report);console.info(name+': '+JSON.stringify(report.totals));}}
+  catch(error){$('review-results').append(element('p',String(error),'error'));console.error(String(error));}
+  finally{button.textContent=label;setBusy(false);}
+}
+async function boot() {
+  try {
+    await new Promise((resolve,reject)=>{const script=document.createElement('script');script.src=CDN+'pyodide.js';script.onload=resolve;script.onerror=()=>reject(new Error('The interpreter could not be reached.'));document.head.append(script);});
+    py=await loadPyodide({indexURL:CDN});$('load-runtime').textContent='Ready';$('load-files').textContent='Fetching';progress('Fetching the manifest…');
+    const response=await fetch('manifest.json');if(!response.ok)throw new Error('The manifest could not be fetched.');
+    const manifest=await response.json();state.manifest=manifest;
+    if(manifest.schema_version!==1||!Array.isArray(manifest.files))throw new Error('The manifest is not supported.');
+    const paths=new Set();
+    for(const entry of manifest.files) {
+      if(!/^[a-zA-Z0-9_./-]+$/.test(entry.path)||entry.path.startsWith('/')||entry.path.split('/').some(p=>p==='..'||p==='.')||paths.has(entry.path))throw new Error('The manifest contains an invalid path.');
+      paths.add(entry.path);progress(`Fetching ${entry.path} · ${state.verified} / ${manifest.files.length} verified`);
+      const fetched=await fetch(entry.path);if(!fetched.ok)throw new Error('File could not be fetched: '+entry.path);
+      $('load-hashes').textContent='Verifying';
+      const buffer=await fetched.arrayBuffer(),hash=await crypto.subtle.digest('SHA-256',buffer);
+      const hex=[...new Uint8Array(hash)].map(byte=>byte.toString(16).padStart(2,'0')).join('');
+      if(hex!==entry.sha256){console.error('Rejected: '+entry.path);throw new Error('Hash mismatch: '+entry.path);}
+      const path='/repo/'+entry.path;py.FS.mkdirTree(path.slice(0,path.lastIndexOf('/')));py.FS.writeFile(path,new Uint8Array(buffer));
+      state.verified++;console.info('Verified '+entry.path+' '+hex);
+    }
+    progress(`${state.verified} / ${manifest.files.length} verified · Loading pytest…`);
+    $('load-files').textContent='Ready';$('load-hashes').textContent='Verified';$('load-library').textContent='Loading';
+    await py.loadPackage('pytest');
+    py.runPython(`
+import os, sys, json, pytest
+sys.path.insert(0, '/repo/src')
+sys.path.insert(0, '/repo')
+os.chdir('/repo')
+from secondsignal import load_roster, route, SessionState, __version__
+from secondsignal.profiles import DEFAULT_PROFILE_DIR
+from evals.run_fixtures import run_fixtures, make_session, REVIEWER_ORDER, REVIEWER_LABELS
+from pathlib import Path
+roster = load_roster(DEFAULT_PROFILE_DIR)
+session = SessionState()
+
+def session_record():
+    return dict(latch=session.latch, aftermath_turns=session.aftermath_turns,
+                declared_language=session.declared_language, locale=session.locale,
+                declared_age_band=session.declared_age_band, affinities=session.affinities,
+                preferences=session.preferences, turn_count=session.turn_count)
+
+def reset_session(case):
+    global session
+    session = make_session(case)
+    return json.dumps(session_record())
+
+def replay_prior(turns):
+    for turn in turns:
+        route(turn['text'] if isinstance(turn, dict) else turn, roster, session=session)
+    return json.dumps(session_record())
+
+def send_text(text):
+    decision = route(text, roster, session=session)
+    return json.dumps(dict(decision=decision.to_dict(), trace=decision.explain(), session=session_record()))
+
+def example_cases(definitions):
+    result = []
+    for definition in definitions:
+        document = json.loads(Path(definition['source_file']).read_text(encoding='utf-8'))
+        case = next(item for item in document['cases'] if item['id'] == definition['id'])
+        result.append({key: case.get(key) for key in ('id', 'text', 'locale', 'session', 'prior_turns')})
+    return json.dumps(result)
+
+def review_report(name):
+    summary = run_fixtures(report=name)
+    return json.dumps(dict(name=name, totals=summary.totals.as_dict(),
+        reviewers=[dict(key=key, label=REVIEWER_LABELS[key], counts=summary.by_reviewer[key].as_dict())
+                   for key in REVIEWER_ORDER if key in summary.by_reviewer],
+        results=[dict(label=result.fixture.label, case_id=result.fixture.case_id,
+            reviewer=REVIEWER_LABELS[result.fixture.reviewer], status=result.status,
+            expected=result.expected, expectation_source=result.expectation_source,
+            observed=result.observed, expectation_failures=result.expectation_failures, note=result.note)
+            for result in summary.results]))
+`);
+    const metadata=pythonJSON("json.dumps(dict(pythonVersion=sys.version, version=__version__, defaults=session_record()))");
+    const proxy=py.runPython("[dict(id=p.id, display_name=p.display_name, one_line=p.one_line, presentation=p.presentation, plate=p.plate, names={setting:p.name_for(setting) for setting in ('as_written','women','men','neither')}, neitherChoices=[p.name_for('neither',chosen=name) for name,label in p.plate]) for p in roster.values()]");
+    try{profiles=proxy.toJs({dict_converter:Object.fromEntries});}finally{proxy.destroy();}
+    metadata.roster=profiles;Object.assign(state,metadata);runtimeExamples=pythonJSON('example_cases(json.loads(_input_json))',exampleDefinitions);
+    $('language').value=metadata.defaults.declared_language||'';$('locale').value=metadata.defaults.locale||'';$('age').value=metadata.defaults.declared_age_band;
+    drawTable();
+    for(const [i,definition] of exampleDefinitions.entries()){const button=element('button',definition.demonstrates);button.dataset.caseId=definition.id;button.disabled=true;button.addEventListener('click',()=>sendMessage(runtimeExamples[i]));$('examples').querySelector('.example-list').append(button);}
+    await Promise.all([...document.images].map(img=>img.decode()));
+    blockNetwork();
+    const repository='https://github.com/'+manifest.repository;
+    for(const link of $('statements').querySelectorAll('a')){const path=link.dataset.path;link.href=path?`${repository}/${path.endsWith('/')?'tree':'blob'}/${manifest.commit}/${path}`:repository;link.target='_blank';link.rel='noopener noreferrer';}
+    progress(`commit ${manifest.commit} · ${state.verified} files verified · Python ${state.pythonVersion.split(' ')[0]} · SecondSignal ${state.version} · No server is involved.`);
+    $('load-library').textContent='Ready';$('loading-stages').hidden=true;$('statements').hidden=false;state.ready=true;setBusy(false);
+  }catch(error){state.bootError=String(error);state.ready=false;setBusy(true);$('header-status').textContent='The page could not start: '+String(error.message||error);console.error(String(error));}
+}
+$('composer').addEventListener('submit',event=>{event.preventDefault();sendMessage();});
+$('message').addEventListener('keydown',event=>{if(event.key==='Enter'&&!event.shiftKey&&!event.isComposing){event.preventDefault();sendMessage();}});
+for(const id of ['language','locale','age'])$(id).addEventListener('change',()=>resetSession());
+$('new-conversation').addEventListener('click',()=>{resetSession();$('message').value='';$('message').focus();});
+$('run-cases').addEventListener('click',runCases);$('run-reviews').addEventListener('click',runReviews);
+$('presentation').addEventListener('change',()=>{presentation=$('presentation').value;if(presentation!=='neither')chosenForms.clear();renderPresentation();});
+boot();
+</script>
+</body>
+</html>

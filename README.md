@@ -17,7 +17,7 @@ points at a test, a record, or a labelled proposal.
 Follow the build. Inspect the design. See what still needs testing.
 
 [![CI](https://github.com/THerigstad/SecondSignal/actions/workflows/ci.yml/badge.svg)](https://github.com/THerigstad/SecondSignal/actions/workflows/ci.yml)
-[![tests](https://img.shields.io/badge/tests-1%2C259%20%C2%B7%20179%20known%20gaps%20%C2%B7%2014%20recorded%20dissents-brightgreen)](docs/evaluation.md)
+[![tests](https://img.shields.io/badge/tests-1%2C299%20%C2%B7%20179%20known%20gaps%20%C2%B7%2014%20recorded%20dissents-brightgreen)](docs/evaluation.md)
 [![python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue)](pyproject.toml)
 [![license](https://img.shields.io/badge/license-MIT%20code%20%C2%B7%20CC%20BY--NC--ND%204.0%20characters-blue)](LICENSE-CONTENT)
 
@@ -115,7 +115,7 @@ git clone https://github.com/THerigstad/SecondSignal.git
 cd SecondSignal
 pip install -e ".[dev]"
 
-pytest                                  # 1,259 tests: 193 expected failures (179 documented gaps, 14 recorded dissents), the rest pass; no network, no API key
+pytest                                  # 1,299 tests: 193 expected failures (179 documented gaps, 14 recorded dissents), the rest pass; no network, no API key
 python -m secondsignal --roster
 python -m secondsignal "I'm panicking, chest tight, can't breathe"
 python -m secondsignal --json "help me plan the launch"
@@ -443,7 +443,7 @@ yet to move it.
 | Fail-closed crisis screen (class lexicon, `unreviewed`) over normalized text, with idiom masks and a receipt on every verdict; the danger lane with verified domestic-violence lines for five locales; the post-separation window and the abuse-history hold; boundary, integrity and facilitation holds; the two-tier careful-side latch and register cap; the house lines; the bounded aftermath; style preferences that ask | Response generation of any kind; the settings surface that stores a confirmed preference; the correction path after a careful-side inference beyond its first step |
 | Declarative roster validated at load, including the stabilizer floor; profiles hashed; aliases; stabilizer resolved by role; ten codexes in the two-part shape, each family codex held equal to its profile by a test | Persistent cross-session memory; persistence of a safety restriction across sessions (a hard latch dies with the session today) |
 | Labeled eval cases run in CI: 415 inventoried in a case manifest, 165 of them external reviewer fixtures kept verbatim, 179 documented gaps and 14 recorded dissents; an expected failure may fail only on the fields it was approved for, so it cannot absorb an unrelated regression; 71 deferred fixtures stored and not run | The audit harness wired in (a reference port, `jr.py`, is in the tree and deliberately unwired); intake and provenance; the ledger and the interlock; Protocol A / B evaluations |
-| English and a native Spanish pack (`unreviewed`; native review in progress) with verified resource rows; a machine-checked register of every design decision, hardened against the mutations its reviewers wrote; 1,259 tests, no network or API key required | Any other language; Spanish integrity, danger and separation detectors; clinical review of any lexicon; multi-turn conversational state beyond the monitors |
+| English and a native Spanish pack (`unreviewed`; native review in progress) with verified resource rows; a machine-checked register of every design decision, hardened against the mutations its reviewers wrote; 1,299 tests, no network or API key required | Any other language; Spanish integrity, danger and separation detectors; clinical review of any lexicon; multi-turn conversational state beyond the monitors |
 
 This repository is the **policy layer only**. It decides who should respond and
 whether anyone should. It does not generate responses. That boundary is
@@ -487,7 +487,7 @@ edited by hand or if a status claim appears anywhere else on this page.
 - [ADR-0022](docs/adr/0022-intake-and-provenance.md) — Intake and provenance runs after the gate and before routing, and proposes but never grants. **Proposed (written, not yet adopted); not built.** Not built. The integrity patterns and the forged-ping guard exist inside the gate (safety.py, tests/test_guards.py) and are the detectors this record gathers under one name; no intake function, row, stamp, backend or validator exists. Failure clause revised in place 2026-09-10 (seat the persona, block the writes, one automatic retry, the house's failure line) on the operator's ruling after review round 2; the original clause is kept in the record's revision history.
 - [ADR-0023](docs/adr/0023-ledger-and-interlock.md) — The ledger and the interlock are two named things bound by one invariant, and nothing weakens a restriction without a clearance row. **Proposed (written, not yet adopted); not built.** Not built. Session-scoped latch state, operator clear by reason and selective clear exist inside the gate (tests/test_latch.py); no append-only row, hash chain, interlock, clearance row, persistence, manifest, aftermath counter or narrator exists. Amends ADR-0015's hard-tier visibility clause (once when the latch sets, again only as a refusal's reason); the cap is unchanged.
 - [ADR-0025](docs/adr/0025-assist-from-the-hold-and-affinity-seat-trade.md) — The assist from the hold, and an affinity that can trade seats. **Proposed (written, not yet adopted); not built.** The operator's design intent, recorded with its target case (SiblingAssist) and its gate. Not adopted; would amend ADR-0016 if Accepted; not to be built before a generation layer exists. Amended 2026-09-10 by ADR-0026: proposal 2 (the affinity seat trade) withdrawn; proposal 1 (the assist from the hold) stands.
-- [ADR-0026](docs/adr/0026-twins-two-presentations-one-routing-contract.md) — Twins: every persona has two presentations and one routing contract. **Proposed (written, not yet adopted); not built.** The operator's ruling of 2026-09-10. Not built. Replaces ADR-0025's seat trade by construction (the specialist keeps the seat; only the presentation changes); the rename to twin-neutral names (Cody, Vandal, Nikki, Willow, Ellis, Seren, Rowan) is built as an alias layer in the same push. Flips to Accepted after review round 3 reads it beside the amended ADR-0025.
+- [ADR-0026](docs/adr/0026-twins-two-presentations-one-routing-contract.md) — Twins: every persona has two presentations and one routing contract. **Proposed (written, not yet adopted); partly built.** The operator's ruling of 2026-09-10; amended in place 2026-09-11 (amendment 1: three presentations, woman, man or neither; one name in two forms, the short form the full form with letters dropped, both on every plate with she and he labels, printed twice when the name does not shorten; the door's fourth answer). Partial: the presentation block in every family profile, the plate and name_for helpers and their tests are built; routing reads none of it, and the door, the settings and the generation layer are not built. Replaces ADR-0025's seat trade by construction (the specialist keeps the seat; only the presentation changes); the rename to twin-neutral names (Cody, Vandal, Nikki, Willow, Ellis, Seren, Rowan) is built as an alias layer. Flips to Accepted after review round 3 reads it, with amendment 1, beside the amended ADR-0025.
 - [ADR-0027](docs/adr/0027-a-relatives-return-to-use-is-a-hold.md) — A relative's return to use is a hold, not a seat-claim. **Proposed (written, not yet adopted); built.** The operator's ruling of 2026-09-08 (D3, decided with dissent), built 2026-09-10. Proposed because the record's text is the assistant's; flips to Accepted after review round 3 reads it.
 
 Numbers held for records not yet written: ADR-0021 (the neurodivergent interruption stack (an external reviewer's draft); lands only with its fixtures, gated by the rule that neurodivergent-friendliness claims wait on green fixtures); ADR-0024 (the completion field per profile; lands with its own change).
@@ -751,7 +751,7 @@ page.
 Every time a model working on this project wiped something out, gamed a test,
 invented a fact, or claimed work it had not done, it has a line, and so does
 every time the project's own assistant or its operator did:
-[`docs/confessions.md`](docs/confessions.md), twenty-two entries, each with the
+[`docs/confessions.md`](docs/confessions.md), twenty-five entries, each with the
 ask that produced it and a grade of that ask.
 
 ## Provenance

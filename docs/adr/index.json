@@ -347,13 +347,19 @@
       "file": "0026-twins-two-presentations-one-routing-contract.md",
       "title": "Twins: every persona has two presentations and one routing contract",
       "decision": "Proposed",
-      "implementation": "none",
-      "evidence": [],
-      "modules": [],
+      "implementation": "partial",
+      "evidence": [
+        "tests/test_presentations.py::test_the_plate_is_the_ruled_one",
+        "tests/test_presentations.py::test_no_routing_module_reads_the_presentation_block",
+        "tests/test_codex_house_block.py::test_a_family_codex_machine_block_equals_its_profile"
+      ],
+      "modules": [
+        "src/secondsignal/profiles.py"
+      ],
       "amends": [
         "0025"
       ],
-      "notes": "The operator's ruling of 2026-09-10. Not built. Replaces ADR-0025's seat trade by construction (the specialist keeps the seat; only the presentation changes); the rename to twin-neutral names (Cody, Vandal, Nikki, Willow, Ellis, Seren, Rowan) is built as an alias layer in the same push. Flips to Accepted after review round 3 reads it beside the amended ADR-0025."
+      "notes": "The operator's ruling of 2026-09-10; amended in place 2026-09-11 (amendment 1: three presentations, woman, man or neither; one name in two forms, the short form the full form with letters dropped, both on every plate with she and he labels, printed twice when the name does not shorten; the door's fourth answer). Partial: the presentation block in every family profile, the plate and name_for helpers and their tests are built; routing reads none of it, and the door, the settings and the generation layer are not built. Replaces ADR-0025's seat trade by construction (the specialist keeps the seat; only the presentation changes); the rename to twin-neutral names (Cody, Vandal, Nikki, Willow, Ellis, Seren, Rowan) is built as an alias layer. Flips to Accepted after review round 3 reads it, with amendment 1, beside the amended ADR-0025."
     },
     {
       "number": "0027",

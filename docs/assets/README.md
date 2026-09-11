@@ -58,7 +58,12 @@ the reason it was looked at.
   result pages.
 - **`social-preview.png`** (1280 × 640). The house with the mark in one
   corner, composed on 10 September 2026 for the repository's social preview
-  so a link unfurls with the house. Not used in the README.
+  so a link unfurls with the house. Not used in the README. What GitHub
+  actually serves is a JPEG edition of this file, uploaded by hand in the
+  repository settings on 10 September 2026 because the settings page holds
+  uploads under one megabyte and the PNG is over it; the JPEG is the same
+  picture re-encoded and is not committed, so the committed PNG remains the
+  record of what was composed.
 
 ## Palette
 

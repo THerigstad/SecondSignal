@@ -12,16 +12,18 @@ he asked for each of them. The page exists because "I audit everything" is a
 claim, and a claim without receipts is the thing this project is arguing
 against.
 
-**Status: version 4, 10 September 2026. Entries C-01 to C-19 were approved
+**Status: version 5, 11 September 2026. Entries C-01 to C-19 were approved
 by the operator on 9 and 10 September 2026; C-20 was added at his instruction
 on 10 September, and its wording stays his to edit; C-21 was added at his
 instruction the same day, after the pre-push check that produced it, and its
 wording was read by him before the push; C-22 was added at his instruction
-the same night, after the sweep that ran when the push had landed.** The
+the same night, after the sweep that ran when the push had landed; C-23 to
+C-25 were approved by him on 11 September 2026, from the demonstration page's
+build rounds.** The
 operator approves each entry individually before it is published or linked
 from the README. Entries are written by the project's Primary Design Agent
-(Claude), which is also the subject of four of the first twelve and eight of
-the last ten; the other two are the operator's.
+(Claude), which is also the subject of four of the first twelve and eleven of
+the last thirteen; the other two are the operator's.
 
 ## Read this before the entries
 
@@ -473,7 +475,7 @@ the runner's, for treating an unrecognized instruction as an absent one.
 
 *A coder would never have let a runner shrug at a key it did not recognize. A coder treats an unknown key as an error, because a coder has met himself before.*
 
-## The Primary Design Agent's own, ten more
+## The Primary Design Agent's own, thirteen more
 
 These five come from the accounting of 6 September 2026, when the operator
 asked for every mistake of that evening to be listed. Sixteen were listed; the
@@ -488,7 +490,10 @@ own, and he asked for each of them as it came up. The ninth, C-21, is from
 the check that ran before push 3 went out, and the operator ruled that it
 earns its place because it was caught, not although. The tenth, C-22, is from
 the sweep that ran after push 3 had landed, and the operator asked for it the
-same night.
+same night. C-23, C-24 and C-25 are from the demonstration page's two build
+rounds of 10 and 11 September: three defects in the design agent's own
+orders, each caught by the builder that read them, and recorded because the
+builder's honesty is the only reason they were caught at all.
 
 ### C-13. A push plan that told the operator to run git
 
@@ -847,6 +852,108 @@ identifier, and this entry is the record.
 The narrowing was the Primary Design Agent's, and so was the eight days.
 
 *A coder would never have searched for the address when the instruction said the word. A coder searches for what he was told, not for what he expects to find.*
+
+### C-23. The order told two builders to deploy with a permission that cannot deploy
+
+**The ask.** The operator's demonstration page: a static page that runs the
+real package in the visitor's browser, built by one of his other systems
+from a written order, so that no Anthropic credit is spent on a build his
+other accounts can do. The order was the Primary Design Agent's to write,
+thoroughly, and it specified the publishing workflow line by line.
+
+**What happened.** Section 7 of the round-1 order said the workflow's
+permissions were `pages: write` and `id-token: read`. The deploy action
+needs `id-token: write` to obtain its identity token; with `read` the
+deploy step fails. Two builders received the order. Both preserved the
+wrong value, as the order told them to. One of them (Codex) wrote in its
+build log that the requested permission could not perform the requested
+deployment and cited the action's own documentation; the other (Grok
+Build) marked the item passed.
+
+**How it was caught.** By a builder reading the documentation of the
+action it was told to use, and saying so instead of complying quietly. The
+design agent had written the line from memory.
+
+**What it cost.** A round: the correction went into the round-2 order, and
+no workflow with the wrong value reached the repository.
+
+**What changed.** A line in an order that names a permission, a version or
+an address is checked against the thing's own documentation before the
+order goes out, and the order says where the value came from. And a
+builder's build log that disagrees with the order is read as data first,
+not as an excuse.
+
+**Grade of the ask: clear, and wrong in one line.** The builders did what
+they were told; one of them also said the line was wrong.
+
+*A coder would never have specified a permission without reading what the action needs. A coder reads the action.*
+
+### C-24. A rule no page could satisfy, and one builder said so
+
+**The ask.** The same round-1 order, section 2, rule 6: no name may appear
+on the page other than the project's, the seven personas', "the operator",
+and the reviewer labels; no personal name, place, employer, other character
+or product, anywhere in the page, its source or its build log. The intent
+was the operator's exclusion list.
+
+**What happened.** The rule was unsatisfiable as written. The order also
+required, in the same document, fourteen example messages taken verbatim
+from the fixtures (one carries a persona's retired name inside the
+reviewer's text), the resource rows exactly as the library returns them
+(country names, service names), and the runner's output (reviewer labels
+and fixture ids). Every one of those is content the library emits; none is
+a name the builder typed. Codex ran the scan the order asked for, found
+the emitted names, and marked the item FAIL with the reason: the required
+content contains names outside the allow-list, and censoring it would
+break other rules. Grok Build marked the same item passed.
+
+**How it was caught.** By the builder that refused to pass an item it could
+not truthfully pass.
+
+**What it cost.** Nothing on the page; the names were the library's. It
+cost the order its precision, and it put a false pass in one build log.
+
+**What changed.** The rule now says what it meant: the distinction is
+between what the builder types and what the library emits; a typed name
+fails, an emitted one is content shown exactly as emitted. The acceptance
+item asks the builder to list the capitalised words it typed.
+
+**Grade of the ask: clear in intent, unsatisfiable in letter.** The
+failure is the order's for writing a test it had not run against its own
+requirements.
+
+*A coder would never have written an acceptance test that the required inputs fail. A coder runs the check against the fixture before handing it to anyone.*
+
+### C-25. A gate written from one machine's skip stopped a builder that had done everything right
+
+**The ask.** The round-2 order: copy the design agent's library changes
+over a fresh clone, run the whole suite, and stop if the numbers differ
+from the ones the order gives. A stop clause, so that a builder never
+adjusts a test to make a number match.
+
+**What happened.** The order gave one number, 1,104 passing and one skip,
+measured on the design agent's host, where the packaging check skips
+because that host cannot build a wheel. The builder's host builds the
+wheel; its suite reported 1,105 passing and no skip, which is the same tree
+passing one more test. The order's clause was unconditional, so the builder
+stopped, built nothing, returned a log that marked every acceptance item
+"not run", and proposed the wording the order should have used. It did not
+skip the wheel test to make 1,104 appear.
+
+**How it was caught.** By the builder's return, which was correct.
+
+**What it cost.** One round trip and one line of correction, pasted by the
+operator into the same open session. The corrected order names both
+outcomes.
+
+**What changed.** A number in an order that depends on the host is given
+for every host it can be measured on, with the reason for the difference,
+before the stop clause is attached to it.
+
+**Grade of the ask: clear, and one number short.** The builder honoured the
+clause exactly; the clause was written from one chair.
+
+*A coder would never have hard-coded a count that depends on whether the machine can build a wheel. A coder states the invariant, not the number on his own screen.*
 
 ## The refusals that were right
 
