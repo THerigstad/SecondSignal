@@ -37,6 +37,14 @@ All notable changes to SecondSignal are documented here.
 - **Three ledger entries** (`docs/confessions.md`, version 5): C-23, C-24
   and C-25, the design agent's own, from the demonstration page's orders.
 
+### Fixed — 2026-09-11
+
+- **The demonstration page boots in a background tab.** Its boot waited
+  for the two pictures to finish decoding, which a hidden tab never does;
+  found in the operator's browser after the push, fixed the same night
+  (a bounded wait, and a paint yield that does not depend on an animation
+  frame). `docs/notes/demo-build-2026-09-11.md` records it.
+
 ### Changed — 2026-09-11
 
 - **The test count on the front page and the evaluation page:** 1,299

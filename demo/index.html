@@ -162,7 +162,7 @@ function detail(label, content, className) {const el=element('details',undefined
 function jsonBlock(value) {return element('pre',JSON.stringify(value,null,2));}
 function progress(text) {$('header-status').textContent=text;console.info(text);}
 function setBusy(value) {busy=value;document.querySelectorAll('button,select,textarea').forEach(el=>el.disabled=value||!state.ready);}
-function yieldPaint() {return new Promise(resolve=>requestAnimationFrame(()=>setTimeout(resolve,0)));}
+function yieldPaint() {return new Promise(resolve=>{let done=false;const finish=()=>{if(!done){done=true;setTimeout(resolve,0);}};requestAnimationFrame(finish);setTimeout(finish,100);});}
 function pythonJSON(code, input) {if(input!==undefined) py.globals.set('_input_json',JSON.stringify(input));return JSON.parse(py.runPython(code));}
 function blockNetwork() {
   const blocked=function(){throw new Error('Network access is off.');};
@@ -414,7 +414,7 @@ def review_report(name):
     $('language').value=metadata.defaults.declared_language||'';$('locale').value=metadata.defaults.locale||'';$('age').value=metadata.defaults.declared_age_band;
     drawTable();
     for(const [i,definition] of exampleDefinitions.entries()){const button=element('button',definition.demonstrates);button.dataset.caseId=definition.id;button.disabled=true;button.addEventListener('click',()=>sendMessage(runtimeExamples[i]));$('examples').querySelector('.example-list').append(button);}
-    await Promise.all([...document.images].map(img=>img.decode()));
+    await Promise.race([Promise.allSettled([...document.images].map(img=>img.decode().catch(()=>{}))),new Promise(resolve=>setTimeout(resolve,2000))]);
     blockNetwork();
     const repository='https://github.com/'+manifest.repository;
     for(const link of $('statements').querySelectorAll('a')){const path=link.dataset.path;link.href=path?`${repository}/${path.endsWith('/')?'tree':'blob'}/${manifest.commit}/${path}`:repository;link.target='_blank';link.rel='noopener noreferrer';}
