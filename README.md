@@ -23,6 +23,14 @@ Follow the build. Inspect the design. See what still needs testing.
 
 Zero runtime dependencies. Pure Python. No model calls required to run the policy layer.
 
+**Try it in your browser:** [therigstad.github.io/SecondSignal](https://therigstad.github.io/SecondSignal/)
+runs this repository's real package under Python compiled to WebAssembly: type
+a message and watch the decision, run the labelled cases through pytest, run
+the three external review sets, and switch every character between a woman, a
+man, or neither. Every file is verified by hash before it runs, nothing you
+type leaves the page, and every number on it comes from that run
+([how it was built and what its acceptance run measured](docs/notes/demo-build-2026-09-11.md)).
+
 ![Seven open rooms in a shallow concrete arc, each lit the same warm amber, facing an empty gravel courtyard with one stone bench at dusk. Nobody is seated: which room lights up is decided outside the rooms.](docs/assets/secondsignal-house.png)
 
 **The thesis in one sentence:** in a system of AI personas, authority over
