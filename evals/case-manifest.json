@@ -3453,6 +3453,36 @@
    "source": "safety_gate",
    "plane": "policy",
    "disposition": "accepted"
+  },
+  {
+   "id": "live-past-tense-third-person-001",
+   "source": "operator_live_test_2026-09-11",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "live-modal-give-up-001",
+   "source": "operator_live_test_2026-09-11",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "live-modal-give-up-002",
+   "source": "operator_live_test_2026-09-11",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "live-idiom-control-killed-laughing-001",
+   "source": "operator_live_test_2026-09-11",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "live-idiom-control-give-up-habit-001",
+   "source": "operator_live_test_2026-09-11",
+   "plane": "policy",
+   "disposition": "accepted"
   }
  ]
 }

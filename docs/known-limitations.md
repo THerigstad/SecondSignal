@@ -3,8 +3,12 @@
 One page, kept current, for a stranger who wants to know what this
 repository does not do before reading what it does. Every item here is also
 stated where it applies; this page exists so nobody has to collect them.
-Last audit: 2026-09-10, after review round 2 (eight model families) and the
-build of that day.
+Last audit: 2026-09-17, after review round 2 (nine model families), the
+build of 10 September, the demonstration page of 11 September, and the
+pre-launch audit of 13 September that found this page contradicting the
+README on two lines. `tests/test_public_claims.py` now checks the claims
+this page shares with the README, the evaluation document, the changelog and
+the package metadata, and fails when they disagree.
 
 ## What is not built
 
@@ -79,7 +83,15 @@ build of that day.
   decided by a function-word heuristic and a script check. A language no
   pack covers is flagged as unscreened and handled by the fail-closed rule;
   it is never presented as covered.
-- No demo page yet. The command line and the test suite are the demo.
+- The demonstration page
+  ([therigstad.github.io/SecondSignal](https://therigstad.github.io/SecondSignal/),
+  live since 11 September 2026) runs the real package in the browser, with
+  the same labelled cases the suite runs. It is a demonstration of the
+  policy layer, not a product: it generates no replies, holds no memory
+  between visits, and its crisis card points to resources it cannot dial.
+  This page said the opposite for six days after the page went live; the
+  13 September pre-launch audit caught it, and the public-claims test now
+  fails on that sentence.
 
 ## What no one has reviewed
 
@@ -138,6 +150,16 @@ build of that day.
   anymore" in a language it screens thinly, and it fails closed.
 - "I'm done" with a stated next step ("I need to figure out how to leave")
   escalates on the bare phrase. Found 2026-09-03; recorded as a gap.
+- Tense and mood were gaps until 2026-09-17. The operator's first live test
+  of the demonstration page (11 September 2026) typed one sentence and
+  found two: "killed themselves" read MISS because the direct-ideation stems
+  carried no past tense, and "I should just give up" went unresolved because
+  the inconclusive set listed only the bare "I give up". Both are closed
+  (three verbs now carry their past tenses; the modal forms of giving up are
+  inconclusive and fail closed), each with its over-restriction control
+  (`evals/cases/operator_live_test_2026-09-11.json`,
+  `tests/test_operator_live_test.py`). The lesson is the ceiling argument
+  again: a person finds a lexicon's tense gap in a minute, and more exist.
 - Danger from another person is a lane now, built 10 September 2026, and
   it has named gaps. The class fires on any two of four signal groups in
   one message (present confinement, prior violence, fear for dependents, an

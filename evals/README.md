@@ -28,6 +28,16 @@ decision — so that no case can pass on the winner alone.
   with each reviewer's original expectation kept beside the projection
   wherever the two vocabularies differ (`original_expect`, `reviewer_session`,
   `reviewer_prior_turns`, `projection_note`).
+- `operator_live_test_2026-09-11.json` — the two lexicon gaps the operator's
+  first live test of the demonstration page found in one sentence (a
+  past-tense third-person report; the modal "I should just give up"), closed
+  17 September with their over-restriction controls.
+- `trajectories/` — one session, many turns (ADR-0028 (Proposed)): a
+  fixture asserts which turn the gate fires on, which turns stay quiet, and
+  which invariants hold between turns. Its own README states the format. The
+  files carry `kind: trajectory`; the single-case runner refuses them, the
+  shape validator beside them enforces the format's refusals, and the
+  trajectory runner is not yet written.
 - `deferred/` — generation-, harness-, transport-, orchestration- and
   persistence-plane fixtures from the reviews, labeled and deliberately not
   run here (ADR-0013); the round-2 intake, backend, ledger and

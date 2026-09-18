@@ -1,10 +1,14 @@
 # Evaluation program
 
-> **Scope note.** This describes how SecondSignal is *meant* to be measured across its full
-> target architecture. The slice that runs today is deliberately small: the labeled routing
-> cases under [`evals/cases/`](../evals/cases/), each verified by hand against the policy
-> layer. There is no automated runner yet — it is on the README roadmap. This document
-> exists so the measurement bar is public before the system grows into it.
+> **Scope note (revised 2026-09-17).** This describes how SecondSignal is *meant* to be
+> measured across its full target architecture. The slice that runs today is the policy
+> plane: every labelled case under [`evals/cases/`](../evals/cases/) runs through the real
+> pipeline on every commit in `tests/test_eval_cases.py`, the automated runner the addendum
+> of 2026-09-02 below describes, with known gaps as strict expected failures and dissents
+> kept as fixtures. The generation-, harness- and orchestration-plane protocols in this
+> document (Protocol A, Protocol B) are described, not run. The scope note of 31 August
+> said the runner did not exist; it was true on that date and stood here, stale, until the
+> 13 September pre-launch audit. `tests/test_public_claims.py` now fails on it.
 
 ## 11. Evaluation program
 
@@ -183,10 +187,26 @@ Measure final outcome, retained user voice, decision clarity, confidence calibra
 
 ---
 
+## Addendum, 2026-09-17: the slope is the case
+
+> The single-case runner below asserts one decision per case, the last one, after
+> replaying any prior turns silently. That is enough to say a latch set early is still
+> there late; it cannot say which turn the gate should fire on, that the turns before it
+> stayed ordinary, or that "I'm fine" on the turn after the card moved nothing. ADR-0028
+> (Proposed) adds a trajectory fixture format for exactly that (one session, many turns,
+> per-turn expectations, named invariants checked on every transition, provenance the
+> runner reads so a model-authored trajectory never enters the recall figure). The format,
+> one model-authored nine-turn trajectory and its shape validator are in the tree under
+> `evals/cases/trajectories/`; the first hand run against the tree classified the
+> trajectory contract-adjusted on two turns (the record was right, the draft was not, and
+> the originals are kept); the runner is not written. The 17 September research briefs'
+> long-horizon vocabulary (post-refusal failure, first divergence turn, the five
+> outcomes) is mapped onto this plane in the format's README.
+
 ## Addendum, 2026-09-02: the slice that runs
 
-> The scope note above is out of date in one respect: there is now an automated
-> runner. This addendum describes it and the discipline around it (ADR-0013).
+> Written when the runner landed, two days after the scope note of 31 August said there
+> was none. This addendum describes the runner and the discipline around it (ADR-0013).
 
 **Runner.** `tests/test_eval_cases.py` runs every case under `evals/cases/*.json`
 through the real pipeline on every commit — prior turns through a session, then the
@@ -319,6 +339,19 @@ drifted by one after the round-2 dispositions of the same day, which is
 why both committed report pages are now asserted equal to the runner's
 output on every run. The badge on the README is written from these numbers
 and from nothing else.
+
+**Numbers, 2026-09-17.** 1,346 tests: 193 expected failures (the same 179
+documented gaps and 14 recorded dissents), the rest pass, with the packaging
+check skipped where no wheel can be built, measured the way CI runs them. The
+new tests are the operator's live-test fixtures and their pins
+(`tests/test_operator_live_test.py`, 17), the trajectory format's validator,
+guard and hand-rolled preview (`tests/test_trajectory_format.py`, 15;
+`tests/test_eval_cases.py`, 1), and the public-claims test that measures this
+paragraph (`tests/test_public_claims.py`, 9). Five fixtures were added
+(`operator_live_test_2026-09-11.json`, all accepted); none was
+re-dispositioned. From this date the counts on the front page and in this
+paragraph are asserted by `tests/test_public_claims.py` against pytest's own
+collection and the case manifest, so a stale number fails the suite.
 
 **Numbers, 2026-09-11.** 1,299 tests: 193 expected failures (the same 179
 documented gaps and 14 recorded dissents), the rest pass: 1,105 passing with

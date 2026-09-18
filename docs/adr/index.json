@@ -379,6 +379,23 @@
         "0016"
       ],
       "notes": "The operator's ruling of 2026-09-08 (D3, decided with dissent), built 2026-09-10. Proposed because the record's text is the assistant's; flips to Accepted after review round 3 reads it."
+    },
+    {
+      "number": "0028",
+      "file": "0028-trajectory-fixtures.md",
+      "title": "Trajectory fixtures, or which turn the gate fires on",
+      "decision": "Proposed",
+      "implementation": "partial",
+      "evidence": [
+        "tests/test_trajectory_format.py::test_the_validator_accepts_the_first_trajectory",
+        "tests/test_trajectory_format.py::test_only_a_human_authored_human_reviewed_trajectory_counts_toward_recall",
+        "tests/test_trajectory_format.py::test_the_first_trajectory_aftermath_walks_as_the_record_says",
+        "tests/test_eval_cases.py::test_trajectory_files_are_never_collected_as_single_cases"
+      ],
+      "modules": [
+        "evals/cases/trajectories/validate_trajectory.py"
+      ],
+      "notes": "Drafted 2026-09-14 as 0027 without reading this register; renumbered 0028 on 2026-09-17 when the first run landed. Partial: the format, one model-authored trajectory (contract-adjusted after its first run, originals kept), the shape validator that computes the recall flag from provenance, and the guard that keeps trajectory files out of the single-case runner. The runner (tests/test_trajectory_cases.py, five invariant functions) is not built. Proposed because the record's text is the assistant's; flips to Accepted after review round 3 reads it."
     }
   ],
   "reserved": [

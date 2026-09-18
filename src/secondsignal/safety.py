@@ -260,9 +260,14 @@ CRISIS_CLASSES: dict[str, tuple[re.Pattern[str], ...]] = {
         r" to (die|be dead|not exist|stop existing|kill (myself|himself|herself|themselves|yourself|ourselves)"
         r"|end (my|his|her|their|our) (own )?life|end it all|end it|end things|end everything"
         r"|take (my|his|her|their) (own )?life)\b",
-        r"\bkill(ing)? (myself|himself|herself|themselves)\b",
-        r"\bend(ing)? (my|his|her|their) (own )?life\b",
-        r"\btak(e|ing) (my|his|her|their) (own )?life\b",
+        # Tense does not waive the gate either. The operator's first live test
+        # of the demonstration page (11 September 2026) typed a past-tense,
+        # third-person report and it read MISS: "kill" and "killing" matched,
+        # "killed" did not. The three verbs below now carry their past tenses;
+        # the exertion idioms ("killed myself laughing") are masked in en.json.
+        r"\bkill(ed|ing|s)? (myself|himself|herself|themselves)\b",
+        r"\bend(ed|ing|s)? (my|his|her|their) (own )?life\b",
+        r"\b(tak(e|es|ing)|took|taken) (my|his|her|their) (own )?life\b",
         r"\bsuicid(e|al)\b",
         r"\b(hurt|harm|cut|cutting|hurting|harming) (myself|himself|herself|themselves)\b",
         r"\bself[- ]?harm\b",
@@ -505,6 +510,13 @@ INCONCLUSIVE_PATTERNS: tuple[re.Pattern[str], ...] = _compile((
     r"\bnothing (ever |is ever )?(gets|will get|is going to get) better\b",
     r"\b(i|i'?d|i could|i might|i should) (could |might |should |would )?(just )?disappear\b",
     r"\bi give up\b(?! on)",
+    # The modal forms of the same surrender. The operator's first live test of
+    # the demonstration page (11 September 2026): "I should just give up"
+    # read MISS because only the bare "i give up" was listed. "give up on",
+    # and giving up a named habit or object, are masked in en.json.
+    r"\b(i|we)('?ll|'?d| should| could| might| may| will| would| am going to|'?m going to"
+    r"| want to| wanna| need to| have to| gotta) (just |probably |really |honestly )?give up\b(?! on)",
+    r"\b(might|may) as well (just )?give up\b(?! on)",
     r"\bcan'?t keep (doing|going|living) (like )?this\b",
     r"\bno way out\b",
     r"\bcatch (the|a) bus\b",

@@ -3,9 +3,15 @@
 ## Report safety regressions privately
 
 Report a crisis-screen bypass or other safety regression privately before
-opening a public issue. The reporting contact is:
+opening a public issue. Use GitHub's private vulnerability reporting for this
+repository, which needs no contact address and no prior relationship with
+the maintainer:
 
-see the repository owner's GitHub profile
+https://github.com/THerigstad/SecondSignal/security/advisories/new
+
+That is the **Report a vulnerability** button on the repository's Security
+tab. The report is visible only to you and the maintainer until it is
+resolved and, if you choose, published as an advisory.
 
 Do not include a real person's message, name, location, account data, or other
 identifying detail. Replace it with a synthetic case that reproduces the same

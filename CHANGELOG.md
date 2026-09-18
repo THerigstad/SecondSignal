@@ -4,6 +4,72 @@ All notable changes to SecondSignal are documented here.
 
 ## [Unreleased]
 
+Nothing yet.
+
+## [0.3.0] — 2026-09-17
+
+### Fixed — 2026-09-17
+
+- **Two lexicon gaps from the operator's first live test of the
+  demonstration page** (`src/secondsignal/safety.py`,
+  `src/secondsignal/packs/en.json`, `evals/cases/operator_live_test_2026-09-11.json`,
+  `tests/test_operator_live_test.py`). One typed sentence on 11 September
+  read MISS and seated a persona: the direct-ideation stems carried no past
+  tense ("killed themselves" did not match while "kill themselves" did),
+  and the inconclusive set listed only the bare "I give up", so the modal
+  "I should just give up" went unresolved with no card. Three verbs now
+  carry their past tenses ("killed", "took", "ended"); the modal forms of
+  giving up are inconclusive and fail closed; two masks keep the exertion
+  idioms ("killed myself laughing") and giving up a named habit ("give up
+  sugar") out. Five fixtures with their over-restriction controls and
+  seventeen tests pin it both ways. Recorded on the limitations page as the
+  ceiling argument in miniature: a person finds a lexicon's tense gap in a
+  minute.
+- **Six public statements that had gone stale, and the test that keeps them
+  honest** (`tests/test_public_claims.py`; `README.md`,
+  `docs/known-limitations.md`, `docs/evaluation.md`, `SECURITY.md`). The 13
+  September pre-launch audit of the public tree found the limitations page
+  saying there was no demonstration page while the README linked it, the
+  evaluation document's scope note saying there was no automated runner
+  while its own addendum described one, the limitations page saying review
+  round 2 had eight families on one line and nine forty lines later, and a
+  private security-reporting contact a stranger could not use; the new test
+  found a sixth, the README's "actual output on the current tree" carrying
+  a roster hash from before the September renames. All six are fixed, and
+  the test now derives each fact from the tree (the demo file, the runner
+  file, the round-2 fixture documents, the case manifest, the package
+  itself and pytest's own collection) and fails when a page disagrees.
+  SECURITY.md points at GitHub's private vulnerability reporting for this
+  repository.
+
+### Added — 2026-09-17
+
+- **Trajectory fixtures: the format, the first trajectory, the validator and
+  the guard** (`docs/adr/0028-trajectory-fixtures.md`, Proposed;
+  `evals/cases/trajectories/`, `tests/test_trajectory_format.py`,
+  `tests/test_eval_cases.py`). One session, many turns, expectations on
+  each turn and on the whole, five named invariants that restate ADR-0019,
+  ADR-0022, ADR-0023, ADR-0018 and ADR-0013 as checks, and a provenance
+  field the runner reads so that a model-authored trajectory never enters
+  the recall figure. The first trajectory, nine turns with the gate expected
+  on turn six, was run by hand against the tree and classified
+  contract-adjusted: turn six fires as expected, and on turns seven and
+  eight the tree reads the aftermath and the resource restatement the way
+  ADR-0023 states them where the draft had not; the four original values
+  are kept on their turns. The shape validator refuses the six mutations
+  the format forbids; the single-case runner refuses any file carrying
+  `kind: trajectory`. The runner that asserts a whole session is not
+  written. Drafted as 0027 on 14 September without reading the register;
+  renumbered on landing.
+
+### Changed — 2026-09-17
+
+- **Version 0.3.0** in the package, the citation file and this changelog,
+  with a test that fails if the three ever disagree again.
+- **The counts on the front page and the evaluation page**, now measured by
+  the public-claims test rather than typed: see the Numbers paragraph of
+  2026-09-17 in `docs/evaluation.md`.
+
 ### Added — 2026-09-11
 
 - **The presentation block and the plate** (`src/secondsignal/profiles.py`,

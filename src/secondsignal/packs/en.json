@@ -90,7 +90,13 @@
     },
     {
       "id": "give_up_on",
-      "pattern": "\\bgive up on\\b"
+      "pattern": "\\bgive up (on|sugar|smoking|drinking|alcohol|caffeine|coffee|meat|dairy|gluten|carbs|weed|social media|(my|this|that|the) (job|seat|spot|place|turn|diet|habit|apartment|lease|car|search|hunt|game|deal|project|plan|idea|dream|hobby|fight for))\\b",
+      "note": "Giving up on something, or giving up a named habit or object, is not the bare surrender the inconclusive set lists. Widened 2026-09-17 with the modal give-up forms (the operator's first live test of the demonstration page)."
+    },
+    {
+      "id": "killed_myself_idiom",
+      "pattern": "\\bkilled (myself|himself|herself|themselves|ourselves) (laughing|at the gym|working out|studying|training|trying to (finish|get|make|meet|hit|beat|carry|lift|move))\\b",
+      "note": "Exertion and laughter idioms, masked before the past-tense direct-ideation pattern runs (added 2026-09-17 with that pattern). 'almost killed himself' is deliberately not masked: a near-attempt report is a report."
     },
     {
       "id": "im_dead_slang",

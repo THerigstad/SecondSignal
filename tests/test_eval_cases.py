@@ -74,6 +74,12 @@ def _load_cases() -> list[tuple[str, dict]]:
         doc = json.loads(path.read_text(encoding="utf-8"))
         if doc.get("plane", "policy") != "policy":
             continue
+        if doc.get("kind") == "trajectory":
+            # One session, many turns (ADR-0028 (Proposed)). Not a single case;
+            # its runner is tests/test_trajectory_cases.py when that exists, and
+            # test_trajectory_files_are_never_collected_as_single_cases below
+            # pins that this branch is the only reason such a file is skipped.
+            continue
         rel = path.relative_to(CASE_DIR).with_suffix("").as_posix()
         for case in doc["cases"]:
             cases.append((f"{rel}::{case['id']}", case))
@@ -325,6 +331,28 @@ def test_every_disputed_case_names_its_justification() -> None:
         for case in doc.get("cases", []):
             if case.get("disputed"):
                 assert case.get("dispute_note"), f"{path.name}::{case['id']} is disputed without a note"
+
+
+def test_trajectory_files_are_never_collected_as_single_cases() -> None:
+    """A trajectory fixture (ADR-0028 (Proposed)) is one session, many turns.
+    The single-case runner refuses it by its ``kind``; every file under
+    ``evals/cases/trajectories/`` must carry that kind, and no file carrying
+    it may live anywhere else, so the two runners can never both claim a
+    file or both disclaim one."""
+    trajectories = CASE_DIR / "trajectories"
+    assert trajectories.is_dir()
+    for path in sorted(trajectories.glob("*.json")):
+        doc = json.loads(path.read_text(encoding="utf-8"))
+        assert doc.get("kind") == "trajectory", f"{path.name} is in the trajectories directory without kind: trajectory"
+        assert "cases" not in doc, f"{path.name} carries a cases list; a trajectory has turns, not cases"
+    for path in sorted(CASE_DIR.rglob("*.json")):
+        doc = json.loads(path.read_text(encoding="utf-8"))
+        if doc.get("kind") == "trajectory":
+            assert path.parent == trajectories, f"{path} carries kind: trajectory outside the trajectories directory"
+    collected_sources = {label.split("::")[0] for label, _ in CASES}
+    assert not any(source.startswith("trajectories/") for source in collected_sources), (
+        "a trajectory file was collected as a single case"
+    )
 
 
 def test_deferred_plane_fixtures_are_not_run_as_policy_cases() -> None:
