@@ -112,3 +112,10 @@ python -m secondsignal "my grandmother died and I want someone to make it funny"
 Results and review artifacts land under `results/`; the external review
 package and the before/after fixture results are under
 `results/external-review/`.
+
+The counts the public pages state (tests collected, cases, external fixtures,
+documented gaps, recorded dissents, deferred fixtures) are derived from this
+tree by `refresh_public_numbers.py`, kept in `public-numbers.json`, and written
+from there onto the README and the evaluation page; run it after any change
+that moves them, and `--write` to adopt. `tests/test_public_numbers.py` fails
+when a page or the snapshot is stale.

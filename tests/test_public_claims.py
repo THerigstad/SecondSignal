@@ -183,14 +183,16 @@ def test_the_readme_expected_failure_breakdown_is_the_manifest() -> None:
 
 
 def test_the_evaluation_page_numbers_paragraph_is_current() -> None:
-    """The evaluation page keeps a dated "Numbers" paragraph. The newest one is
-    a current-state claim and must match the collection count; older ones are
-    history and are not read."""
-    paragraphs = re.findall(r"\*\*Numbers, (\d{4}-\d{2}-\d{2})\.\*\* (\d{1,3}(?:,\d{3})*) tests", EVALUATION)
-    assert paragraphs, "docs/evaluation.md has no dated Numbers paragraph"
-    newest_date, stated = max(paragraphs)
-    assert int(stated.replace(",", "")) == _collected_tests(), (
-        f"docs/evaluation.md's Numbers paragraph of {newest_date} says {stated} tests; pytest collects {_collected_tests()}"
+    """The evaluation page keeps dated "Numbers" paragraphs as history and one
+    undated current-numbers paragraph, written by
+    ``evals/refresh_public_numbers.py``. The current one is a current-state
+    claim and must match the collection count; the dated ones keep the numbers
+    that were true on their dates and are not read."""
+    match = re.search(r"\*\*Numbers, current\.\*\* (\d{1,3}(?:,\d{3})*) tests", EVALUATION)
+    assert match, "docs/evaluation.md has no current-numbers paragraph"
+    stated = int(match.group(1).replace(",", ""))
+    assert stated == _collected_tests(), (
+        f"docs/evaluation.md's current-numbers paragraph says {stated} tests; pytest collects {_collected_tests()}"
     )
 
 

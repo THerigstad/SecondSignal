@@ -1,0 +1,18 @@
+{
+ "note": "The headline numbers stated on the public pages, derived from the tree by evals/refresh_public_numbers.py: the test count from pytest's own collection, the dispositions from evals/case-manifest.json, the case and fixture counts from the files under evals/cases/. Regenerate with `python evals/refresh_public_numbers.py --write`. tests/test_public_numbers.py fails when this file, or any page written from it, no longer matches the tree.",
+ "tests": 1352,
+ "expected_failures": 193,
+ "documented_gaps": 179,
+ "recorded_dissents": 14,
+ "cases": 420,
+ "external_fixtures": 165,
+ "deferred_fixtures": 71,
+ "written_to": [
+  "README.md: the Quickstart pytest line",
+  "README.md: the Status table, cases",
+  "README.md: the Status table, deferred fixtures",
+  "README.md: the Status table, tests",
+  "README.md: the tests badge",
+  "docs/evaluation.md: the current-numbers paragraph"
+ ]
+}

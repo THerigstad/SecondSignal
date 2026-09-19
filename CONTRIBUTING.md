@@ -55,3 +55,5 @@ what changed.
 - Dissent preserves both the reviewer's and the project's expectations.
 - Policy text and pinned tests change together.
 - Any change to an accepted decision is recorded in a new ADR.
+- The counts on the public pages are current: `python evals/refresh_public_numbers.py`
+  reports nothing stale (`--write` adopts the tree's numbers; never type them).

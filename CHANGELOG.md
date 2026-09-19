@@ -4,7 +4,24 @@ All notable changes to SecondSignal are documented here.
 
 ## [Unreleased]
 
-Nothing yet.
+### Changed — 2026-09-19
+
+- **The headline numbers are written from the tree, not typed**
+  (`evals/refresh_public_numbers.py`, `evals/public-numbers.json`,
+  `tests/test_public_numbers.py`, `README.md`, `docs/evaluation.md`,
+  `CONTRIBUTING.md`, `evals/README.md`, `tests/test_public_claims.py`). 0.3.1
+  closed the stale badge by decoding it in a test; the counts it guards were
+  still typed by hand in four places. A script now derives them from pytest's
+  collection, the case manifest and the case tree, writes them to one snapshot,
+  and writes the snapshot onto the README's tests badge, Quickstart line and
+  Status table and onto a current-numbers paragraph on the evaluation page,
+  each found by its own fixed wording; a surface whose wording is gone stops
+  the script instead of being guessed at. The new test holds the snapshot and
+  every surface to the tree, and proves on a copy that a wrong digit on any
+  surface is caught and rewritten. The evaluation page's dated Numbers
+  paragraphs stay as history; the current-state claim moved to the written
+  paragraph, and the public-claims test reads it there. Recommended by the
+  same external cross-check that surfaced 0.3.1.
 
 ## [0.3.1] — 2026-09-19
 
