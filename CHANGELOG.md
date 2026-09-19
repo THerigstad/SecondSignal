@@ -6,7 +6,29 @@ All notable changes to SecondSignal are documented here.
 
 Nothing yet.
 
-## [0.3.0] — 2026-09-17
+## [0.3.1] — 2026-09-19
+
+### Fixed — 2026-09-19
+
+- **The tests badge had gone stale, and the claims test now reads it**
+  (`README.md`, `tests/test_public_claims.py`). The README's tests badge still
+  said 1,299 while the Quickstart and the status table said the collected
+  total; the public-claims test compared the prose counts to pytest's
+  collection but never decoded the badge, whose comma is written `%2C` and
+  whose number sits before the word "tests", so the contradiction shipped with
+  a green suite. The badge now states the collected total, and the claims test
+  decodes it and holds its test count, its documented-gap and its
+  recorded-dissent numbers to pytest and the case manifest, so a stale badge
+  fails CI. Surfaced by an external cross-check of the 0.3.0 tree.
+- **The release date now follows the repository's stated UTC convention**
+  (`CHANGELOG.md`, `CITATION.cff`, `tests/test_public_claims.py`).
+  `docs/notes/model-provenance.md` says dates in the repository are UTC calendar
+  dates; 0.3.0 had carried 2026-09-17, the operator's local day, while its
+  commit and release landed on 2026-09-18 UTC. 0.3.0 is re-dated to 2026-09-18,
+  and a new check holds the newest changelog release date equal to the
+  citation's date-released so the two cannot drift.
+
+## [0.3.0] — 2026-09-18
 
 ### Fixed — 2026-09-17
 

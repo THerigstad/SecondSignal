@@ -340,6 +340,17 @@ why both committed report pages are now asserted equal to the runner's
 output on every run. The badge on the README is written from these numbers
 and from nothing else.
 
+**Numbers, 2026-09-19.** 1,348 tests: 193 expected failures (the same 179
+documented gaps and 14 recorded dissents), the rest pass, with the packaging
+check skipped where no wheel can be built, measured the way CI runs them. The
+two new tests both harden `tests/test_public_claims.py` (now 11): one decodes
+the README's tests badge and holds its count, documented-gap and
+recorded-dissent numbers to pytest and the case manifest, after the badge
+shipped in 0.3.0 still reading 1,299; the other holds the newest changelog
+release date equal to the citation's date-released, so the release date cannot
+drift from the repository's UTC convention. No fixtures were added and none was
+re-dispositioned.
+
 **Numbers, 2026-09-17.** 1,346 tests: 193 expected failures (the same 179
 documented gaps and 14 recorded dissents), the rest pass, with the packaging
 check skipped where no wheel can be built, measured the way CI runs them. The

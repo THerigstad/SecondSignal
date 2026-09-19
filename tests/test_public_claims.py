@@ -43,6 +43,7 @@ import subprocess
 import sys
 from collections import Counter
 from pathlib import Path
+from urllib.parse import unquote
 
 ROOT = Path(__file__).resolve().parents[1]
 README = (ROOT / "README.md").read_text(encoding="utf-8")
@@ -260,4 +261,59 @@ def test_the_readme_sample_decision_is_the_actual_output_of_the_current_tree() -
         "turn header. Lines that differ:\n" + "\n".join(
             f"  README: {a!r}\n  actual: {b!r}" for a, b in zip(block.splitlines(), actual.splitlines()) if a != b
         )
+    )
+
+
+# --- the tests badge is the same number as the prose, decoded -------------------------------------
+
+
+def _readme_tests_badge() -> str:
+    """The decoded label of the README's tests badge."""
+    match = re.search(r"img\.shields\.io/badge/tests-(.+?)-brightgreen", README)
+    assert match, "README no longer carries the tests badge in its usual form"
+    return unquote(match.group(1))
+
+
+def test_the_readme_tests_badge_is_what_pytest_collects() -> None:
+    """The badge is the most visible number on the page. It drifted once and the
+    prose-only check missed it, because the badge encodes its comma as %2C and
+    puts the word 'tests' before the number. Decode it and hold it to the same
+    sources as the prose."""
+    decoded = _readme_tests_badge()
+    match = re.search(r"(\d{1,3}(?:,\d{3})*)\D+(\d+) known gaps\D+(\d+) recorded dissents", decoded)
+    assert match, f"the tests badge does not state count, gaps and dissents in its usual words: {decoded!r}"
+    count = int(match.group(1).replace(",", ""))
+    gaps, dissents = int(match.group(2)), int(match.group(3))
+    assert count == _collected_tests(), f"the tests badge says {count} tests; pytest collects {_collected_tests()}"
+    dispositions = _manifest_dispositions()
+    assert (gaps, dissents) == (dispositions["known_gap"], dispositions["disputed"]), (
+        f"the tests badge says {gaps} documented gaps and {dissents} recorded dissents; "
+        f"the manifest says {dispositions['known_gap']} and {dispositions['disputed']}"
+    )
+
+
+# --- the release date is stated twice and the two must agree --------------------------------------
+
+
+def _changelog_newest_release_date() -> str:
+    match = re.search(r"^## \[\d+\.\d+\.\d+\] \u2014 (\d{4}-\d{2}-\d{2})", CHANGELOG, re.M)
+    assert match, "CHANGELOG.md's newest release heading has no date in its usual form"
+    return match.group(1)
+
+
+def _citation_date_released() -> str:
+    match = re.search(r"^date-released: (\d{4}-\d{2}-\d{2})", CITATION, re.M)
+    assert match, "CITATION.cff has no date-released line"
+    return match.group(1)
+
+
+def test_the_release_date_agrees_between_changelog_and_citation() -> None:
+    """docs/notes/model-provenance.md says repository dates are UTC. The release
+    date is stated in the changelog heading and in the citation; the two must
+    agree so a hand-edit cannot leave them apart."""
+    changelog_date = _changelog_newest_release_date()
+    citation_date = _citation_date_released()
+    assert changelog_date == citation_date, (
+        f"the newest CHANGELOG release is dated {changelog_date} but CITATION.cff's "
+        f"date-released is {citation_date}"
     )
