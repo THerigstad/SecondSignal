@@ -1,8 +1,8 @@
 # ADR-0020: J.R. v0 predicates
 
-- **Status:** Proposed — reference-unwired; drafted by an external reviewer (Grok, 2026-09-03) with a runnable reference implementation; a second family's review (Codex, 2026-09-04) named four corrections, review round 1 a fifth and review round 2 a sixth, and all six must be verified against the code before this record can be Accepted; every reviewing family in round 2 refused the flip before that
+- **Status:** Proposed — partial; called on every seated turn by the generation harness since 2026-09-19 (`src/secondsignal_harness/`, ADR-0029, Proposed), which flattens the nested decision record for it until the first correction below lands; drafted by an external reviewer (Grok, 2026-09-03) with a runnable reference implementation; a second family's review (Codex, 2026-09-04) named four corrections, review round 1 a fifth and review round 2 a sixth, and all six must be verified against the code before this record can be Accepted; every reviewing family in round 2 refused the flip before that
 - **Date:** 2026-09-03
-- **Evidence:** `src/secondsignal/jr.py` (the reference port, deliberately unwired); `tests/test_jr_v0.py` and `tests/test_nd_interruption_stack.py` (synthetic replies; they run today); `evals/cases/deferred/jr_v0_cases.json` (`plane: harness`, `runnable_here: false`)
+- **Evidence:** `src/secondsignal/jr.py` (the reference port; its caller is `src/secondsignal_harness/harness.py`, ADR-0029, Proposed); `tests/test_jr_v0.py` and `tests/test_nd_interruption_stack.py` (synthetic replies; they run today); `evals/cases/deferred/jr_v0_cases.json` (`plane: harness`, `runnable_here: false`)
 - **Depends on:** ADR-0014, ADR-0019
 
 ## Decision
@@ -85,8 +85,12 @@ six (review round 2 found the record saying four and its list saying five).
 
 ## Relationship to the current implementation
 
-The reference port is in the tree and unwired: nothing in `router.py`,
-`cli.py` or the gate calls or imports `audit()` (`tests/test_guards.py`
-checks the imports). It cites this record and ADR-0019 as Proposed. The six
-corrections above are open; the register (`docs/adr/index.json`) lists the
-implementation as `reference-unwired`.
+The reference port is in the tree and, since 2026-09-19, has one caller: the
+generation harness (`src/secondsignal_harness/harness.py`, ADR-0029,
+Proposed), which audits every composed reply through `audit()` and writes the
+row before release. Nothing in `router.py`, `cli.py` or the gate calls or
+imports it (`tests/test_guards.py` checks the imports); the harness reads the
+nested decision record through a flattening view (`view.py`) because of the
+first correction above, and the view is deleted the day the port reads the
+record directly. The six corrections above are open; the register
+(`docs/adr/index.json`) lists the implementation as `partial`.

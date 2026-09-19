@@ -194,15 +194,18 @@
       "file": "0014-jr-is-a-harness-not-a-persona.md",
       "title": "The audit function is a harness, not a persona",
       "decision": "Accepted",
-      "implementation": "reference-unwired",
+      "implementation": "partial",
       "evidence": [
         "tests/test_guards.py::test_security_characters_are_not_routable",
-        "tests/test_jr_v0.py"
+        "tests/test_guards.py::test_router_cli_and_safety_import_nothing_from_the_audit_port",
+        "tests/test_jr_v0.py",
+        "tests/test_harness_contract.py::test_every_seated_turn_writes_a_row_that_binds_to_the_composed_text"
       ],
       "modules": [
-        "src/secondsignal/jr.py"
+        "src/secondsignal/jr.py",
+        "src/secondsignal_harness/harness.py"
       ],
-      "notes": "A reference port of the thin slice is in the tree and deliberately unwired; nothing in router.py or cli.py calls audit(). Status line corrected 2026-09-08: Accepted; reference port present and deliberately unwired."
+      "notes": "The reference port of the thin slice is in the tree; since 2026-09-19 the generation harness (ADR-0029, Proposed) calls it on every seated turn, after the router and before release, and nothing on the policy layer's own request path imports it. Partial: the second engine, human-token issuance and expiry, and the locked cultural rubric are not built. Status line corrected 2026-09-08 (Accepted; reference port present) and 2026-09-19 (partial; wired by the harness)."
     },
     {
       "number": "0015",
@@ -292,15 +295,18 @@
       "file": "0020-jr-v0-predicates.md",
       "title": "J.R. v0 predicates",
       "decision": "Proposed",
-      "implementation": "reference-unwired",
+      "implementation": "partial",
       "evidence": [
         "tests/test_jr_v0.py",
-        "tests/test_nd_interruption_stack.py"
+        "tests/test_nd_interruption_stack.py",
+        "tests/test_harness_contract.py::test_a_broken_obligation_is_withheld",
+        "tests/test_harness_contract.py::test_withheld_text_reaches_no_one_and_stays_in_the_row"
       ],
       "modules": [
-        "src/secondsignal/jr.py"
+        "src/secondsignal/jr.py",
+        "src/secondsignal_harness/view.py"
       ],
-      "notes": "The reference port implements these predicates on synthetic records and is unwired. Six corrections are listed inside the record and must be verified against the code before the decision can flip to Accepted."
+      "notes": "The reference port implements these predicates and, since 2026-09-19, is called on every seated turn by the generation harness (ADR-0029, Proposed) through a view that flattens the nested decision record. Six corrections are listed inside the record and must be verified against the code before the decision can flip to Accepted; the first (the port reads the nested record) retires the view."
     },
     {
       "number": "0022",
@@ -396,6 +402,28 @@
         "evals/cases/trajectories/validate_trajectory.py"
       ],
       "notes": "Drafted 2026-09-14 as 0027 without reading this register; renumbered 0028 on 2026-09-17 when the first run landed. Partial: the format, one model-authored trajectory (contract-adjusted after its first run, originals kept), the shape validator that computes the recall flag from provenance, and the guard that keeps trajectory files out of the single-case runner. The runner (tests/test_trajectory_cases.py, five invariant functions) is not built. Proposed because the record's text is the assistant's; flips to Accepted after review round 3 reads it."
+    },
+    {
+      "number": "0029",
+      "file": "0029-the-voice-is-a-harness-behind-the-policy-layer.md",
+      "title": "The voice is a generation harness behind the policy layer",
+      "decision": "Proposed",
+      "implementation": "partial",
+      "evidence": [
+        "tests/test_harness_contract.py::test_the_policy_layer_never_imports_the_harness",
+        "tests/test_harness_contract.py::test_the_gate_holds_the_floor_and_the_model_is_never_called",
+        "tests/test_harness_contract.py::test_every_labelled_case_keeps_the_contract_on_every_turn",
+        "tests/test_harness_contract.py::test_operator_circle_off_withholds_every_seated_reply_while_no_rubric_is_locked",
+        "tests/test_harness_contract.py::test_operator_circle_on_releases_normal_risk_and_still_withholds_high_risk",
+        "tests/test_harness_prompt.py::test_the_turn_block_for_the_grief_fixture_is_pinned"
+      ],
+      "modules": [
+        "src/secondsignal_harness/harness.py",
+        "src/secondsignal_harness/prompt.py",
+        "src/secondsignal_harness/adapters.py",
+        "src/secondsignal_harness/view.py"
+      ],
+      "notes": "Specified and built on 2026-09-19 on the operator's ruling (option A: a package inside this repository that the policy layer never imports). Partial: the turn, the prompt, the composition, the audit call, the audit row, the release rule with operator-circle mode, four vendor presets over the standard library (Anthropic, OpenAI, xAI, Gemini), one adapter for any other host of the same dialect by address, and a scripted fake, and a command-line surface are built and tested; the six ADR-0020 corrections it relies on are not (the audit view in view.py flattens the record until they land), no real-model run has been recorded, and the public pages still describe the tree without a voice until the same commit changes them. Proposed because the record's text is the assistant's and because it puts a model on the request path for the first time; flips only after a review round has attacked it."
     }
   ],
   "reserved": [

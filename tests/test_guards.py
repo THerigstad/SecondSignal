@@ -256,10 +256,12 @@ def test_security_characters_are_not_routable(roster):
 
 # 11b. The reference port stays unwired: nothing on the request path imports it.
 def test_router_cli_and_safety_import_nothing_from_the_audit_port():
-    """ADR-0014 says the audit function is reference-unwired; the register
-    records it; review round 2 (Kimi, Grok E2) asked for the tree to check
-    it rather than say it. The package re-exports the port's names for
-    callers who want to read it; the request path may not import them."""
+    """ADR-0014 places the audit function after the router, outside the
+    policy layer's own request path; review round 2 (Kimi, Grok E2) asked for
+    the tree to check it rather than say it. The package re-exports the
+    port's names for callers who want to read it, and since 2026-09-19 the
+    generation harness (ADR-0029 (Proposed)) is that caller; the request path
+    inside this package may not import them."""
     import ast
     package = Path(__file__).resolve().parents[1] / "src" / "secondsignal"
     for name in ("router.py", "cli.py", "safety.py", "signals.py", "preferences.py", "profiles.py", "lexicon.py", "normalize.py"):

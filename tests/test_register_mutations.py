@@ -116,7 +116,7 @@ def test_the_copy_is_clean_before_any_mutation(tree: Path, monkeypatch: pytest.M
 
 def test_r01_relabelling_unwired_as_built_without_the_status_suffix_is_caught(tree: Path) -> None:
     mutate_index(tree, "0014", implementation="built")
-    assert any("ADR-0014: record says implementation 'reference-unwired', register says 'built'" in p for p in register.check_status_lines(tree))
+    assert any("ADR-0014: record says implementation 'partial', register says 'built'" in p for p in register.check_status_lines(tree))
 
 
 def test_r02_implementation_suffix_drift_is_caught(tree: Path) -> None:
@@ -170,7 +170,7 @@ def test_r08_evidence_names_that_live_only_in_docstrings_are_caught(tree: Path) 
 
 def test_r09_superseded_with_no_successor_is_caught(tree: Path) -> None:
     mutate_index(tree, "0014", decision="Superseded")
-    replace(record(tree, "0014"), "**Status:** Accepted — reference-unwired", "**Status:** Superseded — reference-unwired")
+    replace(record(tree, "0014"), "**Status:** Accepted — partial", "**Status:** Superseded — partial")
     assert any("ADR-0014 is Superseded with no successor" in p for p in register.check_relationships(tree))
 
 

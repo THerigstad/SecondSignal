@@ -1,11 +1,11 @@
 # Roadmap
 
-> **Scope note.** Today the repository is at milestone **M1** — the policy layer
-> (deterministic routing + the pre-generation safety gate) with its test suite —
-> plus the tail of architecture **Phase 0** (freezing invariants before any
-> autonomy is added). Everything past that on both tracks below is planned. This
-> document states the trajectory openly so the gap between what exists and what is
-> intended is never in doubt.
+> **Scope note.** The repository milestones M1 to M4 below are landed and M5,
+> the voice, is begun; the architecture track is at the tail of **Phase 0**
+> (freezing invariants before any autonomy is added), with the harness of
+> ADR-0029 the first piece of Phase 1's execution boundary. Everything past
+> that on both tracks is planned. This document states the trajectory openly
+> so the gap between what exists and what is intended is never in doubt.
 
 SecondSignal has two coordinated roadmaps: what lands in the *repository* and
 when (repository milestones), and the order in which the *architecture* is built
@@ -34,6 +34,14 @@ out (architecture phases, drawn from the
   issue templates, and the standing red-team invitation. The flip was the
   push of 10 September 2026; the demonstration page that runs the package in
   the browser (`demo/`) followed on 11 September.
+- **M5 — begun 19 September 2026.** The voice: a generation harness behind
+  the policy layer (`src/secondsignal_harness/`, ADR-0029), which the policy
+  layer never imports. It calls one model adapter only when the record seats
+  a persona, composes the reply with the attached house lines, audits the
+  composed text through the reference port of ADR-0014 and writes the row
+  before release. Begun, not done: no run with a real model is recorded, the
+  six ADR-0020 corrections are open, and the audit's cultural layer withholds
+  every reply outside operator-circle mode until two humans lock a rubric.
 
 ## The next build blocks, in order (as of 2026-09-10)
 
@@ -79,8 +87,10 @@ lands with its fixtures or not at all.
    published response time in the capability manifest.
 9. **ADR-0026's presentations** (three since amendment 1 of 11 September
    2026: woman, man, neither; the name forms and the plate are in the data
-   already) when a generation layer exists to present them, and ADR-0025's
-   assist from the hold behind its five-predicate gate.
+   already), which the generation harness now writes into every prompt it
+   builds (ADR-0029) and which no recorded model run has yet been read
+   against; and ADR-0025's assist from the hold behind its five-predicate
+   gate.
 
 ## Architecture phases
 

@@ -4,6 +4,29 @@ All notable changes to SecondSignal are documented here.
 
 ## [Unreleased]
 
+### Added — 2026-09-19
+
+- **The voice, behind the policy layer** (`src/secondsignal_harness/`,
+  [ADR-0029](docs/adr/0029-the-voice-is-a-harness-behind-the-policy-layer.md),
+  Proposed). A second package the policy layer never imports. On every turn
+  the policy decides first; the harness calls one model adapter only when the
+  record seats a persona, sends the card alone when the gate fired and the
+  house's ask line when nobody is seated, composes the reply with the attached
+  house lines verbatim, audits the composed text through `secondsignal.jr`
+  (the reference port's first caller), writes an audit row and proves the
+  write before anything is released, and releases only on the audit's `SHIP`,
+  or, in a named operator-circle mode that is off by default, on a
+  normal-risk verdict whose only open layer is the cultural one. Four vendor
+  presets over the standard library (Anthropic, OpenAI, xAI, Gemini) and one
+  adapter for any other host of the same dialect by address (how Meta's
+  models are reached), one prompt for every family, a scripted fake, a
+  pinned prompt, a command-line surface, and 34 tests, one of which replays
+  every labelled case in the tree through the wired pair. Every audit row
+  carries the person's words, and the limitations page says where the words
+  go: to the chosen vendor, under its terms, on every seated turn. No run with a real model is
+  recorded. The README's first paragraph, the Status table and the
+  known-limitations page say what changed and what did not.
+
 ### Changed — 2026-09-19
 
 - **The headline numbers are written from the tree, not typed**

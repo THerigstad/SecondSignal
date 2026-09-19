@@ -11,13 +11,17 @@ SecondSignal is an assistant with seven voices, made to keep a person company
 and to know when company is not what they need. This repository is its policy
 layer: the part that decides which voice may answer, whether anyone should,
 and which fixed lines are attached, before any model is called. The part that
-speaks is not here yet. In development, in public: every claim on this page
-points at a test, a record, or a labelled proposal.
+speaks is a second package in this repository, `secondsignal_harness`, behind
+the policy layer and off by default: a model can speak only when the policy
+has seated someone, never over the crisis card, and every reply is audited
+before it is released ([ADR-0029](docs/adr/0029-the-voice-is-a-harness-behind-the-policy-layer.md);
+no run with a real model is recorded yet). In development, in public: every
+claim on this page points at a test, a record, or a labelled proposal.
 
 Follow the build. Inspect the design. See what still needs testing.
 
 [![CI](https://github.com/THerigstad/SecondSignal/actions/workflows/ci.yml/badge.svg)](https://github.com/THerigstad/SecondSignal/actions/workflows/ci.yml)
-[![tests](https://img.shields.io/badge/tests-1%2C352%20%C2%B7%20179%20known%20gaps%20%C2%B7%2014%20recorded%20dissents-brightgreen)](docs/evaluation.md)
+[![tests](https://img.shields.io/badge/tests-1%2C386%20%C2%B7%20179%20known%20gaps%20%C2%B7%2014%20recorded%20dissents-brightgreen)](docs/evaluation.md)
 [![python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue)](pyproject.toml)
 [![license](https://img.shields.io/badge/license-MIT%20code%20%C2%B7%20CC%20BY--NC--ND%204.0%20characters-blue)](LICENSE-CONTENT)
 
@@ -123,7 +127,7 @@ git clone https://github.com/THerigstad/SecondSignal.git
 cd SecondSignal
 pip install -e ".[dev]"
 
-pytest                                  # 1,352 tests: 193 expected failures (179 documented gaps, 14 recorded dissents), the rest pass; no network, no API key
+pytest                                  # 1,386 tests: 193 expected failures (179 documented gaps, 14 recorded dissents), the rest pass; no network, no API key
 python -m secondsignal --roster
 python -m secondsignal "I'm panicking, chest tight, can't breathe"
 python -m secondsignal --json "help me plan the launch"
@@ -131,6 +135,7 @@ python evals/run_fixtures.py                                   # reproduce the r
 python evals/run_fixtures.py --report round2-2026-09-08 \
     --output /tmp/round2.md                                    # and round 2's
 python evals/refresh_public_numbers.py                         # the counts on this page, derived from the tree; --write adopts them
+python -m secondsignal_harness --adapter fake --locale US      # the voice on a fake model: watch the house seat, withhold, and hold the floor
 ```
 
 The bundled roster loads by default; use `--profiles DIR` to override it with
@@ -451,13 +456,17 @@ yet to move it.
 | Deterministic routing policy with full traces and named reasons; seat-claims, holds with obligations, an advisory assist, one eligibility gate; a relative's return to use as a hold | Model-backed signal extraction; a trained crisis classifier; token-level language identification |
 | Fail-closed crisis screen (class lexicon, `unreviewed`) over normalized text, with idiom masks and a receipt on every verdict; the danger lane with verified domestic-violence lines for five locales; the post-separation window and the abuse-history hold; boundary, integrity and facilitation holds; the two-tier careful-side latch and register cap; the house lines; the bounded aftermath; style preferences that ask | Response generation of any kind; the settings surface that stores a confirmed preference; the correction path after a careful-side inference beyond its first step |
 | Declarative roster validated at load, including the stabilizer floor; profiles hashed; aliases; stabilizer resolved by role; ten codexes in the two-part shape, each family codex held equal to its profile by a test | Persistent cross-session memory; persistence of a safety restriction across sessions (a hard latch dies with the session today) |
-| Labeled eval cases run in CI: 420 inventoried in a case manifest, 165 of them external reviewer fixtures kept verbatim, 179 documented gaps and 14 recorded dissents; an expected failure may fail only on the fields it was approved for, so it cannot absorb an unrelated regression; 71 deferred fixtures stored and not run | The audit harness wired in (a reference port, `jr.py`, is in the tree and deliberately unwired); intake and provenance; the ledger and the interlock; Protocol A / B evaluations; the trajectory runner (the format, one model-authored nine-turn trajectory and its shape validator are in the tree under `evals/cases/trajectories/`, [ADR-0028](docs/adr/0028-trajectory-fixtures.md); the runner that asserts a whole session is not written) |
-| English and a native Spanish pack (`unreviewed`; native review in progress) with verified resource rows; a machine-checked register of every design decision, hardened against the mutations its reviewers wrote; 1,352 tests, no network or API key required | Any other language; Spanish integrity, danger and separation detectors; clinical review of any lexicon; multi-turn conversational state beyond the monitors |
+| The voice: `secondsignal_harness` calls one model adapter only when the record seats a persona, composes the reply with the attached house lines, audits the composed text through `jr.py` (the first caller the reference port has had) and writes a row before anything is released; four vendor presets over the standard library (Anthropic, OpenAI, xAI, Gemini) and one adapter for any other host of the same dialect by address (how Meta's models are reached), and a scripted fake; every labelled case replayed through the wired pair in CI ([ADR-0029](docs/adr/0029-the-voice-is-a-harness-behind-the-policy-layer.md)) | Operator-circle mode as a rule for anyone but the operator's own circle: with it off, the audit's cultural layer withholds every reply until two humans lock a rubric, so the voice is a prototype for the operator's circle and not a product |
+| Labeled eval cases run in CI: 420 inventoried in a case manifest, 165 of them external reviewer fixtures kept verbatim, 179 documented gaps and 14 recorded dissents; an expected failure may fail only on the fields it was approved for, so it cannot absorb an unrelated regression; 71 deferred fixtures stored and not run | The six corrections ADR-0020 names before its predicates can be adopted (the harness reads the record through a flattening view until they land); a recorded run of the voice with a real model; a second model family for the audit's residual checks; intake and provenance; the ledger and the interlock; Protocol A / B evaluations; the trajectory runner (the format, one model-authored nine-turn trajectory and its shape validator are in the tree under `evals/cases/trajectories/`, [ADR-0028](docs/adr/0028-trajectory-fixtures.md); the runner that asserts a whole session is not written) |
+| English and a native Spanish pack (`unreviewed`; native review in progress) with verified resource rows; a machine-checked register of every design decision, hardened against the mutations its reviewers wrote; 1,386 tests, no network or API key required | Any other language; Spanish integrity, danger and separation detectors; clinical review of any lexicon; multi-turn conversational state beyond the monitors |
 
-This repository is the **policy layer only**. It decides who should respond and
-whether anyone should. It does not generate responses. That boundary is
-deliberate: the routing and safety logic is the part that should be auditable,
-and it is the part that stays stable while the underlying model is replaced.
+The policy layer decides who should respond and whether anyone should; it
+does not generate responses, and `secondsignal` never imports the package
+that does. That boundary is deliberate: the routing and safety logic is the
+part that should be auditable, and it is the part that stays stable while the
+underlying model is replaced. The voice sits behind it as a caller, can be
+removed without changing a test in the policy layer, and is held to the
+decision record by the audit function rather than by a prompt.
 The full list of what is not built, not reviewed, and not decided is one page:
 [`docs/known-limitations.md`](docs/known-limitations.md).
 
@@ -486,19 +495,20 @@ edited by hand or if a status claim appears anywhere else on this page.
 - [ADR-0011](docs/adr/0011-no-signal-routing-is-a-policy.md) — No-signal routing is a policy, not an accident. **Accepted; built.** Amended 2026-09-03 inside the record.
 - [ADR-0012](docs/adr/0012-regulation-floor-is-eligibility.md) — The regulation floor is eligibility, and the roster must prove it at load. **Accepted; built.**
 - [ADR-0013](docs/adr/0013-two-evaluation-planes.md) — Two evaluation planes, one honest runner. **Accepted; partly built.** Policy plane runs; generation and harness planes are stored, not run.
-- [ADR-0014](docs/adr/0014-jr-is-a-harness-not-a-persona.md) — The audit function is a harness, not a persona. **Accepted; a reference port in the tree, deliberately unwired.** A reference port of the thin slice is in the tree and deliberately unwired; nothing in router.py or cli.py calls audit(). Status line corrected 2026-09-08: Accepted; reference port present and deliberately unwired.
+- [ADR-0014](docs/adr/0014-jr-is-a-harness-not-a-persona.md) — The audit function is a harness, not a persona. **Accepted; partly built.** The reference port of the thin slice is in the tree; since 2026-09-19 the generation harness (ADR-0029, Proposed) calls it on every seated turn, after the router and before release, and nothing on the policy layer's own request path imports it. Partial: the second engine, human-token issuance and expiry, and the locked cultural rubric are not built. Status line corrected 2026-09-08 (Accepted; reference port present) and 2026-09-19 (partial; wired by the harness).
 - [ADR-0015](docs/adr/0015-two-tier-latch-with-declared-bands.md) — The careful-side latch has two tiers, declared-age priors, and clears by reason. **Accepted; built.**
 - [ADR-0016](docs/adr/0016-seat-versus-hold-routing-tree.md) — Seat versus hold — a seven-layer routing tree with one eligibility gate. **Accepted; built.** Amended 2026-09-10 by ADR-0027: a relative's return to use is a hold, not a seat-claim (D3).
 - [ADR-0017](docs/adr/0017-style-preferences-never-touch-the-envelope.md) — Style preferences are declared or confirmed, never inferred into policy, and never touch the safety envelope. **Accepted; partly built.** Policy layer built; the settings surface that stores a confirmed preference is not.
 - [ADR-0018](docs/adr/0018-normalize-masks-and-language-packs.md) — Normalize before every lexicon; masks are pre-filters with objects; languages are packs, and declaring one never exempts text. **Accepted; built.**
 - [ADR-0019](docs/adr/0019-security-triad-and-commit-monitor.md) — Security triad clocks and the unnamed commit monitor. **Proposed (written, not yet adopted); not built.** Drafted by an external reviewer (2026-09-03), accepted in principle by the operator (2026-09-07), amended 2026-09-08 (the gate is object one; narrators outside the five; intake after the gate). Stays Proposed until review round 2 reviews the amendment. The gate it names is built and belongs to ADR-0010 and ADR-0015; the other four objects are not built.
-- [ADR-0020](docs/adr/0020-jr-v0-predicates.md) — J.R. v0 predicates. **Proposed (written, not yet adopted); a reference port in the tree, deliberately unwired.** The reference port implements these predicates on synthetic records and is unwired. Six corrections are listed inside the record and must be verified against the code before the decision can flip to Accepted.
+- [ADR-0020](docs/adr/0020-jr-v0-predicates.md) — J.R. v0 predicates. **Proposed (written, not yet adopted); partly built.** The reference port implements these predicates and, since 2026-09-19, is called on every seated turn by the generation harness (ADR-0029, Proposed) through a view that flattens the nested decision record. Six corrections are listed inside the record and must be verified against the code before the decision can flip to Accepted; the first (the port reads the nested record) retires the view.
 - [ADR-0022](docs/adr/0022-intake-and-provenance.md) — Intake and provenance runs after the gate and before routing, and proposes but never grants. **Proposed (written, not yet adopted); not built.** Not built. The integrity patterns and the forged-ping guard exist inside the gate (safety.py, tests/test_guards.py) and are the detectors this record gathers under one name; no intake function, row, stamp, backend or validator exists. Failure clause revised in place 2026-09-10 (seat the persona, block the writes, one automatic retry, the house's failure line) on the operator's ruling after review round 2; the original clause is kept in the record's revision history.
 - [ADR-0023](docs/adr/0023-ledger-and-interlock.md) — The ledger and the interlock are two named things bound by one invariant, and nothing weakens a restriction without a clearance row. **Proposed (written, not yet adopted); not built.** Not built. Session-scoped latch state, operator clear by reason and selective clear exist inside the gate (tests/test_latch.py); no append-only row, hash chain, interlock, clearance row, persistence, manifest, aftermath counter or narrator exists. Amends ADR-0015's hard-tier visibility clause (once when the latch sets, again only as a refusal's reason); the cap is unchanged.
 - [ADR-0025](docs/adr/0025-assist-from-the-hold-and-affinity-seat-trade.md) — The assist from the hold, and an affinity that can trade seats. **Proposed (written, not yet adopted); not built.** The operator's design intent, recorded with its target case (SiblingAssist) and its gate. Not adopted; would amend ADR-0016 if Accepted; not to be built before a generation layer exists. Amended 2026-09-10 by ADR-0026: proposal 2 (the affinity seat trade) withdrawn; proposal 1 (the assist from the hold) stands.
 - [ADR-0026](docs/adr/0026-twins-two-presentations-one-routing-contract.md) — Twins: every persona has two presentations and one routing contract. **Proposed (written, not yet adopted); partly built.** The operator's ruling of 2026-09-10; amended in place 2026-09-11 (amendment 1: three presentations, woman, man or neither; one name in two forms, the short form the full form with letters dropped, both on every plate with she and he labels, printed twice when the name does not shorten; the door's fourth answer). Partial: the presentation block in every family profile, the plate and name_for helpers and their tests are built; routing reads none of it, and the door, the settings and the generation layer are not built. Replaces ADR-0025's seat trade by construction (the specialist keeps the seat; only the presentation changes); the rename to twin-neutral names (Cody, Vandal, Nikki, Willow, Ellis, Seren, Rowan) is built as an alias layer. Flips to Accepted after review round 3 reads it, with amendment 1, beside the amended ADR-0025.
 - [ADR-0027](docs/adr/0027-a-relatives-return-to-use-is-a-hold.md) — A relative's return to use is a hold, not a seat-claim. **Proposed (written, not yet adopted); built.** The operator's ruling of 2026-09-08 (D3, decided with dissent), built 2026-09-10. Proposed because the record's text is the assistant's; flips to Accepted after review round 3 reads it.
 - [ADR-0028](docs/adr/0028-trajectory-fixtures.md) — Trajectory fixtures, or which turn the gate fires on. **Proposed (written, not yet adopted); partly built.** Drafted 2026-09-14 as 0027 without reading this register; renumbered 0028 on 2026-09-17 when the first run landed. Partial: the format, one model-authored trajectory (contract-adjusted after its first run, originals kept), the shape validator that computes the recall flag from provenance, and the guard that keeps trajectory files out of the single-case runner. The runner (tests/test_trajectory_cases.py, five invariant functions) is not built. Proposed because the record's text is the assistant's; flips to Accepted after review round 3 reads it.
+- [ADR-0029](docs/adr/0029-the-voice-is-a-harness-behind-the-policy-layer.md) — The voice is a generation harness behind the policy layer. **Proposed (written, not yet adopted); partly built.** Specified and built on 2026-09-19 on the operator's ruling (option A: a package inside this repository that the policy layer never imports). Partial: the turn, the prompt, the composition, the audit call, the audit row, the release rule with operator-circle mode, four vendor presets over the standard library (Anthropic, OpenAI, xAI, Gemini), one adapter for any other host of the same dialect by address, and a scripted fake, and a command-line surface are built and tested; the six ADR-0020 corrections it relies on are not (the audit view in view.py flattens the record until they land), no real-model run has been recorded, and the public pages still describe the tree without a voice until the same commit changes them. Proposed because the record's text is the assistant's and because it puts a model on the request path for the first time; flips only after a review round has attacked it.
 
 Numbers held for records not yet written: ADR-0021 (the neurodivergent interruption stack (an external reviewer's draft); lands only with its fixtures, gated by the rule that neurodivergent-friendliness claims wait on green fixtures); ADR-0024 (the completion field per profile; lands with its own change).
 
@@ -538,11 +548,14 @@ landed on 10 September with the fixtures in
       limitations page says so
 - [ ] The correction path after a careful-side inference: who reviews, when,
       and what the person is told about timing
-- [ ] The audit harness wired in. A reference port of the thin slice
-      (predicates, worst-layer-wins composition, payload-hash binding,
-      write-permission sandbox, ADR-0014) is in the tree as `jr.py`, reviewed
-      blind-first by a second model family, and stays unwired until the
-      release door exists
+- [x] The audit harness wired in, on 2026-09-19, by the generation harness
+      (`secondsignal_harness`, ADR-0029): the reference port of the
+      thin slice (predicates, worst-layer-wins composition, payload-hash
+      binding, write-permission sandbox, ADR-0014) judges every composed reply
+      and the row is written before release. Still open: the six corrections
+      ADR-0020 names, a second engine from another model family, and the
+      two-human cultural rubric without which the audit withholds everything
+      outside operator-circle mode
 - [ ] Intake and provenance, then the ledger and the interlock, with the
       eighteen round-2 fixtures moving up from `evals/cases/deferred/`
 - [ ] The seven-versus-one experiment: one competent assistant, the same

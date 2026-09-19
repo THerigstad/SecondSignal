@@ -1,6 +1,6 @@
 # ADR-0014: The audit function is a harness, not a persona
 
-- **Status:** Accepted — reference-unwired; a reference port is present and deliberately unwired (`src/secondsignal/jr.py`)
+- **Status:** Accepted — partial; the reference port (`src/secondsignal/jr.py`) has its first caller since 2026-09-19, the generation harness (`src/secondsignal_harness/`, ADR-0029, Proposed), which runs it on every seated turn after the router and before release, exactly where this record places it; the request path inside the policy layer still imports nothing from it (`tests/test_guards.py`); not built: the second engine for the residual checks, human-token issuance and expiry, and the locked cultural rubric
 - **Date:** 2026-09-02
 - **Evidence:** External red-team review (Grok 4.6, 2026-09-01), docs 08 and 11, `fixtures/jr_harness_cases.json`, `fixtures/jr_eval_protocol.md`; Charafeddine, letter 96, "Agent = Model + Harness" (2026-08-29)
 
@@ -74,11 +74,16 @@ scheduled.
 
 ## Relationship to the current implementation
 
-Not wired. What exists today already satisfies two of the contract's
-requirements by construction: the security characters are not routable, and a
-forged ping is treated as user text (`tests/test_guards.py`). Since 2026-09-06
-a reference port of the thin slice sits in the tree at `src/secondsignal/jr.py`
-(predicates in ADR-0020, Proposed); nothing in `router.py` or `cli.py` calls
-it, and the register (`docs/adr/index.json`) records the implementation as
-`reference-unwired`. Everything else in this record is a promise the code has
-not yet made.
+Wired in one place, since 2026-09-19. What exists satisfies the contract's
+first requirements by construction: the security characters are not routable,
+a forged ping is treated as user text, and nothing on the policy layer's own
+request path imports the port (`tests/test_guards.py`). The reference port of
+the thin slice sits at `src/secondsignal/jr.py` (predicates in ADR-0020,
+Proposed) and is called by the generation harness (`src/secondsignal_harness/`,
+ADR-0029, Proposed) on every seated turn: after the router, on the composed
+reply, with the verdict bound to the payload hash and the row written before
+release, and never on a turn the gate already took. The register
+(`docs/adr/index.json`) records the implementation as `partial`: the second
+engine from a different model family, a human token with issuer, expiry,
+scope and binding, and the two-human cultural rubric are promises the code has
+not yet made, and the six corrections in ADR-0020 are open.

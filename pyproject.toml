@@ -62,5 +62,5 @@ strict_optional = true
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
-module = ["secondsignal", "secondsignal.*"]
+module = ["secondsignal", "secondsignal.*", "secondsignal_harness", "secondsignal_harness.*"]
 disallow_untyped_defs = true

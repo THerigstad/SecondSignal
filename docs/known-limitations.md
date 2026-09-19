@@ -12,16 +12,41 @@ the package metadata, and fails when they disagree.
 
 ## What is not built
 
-- No generation layer. SecondSignal decides who may speak and whether
-  anyone should; it writes no replies. Nothing in this repository is a
-  chatbot, and the personas exist only as routing profiles.
-- No audit harness wired in. The after-the-fact check that a reply honored
-  the decision record — the obligations on a hold, the register cap, a
-  stored preference — is a contract (ADR-0014) with a reference port in the
-  tree (`src/secondsignal/jr.py`, predicates in ADR-0020, Proposed) that
-  nothing calls. Obligations are recorded on every decision and enforced by
-  nothing yet. Where a decision rests on an obligation being honored, the
-  dissent log says so (D3).
+- No recorded run of the voice with a real model. The generation harness
+  exists since 2026-09-19 (`src/secondsignal_harness/`, ADR-0029, Proposed):
+  it calls one model adapter only when the decision record seats a persona,
+  never on a crisis turn or an empty turn, and audits every composed reply
+  before release. In this repository it has spoken only through a scripted
+  fake and a stand-in transport; the vendor adapters have not been run
+  against a vendor, and no transcript from a real model is on the record.
+  The policy layer itself still writes no replies and never imports the
+  harness (a test holds the direction), so nothing under `src/secondsignal/`
+  is a chatbot and the personas there exist only as routing profiles. The
+  voice is the first part of the repository that sends what a person typed
+  off the machine: on every seated turn the conversation and the codex go
+  to the chosen vendor under that vendor's terms, and the vendor's own
+  filters sit under the house's, so a vendor may refuse a turn the house
+  would have seated, which the house reports as its failure line and the
+  audit log records. The demonstration page's promise that nothing typed
+  leaves the page is a promise about the demonstration page. A deployer
+  owes users the vendor's data terms in plain words, uses only keys whose
+  tier does not train on submitted text, and must satisfy the vendor's
+  usage policy for health-adjacent use.
+- The audit harness is wired in one place and its predicates are still
+  Proposed. The after-the-fact check that a reply honored the decision
+  record (ADR-0014; predicates in ADR-0020, Proposed) has its first caller,
+  the generation harness, which binds every verdict to the composed text and
+  writes the row before release. Six corrections named inside ADR-0020 are
+  open (the record it reads is nested, and the harness flattens it for the
+  port until the port reads it directly; the human token is a boolean; the
+  canonicalization stringifies). The cultural layer composes to
+  `INCONCLUSIVE` until two humans lock a rubric, and no rubric is locked, so
+  with operator-circle mode off the harness withholds every reply on this
+  tree; the mode that releases normal-risk replies with the verdict recorded
+  is for the operator's own circle and is named as such on the record.
+  Outside the harness package, obligations are recorded on every decision
+  and enforced by nothing. Where a decision rests on an obligation being
+  honored, the dissent log says so (D3).
 - No intake and provenance function, no ledger, no interlock, no commit
   monitor, no narrators. The security layer is specified as four objects on
   four clocks behind the gate, their dependency (ADR-0019, ADR-0022,
