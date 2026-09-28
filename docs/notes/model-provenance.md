@@ -8,6 +8,9 @@ is amended by adding rows, never by rewriting one. Version 1 (8 September)
 asked the operator three questions; his answers are in this version and are
 marked as his account wherever the product itself did not report the fact.
 
+**Amended:** 28 September 2026, adding the model change of 27 September and
+the commit ledger; nothing above was rewritten.
+
 ## Why this record exists
 
 SecondSignal is written by one person working with several model families.
@@ -86,6 +89,12 @@ session to Claude Opus 5 at maximum effort during a decision queue, one
 assistant turn ran on it, and he switched back before ruling; the turn was
 discarded as canon and the rule adopted that a ruling is taken on the tier
 that wrote the recommendation (`docs/confessions.md`, C-19).
+
+From 27 September 2026, by the operator's ruling, the build runs on Claude
+Opus 5.5 at the setting his screen shows as Max. The rule he states is the
+best model available at the time, not a named one; Fable 5.1 held the role
+before that date. The commit ledger below records the model for each commit
+from 28 September.
 
 On the OpenAI side, by the same account: GPT-6 Astra at its highest available
 setting from Astra's release (3 to 4 September 2026) onward, and GPT-5.6 Sol at
@@ -181,6 +190,21 @@ June 2025. The codex documents exist as text editions dated July and August
 shape in September 2026 (`docs/codex/`). Nothing of the original GPT
 configurations is in this repository; the personas here are profiles the
 router reads, not model instances.
+
+## Commits, from 2026-09-28
+
+By the operator's ruling of 26 September 2026, amended 28 September, every
+commit ends with one "Co-authored-by:" line naming the one model that owns the
+commit: the model that did the final review, checked it for accuracy and
+pushed it, named as the operator's screen showed it. Models whose work is in a
+commit as data (reviewer fixtures and cases) are credited in the files that
+hold it, not in the commit line. One row per commit; rows are added, never
+rewritten.
+
+- **2026-09-28**, "The present and past of "end it all" now draw the card
+  (review round 3B)": Claude Opus 5.5, Max, as the operator's screen showed
+  it (the operator's account). Authored by the operator and pushed through his
+  browser session on GitHub's upload page.
 
 ## What this note does not do
 

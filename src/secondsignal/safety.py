@@ -273,6 +273,17 @@ CRISIS_CLASSES: dict[str, tuple[re.Pattern[str], ...]] = {
         r"\bself[- ]?harm\b",
         r"\b(should|could|might|will|i'?ll|i'?d|i will|i would|gonna|going to|about to)"
         r" (just )?(end it|end it all|end things|end everything)\b",
+        # Tense, again (review round 3B, found 28 September 2026): "end it all"
+        # and "end everything" fired only in their modal and infinitive forms,
+        # so "I'm ending it all tonight" and a past-tense report ("he ended it
+        # all") read MISS. Found by running Nemotron's round-3B settling
+        # trajectory (traj-split-escalation-001, turn 2: "ending it all
+        # tonight") on the tree. "ending it all with a bang" and "on a high
+        # note" are excluded by the tail. "ending it" and "ending things" alone
+        # are not here, because a breakup uses the same words: they fail closed
+        # as inconclusive instead (see INCONCLUSIVE_PATTERNS).
+        r"\b(end(ed|ing|s)) (it all|everything)\b(?! (with\b|on an? (high|good|positive|happy|sweet|light) note))",
+        r"\btime to (just )?(end it all|end everything)\b",
         r"\b(better off|rather be) dead\b",
         r"\bwish (i|he|she|they) (was|were) (dead|gone|never born|not here|not alive)\b",
         r"\b(hurt|kill|harm) (someone|somebody|people|him|her|them)\b",
@@ -527,6 +538,15 @@ INCONCLUSIVE_PATTERNS: tuple[re.Pattern[str], ...] = _compile((
     r"\bnot (be )?around (much longer|for long|anymore)\b",
     # A bare "going to jump" with no object is not a game and not a plan.
     r"\b(i'?m|i am|im) (going to|gonna|about to) jump\b(?![ -](in|into|on|onto|at|for|to|through|around|back|rope|start|ship|the gun|ahead|right in|straight in|over to))",
+    # "ending it" and "ending things" in the first-person present, with no
+    # "all" (review round 3B, 28 September 2026). The future form ("I'm going
+    # to end it tonight") already fired; the present did not. A breakup uses
+    # the same words, so the operator ruled (option B) that the bare form fails
+    # closed as inconclusive rather than being recorded as ideation: the card
+    # still goes out, and the record says the read was ambiguous. With a person
+    # or a relationship after it ("ending it with him", "ending things between
+    # us") it is a breakup and stays out.
+    r"\b(i'?m|im|i am) (just |finally |really |seriously )?ending (it|things)\b(?! all\b)(?! (with|between)\b)",
     # Acute physical danger adjacent to eating or ingestion; a clinician call
     # in every direction, so it fails closed rather than routing to a persona.
     r"\b(can'?t|cannot) keep (water|food|anything|liquids?) down\b",

@@ -4,6 +4,29 @@ All notable changes to SecondSignal are documented here.
 
 ## [Unreleased]
 
+### Fixed — 2026-09-28
+
+- **A crisis phrase in the present tense read MISS** (`src/secondsignal/safety.py`,
+  `evals/cases/review_round3b_tense_2026-09-28.json`,
+  `tests/test_round3b_tense.py`). "end it all" and "end everything" fired
+  only in their modal and infinitive forms: "I'm going to end it all tonight"
+  drew the card, while "I'm ending it all tonight" proceeded to a persona, and
+  so did a past-tense report ("he ended it all"). Found by the triage of
+  review round 3B, which ran Nemotron's settling trajectory
+  (traj-split-escalation-001, turn 2: "ending it all tonight") on the tree.
+  The direct-ideation class now carries the present and past forms and "time
+  to end it all"; an idiom with "with" or "on a high note" after it stays out,
+  and so does a breakup ("ending things with him"). "ending it" and "ending
+  things" alone, which a breakup also uses, read inconclusive by the
+  operator's ruling of the same morning and fail closed: the card still goes
+  out, and the record says the read was ambiguous. Twelve labelled cases and
+  twenty-one tests pin the repair in both directions. One over-restriction is
+  known and written down: when the subject is a thing, not a person ("the
+  season finale is ending it all"), the sentence now draws the card; a
+  thirteenth case records it as a strict expected failure (`docs/known-
+  limitations.md`). The public numbers were refreshed from the tree, and
+  `docs/notes/model-provenance.md` gained its commit ledger.
+
 ### Added — 2026-09-19
 
 - **The voice, behind the policy layer** (`src/secondsignal_harness/`,

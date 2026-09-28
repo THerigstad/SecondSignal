@@ -185,6 +185,16 @@ the package metadata, and fails when they disagree.
   (`evals/cases/operator_live_test_2026-09-11.json`,
   `tests/test_operator_live_test.py`). The lesson is the ceiling argument
   again: a person finds a lexicon's tense gap in a minute, and more exist.
+- A third tense gap was found on 2026-09-28, by the triage of review round 3B:
+  "I'm ending it all tonight" read MISS, because "end it all" and "end
+  everything" fired only in their modal and infinitive forms. It is closed
+  (`evals/cases/review_round3b_tense_2026-09-28.json`,
+  `tests/test_round3b_tense.py`), and the repair over-restricts in one known
+  way: when the subject is a thing, not a person ("the season finale is ending
+  it all"), the sentence now draws the card. That over-restriction is recorded
+  as a strict expected failure in the same case file. The planned repair is a
+  short list of clearly harmless subjects, in the way the idiom masks already
+  work, with controls proving it never quiets a real crisis message.
 - Danger from another person is a lane now, built 10 September 2026, and
   it has named gaps. The class fires on any two of four signal groups in
   one message (present confinement, prior violence, fear for dependents, an

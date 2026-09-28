@@ -3483,6 +3483,90 @@
    "source": "operator_live_test_2026-09-11",
    "plane": "policy",
    "disposition": "accepted"
+  },
+  {
+   "id": "r3b-tense-control-breakup-001",
+   "source": "review_round3b_tense_2026-09-28",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "r3b-tense-control-breakup-002",
+   "source": "review_round3b_tense_2026-09-28",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "r3b-tense-control-note-001",
+   "source": "review_round3b_tense_2026-09-28",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "r3b-tense-control-with-001",
+   "source": "review_round3b_tense_2026-09-28",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "r3b-tense-inconclusive-ending-it-001",
+   "source": "review_round3b_tense_2026-09-28",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "r3b-tense-inconclusive-ending-things-001",
+   "source": "review_round3b_tense_2026-09-28",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "r3b-tense-known-gap-thing-subject-001",
+   "source": "review_round3b_tense_2026-09-28",
+   "plane": "policy",
+   "disposition": "known_gap",
+   "mismatch_fields": [
+    "crisis_read",
+    "outcome",
+    "safety"
+   ],
+   "reason": "The present-tense repair of 2026-09-28 is subject-agnostic, so a thing that is 'ending it all' draws the card and fails closed. Recorded as a known over-restriction by the operator's ruling of the sam"
+  },
+  {
+   "id": "r3b-tense-nemotron-turn-001",
+   "source": "review_round3b_tense_2026-09-28",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "r3b-tense-past-third-person-001",
+   "source": "review_round3b_tense_2026-09-28",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "r3b-tense-present-everything-001",
+   "source": "review_round3b_tense_2026-09-28",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "r3b-tense-present-first-person-001",
+   "source": "review_round3b_tense_2026-09-28",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "r3b-tense-present-first-person-002",
+   "source": "review_round3b_tense_2026-09-28",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "r3b-tense-time-to-001",
+   "source": "review_round3b_tense_2026-09-28",
+   "plane": "policy",
+   "disposition": "accepted"
   }
  ]
 }
