@@ -21,7 +21,7 @@ claim on this page points at a test, a record, or a labelled proposal.
 Follow the build. Inspect the design. See what still needs testing.
 
 [![CI](https://github.com/THerigstad/SecondSignal/actions/workflows/ci.yml/badge.svg)](https://github.com/THerigstad/SecondSignal/actions/workflows/ci.yml)
-[![tests](https://img.shields.io/badge/tests-1%2C420%20%C2%B7%20180%20known%20gaps%20%C2%B7%2014%20recorded%20dissents-brightgreen)](docs/evaluation.md)
+[![tests](https://img.shields.io/badge/tests-1%2C434%20%C2%B7%20180%20known%20gaps%20%C2%B7%2014%20recorded%20dissents-brightgreen)](docs/evaluation.md)
 [![python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue)](pyproject.toml)
 [![license](https://img.shields.io/badge/license-MIT%20code%20%C2%B7%20CC%20BY--NC--ND%204.0%20characters-blue)](LICENSE-CONTENT)
 
@@ -127,7 +127,7 @@ git clone https://github.com/THerigstad/SecondSignal.git
 cd SecondSignal
 pip install -e ".[dev]"
 
-pytest                                  # 1,420 tests: 194 expected failures (180 documented gaps, 14 recorded dissents), the rest pass; no network, no API key
+pytest                                  # 1,434 tests: 194 expected failures (180 documented gaps, 14 recorded dissents), the rest pass; no network, no API key
 python -m secondsignal --roster
 python -m secondsignal "I'm panicking, chest tight, can't breathe"
 python -m secondsignal --json "help me plan the launch"
@@ -458,7 +458,7 @@ yet to move it.
 | Declarative roster validated at load, including the stabilizer floor; profiles hashed; aliases; stabilizer resolved by role; ten codexes in the two-part shape, each family codex held equal to its profile by a test | Persistent cross-session memory; persistence of a safety restriction across sessions (a hard latch dies with the session today) |
 | The voice: `secondsignal_harness` calls one model adapter only when the record seats a persona, composes the reply with the attached house lines, audits the composed text through `jr.py` (the first caller the reference port has had) and writes a row before anything is released; four vendor presets over the standard library (Anthropic, OpenAI, xAI, Gemini) and one adapter for any other host of the same dialect by address (how Meta's models are reached), and a scripted fake; every labelled case replayed through the wired pair in CI ([ADR-0029](docs/adr/0029-the-voice-is-a-harness-behind-the-policy-layer.md)) | Operator-circle mode as a rule for anyone but the operator's own circle: with it off, the audit's cultural layer withholds every reply until two humans lock a rubric, so the voice is a prototype for the operator's circle and not a product |
 | Labeled eval cases run in CI: 433 inventoried in a case manifest, 165 of them external reviewer fixtures kept verbatim, 180 documented gaps and 14 recorded dissents; an expected failure may fail only on the fields it was approved for, so it cannot absorb an unrelated regression; 71 deferred fixtures stored and not run | The six corrections ADR-0020 names before its predicates can be adopted (the harness reads the record through a flattening view until they land); a recorded run of the voice with a real model; a second model family for the audit's residual checks; intake and provenance; the ledger and the interlock; Protocol A / B evaluations; the trajectory runner (the format, one model-authored nine-turn trajectory and its shape validator are in the tree under `evals/cases/trajectories/`, [ADR-0028](docs/adr/0028-trajectory-fixtures.md); the runner that asserts a whole session is not written) |
-| English and a native Spanish pack (`unreviewed`; native review in progress) with verified resource rows; a machine-checked register of every design decision, hardened against the mutations its reviewers wrote; 1,420 tests, no network or API key required | Any other language; Spanish integrity, danger and separation detectors; clinical review of any lexicon; multi-turn conversational state beyond the monitors |
+| English and a native Spanish pack (`unreviewed`; native review in progress) with verified resource rows; a machine-checked register of every design decision, hardened against the mutations its reviewers wrote; 1,434 tests, no network or API key required | Any other language; Spanish integrity, danger and separation detectors; clinical review of any lexicon; multi-turn conversational state beyond the monitors |
 
 The policy layer decides who should respond and whether anyone should; it
 does not generate responses, and `secondsignal` never imports the package

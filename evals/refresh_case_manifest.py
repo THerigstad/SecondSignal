@@ -27,6 +27,14 @@ sys.path.insert(0, str(ROOT / "tests"))
 
 import test_eval_cases as runner  # noqa: E402
 
+
+def clip(text: str, limit: int = 200) -> str:
+    """Shorten a reason at a word boundary, never mid-word (review round 3)."""
+    if len(text) <= limit:
+        return text
+    cut = text[: limit - 1].rsplit(" ", 1)[0].rstrip(" ,;:")
+    return cut + "\u2026"
+
 from secondsignal import load_roster  # noqa: E402
 
 MANIFEST_PATH = ROOT / "evals" / "case-manifest.json"
@@ -56,9 +64,9 @@ def build() -> dict:
         if entry["disposition"] in ("known_gap", "disputed"):
             decision, session = runner.run_case(case, roster)
             entry["mismatch_fields"] = sorted(runner.field_failures(case, decision, session))
-            entry["reason"] = (
+            entry["reason"] = clip(
                 case.get("gap_note") or case.get("dispute_note") or case.get("why", "")
-            )[:200]
+            )
         entries.append(entry)
     entries.sort(key=lambda e: (e["source"], e["id"]))
     current = json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))

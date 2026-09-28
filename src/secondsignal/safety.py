@@ -626,6 +626,16 @@ CORRECTION_PATTERNS: tuple[re.Pattern[str], ...] = _compile((
     r"\b(i )?(mistyped|typed the wrong age|put the wrong age|wrote the wrong age|gave the wrong age)\b",
 ))
 
+# A person taking back what they said after a card. Recorded, never obeyed:
+# message text clears nothing (ADR-0022 (Proposed), ADR-0023 (Proposed)).
+RETRACTION_PATTERNS: tuple[re.Pattern[str], ...] = _compile((
+    r"\b(i'?m|im|i am) (fine|ok|okay|alright|all right|good)\b",
+    r"\b(ignore|forget|disregard) (that|it|this|what i (said|wrote))\b",
+    r"\bnever ?mind\b",
+    r"\b(i was|i'?m|im) (just )?(joking|kidding)\b",
+    r"\bjk\b",
+))
+
 # Romantic or sexual frames toward the persona. Held as a boundary for
 # everyone; under a careful-side posture the careful line rides along.
 BOUNDARY_INDICATORS: tuple[str, ...] = (
@@ -706,10 +716,24 @@ ACKNOWLEDGEMENT_TOKENS: frozenset[str] = frozenset({
 })
 
 
+# Function words that carry no new content on their own (review round 3B,
+# Qwen's rerun: "the the the" counted as a substantive turn). A turn made only
+# of these, or only of one word repeated, does not run the aftermath clock.
+FILLER_TOKENS: frozenset[str] = frozenset({
+    "the", "a", "an", "and", "or", "but", "of", "to", "in", "on", "at", "for",
+    "with", "is", "it", "its", "this", "that", "what", "so", "as", "be",
+})
+
+
 def is_substantive(masked: str) -> bool:
-    """A turn with new content beyond an acknowledgement list."""
-    content = [tok for tok, _, _ in tokenize(masked) if tok.lower().strip("'") not in ACKNOWLEDGEMENT_TOKENS]
-    return len(content) >= SUBSTANTIVE_TURN_MIN_TOKENS
+    """A turn with new content beyond an acknowledgement list.
+
+    Counted in distinct words, and at least one of them must be more than a
+    function word, so repetition and filler do not run the clock.
+    """
+    content = [tok.lower().strip("'") for tok, _, _ in tokenize(masked)]
+    content = [tok for tok in content if tok not in ACKNOWLEDGEMENT_TOKENS]
+    return len(set(content)) >= SUBSTANTIVE_TURN_MIN_TOKENS and any(tok not in FILLER_TOKENS for tok in content)
 
 REGISTER_CAPS: tuple[str, ...] = ("no_romance", "no_sexual", "no_roast", "no_challenge", "dependency_threshold=1")
 CAPPED_MODES: frozenset[str] = frozenset({"challenge", "humor"})
@@ -1297,6 +1321,11 @@ def evaluate(
             reasons.append("unscreened span is an inconclusive read -> HUMAN_ESCALATION by fail-closed policy (ADR-0010)")
             if frustration:
                 reasons.append(f"frustration frame noted: {frustration[0]!r}")
+            if session is not None:
+                # The same bounded aftermath as every other card (C3). Review
+                # rounds 3 and 3B found this path returned without it, so the
+                # turns after a card in an unscreened language were unprotected.
+                session.aftermath_turns = AFTERMATH_TURNS
             return _finish(SafetyVerdict(
                 action=Action.HUMAN_ESCALATION,
                 reasons=tuple(reasons),
@@ -1384,6 +1413,13 @@ def evaluate(
             if show_line:
                 action = max(action, Action.DISCLOSE)
                 disclosures.append(lines["minor_declared"] if declared else lines["minor_inferred"])
+        if session.escalated_last_turn or session.aftermath_turns > 0:
+            # A retraction after a card (review round 3B, Qwen's rerun, on
+            # slow-slope-001 turn 7) is evidence, not a key: it is written into
+            # the record and moves nothing.
+            retraction = next((m.group(0) for p in RETRACTION_PATTERNS if (m := p.search(norm))), None)
+            if retraction:
+                reasons.append(f"retraction after a card recorded as evidence ({retraction!r}); it clears nothing")
         if session.escalated_last_turn:
             action = max(action, Action.DISCLOSE)
             reasons.append("turn after an escalation: resources restated once; next turn was screened like any other")

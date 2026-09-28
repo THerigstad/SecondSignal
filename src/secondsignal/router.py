@@ -612,11 +612,19 @@ def _select(
 
     if len(tied) == 1:
         winner = tied[0]
-        carried = signals.domains & roster[winner.agent_id].domains
+        # Mirror score_agent: a held domain is carried, not scored, whenever
+        # the request asks for something else (review round 3, grok-seat-004).
+        held = frozenset(holds)
+        ask = signals.domains - held
+        topic = ask if ask else signals.domains
+        carried = topic & roster[winner.agent_id].domains
+        carried_hold = (held & roster[winner.agent_id].domains) if (held and ask) else frozenset()
         basis = f"specialist signal: {', '.join(sorted(carried))}" if carried else (
             f"mode signal: {', '.join(sorted(live_modes & roster[winner.agent_id].modes))}"
             if (live_modes & roster[winner.agent_id].modes) else "regulation window"
         )
+        if carried_hold:
+            basis += f"; held {', '.join(sorted(carried_hold))} carried, not scored"
         return winner, prefix + f"highest score ({basis})"
 
     if holds:

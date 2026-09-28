@@ -205,6 +205,10 @@ rewritten.
   (review round 3B)": Claude Opus 5.5, Max, as the operator's screen showed
   it (the operator's account). Authored by the operator and pushed through his
   browser session on GitHub's upload page.
+- **2026-09-28**, "Six code fixes from review rounds 3 and 3B": Claude Opus
+  5.5, Max, as the operator's screen showed it (the
+  operator's account). Authored by the operator and pushed through his
+  browser session on GitHub's upload page.
 
 ## What this note does not do
 

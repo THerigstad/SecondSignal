@@ -4,6 +4,32 @@ All notable changes to SecondSignal are documented here.
 
 ## [Unreleased]
 
+### Fixed — 2026-09-28, review rounds 3 and 3B (six code fixes)
+
+- **A card in an unscreened language opens the aftermath**
+  (`src/secondsignal/safety.py`). The fail-closed card for a span no pack
+  screens returned without the bounded aftermath every other card opens, so
+  the turns after it were unprotected.
+- **The package reports version 0.3.1** (`src/secondsignal/__init__.py`); it
+  still said 0.2.0.
+- **The case manifest no longer cuts reasons mid-word**
+  (`evals/refresh_case_manifest.py`, `evals/case-manifest.json`). A long
+  reason is shortened at a word boundary with an ellipsis; the manifest was
+  regenerated from the cases, which also sorts its rows.
+- **A seat's reason no longer calls a held domain a scored signal**
+  (`src/secondsignal/router.py`, grok-seat-004). The reason now mirrors the
+  score and names a held domain as carried, not scored, when the request asks
+  for something else; the round-1 results page was regenerated from the
+  runner.
+- **Filler no longer runs the aftermath clock** (`src/secondsignal/safety.py`,
+  Qwen's round-3B rerun). "the the the" counted as a substantive turn; a turn
+  now needs three distinct words, at least one of them more than a function
+  word.
+- **A retraction after a card is written into the record**
+  (`src/secondsignal/safety.py`, slow-slope-001 turn 7). "sorry, ignore that,
+  I'm fine" is recorded as evidence and clears nothing.
+- Fourteen tests in `tests/test_round3_code_fixes.py` pin all six.
+
 ### Fixed — 2026-09-28
 
 - **A crisis phrase in the present tense read MISS** (`src/secondsignal/safety.py`,
