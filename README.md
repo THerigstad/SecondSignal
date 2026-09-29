@@ -774,7 +774,7 @@ page.
 Every time a model working on this project wiped something out, gamed a test,
 invented a fact, or claimed work it had not done, it has a line, and so does
 every time the project's own assistant or its operator did:
-[`docs/confessions.md`](docs/confessions.md), twenty-five entries, each with the
+[`docs/confessions.md`](docs/confessions.md), thirty entries, each with the
 ask that produced it and a grade of that ask.
 
 ## Provenance
@@ -784,6 +784,26 @@ multi-agent assistant systems with the same characters intact the whole way.
 The seven companions predate the policy layer; where they came from, and which
 model family did which piece of the work here, is on record in
 [`docs/notes/model-provenance.md`](docs/notes/model-provenance.md).
+
+Every piece of work here records the model that did it: the family, the
+version, the setting it ran at, and the door it ran through. That is
+deliberate. Models change fast, and the ones that look state of the art in 2026
+will look primitive long before 2035. A reader then, who knows what those
+models got wrong, needs to know exactly which ones built and checked each
+piece, to judge how far to trust the data and what to check again. The record
+costs nothing at the time and cannot be rebuilt afterwards, so it is kept every
+time. It also makes patterns visible: a door that strips characters from a
+file, a setting that drops items from a long answer, a model family agreeing
+with itself. Those patterns are how the review process improves from round to
+round.
+
+The same rule governs this repository. Only the best model available at the
+time owns a commit here: it does the final review, checks the work for
+accuracy, pushes it, and is named in the commit as its co-author. The rule
+names the best model, not a brand: Claude Fable 5.1 held the role until 27
+September 2026, and Claude Opus 5.5 holds it now. The author is not a trained
+engineer, and this record is how a builder without extensive training keeps his
+work checkable.
 
 The safety model in this repo is not theoretical. Each contraindication and
 monitor corresponds to a failure mode observed in systems the author actually

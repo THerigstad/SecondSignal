@@ -4,6 +4,18 @@ All notable changes to SecondSignal are documented here.
 
 ## [Unreleased]
 
+### Added — 2026-09-28, confessions and provenance
+
+- **Five confessions from review rounds 3 and 3B** (`docs/confessions.md`,
+  C-26 to C-30), approved by the operator one at a time: the Primary Design
+  Agent's shared editions; GLM and Qwen printing a tool call instead of
+  running it; Nemotron's "read in full"; Perplexity's reader as a door; and a
+  Qwen claim its own test disproved. Three rules join the page's list of rules
+  it produced.
+- **Why every model is written down** (`README.md`, Provenance): the reason
+  the project records the model, version, setting and door behind every piece
+  of work, and the rule that only the best model available owns a commit.
+
 ### Fixed — 2026-09-28, review rounds 3 and 3B (six code fixes)
 
 - **A card in an unscreened language opens the aftermath**

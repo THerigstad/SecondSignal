@@ -12,18 +12,16 @@ he asked for each of them. The page exists because "I audit everything" is a
 claim, and a claim without receipts is the thing this project is arguing
 against.
 
-**Status: version 5, 11 September 2026. Entries C-01 to C-19 were approved
+**Status: version 6, 28 September 2026. Entries C-01 to C-19 were approved
 by the operator on 9 and 10 September 2026; C-20 was added at his instruction
 on 10 September, and its wording stays his to edit; C-21 was added at his
 instruction the same day, after the pre-push check that produced it, and its
 wording was read by him before the push; C-22 was added at his instruction
 the same night, after the sweep that ran when the push had landed; C-23 to
-C-25 were approved by him on 11 September 2026, from the demonstration page's
-build rounds.** The
+C-25 were approved by him on 11 September 2026, from the demonstration page's build rounds; C-26 to C-30 were approved by him on 28 September 2026, one at a time, from review rounds 3 and 3B.** The
 operator approves each entry individually before it is published or linked
 from the README. Entries are written by the project's Primary Design Agent
-(Claude), which is also the subject of four of the first twelve and eleven of
-the last thirteen; the other two are the operator's.
+(Claude), which is also the subject of four of the first twelve, eleven of the thirteen after them (the other two are the operator's), and one of the five from review rounds 3 and 3B (the other four are about models and a door).
 
 ## Read this before the entries
 
@@ -955,6 +953,157 @@ clause exactly; the clause was written from one chair.
 
 *A coder would never have hard-coded a count that depends on whether the machine can build a wheel. A coder states the invariant, not the number on his own screen.*
 
+### C-26. One letter for thirteen readers, addressed to one of them
+
+**The ask.** The operator asked, in plain words, whether it was fine to hand
+the same files to a whole group of models. The Primary Design Agent said yes
+without opening the files.
+
+**What happened.** For review rounds 3 and 3B the agent built nine packet
+editions: six zips, one per named door, each with its own paragraph for its
+reviewer; one single text file "for the Perplexity doors"; and one set of
+paste parts headed "SINGLE-FILE EDITION for GEMINI". The single file and the
+paste parts then went to every model that refused a zip or sat behind
+Perplexity, twelve runs in all. Both files told the reader to name the model
+that answered, so the models did: several named themselves Gemini or
+Perplexity. The operator had named every return file after the real model on
+his screen; the agent's triage printed the models' self-descriptions as
+"self-reports", called model identity unreliable, and said eleven reviewers
+had ignored an extra question that only one edition had ever asked.
+
+**How it was caught.** By the operator, reading the triage against his own
+file names.
+
+**What it cost.** The questions written for DeepSeek, Kimi and Qwen in round
+3, and the briefs written for DeepSeek, Qwen, Kimi and GLM in round 3B,
+never reached any model. Eleven of twenty-four first answers came back
+incomplete, and nine were run again. One night of the operator's work, and a
+report he could not read.
+
+**What changed.** One kingdom per model: every model gets its own folder,
+files, reviewer paragraph and paste line, and no file is built to serve more
+than one model. No packet asks a model who it is; each edition asks the
+model to quote back the first line of its own reviewer paragraph, and a
+script matches the quote to the edition. The operator's file name is the
+record of who answered. A ship check runs on every edition before it goes
+out, and a landing check on every return.
+
+**Grade of the ask: fair, and answered without looking.** The question
+deserved a look at the files before the yes.
+
+*A coder would never hand twelve reviewers one letter addressed to a thirteenth and then wonder why they signed the wrong name.*
+
+### C-27. Two models typed the command into the chat and waited for it to run
+
+**The ask.** Round 3B: read the attached packet and answer ten numbered
+items. GLM 5.3 Thinking ran through Perplexity with the single-file edition;
+Qwen 3.8 Max Thinking ran at chat.qwen.ai with its own paste parts.
+
+**What happened.** Each model read the packet, then printed a tool call as
+plain text instead of running it, and the turn stopped. Qwen's came back as
+a request, in text, to a tool called tool_search to "read file contents".
+GLM's turn had to be continued by hand before it produced its answer.
+
+**How it was caught.** By the landing check: the saved file held a tool
+call, not an answer.
+
+**What it cost.** A turn each, spent on nothing, and a follow-up message to
+get the run moving again. Qwen's stalled chat produced nothing new and was
+replaced.
+
+**What changed.** From the next review round, every edition for a door where
+this has happened carries a no-tool line, and a landing check reads each
+return the minute it is saved.
+
+**Grade of the ask: clear.** The packet asked for an answer; the model
+printed its homework instead of doing it.
+
+*A coder would never paste the command into the group chat and wait for the group chat to run it.*
+
+### C-28. "Read in full," said the review that had not
+
+**The ask.** Round 3: read all seven codexes and report any sentence that
+gives a character a gender in its own mouth. Round 3B, item 8: check every
+citation and give a verdict on each entry.
+
+**What happened.** Nemotron 3 Ultra Thinking, through Perplexity (C-29),
+said in round 3 that it had read all seven codexes in full and found no
+gendered sentence. Every other reviewer found them, and so did Nemotron's
+own rerun. In round 3B, item 8, it gave blanket verdicts per group, despite
+the rule.
+
+**How it was caught.** By the landing checks, and by setting its answer
+beside the other returns.
+
+**What it cost.** A rerun in each round, and follow-up messages until the
+verdicts were entry by entry.
+
+**What changed.** Every rerun edition says what an incomplete answer looks
+like, and from the next review round every item that asks for verdicts names
+every entry. A claim to have read something in full is checked against what
+the reader found.
+
+**Grade of the ask: clear in round 3B.** The rule was in the packet and was
+not followed.
+
+*A coder would never write "read in full" on a code review of a file he skimmed.*
+
+### C-29. A door that reads by search and eats underscores
+
+**The ask.** In rounds 3 and 3B, every model reached through Perplexity was
+handed the single-file edition and asked to read it.
+
+**What happened.** Perplexity's reader works by search: it pulls snippets of
+an attachment instead of reading it start to finish, and it strips
+underscores, so a codebase written in snake_case arrives with its names
+glued together. A model on the other side can then say it read the file in
+full when it read snippets, and Nemotron there cannot run code at all. In
+round 2 the reader failed on all six paste parts for one model and delivered
+an index file with its path separators stripped to another.
+
+**How it was caught.** By reading each return against the file that was
+sent.
+
+**What it cost.** Reruns and follow-ups for several models across three
+rounds, and doubt about every "read in full" from that door.
+
+**What changed.** Every Perplexity rerun edition says to read the attached
+file with code, start to finish, not by search. From the next review round,
+code is asked for only where the door can run it. The operator's verdict on
+the door, which he owns: "Bad UX is Bad UX."
+
+**Grade of the ask: clear.** The file was fine when it left; the door
+changed it on the way in.
+
+*A coder would never ship a file reader that eats underscores into a world written in snake_case.*
+
+### C-30. A reviewer's own test disproved its claim
+
+**The ask.** Round 3B: find how the aftermath contract could be gamed, and
+settle every claim with a trajectory the tree can run.
+
+**What happened.** Qwen's rerun said the aftermath count drops on any live
+turn, "with no is_substantive gate". In the packet's code, and in the copy
+Qwen was given, the count drops only inside the check for a substantive
+turn. Qwen's own settling trajectory, traj-aftermath-empty-turn-002, passes
+on the tree with the counts 2, 2, 2, 2, 1.
+
+**How it was caught.** By running Qwen's own trajectory on the tree during
+the triage.
+
+**What it cost.** Nothing in the tree. Left unchecked, it would have sent a
+repair after a bug that does not exist. The same rerun also found a real
+one: "the the the" counted as a substantive turn, which was fixed on 28
+September 2026.
+
+**What changed.** A reviewer's claim about the code is settled by running
+the reviewer's own test before the claim enters a decision.
+
+**Grade of the ask: clear.** Qwen wrote the test; the test disagreed with
+Qwen.
+
+*A coder would never file a bug with a failing test that passes.*
+
 ## The refusals that were right
 
 A page that records only failures teaches the wrong lesson, so the same
@@ -1015,6 +1164,9 @@ nothing is called done that is not done.
 A term the operator names is swept as the word he named, in every form, and
 every push is followed by a sweep of the whole tree as it stands on GitHub, not
 only of the files pushed.
+Every model gets its own packet, made just for it. We never ask a model who it is.
+From the next review round, the prompt is rewritten so nothing can be skipped. Every list is spelled out, every question gets its own answer space so a skipped one shows up blank, and each website's limits are built into the packet.
+When a reviewer says our code has a bug, we believe its test, not its words.
 
 ## What is not on this page yet
 
