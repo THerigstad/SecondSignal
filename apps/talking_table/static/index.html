@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <title>SecondSignal · The Talking Table</title>
+  <link rel="stylesheet" href="/static/table.css">
+  <script defer src="/static/voice.js"></script>
+  <script defer src="/static/table.js"></script>
+</head>
+<body>
+  <div class="shell">
+    <header class="header">
+      <a class="brand" href="/" aria-label="SecondSignal home">
+        <svg viewBox="0 0 100 100" aria-hidden="true"><path d="M23 82V24.5Q23 21 26.5 21H73.5Q77 21 77 24.5V82"/><path class="inner" d="M39 82V47Q39 44 42 44H58Q61 44 61 47V82"/></svg>
+        <span>SecondSignal<span class="brand-caption">THE TALKING TABLE</span></span>
+      </a>
+      <div class="header-actions"><span class="connection" id="connection">Connecting locally</span><button id="settings-open" type="button" disabled>Settings</button></div>
+    </header>
+    <p class="prototype">A prototype for the operator and adults the operator knows. Not a crisis service.</p>
+    <!-- The mode banner and the voice bar pin to the top together, in the flow. The voice bar used to float at the bottom right, where on a phone it sat on the Send button (Night Builds Review of 30 September 2026, required fix 3 on Codex job 2). -->
+    <div class="table-pinned">
+    <p id="operator-circle-status" class="operator-circle-status" data-mode="unknown" role="status" aria-live="polite" aria-atomic="true">Checking operator-circle mode…</p>
+    <div class="voice-controls" data-voice-controls hidden><span data-voice-status role="status">Voice on</span><span data-voice-badge hidden>AI voice</span><button data-voice-mute type="button" aria-pressed="false">Mute voice</button></div>
+    </div>
+
+    <section class="pair-panel" id="pair-panel" hidden aria-labelledby="pair-title">
+      <p class="eyebrow">JOIN THIS TABLE</p><h1 id="pair-title">Enter the code on the computer.</h1>
+      <p>Both devices need to be on the same Wi-Fi. The code lets this browser join the current table.</p>
+      <form id="pair-form"><label for="pair-code">Six-digit pairing code</label><div class="pair-input"><input id="pair-code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="off" required><button class="primary" type="submit">Pair</button></div></form>
+      <p id="pair-status" class="status" role="status"></p>
+    </section>
+
+    <main id="app" aria-busy="true">
+      <div class="intro"><div><p class="eyebrow">SEVEN CHARACTERS. ONE TABLE.</p><h1>More ways forward.</h1><p class="lead">You speak. The policy decides who can answer.<br>The harness checks the reply before it reaches you.</p></div><div class="session-tools"><span id="model-label" class="tag">Pretend model · free</span><button id="new-session" type="button" disabled>New session</button></div></div>
+      <p id="status" class="status" role="status" aria-live="polite">Opening the table…</p>
+      <div class="workspace" id="workspace">
+        <section class="table-panel" id="table-panel" aria-labelledby="table-title">
+          <div class="section-heading"><h2 id="table-title">A seat at the table</h2><span class="small" id="turn-count">No turns yet</span></div>
+          <div class="presentation-row"><label for="presentation">Character presentation</label><select id="presentation" disabled><option value="as_written">As written</option><option value="women">Woman</option><option value="men">Man</option><option value="neither">Neither</option></select></div>
+          <p class="presentation-note">This describes the characters, not you. For now, your choice lasts for this visit. We're building it so your characters stay the way you set them, and so you can shape them to fit what you need.</p>
+          <!-- Codex's second door paragraph, kept by the operator's ruling 23 of 3 October 2026. Its first sentence changes when the shuffle (decision 2 of 28 September 2026) lands, together with the door-copy test in tests/test_order1_ui.py. -->
+          <p class="presentation-note">Same knowledge, same rules. Leaving this unchanged uses the characters as written. Neither uses the longer name with they pronouns until you choose a name on the plate.</p>
+          <div class="table-stage"><div class="table-surface" aria-hidden="true"></div><div id="plates" class="plates"></div></div>
+          <p class="table-footnote" id="table-footnote">No one is seated until the policy decides.</p>
+          <a id="sigils-link" class="small" href="/static/sigils.html" target="_blank" rel="noopener" hidden>Open the lights view</a>
+        </section>
+
+        <section class="conversation-panel" aria-labelledby="conversation-title">
+          <div class="section-heading"><h2 id="conversation-title">The conversation</h2><span class="small">Policy → reply → audit</span></div>
+          <div class="empty-state" id="empty-state"><span class="empty-mark" aria-hidden="true">/</span><h3>The table is ready.</h3><p>Start with what is on your mind.<br>Every turn has a “why” you can read.</p></div>
+          <div id="transcript" aria-live="polite" aria-relevant="additions"></div>
+          <section id="crisis" class="crisis" aria-label="Crisis card" aria-live="assertive" hidden></section>
+          <form class="composer" id="composer"><label for="message">Say something to the table</label><textarea id="message" rows="3" maxlength="16000" placeholder="Start with one sentence…" autocomplete="off" spellcheck="false" disabled></textarea><div class="compose-actions"><span class="small">Enter sends · Shift+Enter adds a line</span><div><button id="microphone" class="quiet" type="button" hidden>Microphone</button><button id="send" class="primary" type="submit" disabled>Send <span aria-hidden="true">↗</span></button></div></div></form>
+        </section>
+      </div>
+    </main>
+    <footer class="footer"><span class="footer-label">WHAT STAYS HERE</span><p id="storage">Storage information will appear when the server is connected.</p></footer>
+  </div>
+
+  <dialog id="settings-dialog" aria-labelledby="settings-title">
+    <div class="settings-pinned">
+    <p id="settings-operator-circle-status" class="operator-circle-status" data-mode="unknown" role="status" aria-live="polite" aria-atomic="true">Checking operator-circle mode…</p>
+    <div class="dialog-voice-controls" data-voice-controls hidden><span data-voice-status role="status">Voice on</span><button data-voice-mute type="button" aria-pressed="false">Mute voice</button></div>
+    </div>
+    <div class="dialog-heading"><div><p class="eyebrow">YOUR TABLE</p><h2 id="settings-title">Settings</h2></div><button id="settings-close" type="button" aria-label="Close settings">Close</button></div>
+    <p class="dialog-prototype">A prototype for the operator and adults the operator knows. Not a crisis service.</p>
+    <p id="remote-settings-note" class="small" hidden>Model, voice, key and Wi-Fi settings are controlled on the computer.</p>
+    <form id="settings-form">
+      <fieldset id="voice-settings"><legend>Voice · ElevenLabs</legend>
+        <label class="checkbox"><input id="voice-enabled" type="checkbox"><span>Enable voice for checked replies</span></label>
+        <p class="setting-note">Voice stays off until a key and a voice ID for the current presentation are set. ElevenLabs receives only an approved reply. Voice may cost money.</p>
+        <label for="voice-key">ElevenLabs API key</label><input id="voice-key" type="password" autocomplete="new-password" spellcheck="false" value=""><p id="voice-key-status" class="setting-note">No voice key is set.</p>
+        <label class="checkbox"><input id="voice-remember" type="checkbox"><span>Remember voice on this computer</span></label><p class="setting-note">Protects the saved key on this Windows account. Otherwise it stays in server memory until New session or shutdown.</p>
+        <button id="clear-voice-key" class="small-button" type="button">Forget saved and session voice key</button>
+        <p class="setting-note voice-slot-note">Enter your own voice IDs. Empty slots stay silent; each presentation has its own slot.</p>
+        <div class="voice-slot-scroll" tabindex="0" role="region" aria-label="Character voice slots"><table class="voice-slots"><caption>Seven characters · four presentations</caption><thead><tr><th scope="col">Character</th><th scope="col">As written</th><th scope="col">Woman</th><th scope="col">Man</th><th scope="col">Neither</th></tr></thead><tbody id="voice-slots"></tbody></table></div>
+        <p class="setting-note">The crisis card, withheld replies and failure lines are always silent. In operator-circle mode a released reply speaks and the voice carries the mode's label. On the turn after a crisis card the whole reply is spoken once, safety lines included.</p>
+      </fieldset>
+      <fieldset id="model-settings"><legend>Model and access</legend>
+        <label for="adapter">Model family</label><select id="adapter"><option value="fake">Pretend model</option><option value="gemini">Gemini</option><option value="openai">OpenAI</option><option value="anthropic">Anthropic</option><option value="xai">xAI</option><option value="compatible">Other compatible host</option></select>
+        <p class="setting-note">Real models may cost money. The pretend model is free.</p>
+        <p class="setting-note vendor-note" id="gemini-note" hidden>A free Gemini key from Google AI Studio works for testing. On the free tier Google may use what you type, so use test messages only.</p>
+        <label for="model">Model id</label><input id="model" type="text" autocomplete="off" spellcheck="false" value="fake-1" maxlength="160" required>
+        <div id="compatible-fields" hidden><label for="vendor-url">Vendor's chat-completions address</label><input id="vendor-url" type="url" autocomplete="off" spellcheck="false" placeholder="https://…"><p class="setting-note">Use the vendor's own HTTPS address. A real model receives the conversation and character instructions.</p></div>
+        <label for="api-key">API key <span class="optional">optional for the pretend model</span></label><input id="api-key" type="password" autocomplete="new-password" spellcheck="false" value=""><p class="setting-note" id="key-status">No key is stored for this session.</p>
+        <label class="checkbox"><input id="remember" type="checkbox"><span>Remember on this computer</span></label><p class="setting-note">Saves the key in a settings file outside the repository. Otherwise the key stays in server memory for this session.</p>
+        <button id="clear-key" class="small-button" type="button">Forget saved and session key</button>
+      </fieldset>
+      <fieldset id="circle-settings"><legend>Operator circle</legend><label class="checkbox"><input id="operator-circle" type="checkbox"><span>Operator-circle mode</span></label><p class="setting-note">Allow an otherwise passing, normal-risk reply when only the unlocked cultural layer is inconclusive, with the operator reviewing afterward.</p></fieldset>
+      <div class="settings-save"><p id="settings-status" class="status" role="status"></p><button id="save-settings" class="primary" type="submit">Save settings</button></div>
+    </form>
+    <fieldset id="network-settings"><legend>On this Wi-Fi</legend><label class="checkbox"><input id="phone-mode" type="checkbox"><span>Let my phone on this Wi-Fi use the table</span></label><p class="setting-note">Off by default. Paired browsers share this session. Use only with adults the operator knows.</p><div id="phone-details" hidden><p class="small">On the phone, open an address below and enter this code:</p><p id="pairing-code" class="pairing-code"></p><div id="phone-urls"></div></div><p id="network-status" class="status" role="status"></p></fieldset>
+    <p class="dialog-storage" id="settings-storage"></p>
+  </dialog>
+</body>
+</html>
