@@ -29,7 +29,7 @@ import test_eval_cases as runner  # noqa: E402
 
 
 def clip(text: str, limit: int = 200) -> str:
-    """Shorten a reason at a word boundary, never mid-word (review round 3)."""
+    """Legacy display helper; the authoritative manifest keeps reasons whole."""
     if len(text) <= limit:
         return text
     cut = text[: limit - 1].rsplit(" ", 1)[0].rstrip(" ,;:")
@@ -64,7 +64,7 @@ def build() -> dict:
         if entry["disposition"] in ("known_gap", "disputed"):
             decision, session = runner.run_case(case, roster)
             entry["mismatch_fields"] = sorted(runner.field_failures(case, decision, session))
-            entry["reason"] = clip(
+            entry["reason"] = (
                 case.get("gap_note") or case.get("dispute_note") or case.get("why", "")
             )
         entries.append(entry)

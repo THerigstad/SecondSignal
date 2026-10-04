@@ -48,7 +48,9 @@
 <label for="age">Declared age band<select id="age" disabled><option>unknown</option><option>adult</option><option>minor</option></select></label>
 <label for="presentation">Presentation<select id="presentation" disabled><option value="as_written">as written</option><option value="women">women</option><option value="men">men</option><option value="neither">neither</option></select></label>
 </div>
-<p class="presentation-note">Changes what the plates show and how the seat is named; never the decision.</p>
+<p class="presentation-note">This describes the characters, not you. For now, your choice lasts for this visit. We're building it so your characters stay the way you set them, and so you can shape them to fit what you need.</p>
+<!-- Codex's second door paragraph, kept by the operator's ruling 23 of 3 October 2026. Its first sentence changes when the shuffle (decision 2 of 28 September 2026) lands, together with the door-copy test in tests/test_order1_ui.py. -->
+<p class="presentation-note">Leaving this unchanged uses the characters as written. Neither uses the longer name with they pronouns until you choose a name on the plate. Presentation changes never change the decision.</p>
 <div class="session-actions"><button type="button" id="new-conversation" disabled>New conversation</button><p>Declared language, locale or age band starts a fresh session.</p></div>
 <p id="session-status" role="status"></p>
 </form>
@@ -182,7 +184,7 @@ function namePair(id) {
   const profile=profiles.find(p=>p.id===id);if(!profile)return [id,''];
   return presentation==='neither'&&chosenForms.has(id)?profile.neitherChoices[chosenForms.get(id)]:profile.names[presentation];
 }
-function nameOf(id) {const [name,label]=namePair(id);return label?`${name} (${label})`:name;}
+function nameOf(id) {return namePair(id)[0];}
 function seatSentence(d) {
   if(d.safety.action==='HUMAN_ESCALATION')return 'Preempted: the card';
   if(d.safety.action==='BOUNDARY_HOLD')return `Boundary hold: ${nameOf(d.agent_id)} holds the line`;
@@ -191,19 +193,17 @@ function seatSentence(d) {
 }
 function disclosureBox(lines) {const box=element('div',undefined,'disclosures');for(const line of lines)box.append(element('p',line));return box;}
 function renderPlateNames(profile,plate) {
-  const names=plate.querySelector('.plate-names'),labels=plate.querySelector('.plate-labels');names.replaceChildren();labels.replaceChildren();
+  const names=plate.querySelector('.plate-names');names.replaceChildren();
   const pair=namePair(profile.id),pick=chosenForms.get(profile.id);
-  const selected=presentation==='neither'?(pick??-1):profile.plate.findIndex(([name,label])=>name===pair[0]&&label===pair[1]);
+  const selected=presentation==='neither'?(pick??0):profile.plate.findIndex(([name,label])=>name===pair[0]&&label===pair[1]);
   profile.plate.forEach(([name,label],index)=>{
     const form=element(presentation==='neither'?'button':'span',name,'form-name');
     if(presentation==='neither'){
-      form.type='button';form.classList.add('form-choice');form.disabled=busy||!state.ready;form.setAttribute('aria-pressed',String(selected===index));
+      form.type='button';form.classList.add('form-choice');form.disabled=busy||!state.ready;form.setAttribute('aria-pressed',String(selected===index));form.setAttribute('aria-label','Choose '+name+' with they pronouns');
       form.addEventListener('click',()=>{chosenForms.set(profile.id,index);renderPresentation();});
     }
     if(index===selected)form.classList.add('selected');
-    const shownLabel=presentation==='neither'&&index===(pick??0)?pair[1]:label;
-    const labelEl=element('span',shownLabel,'form-label');if(index===selected)labelEl.classList.add('selected');
-    names.append(form);labels.append(labelEl);
+    names.append(form);
     if(index===0){const slash=element('span',' / ');slash.setAttribute('aria-hidden','true');names.append(slash);}
   });
 }
@@ -219,7 +219,7 @@ function drawTable() {
   const target=$('plates');target.replaceChildren();
   profiles.forEach((profile,index)=>{
     const plate=element('div',undefined,'plate');plate.tabIndex=0;plate.role='group';plate.dataset.agentId=profile.id;plate.title=profile.one_line;
-    plate.append(element('div',undefined,'plate-names'),element('div',undefined,'plate-labels'),element('div',undefined,'plate-status'),element('div',undefined,'plate-rationale'));
+    plate.append(element('div',undefined,'plate-names'),element('div',undefined,'plate-status'),element('div',undefined,'plate-rationale'));
     const show=()=>{$('plate-description').textContent=profile.one_line;};
     for(const event of ['focusin','mouseenter','click'])plate.addEventListener(event,show);
     target.append(plate);renderPlateNames(profile,plate);
@@ -240,7 +240,7 @@ function paintTable(d=null,session=null) {
     if(preempted)status='HUMAN_ESCALATION';else if(d?.agent_id===profile.id)status='seated';else if(d?.assist_agent_id===profile.id)status='assisting';else if(status==='scored')status='eligible';
     const rationale=status==='vetoed'?ranked.rationale[0]||'':'';
     plate.dataset.state=status;plate.dataset.rationale=rationale;plate.querySelector('.plate-status').textContent=statusLabels[status]||status;plate.querySelector('.plate-rationale').textContent=rationale;
-    plate.setAttribute('aria-label',[profile.plate.map(pair=>pair.join(' ')).join(' / '),statusLabels[status]||status,profile.one_line,rationale].filter(Boolean).join('; '));
+    plate.setAttribute('aria-label',[profile.plate.map(pair=>pair[0]).join(' / '),statusLabels[status]||status,profile.one_line,rationale].filter(Boolean).join('; '));
   }
   $('table-card').replaceChildren();$('table-card').hidden=!preempted;if(preempted)$('table-card').append(disclosureBox(d.safety.disclosures));
 }
@@ -432,7 +432,7 @@ $('message').addEventListener('keydown',event=>{if(event.key==='Enter'&&!event.s
 for(const id of ['language','locale','age'])$(id).addEventListener('change',()=>resetSession());
 $('new-conversation').addEventListener('click',()=>{resetSession();$('message').value='';$('message').focus();});
 $('run-cases').addEventListener('click',runCases);$('run-reviews').addEventListener('click',runReviews);
-$('presentation').addEventListener('change',()=>{presentation=$('presentation').value;if(presentation!=='neither')chosenForms.clear();renderPresentation();});
+$('presentation').addEventListener('change',()=>{presentation=$('presentation').value;renderPresentation();});
 boot();
 </script>
 </body>

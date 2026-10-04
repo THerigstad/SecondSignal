@@ -205,11 +205,12 @@ def test_installed_wheel_loads_bundled_roster_from_unrelated_cwd(tmp_path: Path)
     assert installed_profile_dir.is_relative_to(environment_root)
 
     roster = subprocess.run(
-        [str(python), "-I", "-m", "secondsignal", "--roster"],
+        [str(python), "-I", "-X", "utf8", "-m", "secondsignal", "--roster"],
         capture_output=True,
         check=True,
         cwd=unrelated_cwd,
         env=environment,
         text=True,
+        encoding="utf-8",
     )
     assert f"7 agents loaded from {installed_profile_dir}" in roster.stdout

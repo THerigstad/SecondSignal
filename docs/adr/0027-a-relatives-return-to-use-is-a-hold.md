@@ -1,7 +1,7 @@
 # ADR-0027: A relative's return to use is a hold, not a seat-claim
 
 - **Status:** Proposed — built; the operator's ruling of 2026-09-08 (D3, decided with dissent), built 2026-09-10 with its fixtures; under the standing rule a record prepared by the project's own assistant becomes canon only after a second model family has read it (review round 3)
-- **Date:** 2026-09-10
+- **Date:** 2026-09-10; decisions 6 and 7 ruled 2026-09-28
 - **Evidence:** `tests/test_holds.py::test_a_relatives_bare_report_seats_the_recovery_persona_as_the_holds_specialist`, `tests/test_holds.py::test_a_relatives_relapse_with_an_ask_seats_the_ask_and_offers_the_recovery_persona`; the D3 fixtures under `evals/cases/` (`grok-seat-004` and `grok-r2-hold-relapse-ask-001`, which now pass; `gpt-d3-third-person` and `qwn-d3-thirdperson-relapse-001`, which stay as the recorded dissents); the both-ways measurement of 3 September and the decision of 8 September in `docs/notes/dissent-log.md`, entry D3
 - **Amends:** ADR-0016 (layer 2 of the tree: the relative's clause)
 
@@ -56,10 +56,11 @@ recovery persona first.
 
 ## Dissent kept
 
-ChatGPT's and DeepSeek's round-1 position, that the recovery specialist
-should take the seat even when the ask resembles mediation, is now the
-losing side, and ChatGPT's fixture `gpt-d3-third-person` runs as a strict
-expected failure with the decision's reasons in its dispute note. Qwen's
+ChatGPT's and DeepSeek's round-1 position seats the recovery specialist even
+when the ask resembles mediation. The implemented tree seats the ask with
+Cody attached, so `gpt-d3-third-person` runs as a strict expected failure.
+Decision 6 now explicitly accepts either answer and retains this fixture as
+an honest dispute, not a verdict that the reviewer is wrong. Qwen's
 position, that the recovery persona should be ineligible on a relative's
 relapse, is still declined: the bare report seats it, because keeping the
 one persona built for the conversation out of it is the worse failure.
@@ -86,3 +87,96 @@ anyone but the recovery persona; an ask about a relative's relapse seats
 the ask without the recovery hold or without the recovery persona offered;
 a first-person return to use fails to claim the seat; `claim_subject` stops
 saying whose relapse it is.
+
+## Decision 6, 28 September 2026: Cody is present on every relapse
+
+The operator's rule: "anytime there's a relapse, it should have Cody as a sidekick, if not seat him." On each recognized, non-emergency addiction-relapse
+message Cody is seated or attached on the decision record as
+`offer_companion:cody`. The crisis card comes first and nobody takes a seat.
+The invariant runs over every addiction-relapse message in the test set;
+unknown recovery phrasing is separately retained as known gaps under decision 7.
+
+`gpt-d3-third-person` stays disputed: the operator accepts Cody seated or Rowan
+seated with Cody as sidekick. His words: "it should have clearly gone to Rowan, with Cody as a sidekick -- or Cody. Period. Full stop." This is an honest
+disagreement between two defensible answers, not a changed reviewer oracle.
+`qwn-d3-thirdperson-relapse-001` also stays disputed: its round-1 expectation
+keeps Cody out and violates this rule. Qwen later changed its own position,
+writing that keeping Cody out "leaves the user without specialized support,
+which is a worse failure than seating them."
+
+The disagreement history stays as data: Qwen changed from neither to both
+fixtures disputed, Gemini Flash from gpt-d3 only to both, and Gemini Pro from
+both to neither. GLM via Perplexity's alternative was to resolve qwn-d3 against
+the reviewer with the dispute note retained; it was declined so the reviewer's
+fixture remains unchanged and guarded as a strict expected failure. Gemini
+Pro's neither-disputed position was also declined: the label preserves the
+opposing expectation as data, not a majority vote. See the dissent log.
+
+Related reviewer findings remain: Qwen's F run warned a bare-report relative
+sent to the specialist "might alienate a non-addicted spouse or child";
+Gemini Flash's `settle-d3-family-relapse-priority-001` concerns a 17-year-old
+son's fentanyl relapse with a list-making ask and expects Cody instead of
+Seren; Kimi via Perplexity run 1's `twins-sponsor-case-001` is a known gap.
+Their absent original fixture text is not invented.
+
+The 28 September baseline observation was Rowan plus `offer_companion:cody`
+for the sibling/calm-conversation case, and Cody for the dad and first-person
+bare reports. A generation harness now exists, but this obligation is still
+not an implemented, verified sidekick experience. Whether the sidekick is an
+offer to the person or an assist behind the seated voice belongs to decision
+11. This push preserves the policy obligation without claiming that future
+interaction is delivered.
+
+## Decision 7, 28 September 2026: whose relapse, and what counts as an ask
+
+A self mention anywhere, including first-person plural, makes a relapse the
+person's own: "I relapsed", "we both relapsed", "and so did I". A named other
+subject, whether a pronoun, relationship or name ("she", "my dad", "Jake"),
+keeps it theirs unless the message also includes the person in the relapse.
+When no subject is named ("relapsed again, feel awful"), it is the person's
+own. Anything else unclear fails toward someone else's (the hold), never the
+first-person claim. Cody is present either way under decision 6; a worried
+family member must not be treated as the one who relapsed. The two diagnosed
+misreads, "my dad relapsed last night and so did I" and "Jake relapsed again",
+are regression tests, with the English word lists and subject logic approved
+by the operator's A2 ruling.
+
+A bare report means the person tells us about the relapse without requesting
+help on another task or domain. It seats Cody as the recovery hold's specialist.
+An ask means the person requests something to do, such as planning a calm
+conversation: the ask can take the seat while recovery is held and Cody is
+attached as companion. Expressing worry alone does not erase that hold, and
+nobody's sentence automatically excludes Cody. Safety preempts both paths.
+
+The required reviewer fixtures are Kimi via Perplexity run 1's
+`d3-ambiguous-subject-001` and `d3-first-person-control-001`, run 2's
+`r3-0027-mixed-subject-001`, and Vibe's `glm-d3-mixed-subject-001`. The ruling
+provides exact message text for the first two and Vibe's; a ruling-sourced
+projection is distinct from a port of absent reviewer JSON. The run-2 mixed
+fixture and sponsor fixture require their original sources before a verbatim
+port can be claimed.
+
+Six supplied recovery-community phrasings run as strict expected failures,
+not fixes: "I went back out last night", "I picked up again after 90 days",
+"I had a slip this weekend", "I have to reset my date", "back to day one again",
+and "my qualifier went back out and I'm a mess". They are the ruling-sourced
+fixtures in `evals/cases/round3_rulings_2026-09-28.json` (ported by Codex on
+30 September 2026, moved into the public case tree on 4 October 2026), run by
+`tests/test_eval_cases.py` under the manifest's field-scoped strict failure rule:
+each may fail on agent and outcome only, and fails the suite if it starts passing
+before its marker is reviewed.
+The seventh required gap, the original sponsor line in `twins-sponsor-case-001`,
+is not runnable until its missing text is supplied; no sponsor line or passing
+result is invented. Existing successful controls include "I drank again last night"
+and "I lost my sobriety date". See `docs/known-limitations.md` for the distinction
+between the unchanged public case-manifest breakdown and these six new gaps.
+
+Qwen's second, independent subject detector is queued for later. The operator
+will dictate relapse, wobble and family-side phrases; Claude runs each through
+the code. Each miss becomes a fixture and an operator-approved word-list fix,
+with innocent-meaning controls such as picking up the kids. This push does not
+broaden the lexicon to close those seven gaps. Recovery programs' ideas may be
+used, never their text or names, and SecondSignal must never imply program
+endorsement. Recovery has many roads: medication such as buprenorphine or
+methadone, SMART Recovery and harm reduction are included without judgment.
+No decision-7 reviewer dissent was recorded.

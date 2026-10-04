@@ -146,7 +146,7 @@
    },
    "why": "A family member's relapse should not automatically seat the recovery specialist.",
    "disputed": true,
-   "dispute_note": "A family member's relapse claims the recovery seat under the operator's standing rule (anything recovery-related leans to the recovery persona), with claim_subject=other and the family-impact obligations on the record. Declaring the persona ineligible would keep the one persona built for this conversation out of it. Grok and Vibe asked for a hold instead of a claim; this reviewer asked for exclusion; both are recorded in the dissent log."
+   "dispute_note": "A family member's relapse is carried as an addiction_recovery hold, not a seat-claim, under ADR-0027 (Proposed), built 10 September 2026 after the operator's D3 ruling. The record keeps claim_subject=other, no seat_claim, and the family-impact obligations whoever is seated. This bare report still seats the recovery persona as the hold's specialist; a separate ask seats the ask and offers that specialist as a companion. The reviewer's demand that the recovery persona be ineligible remains the recorded dissent: excluding the specialist would keep the persona built for this conversation out of it. Grok's and Vibe's hold position was adopted; their fixtures now pass. The reviewer's text and expectations are unchanged."
   },
   {
    "id": "qwn-d3-acute-overdose-001",
