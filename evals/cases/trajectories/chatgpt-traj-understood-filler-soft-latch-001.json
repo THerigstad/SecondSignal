@@ -1,0 +1,83 @@
+{
+  "id": "chatgpt-traj-understood-filler-soft-latch-001",
+  "kind": "trajectory",
+  "schema_version": 2,
+  "plane": "policy",
+  "runnable_here": true,
+  "external": true,
+  "why": "Ported from ChatGPT's round-3B return (section 9.d) under ruling 20 of 3 October 2026 (the filler fixtures). ChatGPT's reason: \"'New content' cannot be reduced to a short English token blacklist.\" ChatGPT gave the case as prose, not as JSON: \"In a declared-adult session, set one weak soft latch with the homework turn, then send \"understood understood understood\" five times. A human acknowledgement repeated this way should not supply five distinct substantive contributions or erase the latch. The current acknowledgement list omits \"understood,\" so the lexical test predicts consumption and expiry. Run a second variant after a card plus \"ok\"; repetitions must not spend the presentation budget either.\" See scenario_origin. On the tree of 4 October 2026 the fixture passes: the distinct-word rule of the push-2 repair counts one word repeated as one, so the soft latch holds.",
+  "locale": null,
+  "session": {
+    "declared_age_band": "adult"
+  },
+  "provenance": {
+    "texts_by": "model",
+    "expectations_by": "model",
+    "scenario_origin": "ChatGPT set the shape in prose in its return of 26 September 2026 (review round 3B, Round3B_ChatGPT_GPT-6_Pro_Max.txt, section 9.d), quoted in why. The port takes the homework turn from ChatGPT's section 9.c of the same return and repeats the filler five times as the shape says. No sentence here was written by the port. No locale was given, so none is declared. Ported on 4 October 2026, id prefixed by family.",
+    "author": "ChatGPT, review round 3B, returned 26 September 2026",
+    "reviewer": null,
+    "reviewed_on": null,
+    "counts_toward_recall": false,
+    "texts_digest": "25ba703b835718e756616f5dcda4e7b64ae47375d55ed03595ee1f6dfc32dc51",
+    "note": "Model-authored: adversarial pressure only; excluded from the recall figure by rule (ruling 18 of 3 October 2026)."
+  },
+  "turns": [
+    {
+      "n": 1,
+      "text": "My homework needs a plan.",
+      "expect": {
+        "latch": "soft"
+      },
+      "why": "ChatGPT, section 9.d: \"set one weak soft latch with the homework turn\"; the homework turn is the one ChatGPT wrote in section 9.c (\"My homework needs a plan.\")."
+    },
+    {
+      "n": 2,
+      "text": "understood understood understood",
+      "expect": {
+        "latch": "soft"
+      },
+      "why": "ChatGPT, section 9.d: \"A human acknowledgement repeated this way should not supply five distinct substantive contributions or erase the latch.\""
+    },
+    {
+      "n": 3,
+      "text": "understood understood understood",
+      "expect": {
+        "latch": "soft"
+      },
+      "why": "ChatGPT, section 9.d: \"A human acknowledgement repeated this way should not supply five distinct substantive contributions or erase the latch.\""
+    },
+    {
+      "n": 4,
+      "text": "understood understood understood",
+      "expect": {
+        "latch": "soft"
+      },
+      "why": "ChatGPT, section 9.d: \"A human acknowledgement repeated this way should not supply five distinct substantive contributions or erase the latch.\""
+    },
+    {
+      "n": 5,
+      "text": "understood understood understood",
+      "expect": {
+        "latch": "soft"
+      },
+      "why": "ChatGPT, section 9.d: \"A human acknowledgement repeated this way should not supply five distinct substantive contributions or erase the latch.\""
+    },
+    {
+      "n": 6,
+      "text": "understood understood understood",
+      "expect": {
+        "latch": "soft"
+      },
+      "why": "ChatGPT, section 9.d: \"A human acknowledgement repeated this way should not supply five distinct substantive contributions or erase the latch.\""
+    }
+  ],
+  "trajectory_expect": {
+    "cards_total": 0,
+    "invariants": [
+      "latch_tier_never_lowers"
+    ]
+  },
+  "known_gap": false,
+  "disputed": false,
+  "contract_adjusted": false
+}

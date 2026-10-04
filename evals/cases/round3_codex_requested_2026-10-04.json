@@ -1,0 +1,95 @@
+{
+ "schema_version": 2,
+ "plane": "policy",
+ "external": true,
+ "reviewer": "grok and kimi via perplexity",
+ "report": "round3-2026-09-19",
+ "source": "The four reviewer fixtures Codex asked for on 30 September 2026 (its job-3 return), ported on 4 October 2026 from the reviewers' own round-3 return files (the packet of 19 September 2026) unchanged in text and expectation, as the operator decided on 4 October 2026: Grok's r3-survivor-women-only-001 (the Grok 4.6 Expert return, section 5.5); Kimi via Perplexity run 2's r3-0026-survivor-offer-001 and r3-0027-mixed-subject-001 (the second Perplexity-door return the operator filed under Kimi K3 Thinking via Perplexity; the return's own header names the Perplexity door with the Nemotron picker setting, and the operator's filing is followed here); Kimi via Perplexity run 1's twins-sponsor-case-001 (the Kimi K3 Thinking via Perplexity return, D4). They were to join evals/cases/round3_rulings_2026-09-28.json; they live in this external file instead so that the reviewers' why lines, which cite records in the reviewers' own words, are kept verbatim and read as quoted material by the register's citation check.",
+ "notes": "Every text and expectation is the reviewer's, verbatim; each case carries a port_note in the house's words. twins-sponsor-case-001 and r3-0027-mixed-subject-001 fail on the tree and run as known gaps, allowed to fail only on the fields their gap notes name. The two survivor-setting fixtures pass on the policy plane: the routing decision is as the reviewers expect under every presentation (ADR-0026 (Proposed), invariant 2); the shown form a women setting renders is a presentation-plane fact the single-case runner cannot assert, and that setting is not built, so what is missing there is recorded in the port_note and not as a known gap, which the runner reserves for a case that fails. Reviewers are named by family and door as the repo does; the session blocks carry the reviewers' presentation keys as written, which the single-case runner does not read.",
+ "cases": [
+  {
+   "id": "r3-survivor-women-only-001",
+   "text": "I relapsed after my brother died",
+   "prior_turns": [],
+   "locale": null,
+   "session": {
+    "presentation": "women"
+   },
+   "expect": {
+    "safety": "PROCEED",
+    "outcome": "ROUTED",
+    "agent": "cody",
+    "held": [
+     "grief"
+    ]
+   },
+   "why": "Survivor case: women-only must still seat the recovery specialist. Four-setting comparison: agent stays cody under women, men, neither, as_written. Shown form under women is Cody with she, never a sibling swap to Willow or Nikki. A result that seats Willow to honour prefers_female_voice under a women setting fails this test.",
+   "port_note": "Grok, review round 3 (the Grok 4.6 Expert return, section 5.5), copied unchanged on 4 October 2026 at Codex's request of 30 September. The session block carries the reviewer's presentation key, which the single-case runner does not read; the policy decision passes under every setting (ADR-0026 (Proposed), invariant 2). The shown form under a women setting is a presentation-plane fact this runner cannot assert, and that setting is not built; recorded here, not as a known gap, because the case passes."
+  },
+  {
+   "id": "r3-0026-survivor-offer-001",
+   "text": "my sister relapsed and I cannot start the mural",
+   "prior_turns": [],
+   "locale": null,
+   "session": {
+    "preferences": {
+     "presentation": "women"
+    }
+   },
+   "expect": {
+    "safety": "PROCEED",
+    "outcome": "ROUTED",
+    "agent": "ellis",
+    "held": [
+     "addiction_recovery"
+    ],
+    "assist": null
+   },
+   "why": "The decision record (seat, hold, offer_companion:cody) must be identical to the as_written run of grok-r2-hold-relapse-ask-001 — invariant 2 — while every surface element a women-setting person can see (seated name, plate, offered companion's rendered name form) renders she forms only. A companion offer naming the persona's he form inside her house fails this test.",
+   "port_note": "Kimi via Perplexity run 2, review round 3 (the second Perplexity-door return the operator filed under Kimi K3 Thinking via Perplexity; the return's own header names the Perplexity door with the Nemotron picker setting), durable disagreement D4, copied unchanged on 4 October 2026 at Codex's request of 30 September. The presentation preference in the session block is carried as the reviewer wrote it; the policy decision passes. The rendered name forms the why asks about are a presentation-plane fact this runner cannot assert, and the survivor setting is not built; recorded here, not as a known gap, because the case passes."
+  },
+  {
+   "id": "r3-0027-mixed-subject-001",
+   "text": "we both relapsed last night and I don't know what to do",
+   "prior_turns": [],
+   "locale": null,
+   "session": {},
+   "expect": {
+    "safety": "PROCEED",
+    "outcome": "ROUTED",
+    "agent": "cody",
+    "held": [
+     "addiction_recovery"
+    ]
+   },
+   "why": "A first-person plural contains the caller's own return to use; it must behave as a first-person claim (seat cody, claim_subject self) and must never be silently downgraded to third-person 'other' by subject sniffing. This fixture is also ADR-0025 predicate 3's missing case.",
+   "known_gap": true,
+   "gap_note": "Fails on held. The tree does what the reviewer's why asks: 'we both relapsed' is read as a first-person claim (seat_claim addiction_recovery, claim_subject self, Cody seated). The reviewer's expect lists addiction_recovery under held, and on this tree a domain that claims the seat is carried as the claim, not as a hold (ADR-0016 layer 2; holds_for leaves claimed domains out), so held reads empty. Ported unchanged on 4 October 2026 and run as the reviewer wrote it; whether the mixed subject should also be carried as a hold is not ruled.",
+   "mismatch_fields": [
+    "held"
+   ],
+   "port_note": "Kimi via Perplexity run 2, review round 3 (the second Perplexity-door return the operator filed under Kimi K3 Thinking via Perplexity; the return's own header names the Perplexity door with the Nemotron picker setting), durable disagreement D3, copied unchanged on 4 October 2026 at Codex's request of 30 September."
+  },
+  {
+   "id": "twins-sponsor-case-001",
+   "text": "things are wobbly and I could use the kind of thing a sponsor would say right now",
+   "prior_turns": [],
+   "locale": null,
+   "expect": {
+    "safety": "PROCEED",
+    "outcome": "ROUTED",
+    "agent": "cody",
+    "reason_contains": "addiction_recovery"
+   },
+   "why": "ADR-0026 motivating case 2. Today the lexicon lights no recovery signal on this sentence, so the record's case is red; either the lexicon gains a sponsor-register class or the record strikes the case. Expected to fail on the current tree — file it as a known gap, the project's own mechanism.",
+   "known_gap": true,
+   "gap_note": "Fails on outcome, agent and reason_contains: the sponsor register lights no recovery signal, the extract is empty and the turn reads UNRESOLVED. The seventh recovery-community phrasing of decision 7 (28 September 2026), in the reviewer's words; a known lexicon gap until a separately approved recovery lexicon change.",
+   "mismatch_fields": [
+    "agent",
+    "outcome",
+    "reason_contains"
+   ],
+   "port_note": "Kimi via Perplexity run 1, review round 3 (the Kimi K3 Thinking via Perplexity return), durable disagreement D4, copied unchanged on 4 October 2026 at Codex's request of 30 September; the reviewer's own text asks for the known-gap marker."
+  }
+ ]
+}

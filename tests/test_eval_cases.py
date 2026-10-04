@@ -298,7 +298,9 @@ def test_every_case_carries_a_reason_or_is_schema_v1() -> None:
         if "deferred" in path.parts:
             continue
         doc = json.loads(path.read_text(encoding="utf-8"))
-        if doc.get("plane", "policy") != "policy":
+        if doc.get("plane", "policy") != "policy" or doc.get("kind") == "trajectory":
+            # A trajectory has turns, not cases (ADR-0028 (Proposed)); its format
+            # moved to schema_version 2 on 3 October 2026, so it is skipped by kind.
             continue
         if doc.get("schema_version", 1) >= 2 and not doc.get("external"):
             for case in doc["cases"]:

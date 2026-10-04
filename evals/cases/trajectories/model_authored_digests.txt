@@ -1,0 +1,31 @@
+# The register of turn-text digests known to be model-written (ruling 18 of 3 October 2026).
+# validate_trajectory.py refuses texts_by human or mixed on a file whose texts_digest is listed here:
+# relabelling unchanged model text does not make it human. The digest is the SHA-256, in hex, of
+# json.dumps([the turn texts in order], ensure_ascii=False, separators=(',', ':')) encoded as UTF-8.
+# A person who rewrites a trajectory's turns in their own words produces a different digest and is not
+# refused; a person who changes three words to dodge this register is not caught by it, and the register
+# does not claim otherwise. Every trajectory in this directory whose texts_by is model is listed; add a
+# row when a model-authored trajectory is added, and never remove one.
+# Columns, tab-separated: digest; the ids that carry these texts (comma-separated); who wrote the texts; the day recorded.
+016a131dcd30215402d2775b9d4e97d492c8f3cc4f81380d4ffac0ca8a312c59	chatgpt-traj-r3b-twenty-turn-terminal-guard	ChatGPT, review round 3B, returned 26 September 2026	2026-10-04
+0851a3fc0663a394337e528d03e99c915a6d373a06b248944dad2f8a83017c5f	grok-traj-hold-vanishes-when-words-leave-001	Grok, review round 3B, returned 26 September 2026	2026-10-04
+25ba703b835718e756616f5dcda4e7b64ae47375d55ed03595ee1f6dfc32dc51	chatgpt-traj-understood-filler-soft-latch-001	ChatGPT, review round 3B, returned 26 September 2026	2026-10-04
+3ecf42086aa8c208b513301b8f0abac6aaf55264d074628464b8ff633715e7fc	qwen-traj-substantive-spam-001	Qwen, review round 3B rerun, returned 27 September 2026	2026-10-04
+6c8b38dbd9cf1afb55ffd7d344dc4b2143dd55d63985bfe443a4e0031f4e0802	deepseek-traj-hold-obligations-late-001	DeepSeek, review round 3B rerun, returned 27 September 2026	2026-10-04
+737fb18378574c142a9a4100fb3b1bfb68692a8c6f1d0fe0163897d8be782bec	gemini-traj-aftermath-substantive-followup	Gemini, review round 3B rerun, returned 27 September 2026	2026-10-04
+7873983309da8853aaf44b00ddfc849aefdce82c9f269d1a330fdb949da007a0	vibe-traj-context-collapse-001	Vibe, review round 3B, returned 27 September 2026	2026-10-04
+956a1644dc2b88d421fa5d1184c9d274ebc826474b7bf108537cdf4cd4699e1a	kimi-k3-traj-filler-today-was-a-day-001	Kimi K3, review round 3B, returned 27 September 2026	2026-10-04
+9714f4627c2899bdf40d82b3a51550b425b0cacfcb3e28e401a586bce036e968	nemotron-traj-substantive-heuristic-001	Nemotron, review round 3B rerun, returned 27 September 2026	2026-10-04
+9fada7347d639d2aa114c60db956c4b046d96dc0a8c9691bbb76e245e4ad4f08	vibe-traj-refusal-decay-001	Vibe, review round 3B, returned 27 September 2026	2026-10-04
+bf9f20f8a26d7d27e46cf261139bbf3e64e60d41ba46681d0c9e13581ac446e1	deepseek-traj-aftermath-first-turn-001	DeepSeek, review round 3B rerun, returned 27 September 2026	2026-10-04
+c1cab70ea0f2d6caf356831a2976ea029d6d8b13b8dedcdb6a3ece1fcfe1e567	traj-provenance-boundary-001 (Nemotron, review round 3B rerun; test data in tests/test_trajectory_validation.py, not a fixture in this directory)	Nemotron, review round 3B rerun, returned 27 September 2026	2026-10-04
+d207770a2211ae606e158c1e3fa6a27426e67b87f7d8356ae6d6c7f1f4774005	deepseek-traj-soft-decay-substance-001	DeepSeek, review round 3B rerun, returned 27 September 2026	2026-10-04
+da32bde0c219a00dbe5b7315e6b70096581b562f454eda360e5f4eec66e790e5	chatgpt-traj-understood-filler-aftermath-001	ChatGPT, review round 3B, returned 26 September 2026	2026-10-04
+e4af49450b1933548c9803d308af9069d1d3fd5f2278429ff24e876091e52bcc	grok-traj-roast-after-zero-001	Grok, review round 3B, returned 26 September 2026	2026-10-04
+f571afbdc45b8af5deb8b2d3f6afc94a21b01ec6cfd8b9e70385beda89a91eb9	glm-and-kimi-via-perplexity-traj-resource-line-once-001, traj-slow-slope-001	the Primary Design Agent (Claude Fable 5.1), drafted 2026-09-14	2026-10-04
+fd10e5a992f907821aaa8bedcdebdbe324e15c0e0c65767168686c7724dd27e5	qwen-traj-humor-after-expiry-004	Qwen, review round 3B rerun, returned 27 September 2026	2026-10-04
+b16e544f555fdbb1b608ee85fd51986b771c77b2bb247c1d5f08585b0504fc3e	grok-traj-vague-slope-001	Grok, vague-message eval (night order 5), returned 30 September 2026	2026-10-04
+3c96b7d6059ed2498e7f4b43b0d746017b88d8e9e10f5b7d44b232cad5ae97df	grok-traj-vague-slope-002	Grok, vague-message eval (night order 5), returned 30 September 2026	2026-10-04
+cd5439ee3cdfd72b6ed47e61afc0fd07feff7710c12141c3fdcc996a5660c16f	grok-traj-vague-slope-003	Grok, vague-message eval (night order 5), returned 30 September 2026	2026-10-04
+2ab24243d2604788ad8bacf2b6c411177cbdd3f8260bbe6018cc6929385770f8	grok-traj-vague-slope-004	Grok, vague-message eval (night order 5), returned 30 September 2026	2026-10-04
+9771a83ce8d49eeab038a49a0e2b0947ffd0e2d245d052aa78fa0fa779c314c1	grok-traj-vague-slope-005	Grok, vague-message eval (night order 5), returned 30 September 2026	2026-10-04
