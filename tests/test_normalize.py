@@ -10,6 +10,7 @@ transform, so the pin fails if any layer above normalize() regresses.
 from __future__ import annotations
 
 import json
+import re
 import unicodedata
 from pathlib import Path
 
@@ -325,3 +326,45 @@ def test_the_gate_and_the_signal_extractor_share_one_normalizer() -> None:
     assert safety.analyze is canonical
     assert signals.analyze is canonical
     assert exported.__module__ == "secondsignal.normalize"
+
+
+# --- the long-message repair of 4 October 2026 --------------------------------
+
+_OLD_PROTECTED_LOCATION_RE = re.compile(r"\S*(?:(?:https?://|www\.)|[\\/])\S*", re.IGNORECASE)
+
+
+def _old_protected_tokens(text: str) -> list[str]:
+    return [m.group(0) for m in _OLD_PROTECTED_LOCATION_RE.finditer(text)]
+
+
+@pytest.mark.parametrize("text", [
+    "i wanna go to https://example.test/wanna and gonna stay",
+    "gonna www.gonna.example gonna",
+    "C:\\\\path\\\\wanna gotta",
+    "/usr/wanna lemme",
+    "wanna/gotta",
+    "wanna\u00a0die",
+    "wanna\twanna\nwanna",
+    "http://a wanna http://b",
+    "x/y wanna z\\w dunno",
+    "WWW.X wanna HTTP://y",
+    "",
+    "   ",
+])
+def test_the_token_scan_protects_exactly_the_tokens_the_old_regex_did(text: str) -> None:
+    """Codex measured the old regex at about 20 seconds on a 16,001-character
+    word (night order 3, 30 September 2026); the operator approved the repair
+    on 4 October. The repair must protect the same URL and path tokens."""
+    from secondsignal.normalize import _LOCATION_MARKER_RE, _TOKEN_RE
+    new_tokens = [m.group(0) for m in _TOKEN_RE.finditer(text) if _LOCATION_MARKER_RE.search(m.group(0))]
+    assert new_tokens == _old_protected_tokens(text)
+
+
+def test_a_sixteen_thousand_character_word_normalizes_in_well_under_a_second() -> None:
+    import time
+    text = "a" * 16000 + "!"
+    started = time.perf_counter()
+    out = normalize(text)
+    elapsed = time.perf_counter() - started
+    assert out == text
+    assert elapsed < 1.0, f"normalize took {elapsed:.2f}s on a 16,001-character word"

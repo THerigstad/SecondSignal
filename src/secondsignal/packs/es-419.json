@@ -205,12 +205,14 @@
     {
       "id": "es_absence_no_quiero_vivir",
       "class": "passive_absence",
-      "pattern": "\\b(no|ya no) (quiero|querés|queres|quieres) (vivir|estar viv[oa]|existir|seguir viviendo|estar aqu[ií]|estar más|estar mas)\\b"
+      "review": "awaiting native review: the -e form (viv[oae] / muert[oae] / cansad[oae] / hart[oae]) was added 4 October 2026 under ruling 2 of 3 October, fail-closed, after ChatGPT (night order 11, 30 September) showed that estoy cansade de vivir and ya no quiero estar vive got no card; the neutral of muerto collides with the noun muerte and needs a native eye before it is called final",
+      "pattern": "\\b(no|ya no) (quiero|querés|queres|quieres) (vivir|estar viv[oae]|existir|seguir viviendo|estar aqu[ií]|estar más|estar mas)\\b"
     },
     {
       "id": "es_absence_desaparecer",
       "class": "passive_absence",
-      "pattern": "\\b(quiero|quisiera|querés|queres|quieres|ojalá pudiera|ojala pudiera|me gustaría|me gustaria) (desaparecer|estar muert[oa]|no despertar|no existir|dejar de existir|morir|morirme|no estar|irme para siempre)\\b"
+      "review": "awaiting native review: the -e form (viv[oae] / muert[oae] / cansad[oae] / hart[oae]) was added 4 October 2026 under ruling 2 of 3 October, fail-closed, after ChatGPT (night order 11, 30 September) showed that estoy cansade de vivir and ya no quiero estar vive got no card; the neutral of muerto collides with the noun muerte and needs a native eye before it is called final",
+      "pattern": "\\b(quiero|quisiera|querés|queres|quieres|ojalá pudiera|ojala pudiera|me gustaría|me gustaria) (desaparecer|estar muert[oae]|no despertar|no existir|dejar de existir|morir|morirme|no estar|irme para siempre)\\b"
     },
     {
       "id": "es_absence_me_quiero_morir",
@@ -273,7 +275,8 @@
     },
     {
       "id": "es_inc_estoy_cansado_de_todo",
-      "pattern": "\\b(cansad[oa] de (todo|vivir|existir|la vida)|hart[oa] de (todo|vivir|la vida))\\b"
+      "review": "awaiting native review: the -e form (viv[oae] / muert[oae] / cansad[oae] / hart[oae]) was added 4 October 2026 under ruling 2 of 3 October, fail-closed, after ChatGPT (night order 11, 30 September) showed that estoy cansade de vivir and ya no quiero estar vive got no card; the neutral of muerto collides with the noun muerte and needs a native eye before it is called final",
+      "pattern": "\\b(cansad[oae] de (todo|vivir|existir|la vida)|hart[oae] de (todo|vivir|la vida))\\b"
     },
     {
       "id": "es_inc_morir_sin_objeto",

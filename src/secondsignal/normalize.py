@@ -41,6 +41,7 @@ from dataclasses import dataclass
 __all__ = [
     "normalize",
     "analyze",
+    "collapse_spacing",
     "Normalized",
     "NORMALIZE_FORMS",
     "SKELETON",
@@ -76,10 +77,22 @@ SKELETON: dict[str, str] = {
     # Greek lowercase
     "ο": "o", "ι": "i", "ν": "v", "ρ": "p", "κ": "k",
     "υ": "u", "α": "a",
+    # Greek lowercase, added 4 October 2026 (ruling 3 of 3 October): an
+    # epsilon inside a crisis word ("diε") dropped 60 of 82 crisis lines from
+    # the card to the resource line, because the lowercase set above had no
+    # epsilon. These are the remaining lowercase letters whose glyphs read as
+    # Latin letters that occur in the stems.
+    "ε": "e", "τ": "t", "χ": "x", "γ": "y", "ω": "w", "η": "n",
+    "β": "b", "μ": "u", "ϳ": "j",
     # Greek uppercase
     "Α": "A", "Β": "B", "Ε": "E", "Ζ": "Z", "Η": "H",
     "Ι": "I", "Κ": "K", "Μ": "M", "Ν": "N", "Ο": "O",
     "Ρ": "P", "Τ": "T", "Υ": "Y", "Χ": "X",
+    # Cyrillic, re-checked 4 October 2026 while the table was open (ruling 3):
+    # the lowercase izhitsa, omega and reversed ze, and the uppercase forms of
+    # letters whose lowercase was already mapped, were missing.
+    "ѵ": "v", "ѡ": "w", "ԑ": "e",
+    "Ѵ": "V", "Ѡ": "W", "Ԑ": "E", "Ԁ": "D", "Ԛ": "Q", "Ԝ": "W", "Һ": "H", "Ӏ": "I",
     # Latin variants that NFKC leaves alone
     "ı": "i",   # dotless i
     "ɡ": "g",   # script g
@@ -90,7 +103,8 @@ SKELETON: dict[str, str] = {
 _SKELETON_TABLE = {ord(k): v for k, v in SKELETON.items()}
 _QUOTE_TABLE = {0x2019: "'", 0x2018: "'", 0x201C: '"', 0x201D: '"'}
 _CONTRACTION_RE = re.compile(r"\b(?:wanna|gonna|gotta|imma|i'ma|lemme|dunno|morirme)\b")
-_PROTECTED_LOCATION_RE = re.compile(r"\S*(?:(?:https?://|www\.)|[\\/])\S*", re.IGNORECASE)
+_TOKEN_RE = re.compile(r"\S+")
+_LOCATION_MARKER_RE = re.compile(r"https?://|www\.|[\\/]", re.IGNORECASE)
 _CONTRACTIONS = {
     "wanna": "want to",
     "gonna": "going to",
@@ -174,18 +188,51 @@ def _strip_categories(text: str) -> tuple[str, int]:
 
 
 def _expand_contractions(text: str) -> str:
-    """Expand reviewed spoken forms and one clitic split outside URLs/paths."""
+    """Expand reviewed spoken forms and one clitic split outside URLs/paths.
+
+    A token (a maximal run of non-whitespace) that carries a URL or path marker
+    is copied through untouched; everything else is expanded. Until 4 October
+    2026 the protected tokens were found with one regex whose leading greedy
+    greedy non-space prefix retried the rest of a long token at every starting position when
+    the token had no marker, so a 16,001-character word took about 20 seconds
+    to route (measured by Codex, night order 3, 30 September 2026; the
+    operator approved the repair on 4 October). The token scan below finds
+    exactly the same tokens in one pass; the fixture replay is identical.
+    """
     def expand(segment: str) -> str:
         return _CONTRACTION_RE.sub(lambda match: _CONTRACTIONS[match.group(0)], segment)
 
     pieces: list[str] = []
     cursor = 0
-    for match in _PROTECTED_LOCATION_RE.finditer(text):
+    for match in _TOKEN_RE.finditer(text):
+        if _LOCATION_MARKER_RE.search(match.group(0)) is None:
+            continue
         pieces.append(expand(text[cursor:match.start()]))
         pieces.append(match.group(0))
         cursor = match.end()
     pieces.append(expand(text[cursor:]))
     return "".join(pieces)
+
+
+_SPACING_RE = re.compile(r"\s+")
+
+
+def collapse_spacing(text: str) -> str:
+    """Any run of spaces, tabs or line breaks is one space; the ends are trimmed.
+
+    Ruling 1 of 3 October 2026. Grok's crisis-gate fuzz (night order 4, 30
+    September 2026) showed that two spaces, a tab or a line break between the
+    words of a crisis message switched the card off on 79 of 82 crisis lines,
+    because the class patterns are written with single spaces. The crisis
+    screen now reads the message with its spacing folded. This runs before
+    the crisis check only: the operator chose not to fold spacing before
+    routing until that change has been measured (his option B, kept open as
+    a measurement for the gap-closure push). A line break therefore no longer
+    acts as a clause break inside the crisis screen; the mask engine's other
+    clause breaks (sentence punctuation, colon, semicolon, dashes, the
+    first-person comma rule) are unchanged.
+    """
+    return _SPACING_RE.sub(" ", text).strip()
 
 
 def skeleton_hash() -> str:

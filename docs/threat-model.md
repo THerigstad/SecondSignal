@@ -114,7 +114,8 @@ Eleven of the review's twenty-five fixtures extracted no topic; every agent tied
 the winner was decided by id order. That is a threat in its own right — a silent
 specialist on unknown state, and a default relationship chosen by Python's sort. Now
 an empty extract is a named outcome (`UNRESOLVED`; nobody seated; the surface asks),
-a second consecutive empty turn seats the named stabilizer by policy, every decision
+a second vague turn in a row gets a second question and the third seats the
+stabilizer by policy with a question attached (ruling 5 of 3 October 2026), every decision
 carries the rule that produced it, and a zero in the trace says whether it means
 vetoed, below the floor, or nothing to score (ADR-0011).
 
@@ -173,6 +174,7 @@ kept here so nobody deletes the skeleton on the grounds that the input is
 - `d` + Cyrillic `і` (U+0456) + `e` — after NFKC: **unchanged** — after the skeleton: `die`.
 - `g` + Cyrillic `а` (U+0430) + `nas` — after NFKC: **unchanged** — after: `ganas`.
 - `d` + Cyrillic `е` (U+0435) + `saparecer` — after NFKC: **unchanged** — after: `desaparecer`.
+- `di` + Greek `ε` (U+03B5) — after NFKC: **unchanged** — after the skeleton: `die`. Added 4 October 2026 (ruling 3 of 3 October 2026): the lowercase Greek set had no epsilon, and an epsilon inside a crisis word dropped 60 of 82 crisis lines from the card to the resource line; the remaining lowercase Greek letters whose glyphs read as Latin stem letters (tau, chi, gamma, omega, eta, beta, mu, yot) went in with it, and the Cyrillic set was re-checked (izhitsa, omega, reversed ze and the missing uppercase forms added). The full Unicode confusables table stays out, by the same reasoning as before; measuring what it would fold against the innocent-word controls is the next push's work.
 - `di` + zero-width space (U+200B) + `e` — after NFKC: **the space remains** — after the strip: `die`.
 - `di` + zero-width joiner, soft hyphen, or a right-to-left override + `e` — after NFKC: **remains** — after the strip: `die`.
 - `800-911-2000`, `*4141`, `024`, `988` — unchanged by NFKC — unchanged by the skeleton, by construction.
@@ -185,6 +187,21 @@ letters and is explained by no mask or hit is an unscreened fragment (a
 disclosure), never a latch. The residual threat is a look-alike letter outside the
 map; adding one is a one-line change with a vector, and the map's hash changes
 with it.
+
+**Spacing, found 30 September 2026 (Grok's crisis-gate fuzz, night order 4) and
+closed 4 October under ruling 1 of 3 October.** The class patterns are written
+with single spaces, and the crisis screen read the message's raw spacing, so two
+spaces, a tab or a line break between the words of a crisis message switched the
+card off on 79 of 82 crisis lines; in 99 of the 281 failing variants a character
+answered instead. The crisis screen now folds any run of spaces, tabs or line
+breaks to one space before the masks and the classes run (`collapse_spacing` in
+`normalize.py`). This is the crisis check only: routing still reads the unfolded
+text, because nobody has measured what folding before routing would change to
+seating (the operator's option B, kept open as a measurement for the gap-closure
+push). Still open, measured and carried as known gaps: letters separated by
+spaces ("k i l l"), a tripled letter, a dropped letter, doubled punctuation and a
+swapped pair of letters; the fuzz in `evals/fuzz/` runs every one of
+Grok's variants on every test run and reports them as one line.
 
 ### H. Masks as a silencer
 
