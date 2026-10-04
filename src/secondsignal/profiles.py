@@ -51,6 +51,7 @@ __all__ = [
     "load_roster",
     "roster_hash",
     "find_stabilizers",
+    "find_relapse_companion",
     "known_persona_names",
     "default_aliases",
     "canonical_id",
@@ -100,10 +101,11 @@ class AgentProfile:
             ADR-0026 (Proposed) as amended 2026-09-11: ``she`` and ``he`` name the woman's
             and the man's form of the one name (``Elli`` / ``Ellis``; the same
             word twice when the name does not shorten), ``they`` is the policy
-            word ``either`` (the neutral presentation goes by either form, the
-            person's choice), and ``as_written`` says which of ``she`` and
-            ``he`` the codex was written in. Read by nothing that routes;
-            ``tests/test_presentations.py`` pins that.
+            word ``either`` (under "neither" the persona goes by either form,
+            the longer one until the person picks the other on the plate, and
+            is called they; decision 3 of 28 September 2026), and ``as_written``
+            says which of ``she`` and ``he`` the codex was written in. Read by
+            nothing that routes; ``tests/test_presentations.py`` pins that.
         source_hash: First 12 hex digits of the SHA-256 of the profile file as
             loaded. Empty for profiles built in memory.
     """
@@ -131,12 +133,15 @@ class AgentProfile:
 
     @property
     def plate(self) -> tuple[tuple[str, str], tuple[str, str]]:
-        """The name plate: two (name, label) pairs, always two, in the order
-        the operator ruled on 2026-09-11: the full name first and the
-        shortened form second, each with its label (``she`` or ``he``), so a
-        reader can see the two forms are one person. A name that does not
-        shorten is printed twice, ``she`` then ``he``. A profile without a
-        presentation block plates its display name twice the same way.
+        """The name plate's data: two (name, label) pairs, always two, in the
+        order the operator ruled on 2026-09-11: the full name first and the
+        shortened form second, so a reader can see the two forms are one
+        person; a name that does not shorten is printed twice. The label
+        (``she`` or ``he``) records which named presentation each form
+        belongs to and is metadata only: since decision 1 of 28 September
+        2026 a surface shows the two names and no she or he label, on screen
+        or to a screen reader. A profile without a presentation block plates
+        its display name twice the same way.
 
         >>> ellis.plate
         (('Ellis', 'he'), ('Elli', 'she'))
@@ -326,6 +331,19 @@ def find_stabilizers(roster: dict[str, AgentProfile]) -> list[str]:
     """Ids of agents that satisfy the roster floor: window reaches 0.0 and no
     contraindications."""
     return sorted(p.id for p in roster.values() if p.is_stabilizer)
+
+
+def find_relapse_companion(roster: dict[str, AgentProfile]) -> str | None:
+    """Resolve the operator-assigned relapse-companion role in this roster.
+
+    Decision 6 (28 September 2026) assigns this role to Cody explicitly,
+    rather than whichever character has the narrowest recovery domains.
+    Keep that roster binding here so the router works in roles, not persona
+    ids. A custom roster without the assigned character gets no phantom
+    companion. This assignment does not alter profile files or their hashes.
+    """
+    profile = roster.get("cody")
+    return profile.id if profile is not None else None
 
 
 def roster_hash(roster: dict[str, AgentProfile]) -> str:

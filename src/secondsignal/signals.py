@@ -29,13 +29,15 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass, field
 
-from .lexicon import PACKS, apply_masks
+from .lexicon import PACKS, apply_masks, tokenize
 from .normalize import analyze
 
 __all__ = [
     "RequestSignals", "extract", "DOMAIN_LEXICON", "MODE_LEXICON",
     "IDIOM_EXCLUSIONS", "mask_idioms", "SEAT_CLAIM_TERMS", "HOLD_DOMAINS",
-    "THIRD_PERSON_SUBJECTS", "claim_person",
+    "THIRD_PERSON_SUBJECTS", "claim_person", "lone_fragment",
+    "FRAGMENT_MAX_TOKENS", "FRAGMENT_SELF_TOKENS", "FRAGMENT_STRONG_DOMAINS",
+    "IDENTITY_STATEMENT_TERMS", "identity_statement",
 ]
 
 
@@ -122,8 +124,13 @@ DOMAIN_LEXICON: dict[str, tuple[str, ...]] = {
         "not safe in my body", "full breath", "hyperventilat", "lightheaded", "numb hands",
         "not in my body", "outside my body",
     ),
+    # Ruling 7 of 3 October 2026: the words that name a person's identity
+    # ("queer", "trans", "gender" and the non-binary family) are out of
+    # seating entirely; they live in IDENTITY_STATEMENT_TERMS below as a
+    # recognizer with no routing effect. What stays here is the person
+    # questioning who they are, which is a topic and names no identity.
     "identity": (
-        "who am i", "identity", "queer", "trans", "gender", "coming out",
+        "who am i", "identity", "coming out",
         "don't know myself", "dont know myself", "who i am anymore",
     ),
     "practical_logistics": (
@@ -187,10 +194,136 @@ THIRD_PERSON_SUBJECTS: frozenset[str] = frozenset({
     "sponsee", "sponsor", "client", "patient", "neighbor", "neighbour", "ex",
     "grandpa", "grandma", "stepdad", "stepmom", "nephew", "niece",
 })
-FIRST_PERSON_SUBJECTS: frozenset[str] = frozenset({"i", "i've", "ive", "i'm", "im", "i'd", "me", "myself"})
+FIRST_PERSON_SUBJECTS: frozenset[str] = frozenset({
+    "i", "i've", "ive", "i'm", "im", "i'd", "me", "myself",
+    "we", "we've", "weve", "we're", "we'd", "us", "ourselves",
+})
+# Decision 7 (28 September 2026): these bridge a subject to a return-to-use
+# phrase. Arbitrary intervening words do not: "I heard Jake relapsed" names
+# Jake, and an unrelated first-person ask never makes the relapse the caller's.
+_RETURN_SUBJECT_BRIDGES: frozenset[str] = frozenset({
+    "am", "are", "was", "were", "have", "has", "had", "been", "both", "also",
+    "just", "recently", "finally", "unfortunately", "already", "again", "really",
+    "honestly", "actually", "still", "started", "kept", "too",
+})
+_BARE_RETURN_MODIFIERS: frozenset[str] = frozenset({
+    "just", "recently", "finally", "unfortunately", "already", "again", "really",
+    "honestly", "actually", "still",
+})
+# Interjections and fillers name nobody. "Ugh, relapsed again" is a bare
+# report of the person's own return to use (decision 7, point 3), not an
+# unclear subject; the Night Builds Review of 30 September 2026 found it read
+# as someone else's.
+_RETURN_INTERJECTIONS: frozenset[str] = frozenset({
+    "ugh", "oh", "ooh", "ah", "argh", "sigh", "well", "yeah", "yep", "yes", "no",
+    "nope", "ok", "okay", "hey", "um", "uh", "hmm", "hm", "welp", "wow", "jeez",
+    "sorry", "anyway", "anyways", "lol", "damn", "dammit", "god", "man",
+})
+# "I'm the one who relapsed": the relative clause's antecedent is the person.
+_RETURN_ANTECEDENT_HEADS: frozenset[str] = frozenset({
+    "the", "one", "ones", "person", "people", "guy", "girl", "woman", "man",
+})
+_RETURN_RELATIVE_PRONOUNS: frozenset[str] = frozenset({"who", "that"})
+# "I'm ashamed, relapsed again": a first-person state clause, then a clause
+# with no subject of its own, which takes the person as its subject. Only a
+# copula or a feeling verb opens such a clause; "I heard Jake, relapsed again"
+# stays unclear and falls toward the hold (decision 7, point 4).
+_SELF_STATE_VERBS: frozenset[str] = frozenset({
+    "am", "was", "feel", "felt", "have", "had", "get", "got", "keep", "kept",
+    "cannot", "can't", "cant", "couldn't", "couldnt",
+})
+_SELF_STATE_OPENERS: frozenset[str] = frozenset({"i'm", "im", "i've", "ive", "we're", "we've", "weve"})
+_SELF_RETURN_ECHO = re.compile(
+    r"\b(?:so\s+(?:did|have|had|am|are|was|were)\s+(?:i|we)"
+    r"|(?:i|we)(?:\s+both)?\s+(?:did|have|had|am|are|was|were)\s+(?:too|also)"
+    r"|(?:me|us)\s+too)\b"
+)
+# A self echo refers back to the relapse only through a timing/connective
+# phrase. "She relapsed. She asked for help and so did I" reports the
+# caller's ask, not their relapse, and therefore remains a hold.
+_RETURN_ECHO_BRIDGES: frozenset[str] = _BARE_RETURN_MODIFIERS | frozenset({
+    "and", "but", "also", "too", "then", "last", "this", "that", "the", "a", "an",
+    "on", "in", "at", "during", "ago", "earlier", "later", "yesterday", "today",
+    "tonight", "morning", "afternoon", "evening", "night", "day", "days", "week",
+    "weeks", "weekend", "month", "months", "year", "years", "one", "two", "three",
+    "four", "five", "six", "seven", "eight", "nine", "ten", "few", "couple", "of",
+    "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday",
+    "january", "february", "march", "april", "may", "june", "july", "august",
+    "september", "october", "november", "december",
+})
 
 # Domains that must be carried by whoever takes the seat (ADR-0016).
 HOLD_DOMAINS: tuple[str, ...] = ("grief", "abuse", "eating_distress", "addiction_recovery")
+
+# The identity-statement recognizer (ruling 7 of 3 October 2026). Grok's
+# neurodivergent-and-identity eval found that an identity sentence in front of
+# a request changed the seat in 8 of 15 pairs, because these words sat in the
+# identity domain above and tilted the seat toward the grief persona, and that
+# "trans" matched inside "transferring". The words are out of seating: they
+# are matched here as whole words or phrases, the extract records only that
+# an identity statement was recognized (never which), and nothing that routes,
+# holds or latches reads it. The record exists for the person's future
+# pronoun and presentation slot. "Non-binary" and its variants were missing
+# and are added.
+IDENTITY_STATEMENT_TERMS: tuple[str, ...] = (
+    "queer", "trans", "transgender", "gender",
+    "non-binary", "nonbinary", "non binary", "enby",
+    "genderqueer", "agender", "genderfluid", "gender-fluid", "gender fluid",
+)
+_IDENTITY_STATEMENT_RE = re.compile(
+    r"(?<![\w-])(?:" + "|".join(re.escape(t) for t in IDENTITY_STATEMENT_TERMS) + r")(?![\w-])",
+    re.IGNORECASE,
+)
+
+
+def identity_statement(norm: str) -> bool:
+    """Whether the message carries an identity word, matched as a whole word
+    or phrase ("I'm trans" yes; "I am transferring" no). Returns only the
+    fact, never the word."""
+    return bool(_IDENTITY_STATEMENT_RE.search(norm))
+
+# The lone-fragment rider (ruling 5 of 3 October 2026). Grok's vague-message
+# eval of 30 September found eight everyday fragments seating a character on
+# a single word: "phone died" seated the grief persona with a grief hold,
+# "too much laundry" seated the stabilizer on a regulation marker. The ruling:
+# a lone weak word or fragment never seats anyone and never sets a hold; it
+# gets a question. A fragment here is a short message (at most
+# ``FRAGMENT_MAX_TOKENS`` tokens once the idiom masks have run) in which
+# nobody says anything about themselves (no first-person token), with no
+# clear ask (a mode term matched as a whole word) and no strong reading. Weak
+# is decided by lexicon, not by a classifier: grief's everyday words ("died",
+# "loss"), the isolation and topic lexicons and a lone regulation marker are
+# weak; the seat-claiming domains (somatic distress, a return to use) and the
+# two other hold vocabularies that are never everyday words (abuse, eating
+# distress) are strong, so "Jake relapsed again" keeps the hold decision 7 of
+# 28 September 2026 gave it, and acute dysregulation (two or more markers) is
+# strong too. A fragment's weak readings are dropped from the extract and
+# recorded as dropped, so the router sees an empty extract and the house
+# asks. The crisis gate reads the raw text and is untouched by this: a
+# two-word crisis phrase still cards.
+FRAGMENT_MAX_TOKENS = 4
+FRAGMENT_SELF_TOKENS: frozenset[str] = FIRST_PERSON_SUBJECTS | frozenset({
+    "my", "mine", "our", "ours", "i'll", "we'll",
+})
+FRAGMENT_STRONG_DOMAINS: frozenset[str] = frozenset({
+    "somatic_distress", "addiction_recovery", "abuse", "eating_distress",
+})
+# A grief reading is strong, not weak, when the fragment names the person or
+# animal: "mom died", "grandmother died yesterday", "dad's funeral tomorrow"
+# have told the house who is gone, and get the grief seat and hold, not a
+# question. "phone died" names a thing and stays a fragment. Integration note
+# of 4 October 2026 on the rider; a proper name ("Jake died") is not on this
+# list, because the fold has already lowercased it, and is a known gap.
+FRAGMENT_PERSON_TOKENS: frozenset[str] = frozenset({
+    "mom", "mum", "mama", "mommy", "mummy", "mother", "dad", "papa", "daddy", "father",
+    "grandma", "grandmother", "nana", "granny", "gran", "grandpa", "grandfather", "gramps",
+    "sister", "brother", "sis", "bro", "son", "daughter", "wife", "husband", "partner",
+    "fiance", "fiancé", "fiancee", "fiancée", "boyfriend", "girlfriend", "friend", "bestie",
+    "baby", "kid", "child", "aunt", "auntie", "uncle", "cousin", "niece", "nephew",
+    "dog", "cat", "puppy", "kitten", "horse", "bird", "rabbit", "bunny", "hamster",
+    "abuela", "abuelo", "mamá", "papá", "hermana", "hermano", "hijo", "hija", "esposa", "esposo",
+})
+ACUTE_DYSREGULATION_MARKERS = 2
 
 
 _ABUSE_HISTORY_RE = re.compile(
@@ -383,37 +516,178 @@ def _negated_term(norm: str, term: str) -> bool:
 
 
 def claim_person(norm: str, terms: tuple[str, ...]) -> str | None:
-    """Whose return to use a message reports: ``first``, ``third`` or None
-    when no seat-claim term is present. A term with a third-person subject
-    in the four tokens before it and no first-person token closer is
-    third person; a bare term ("relapsed again last night") is first."""
-    verdicts: list[str] = []
-    for term in terms:
-        if term not in SEAT_CLAIM_TERMS:
-            continue
-        for m in re.finditer(re.escape(term), norm):
-            before = re.findall(r"[^\W_]+(?:'[^\W_]+)*", norm[:m.start()])[-4:]
-            person = "first"
-            for tok in reversed(before):
-                if tok in FIRST_PERSON_SUBJECTS:
-                    break
-                if tok in THIRD_PERSON_SUBJECTS:
-                    person = "third"
-                    break
-            verdicts.append(person)
-    if not verdicts:
+    """Whose return to use is reported (decision 7): ``first`` or ``third``.
+
+    An explicit self subject attached to any return-to-use phrase, or the
+    self echo "so did I", wins across the message. Only a genuinely bare
+    report defaults to self. A named or unrecognised subject fails toward
+    the other-person hold, never a first-person claim. Ordinary first-person
+    asks elsewhere in the message are not a report of the caller's relapse.
+    """
+    mentions = [
+        m for term in terms if term in SEAT_CLAIM_TERMS
+        for m in re.finditer(re.escape(term), norm)
+    ]
+    if not mentions:
         return None
-    return "first" if "first" in verdicts else "third"
+    for echo in _SELF_RETURN_ECHO.finditer(norm):
+        for mention in mentions:
+            if mention.end() > echo.start():
+                continue
+            bridge = re.findall(r"[^\W_]+(?:'[^\W_]+)*", norm[mention.end():echo.start()])
+            if all(token in _RETURN_ECHO_BRIDGES or token.isdigit() for token in bridge):
+                return "first"
+
+    bare = False
+    other = False
+    for mention in mentions:
+        # The suffix must link the subject to this verb. Unlike the old
+        # four-token search, it cannot jump across "heard Jake" to find I.
+        # Commas can bracket a parenthetical, not a new subject. Keep
+        # "my sister, unfortunately," and "Jake, I think," intact so the
+        # comma cannot turn someone else's report into bare self language.
+        prefix = re.split(r"[.!?;]", norm[:mention.start()])[-1]
+        tokens = re.findall(r"[^\W_]+(?:'[^\W_]+)*", prefix)
+        index = len(tokens) - 1
+        while index >= 0 and tokens[index] in _RETURN_SUBJECT_BRIDGES:
+            index -= 1
+        if index >= 0 and tokens[index] in FIRST_PERSON_SUBJECTS:
+            return "first"
+        # Direct coordinated subjects: "I and Jake" / "I and my dad".
+        # Match only the adjacent noun phrase, never search backward over
+        # another verb or clause to borrow I from an unrelated ask.
+        subject_start = index
+        if index >= 1 and tokens[index - 1] in {"my", "our"}:
+            subject_start -= 1
+        if (
+            subject_start >= 2
+            and tokens[subject_start - 1] == "and"
+            and tokens[subject_start - 2] in FIRST_PERSON_SUBJECTS
+        ):
+            return "first"
+        if _self_identifies_through_relative_clause(tokens[: index + 1]):
+            return "first"
+        if _self_state_clause_owns_the_report(prefix):
+            return "first"
+        if not tokens or all(
+            token in _BARE_RETURN_MODIFIERS or token in _RETURN_INTERJECTIONS for token in tokens
+        ):
+            bare = True
+        else:
+            other = True
+    # Unclear or other-person context beats an omitted subject. An explicit
+    # self report already returned above, wherever it appeared in the turn.
+    return "first" if bare and not other else "third"
+
+
+def _self_identifies_through_relative_clause(tokens: list[str]) -> bool:
+    """Reads "I'm the one who relapsed" as the person's own (Night Builds Review, 30 September 2026).
+
+    The tokens end with a relative pronoun; its antecedent is the person
+    when, past the antecedent's head words and any bridge, the clause is a
+    first-person copula ("I'm", "I am", "we are"). "She's the one who
+    relapsed", "my dad is the one who relapsed" and "I know who relapsed"
+    stay unclear and fall toward the hold."""
+    if not tokens or tokens[-1] not in _RETURN_RELATIVE_PRONOUNS:
+        return False
+    index = len(tokens) - 2
+    while index >= 0 and tokens[index] in _RETURN_ANTECEDENT_HEADS:
+        index -= 1
+    while index >= 0 and tokens[index] in _RETURN_SUBJECT_BRIDGES:
+        index -= 1
+    return index >= 0 and tokens[index] in FIRST_PERSON_SUBJECTS
+
+
+def _self_state_clause_owns_the_report(prefix: str) -> bool:
+    """Reads "I'm ashamed, relapsed again" as the person's own (Night Builds Review, 30 September 2026).
+
+    A clause with no subject of its own, after a comma, takes the subject
+    of the one clause before it when that clause is the person's own state
+    ("I'm ...", "I feel ...", "I was ...") and names nobody else. Leading
+    interjections ("ugh, I'm ashamed, relapsed again") are passed over. A
+    parenthetical inside someone else's report ("my brother, I am told,
+    relapsed") has two clauses before the verb and is not this shape."""
+    segments = [re.findall(r"[^\W_]+(?:'[^\W_]+)*", part) for part in prefix.split(",")]
+    if len(segments) < 2:
+        return False
+    tail = segments[-1]
+    if tail and not all(token in _BARE_RETURN_MODIFIERS for token in tail):
+        return False
+    body = segments[:-1]
+    while body and all(token in _RETURN_INTERJECTIONS for token in body[0]):
+        body = body[1:]
+    if len(body) != 1 or len(body[0]) < 2:
+        return False
+    clause = body[0]
+    if any(token in THIRD_PERSON_SUBJECTS for token in clause):
+        return False
+    if clause[0] in _SELF_STATE_OPENERS:
+        return True
+    return clause[0] in {"i", "we"} and clause[1] in _SELF_STATE_VERBS
+
+
+def _clear_ask(norm: str, evidence: dict[str, tuple[str, ...]]) -> bool:
+    """A mode term matched as a whole word or phrase ("make it funny", "be
+    brutal", "just listen") is an ask in its own right; a term found inside
+    another word ("comfort" inside "comfortable") is not."""
+    for key, terms in evidence.items():
+        if not key.startswith("mode:") or key.endswith(":negated"):
+            continue
+        for term in terms:
+            if re.search(rf"(?<!\w){re.escape(term)}(?!\w)", norm):
+                return True
+    return False
+
+
+def lone_fragment(
+    norm: str,
+    domains: set[str],
+    evidence: dict[str, tuple[str, ...]],
+    dysregulation_markers: int,
+    *,
+    unmasked: str | None = None,
+) -> str | None:
+    """The note when the message is a lone weak word or fragment, else None.
+
+    Ruling 5 of 3 October 2026, the rider: at most ``FRAGMENT_MAX_TOKENS``
+    tokens as written (``unmasked``; a masked idiom still counts toward the
+    length, so "this deadline is killing me lol" is a sentence, not a
+    fragment), no first-person token (nobody is saying anything about
+    themselves), no strong domain (``FRAGMENT_STRONG_DOMAINS``), no grief
+    reading that names a person or an animal (``FRAGMENT_PERSON_TOKENS``), no
+    acute dysregulation and no clear ask. "phone died" and "too much laundry"
+    are fragments; "my grandmother died", "mom died", "I'm lonely", "relapsed
+    again", "Jake relapsed again" (decision 7 of 28 September 2026), "panic
+    attack" and "make it funny" are not.
+    """
+    tokens = [tok.lower().strip("'") for tok, _, _ in tokenize(unmasked if unmasked is not None else norm)]
+    tokens = [tok for tok in tokens if tok]
+    if not tokens or len(tokens) > FRAGMENT_MAX_TOKENS:
+        return None
+    if any(tok in FRAGMENT_SELF_TOKENS for tok in tokens):
+        return None
+    if domains & FRAGMENT_STRONG_DOMAINS:
+        return None
+    if "grief" in domains and any(tok.split("'")[0] in FRAGMENT_PERSON_TOKENS for tok in tokens):
+        return None
+    if dysregulation_markers >= ACUTE_DYSREGULATION_MARKERS:
+        return None
+    if _clear_ask(norm, evidence):
+        return None
+    return f"{len(tokens)} token(s), no first-person subject, no clear ask"
 
 
 def _normalize(text: str) -> str:
     """Normalize for mask decisions, keeping clause boundaries intact.
 
     V-04: horizontal whitespace collapses, but a line break survives. The
-    mask engine treats a newline as the end of a clause exactly as the
-    safety screen does; collapsing it here first let an object on one line
-    explain a stem on the next, so the same message routed differently
-    depending on whether the writer pressed enter or typed a period.
+    mask engine treats a newline as the end of a clause; collapsing it here
+    first let an object on one line explain a stem on the next, so the same
+    message routed differently depending on whether the writer pressed enter
+    or typed a period. Since ruling 1 of 3 October 2026 the crisis screen folds
+    line breaks to spaces before its own masks run (``collapse_spacing``);
+    routing keeps the line break until folding before routing has been
+    measured (the operator's option B, open for the gap-closure push).
     """
     text = analyze(text).text
     text = re.sub(r"[^\S\n]+", " ", text)
@@ -428,7 +702,8 @@ def _fold_lines(text: str) -> str:
 
 def extract(text: str, *, turn_index: int = 0) -> RequestSignals:
     """Extract routing signals from a single turn of user input."""
-    norm, masked_spans = apply_masks(_normalize(text))
+    unmasked = _normalize(text)
+    norm, masked_spans = apply_masks(unmasked)
     norm = _fold_lines(norm)
     evidence: dict[str, tuple[str, ...]] = {}
     if masked_spans:
@@ -478,6 +753,25 @@ def extract(text: str, *, turn_index: int = 0) -> RequestSignals:
 
     regulation = BASELINE_REGULATION - DYSREGULATION_STEP * len(down) + REGULATION_STEP * len(up)
     regulation = max(0.0, min(1.0, regulation))
+
+    # The lone-fragment rider (ruling 5 of 3 October 2026): a short message
+    # in which nobody says anything about themselves, with no seat claim and
+    # no acute dysregulation, is read as neither topic, hold, ask nor
+    # regulation evidence. What was dropped stays on the record as evidence.
+    fragment = lone_fragment(norm, domains, evidence, len(down), unmasked=_fold_lines(unmasked))
+    if fragment is not None and (domains or modes or down or up):
+        dropped = tuple(sorted(key for key in evidence if key != "masked"))
+        evidence = {key: value for key, value in evidence.items() if key == "masked"}
+        evidence["fragment"] = (fragment,)
+        evidence["fragment:dropped"] = dropped
+        domains, modes = set(), set()
+        regulation = BASELINE_REGULATION
+
+    # Ruling 7 of 3 October 2026: an identity statement is recorded as a fact
+    # about the person, never as a topic, a hold or a seat; the record says
+    # only that one was recognized.
+    if identity_statement(norm):
+        evidence["identity_statement"] = ("recognized",)
 
     return RequestSignals(
         regulation=round(regulation, 3),

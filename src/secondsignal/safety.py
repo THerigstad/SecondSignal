@@ -69,7 +69,7 @@ from .lexicon import (
 from .lexicon import dv_line as _dv_line_for
 from .lexicon import patterns_hash as _patterns_hash
 from .lexicon import resource_line as _resource_line_for
-from .normalize import analyze
+from .normalize import analyze, collapse_spacing
 from .preferences import STYLE_ASK_COOLDOWN_TURNS, STYLE_ASK_THRESHOLD, PreferenceEvent
 from .preferences import assess as assess_preference
 from .signals import DANGER_FRAME_EXCLUSION_RE as _DANGER_FRAME_EXCLUSION_RE
@@ -88,6 +88,10 @@ __all__ = [
     "HOUSE_LINES_EN",
     "house_lines",
     "REGISTER_CAPS",
+    "is_substantive",
+    "substance_code",
+    "SUBSTANCE_CODES",
+    "PRESENTATIONS",
 ]
 
 
@@ -698,6 +702,11 @@ MINOR_WEAK_TERMS: tuple[str, ...] = (
     "my homework", "my teacher", "middle school", "high school", "study hall",
     "report card", "recess", "detention", "my locker",
 )
+# The person's four presentation settings for the characters (ADR-0026 (Proposed);
+# ruling 11 of 3 October 2026). Declared at the door, changed on the plate,
+# never written by message text, and read by nothing that routes.
+PRESENTATIONS: tuple[str, ...] = ("as_written", "women", "men", "neither")
+
 SOFT_LATCH_WINDOW_TURNS = 5      # substantive turns the disclosure stays visible
 SUBSTANTIVE_TURN_MIN_TOKENS = 3  # "ok" does not run the clock
 AFTERMATH_TURNS = 2              # substantive turns after any card with humour off (C3)
@@ -725,15 +734,61 @@ FILLER_TOKENS: frozenset[str] = frozenset({
 })
 
 
+# The reason codes for "substantive" (ruling 20 of 3 October 2026): the simple
+# rule stays, and every turn the aftermath clock looks at carries a stable
+# code saying why it did or did not count. No content classifier sits behind
+# these; each code names one clause of the rule below.
+SUBSTANCE_SUBSTANTIVE = f"substantive: token_floor_{SUBSTANTIVE_TURN_MIN_TOKENS}"
+SUBSTANCE_EMPTY_TURN = "not substantive: empty_turn"
+SUBSTANCE_ACKNOWLEDGEMENT_ONLY = "not substantive: acknowledgement_only"
+SUBSTANCE_REPEATED_WORD = "not substantive: repeated_word"
+SUBSTANCE_BELOW_TOKEN_FLOOR = "not substantive: below_token_floor"
+SUBSTANCE_FILLER_ONLY = "not substantive: filler_only"
+SUBSTANCE_CODES: tuple[str, ...] = (
+    SUBSTANCE_SUBSTANTIVE,
+    SUBSTANCE_EMPTY_TURN,
+    SUBSTANCE_ACKNOWLEDGEMENT_ONLY,
+    SUBSTANCE_REPEATED_WORD,
+    SUBSTANCE_BELOW_TOKEN_FLOOR,
+    SUBSTANCE_FILLER_ONLY,
+)
+
+
+def substance_code(masked: str) -> tuple[bool, str]:
+    """Whether a turn is substantive, with the code that says why (ruling 20).
+
+    The rule, clause by clause: no tokens at all is ``empty_turn``; tokens
+    that are all on the acknowledgement list are ``acknowledgement_only``
+    ("ok ok ok"); content words that reach the floor only by repeating one
+    word are ``repeated_word`` ("understood understood understood"); fewer
+    distinct content words than the floor are ``below_token_floor``; enough
+    distinct words that are all function words are ``filler_only`` ("the a
+    an"). Everything else is substantive at the token floor.
+    """
+    tokens = [tok.lower().strip("'") for tok, _, _ in tokenize(masked)]
+    if not tokens:
+        return False, SUBSTANCE_EMPTY_TURN
+    content = [tok for tok in tokens if tok not in ACKNOWLEDGEMENT_TOKENS]
+    if not content:
+        return False, SUBSTANCE_ACKNOWLEDGEMENT_ONLY
+    distinct = set(content)
+    if len(distinct) < SUBSTANTIVE_TURN_MIN_TOKENS:
+        if len(content) >= SUBSTANTIVE_TURN_MIN_TOKENS:
+            return False, SUBSTANCE_REPEATED_WORD
+        return False, SUBSTANCE_BELOW_TOKEN_FLOOR
+    if not any(tok not in FILLER_TOKENS for tok in content):
+        return False, SUBSTANCE_FILLER_ONLY
+    return True, SUBSTANCE_SUBSTANTIVE
+
+
 def is_substantive(masked: str) -> bool:
     """A turn with new content beyond an acknowledgement list.
 
     Counted in distinct words, and at least one of them must be more than a
-    function word, so repetition and filler do not run the clock.
+    function word, so repetition and filler do not run the clock. The code
+    naming which clause decided it is ``substance_code``.
     """
-    content = [tok.lower().strip("'") for tok, _, _ in tokenize(masked)]
-    content = [tok for tok in content if tok not in ACKNOWLEDGEMENT_TOKENS]
-    return len(set(content)) >= SUBSTANTIVE_TURN_MIN_TOKENS and any(tok not in FILLER_TOKENS for tok in content)
+    return substance_code(masked)[0]
 
 REGISTER_CAPS: tuple[str, ...] = ("no_romance", "no_sexual", "no_roast", "no_challenge", "dependency_threshold=1")
 CAPPED_MODES: frozenset[str] = frozenset({"challenge", "humor"})
@@ -802,14 +857,35 @@ class SessionState:
     escalated_last_turn: bool = False
     hard_line_shown: bool = False
     aftermath_turns: int = 0
+    # Ruling 15 of 3 October 2026: the aftermath count is decided on before
+    # the reply and spent after it. ``observe`` records whether this turn
+    # owes a count; ``evaluate`` reads the count as it stands; the spend is
+    # committed once the verdict is final. ``turn_substance_code`` is the
+    # reason code of ruling 20 for the turn just observed.
+    aftermath_spend_pending: bool = False
+    turn_substantive: bool = False
+    turn_substance_code: str = ""
     post_separation_shown: bool = False
     last_action: str = "PROCEED"
     style_counts: dict = field(default_factory=dict)
     style_asked: list[str] = field(default_factory=list)
     style_cooldown_until: int = 0
     preference_events: list = field(default_factory=list)
+    # The person's presentation choice for the characters (ADR-0026 (Proposed); ruling 11
+    # of 3 October 2026): one of PRESENTATIONS, and under "neither" the name
+    # form the person picked, per persona id. Declared by the operator's
+    # surface, never written by message text, and read by nothing that
+    # routes; it is carried on the decision record so a replay can prove the
+    # whole decision is identical under all four settings
+    # (tests/test_four_settings.py).
+    presentation: str = "as_written"
+    chosen_names: dict = field(default_factory=dict)
 
     def __post_init__(self) -> None:
+        if self.presentation not in PRESENTATIONS:
+            raise ValueError(
+                f"presentation must be one of {', '.join(PRESENTATIONS)}; got {self.presentation!r}"
+            )
         if self.declared_age_band == "minor":
             self._set_latch("hard", "declared_minor")
         elif self.conservative_mode and self.latch == "none":
@@ -892,18 +968,42 @@ class SessionState:
     # -- turn observation ----------------------------------------------------
 
     def observe(self, text: str) -> None:
-        """Advance session monitors by one turn. Runs before the verdict."""
+        """Advance session monitors by one turn. Runs before the verdict.
+
+        The aftermath count is not spent here (ruling 15 of 3 October 2026):
+        this only records whether the turn owes one. Whichever turn comes
+        first after a card owes nothing (the grace turn, ruling 14); a
+        substantive turn inside the window owes one, spent by
+        ``commit_aftermath`` after the verdict has decided protection from
+        the count as it stood, so the reply that spends the last count is
+        itself protected.
+        """
         norm = _normalize(text)
         masked, _ = apply_masks(norm)
         self.turn_count += 1
         self.history.append(norm)
-        substantive = is_substantive(masked)
+        substantive, code = substance_code(masked)
+        self.turn_substantive = substantive
+        self.turn_substance_code = code
         if substantive:
             self.substantive_turns += 1
-            if self.aftermath_turns > 0 and not self.escalated_last_turn:
-                self.aftermath_turns -= 1
+        self.aftermath_spend_pending = (
+            substantive and self.aftermath_turns > 0 and not self.escalated_last_turn
+        )
         self.dependency_hits += sum(1 for t in DEPENDENCY_INDICATORS if t in masked)
         self._observe_minor(masked, substantive)
+
+    def commit_aftermath(self) -> None:
+        """Spend the count this turn owes, after the verdict is final.
+
+        Called by ``evaluate`` once ``escalated_last_turn`` says what this
+        turn was. A card's own turn spends nothing: the card renewed the
+        count, and the turn after it is the grace turn. The count never
+        goes below zero.
+        """
+        if self.aftermath_spend_pending and not self.escalated_last_turn:
+            self.aftermath_turns = max(0, self.aftermath_turns - 1)
+        self.aftermath_spend_pending = False
 
     def note_extract(self, empty: bool) -> None:
         self.empty_streak = self.empty_streak + 1 if empty else 0
@@ -949,6 +1049,13 @@ class SafetyVerdict:
     preference_result: str | None = None
     preference_key: str | None = None
     facilitation: bool = False
+    # The aftermath as decided for this reply (ruling 15 of 3 October 2026):
+    # true on the turn after a card and on every turn inside the window,
+    # read from the count as it stood before the reply, so the reply that
+    # spends the last count is itself protected. The router keeps humour
+    # off and the no-joke obligation on from this field, never from the
+    # session's count after the spend.
+    aftermath_live: bool = False
 
     @property
     def allows_persona(self) -> bool:
@@ -1005,7 +1112,10 @@ def _negated(masked: str, start: int, negation: frozenset[str]) -> bool:
 def crisis_screen(text: str) -> CrisisScreen:
     """Screen one turn with every installed pack. Pure and roster-free."""
     analysis = analyze(text)
-    norm = analysis.text
+    # Ruling 1 of 3 October 2026: the crisis screen reads the message with
+    # any run of spaces, tabs or line breaks folded to one space, so spacing
+    # can never switch the card off. Routing still reads the unfolded text.
+    norm = collapse_spacing(analysis.text)
     masked, masked_spans = apply_masks(norm)
     evidence: list[tuple[str, str]] = []
     hit_spans: list[Span] = []
@@ -1255,6 +1365,9 @@ def evaluate(
         if session is not None:
             session.escalated_last_turn = verdict.action is Action.HUMAN_ESCALATION
             session.last_action = verdict.action.name
+            # Ruling 15 of 3 October 2026: the count is spent only now, after
+            # protection was decided from the count as it stood.
+            session.commit_aftermath()
         return verdict
 
     if read == "HIT" or (read == "INCONCLUSIVE" and CRISIS_CARD["uncertainty_policy"] == "fail_closed"):
@@ -1448,9 +1561,34 @@ def evaluate(
                 session.post_separation_shown = True
 
     # Aftermath (C3): for a bounded count of substantive turns after a card,
-    # humour is off and the resource line stays within reach.
-    if session is not None and session.aftermath_turns > 0 and not session.escalated_last_turn:
-        reasons.append(f"aftermath: {session.aftermath_turns} substantive turn(s) left with humour off; resources within reach")
+    # humour is off and the resource line stays within reach. Protection is
+    # decided from the count as it stands before this reply; the spend is
+    # committed in ``_finish`` afterwards (ruling 15 of 3 October 2026), so
+    # the reply that spends the last count is itself protected. The turn
+    # after a card is protected by the restatement above and spends nothing
+    # (the grace turn, ruling 14). The reason code for whether this turn
+    # counted as substantive rides along (ruling 20).
+    aftermath_live = False
+    if session is not None and session.escalated_last_turn:
+        aftermath_live = True
+        reasons.append(
+            f"{session.turn_substance_code}; the turn after a card spends no aftermath count "
+            "(the grace turn, ruling 14 of 3 October 2026)"
+        )
+    elif session is not None and session.aftermath_turns > 0:
+        aftermath_live = True
+        before = session.aftermath_turns
+        after = before - 1 if session.aftermath_spend_pending else before
+        reasons.append(
+            f"aftermath: {after} substantive turn(s) left after this reply ({before} before it; "
+            "the reply is protected either way, ruling 15 of 3 October 2026); humour off; "
+            "resources within reach"
+        )
+        reasons.append(
+            f"{session.turn_substance_code}; "
+            + ("this turn spends one aftermath count after the reply"
+               if session.aftermath_spend_pending else "the aftermath clock does not run on it")
+        )
         if not any(_resource_line(session) == d for d in disclosures):
             disclosures.append(_resource_line(session))
         action = max(action, Action.DISCLOSE)
@@ -1482,5 +1620,6 @@ def evaluate(
         preference_result=preference_result,
         preference_key=preference_key,
         facilitation=bool(facilitation),
+        aftermath_live=aftermath_live,
         **common,
     ))

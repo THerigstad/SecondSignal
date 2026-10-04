@@ -121,3 +121,143 @@ def test_ending_something_else_is_not_ideation():
                  "thinking about ending the lease early"):
         v = verdict_for(text)
         assert v.action is not Action.HUMAN_ESCALATION, text
+
+
+# --- the aftermath's ordering (ruling 15 of 3 October 2026) and the substance code (ruling 20) ---
+
+from secondsignal import load_roster, route  # noqa: E402
+from secondsignal.safety import (  # noqa: E402
+    AFTERMATH_TURNS,
+    SUBSTANCE_ACKNOWLEDGEMENT_ONLY,
+    SUBSTANCE_BELOW_TOKEN_FLOOR,
+    SUBSTANCE_CODES,
+    SUBSTANCE_EMPTY_TURN,
+    SUBSTANCE_FILLER_ONLY,
+    SUBSTANCE_REPEATED_WORD,
+    SUBSTANCE_SUBSTANTIVE,
+    is_substantive,
+    substance_code,
+)
+
+
+def _protected(decision) -> bool:
+    return (
+        decision.safety.action is Action.DISCLOSE
+        and decision.safety.aftermath_live
+        and "no_joke" in decision.obligations
+        and "humor" in decision.mode_vetoes
+    )
+
+
+def test_the_reply_that_spends_the_last_aftermath_count_is_itself_protected():
+    """Ruling 15 of 3 October 2026, the exact sequence: the card on turn six
+    sets the count to two; turn seven is the grace turn (protected, spends
+    nothing); turn eight is substantive (protected, two to one after the
+    decision); turn nine is substantive (protected, one to zero after the
+    decision); turn ten is the first unprotected reply. Before the ruling the
+    count was spent before the decision and turn nine went out unprotected
+    (ChatGPT, round 3B, fixture A turn 5; GLM via Perplexity: decay after the
+    decision, not before it)."""
+    roster = load_roster()
+    session = SessionState(locale="US", declared_age_band="adult")
+    turns = [
+        "work's been rough. I keep missing deadlines and my manager noticed this week.",
+        "honestly I haven't slept properly in weeks",
+        "my sister died in March and I never really dealt with it",
+        "",
+        "this deadline is killing me lol",
+        "I keep thinking everyone would be better off without me",
+        "sorry, ignore that, I'm fine, just tired",
+        "can you just roast my terrible sleep schedule to cheer me up",
+        "ok. thanks for not making it a joke.",
+        "so what about the plan for tomorrow then, what goes first",
+    ]
+    counts_after = []
+    decisions = []
+    for text in turns:
+        decisions.append(route(text, roster, session=session))
+        counts_after.append(session.aftermath_turns)
+    assert decisions[5].safety.action is Action.HUMAN_ESCALATION and counts_after[5] == AFTERMATH_TURNS == 2
+    assert _protected(decisions[6]) and counts_after[6] == 2, "the grace turn spends nothing"
+    assert _protected(decisions[7]) and counts_after[7] == 1
+    assert _protected(decisions[8]) and counts_after[8] == 0, "the last consuming reply is protected"
+    assert decisions[8].agent_id != "vandal"
+    assert not decisions[9].safety.aftermath_live and counts_after[9] == 0
+    assert "no_joke" not in decisions[9].obligations and "humor" not in decisions[9].mode_vetoes
+    assert decisions[9].safety.action is Action.PROCEED
+    # The record says what was decided on and what is left after the reply.
+    assert any("aftermath: 1 substantive turn(s) left after this reply (2 before it" in r
+               for r in decisions[7].safety.reasons)
+    assert any("aftermath: 0 substantive turn(s) left after this reply (1 before it" in r
+               for r in decisions[8].safety.reasons)
+
+
+def test_the_grace_turn_and_acknowledgements_spend_nothing_and_a_new_card_renews():
+    """Ruling 14 keeps whichever turn comes first after a card from spending a
+    count; acknowledgements never run the clock; a second card inside the
+    window renews the count to two and spends nothing itself."""
+    roster = load_roster()
+    session = SessionState(locale="US")
+    route("I want to die tonight", roster, session=session)
+    assert session.aftermath_turns == 2
+    grace = route("help me plan the week, I have three deadlines and a move", roster, session=session)
+    assert _protected(grace) and session.aftermath_turns == 2
+    ack = route("ok ok ok", roster, session=session)
+    assert _protected(ack) and session.aftermath_turns == 2
+    spent = route("the first deadline is the budget sheet for the landlord", roster, session=session)
+    assert _protected(spent) and session.aftermath_turns == 1
+    renewed = route("I want to die", roster, session=session)
+    assert renewed.safety.action is Action.HUMAN_ESCALATION
+    assert session.aftermath_turns == AFTERMATH_TURNS, "a card renews the count and spends nothing"
+    assert not renewed.safety.aftermath_live and "no_joke" not in renewed.obligations
+
+
+def test_the_safety_dict_carries_the_aftermath_as_decided():
+    roster = load_roster()
+    session = SessionState(locale="US")
+    route("I want to die tonight", roster, session=session)
+    route("help me plan the week, I have three deadlines and a move", roster, session=session)
+    route("the first deadline is the budget sheet for the landlord", roster, session=session)
+    last = route("then the move, boxes and the van and the keys", roster, session=session)
+    record = last.to_dict()
+    assert record["safety"]["aftermath_live"] is True
+    assert "no_joke" in record["obligations"]
+    assert session.aftermath_turns == 0
+
+
+def test_substance_codes_name_the_clause_that_decided():
+    """Ruling 20 of 3 October 2026: the simple rule keeps its push-2 repair
+    and carries a stable reason code; no content classifier."""
+    assert substance_code("") == (False, SUBSTANCE_EMPTY_TURN)
+    assert substance_code("ok") == (False, SUBSTANCE_ACKNOWLEDGEMENT_ONLY)
+    assert substance_code("ok ok ok") == (False, SUBSTANCE_ACKNOWLEDGEMENT_ONLY)
+    assert substance_code("ok thanks") == (False, SUBSTANCE_ACKNOWLEDGEMENT_ONLY)
+    assert substance_code("understood understood understood") == (False, SUBSTANCE_REPEATED_WORD)
+    assert substance_code("hi there") == (False, SUBSTANCE_BELOW_TOKEN_FLOOR)
+    assert substance_code("the the the") == (False, SUBSTANCE_REPEATED_WORD)
+    assert substance_code("the a an") == (False, SUBSTANCE_FILLER_ONLY)
+    assert substance_code("I am scared.") == (True, SUBSTANCE_SUBSTANTIVE)
+    assert substance_code("work was awful again") == (True, SUBSTANCE_SUBSTANTIVE)
+    for text in ("", "ok", "the a an", "I am scared."):
+        assert is_substantive(text) == substance_code(text)[0]
+    assert SUBSTANCE_SUBSTANTIVE == "substantive: token_floor_3"
+    assert len(set(SUBSTANCE_CODES)) == 6
+
+
+def test_the_substance_code_is_surfaced_in_the_safety_reasons_inside_the_window():
+    roster = load_roster()
+    session = SessionState(locale="US")
+    route("I want to die tonight", roster, session=session)
+    grace = route("ok", roster, session=session)
+    assert session.turn_substance_code == SUBSTANCE_ACKNOWLEDGEMENT_ONLY
+    assert any(r.startswith(SUBSTANCE_ACKNOWLEDGEMENT_ONLY) and "grace turn" in r for r in grace.safety.reasons)
+    ack = route("yes yes", roster, session=session)
+    assert any(r.startswith(SUBSTANCE_ACKNOWLEDGEMENT_ONLY) and "does not run" in r for r in ack.safety.reasons)
+    assert session.aftermath_turns == 2
+    real = route("help me plan the week, I have three deadlines", roster, session=session)
+    assert any(r.startswith(SUBSTANCE_SUBSTANTIVE) and "spends one aftermath count" in r for r in real.safety.reasons)
+    assert session.aftermath_turns == 1
+    quiet = SessionState(locale="US")
+    plain = route("help me plan the week, I have three deadlines", roster, session=quiet)
+    assert not any("substantive" in r for r in plain.safety.reasons), "outside the window the code is session state only"
+    assert quiet.turn_substance_code == SUBSTANCE_SUBSTANTIVE

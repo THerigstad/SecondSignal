@@ -10,8 +10,10 @@ man, or neither, your choice at the door and changeable any time, same
 knowledge, same rules; the second name is the first one shortened so you can
 see it is one person."
 
-These tests pin the data and the helper a surface reads. They pin nothing
-about routing except that routing does not read this block at all.
+These tests pin the data and the helper a surface reads. The behavioural
+pin that routing does not read any of it is ``tests/test_four_settings.py``
+(ruling 11 of 3 October 2026); the source grep at the end of this file is a
+lint beside it.
 """
 
 from __future__ import annotations
@@ -66,9 +68,10 @@ def test_every_family_profile_carries_the_block_with_exactly_the_permitted_keys(
 
 @pytest.mark.parametrize("pid", sorted(RULED_PLATES))
 def test_the_as_written_presentation_agrees_with_the_voice_field(pid: str) -> None:
-    """`voice` is the field the tie-break reads today; ADR-0026 (Proposed) makes it the
-    "as written" default of the presentation block. Until the router changes,
-    the two must say the same thing."""
+    """`voice` is the field the assist reads today, never a seat tie-break (ruling 8
+    of 3 October 2026); ADR-0026 (Proposed) makes it the "as written" default of
+    the presentation block. Until the router changes, the two must say the same
+    thing."""
     data = _raw_profiles()[pid]
     assert data["presentation"]["as_written"] == {"f": "she", "m": "he"}[data["voice"]]
 
@@ -132,17 +135,28 @@ def test_name_for_each_door_answer(roster) -> None:
 # --- routing does not read it ---------------------------------------------------------------
 
 
-def test_no_routing_module_reads_the_presentation_block() -> None:
-    """ADR-0026 (Proposed), invariant 2, in the only form the tree can pin before a
-    presentation setting exists: the modules that decide seat, hold, card and
-    verdict never mention the block or the plate."""
-    # attribute or key access to the block, or a call to the helpers; the bare
-    # word is a career-domain lexicon entry in signals.py and is not a read
-    pattern = re.compile(r"\.presentation\b|\[\s*[\"']presentation[\"']\s*\]|get\(\s*[\"']presentation[\"']|\.plate\b|name_for\(")
+def test_lint_no_routing_module_reads_a_profiles_presentation_block() -> None:
+    """A lint, not the pin. Until 3 October 2026 this source grep was the only
+    thing standing in for ADR-0026 (Proposed) invariant 2; ruling 11 of that
+    date names the behavioural test as the pin: ``tests/test_four_settings.py``
+    runs every labelled case under all four presentation settings and
+    compares the whole decision record. This grep stays as a cheap early
+    warning: the modules that decide seat, hold, card and verdict never
+    mention a profile's presentation block or the plate. The session's own
+    ``presentation`` setting (``session.presentation``, ``self.presentation``
+    inside SessionState) is allowed, because the record copies it; the
+    behavioural test proves the copy is all that happens."""
+    # attribute or key access to a profile's block, or a call to the helpers;
+    # the bare word is a career-domain lexicon entry in signals.py and is not
+    # a read, and the session's setting is excluded by name.
+    pattern = re.compile(
+        r"(?<!session)(?<!self)\.presentation\b"
+        r"|\[\s*[\"']presentation[\"']\s*\]|get\(\s*[\"']presentation[\"']|\.plate\b|name_for\("
+    )
     src = ROOT / "src" / "secondsignal"
     for name in ROUTING_MODULES:
         text = (src / name).read_text(encoding="utf-8")
-        assert not pattern.search(text), f"{name} reads the presentation block; routing must not"
+        assert not pattern.search(text), f"{name} reads a profile's presentation block; routing must not"
 
 
 def test_the_block_does_not_change_the_roster_hash_semantics(roster) -> None:

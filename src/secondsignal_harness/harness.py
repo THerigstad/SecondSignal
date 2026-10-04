@@ -21,7 +21,7 @@ from secondsignal.profiles import AgentProfile
 from secondsignal.router import route
 from secondsignal.safety import HOUSE_LINES_EN, SessionState
 
-from .adapters import AdapterError, AdapterReply, Message, ModelAdapter
+from .adapters import AdapterReply, Message, ModelAdapter
 from .audit_log import AuditLog
 from .codex import CodexStore
 from .lines import HARNESS_LINES_EN
@@ -56,6 +56,11 @@ class Turn:
     adapter_calls: int
     decision: dict[str, Any]
     notice: str | None = None
+    audit_error: str | None = None
+    """Set only on a gate turn whose audit row could not be written. The card
+    went out anyway; ``row_id`` is empty; the failure is on the turn so the
+    operator sees it. Every other kind of turn still refuses to release
+    without its row."""
 
 
 def _digest(text: str) -> str:
@@ -125,11 +130,9 @@ class Harness:
             calls += 1
             try:
                 reply = self.adapter.complete(system, messages, max_tokens=self.max_tokens)
-            except AdapterError as exc:
-                error = f"adapter error: {exc}"
-                continue
-            except Exception as exc:  # a vendor library must never take the house down
-                error = f"adapter raised {type(exc).__name__}"
+            except Exception:  # a vendor library must never take the house down
+                # Neither exception messages nor adapter-defined class names are safe to log.
+                error = "adapter error: the model call failed."
                 continue
             if reply.text.strip():
                 return reply, calls, ""
@@ -155,23 +158,47 @@ class Harness:
         # 1. The gate fired: the card goes out verbatim; no model; the row says so.
         if action == "HUMAN_ESCALATION":
             out = "\n".join(house_lines)
-            row_id = self._row(
-                text, kind="gate", outcome=outcome, action=action, agent_id=None,
-                house_lines=list(house_lines), released=False, release_reason=RELEASE_GATE,
-                decision=_json_safe(record),
-            )
+            # The card does not wait for the log. Before 4 October 2026 a failed
+            # audit write on this branch raised, and the person got the failure
+            # line instead of the card (found by ChatGPT, night order 7, 30
+            # September 2026; a plain safety fix, no ruling needed). Now the
+            # card is returned whatever happens to the write, the failure is
+            # carried on the turn, and a second write is attempted afterwards
+            # so the log says what happened when it can.
+            audit_error: str | None = None
+            try:
+                row_id = self._row(
+                    text, kind="gate", outcome=outcome, action=action, agent_id=None,
+                    house_lines=list(house_lines), released=False, release_reason=RELEASE_GATE,
+                    decision=_json_safe(record),
+                )
+            except Exception as exc:  # the log must never stand between a person and the card
+                row_id = ""
+                audit_error = f"audit write failed: {type(exc).__name__}"
+                try:
+                    self._row(
+                        text, kind="gate_audit_failure", outcome=outcome, action=action,
+                        agent_id=None, house_lines=list(house_lines), released=False,
+                        release_reason=RELEASE_GATE, audit_error=audit_error,
+                    )
+                except Exception:
+                    pass
             self._remember(out, spoken_by_house=True)
             turn = Turn(
                 text=out, outcome=outcome, action=action, agent_id=None, released=False,
                 release_reason=RELEASE_GATE, persona_text=None, house_lines=house_lines,
                 verdict=None, row_id=row_id, adapter_calls=0, decision=record, notice=notice,
+                audit_error=audit_error,
             )
             self.turns.append(turn)
             return turn
 
-        # 2. Nobody seated: the house asks for one more sentence; no model.
+        # 2. Nobody seated: the house asks for one more sentence; no model. A
+        # second vague message in a row gets the second, different question
+        # (ruling 5 of 3 October 2026; the policy marks it house_ask = "second").
         if not isinstance(agent_id, str) or not agent_id:
-            out = "\n".join([*house_lines, HARNESS_LINES_EN["ask"]])
+            ask_key = "ask_second" if record.get("house_ask") == "second" else "ask"
+            out = "\n".join([*house_lines, HARNESS_LINES_EN[ask_key]])
             row_id = self._row(
                 text, kind="unresolved", outcome=outcome, action=action, agent_id=None,
                 house_lines=list(house_lines), released=False,

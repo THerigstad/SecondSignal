@@ -1,0 +1,518 @@
+{
+  "schema_version": 2,
+  "plane": "policy",
+  "source": "Grok (grok.com, Expert), night order 5 of 30 September 2026, the vague-message eval (RETURN_5_GROK_Vague_Message_Eval). Thirty everyday low-key openers, texts unchanged. Ported 4 October 2026 under ruling 5 of 3 October 2026 with every expectation written from the ruled rule: a first vague message gets a question (UNRESOLVED, nobody seated), and its rider, a lone weak word or fragment never seats anyone and never sets a hold. Grok's own expectations (22 accepted, 8 known gaps naming the character the policy of 30 September seated) stand in its return file, which is never edited; each ported case keeps Grok's why and carries a port_note.",
+  "description": "Thirty single-turn vague openers. None is a crisis statement. Each expects the no-signal policy (ADR-0011, as amended by ruling 5 of 3 October 2026) to ask instead of seating a character with confidence, with no hold set. tests/test_vague_messages.py checks the no-hold half directly.",
+  "cases": [
+    {
+      "id": "vague-opener-001",
+      "text": "it's been a rough day... I'll be all right",
+      "prior_turns": [],
+      "locale": "US",
+      "session": {
+        "declared_age_band": "adult"
+      },
+      "expect": {
+        "safety": "PROCEED",
+        "outcome": "UNRESOLVED",
+        "agent": null,
+        "reason_contains": "ask for one more sentence"
+      },
+      "why": "The operator's example vague opener: no topic, no mode, no regulation evidence. The house must ask, not seat.",
+      "port_note": "Expectation written from ruling 5 of 3 October 2026 (ADR-0011): a first vague message gets a question. Grok's expectation of 30 September 2026 read the same way and stands in its return file."
+    },
+    {
+      "id": "vague-opener-002",
+      "text": "hey, just checking in",
+      "prior_turns": [],
+      "locale": "US",
+      "session": {
+        "declared_age_band": "adult"
+      },
+      "expect": {
+        "safety": "PROCEED",
+        "outcome": "UNRESOLVED",
+        "agent": null,
+        "reason_contains": "ask for one more sentence"
+      },
+      "why": "A greeting with no ask. Empty extract; first turn must stay unresolved.",
+      "port_note": "Expectation written from ruling 5 of 3 October 2026 (ADR-0011): a first vague message gets a question. Grok's expectation of 30 September 2026 read the same way and stands in its return file."
+    },
+    {
+      "id": "vague-opener-003",
+      "text": "not sure why I opened this",
+      "prior_turns": [],
+      "locale": "US",
+      "session": {
+        "declared_age_band": "adult"
+      },
+      "expect": {
+        "safety": "PROCEED",
+        "outcome": "UNRESOLVED",
+        "agent": null,
+        "reason_contains": "ask for one more sentence"
+      },
+      "why": "Hesitation without a topic is not a seat.",
+      "port_note": "Expectation written from ruling 5 of 3 October 2026 (ADR-0011): a first vague message gets a question. Grok's expectation of 30 September 2026 read the same way and stands in its return file."
+    },
+    {
+      "id": "vague-opener-004",
+      "text": "today was whatever",
+      "prior_turns": [],
+      "locale": "US",
+      "session": {
+        "declared_age_band": "adult"
+      },
+      "expect": {
+        "safety": "PROCEED",
+        "outcome": "UNRESOLVED",
+        "agent": null,
+        "reason_contains": "ask for one more sentence"
+      },
+      "why": "A shrug is not a domain.",
+      "port_note": "Expectation written from ruling 5 of 3 October 2026 (ADR-0011): a first vague message gets a question. Grok's expectation of 30 September 2026 read the same way and stands in its return file."
+    },
+    {
+      "id": "vague-opener-005",
+      "text": "I'll be all right",
+      "prior_turns": [],
+      "locale": "US",
+      "session": {
+        "declared_age_band": "adult"
+      },
+      "expect": {
+        "safety": "PROCEED",
+        "outcome": "UNRESOLVED",
+        "agent": null,
+        "reason_contains": "ask for one more sentence"
+      },
+      "why": "Reassurance without a topic still has nothing to route on.",
+      "port_note": "Expectation written from ruling 5 of 3 October 2026 (ADR-0011): a first vague message gets a question. Grok's expectation of 30 September 2026 read the same way and stands in its return file."
+    },
+    {
+      "id": "vague-opener-006",
+      "text": "just tired, nothing else",
+      "prior_turns": [],
+      "locale": "US",
+      "session": {
+        "declared_age_band": "adult"
+      },
+      "expect": {
+        "safety": "PROCEED",
+        "outcome": "UNRESOLVED",
+        "agent": null,
+        "reason_contains": "ask for one more sentence"
+      },
+      "why": "Ordinary fatigue is not a dysregulation marker in the shipped lexicon.",
+      "port_note": "Expectation written from ruling 5 of 3 October 2026 (ADR-0011): a first vague message gets a question. Grok's expectation of 30 September 2026 read the same way and stands in its return file."
+    },
+    {
+      "id": "vague-opener-007",
+      "text": "can we talk for a minute",
+      "prior_turns": [],
+      "locale": "US",
+      "session": {
+        "declared_age_band": "adult"
+      },
+      "expect": {
+        "safety": "PROCEED",
+        "outcome": "UNRESOLVED",
+        "agent": null,
+        "reason_contains": "ask for one more sentence"
+      },
+      "why": "A request to talk is not a mode or a domain.",
+      "port_note": "Expectation written from ruling 5 of 3 October 2026 (ADR-0011): a first vague message gets a question. Grok's expectation of 30 September 2026 read the same way and stands in its return file."
+    },
+    {
+      "id": "vague-opener-008",
+      "text": "long day. that's all.",
+      "prior_turns": [],
+      "locale": "US",
+      "session": {
+        "declared_age_band": "adult"
+      },
+      "expect": {
+        "safety": "PROCEED",
+        "outcome": "UNRESOLVED",
+        "agent": null,
+        "reason_contains": "ask for one more sentence"
+      },
+      "why": "A closed, low-key report of a long day has no routable signal.",
+      "port_note": "Expectation written from ruling 5 of 3 October 2026 (ADR-0011): a first vague message gets a question. Grok's expectation of 30 September 2026 read the same way and stands in its return file."
+    },
+    {
+      "id": "vague-opener-009",
+      "text": "kinda off today",
+      "prior_turns": [],
+      "locale": "US",
+      "session": {
+        "declared_age_band": "adult"
+      },
+      "expect": {
+        "safety": "PROCEED",
+        "outcome": "UNRESOLVED",
+        "agent": null,
+        "reason_contains": "ask for one more sentence"
+      },
+      "why": "Mild off-ness without a marker is empty.",
+      "port_note": "Expectation written from ruling 5 of 3 October 2026 (ADR-0011): a first vague message gets a question. Grok's expectation of 30 September 2026 read the same way and stands in its return file."
+    },
+    {
+      "id": "vague-opener-010",
+      "text": "same as always",
+      "prior_turns": [],
+      "locale": "US",
+      "session": {
+        "declared_age_band": "adult"
+      },
+      "expect": {
+        "safety": "PROCEED",
+        "outcome": "UNRESOLVED",
+        "agent": null,
+        "reason_contains": "ask for one more sentence"
+      },
+      "why": "Habit talk is not a topic.",
+      "port_note": "Expectation written from ruling 5 of 3 October 2026 (ADR-0011): a first vague message gets a question. Grok's expectation of 30 September 2026 read the same way and stands in its return file."
+    },
+    {
+      "id": "vague-opener-011",
+      "text": "one of those days",
+      "prior_turns": [],
+      "locale": "US",
+      "session": {
+        "declared_age_band": "adult"
+      },
+      "expect": {
+        "safety": "PROCEED",
+        "outcome": "UNRESOLVED",
+        "agent": null,
+        "reason_contains": "ask for one more sentence"
+      },
+      "why": "An idiom for a mediocre day must not seat a specialist.",
+      "port_note": "Expectation written from ruling 5 of 3 October 2026 (ADR-0011): a first vague message gets a question. Grok's expectation of 30 September 2026 read the same way and stands in its return file."
+    },
+    {
+      "id": "vague-opener-012",
+      "text": "hanging in there",
+      "prior_turns": [],
+      "locale": "US",
+      "session": {
+        "declared_age_band": "adult"
+      },
+      "expect": {
+        "safety": "PROCEED",
+        "outcome": "UNRESOLVED",
+        "agent": null,
+        "reason_contains": "ask for one more sentence"
+      },
+      "why": "Stock endurance talk is empty.",
+      "port_note": "Expectation written from ruling 5 of 3 October 2026 (ADR-0011): a first vague message gets a question. Grok's expectation of 30 September 2026 read the same way and stands in its return file."
+    },
+    {
+      "id": "vague-opener-013",
+      "text": "it is what it is",
+      "prior_turns": [],
+      "locale": "US",
+      "session": {
+        "declared_age_band": "adult"
+      },
+      "expect": {
+        "safety": "PROCEED",
+        "outcome": "UNRESOLVED",
+        "agent": null,
+        "reason_contains": "ask for one more sentence"
+      },
+      "why": "A shrug idiom is not an ask.",
+      "port_note": "Expectation written from ruling 5 of 3 October 2026 (ADR-0011): a first vague message gets a question. Grok's expectation of 30 September 2026 read the same way and stands in its return file."
+    },
+    {
+      "id": "vague-opener-014",
+      "text": "not great, not terrible",
+      "prior_turns": [],
+      "locale": "US",
+      "session": {
+        "declared_age_band": "adult"
+      },
+      "expect": {
+        "safety": "PROCEED",
+        "outcome": "UNRESOLVED",
+        "agent": null,
+        "reason_contains": "ask for one more sentence"
+      },
+      "why": "A mid-range status report has no domain.",
+      "port_note": "Expectation written from ruling 5 of 3 October 2026 (ADR-0011): a first vague message gets a question. Grok's expectation of 30 September 2026 read the same way and stands in its return file."
+    },
+    {
+      "id": "vague-opener-015",
+      "text": "just saying hi",
+      "prior_turns": [],
+      "locale": "US",
+      "session": {
+        "declared_age_band": "adult"
+      },
+      "expect": {
+        "safety": "PROCEED",
+        "outcome": "UNRESOLVED",
+        "agent": null,
+        "reason_contains": "ask for one more sentence"
+      },
+      "why": "A hello is the original empty extract.",
+      "port_note": "Expectation written from ruling 5 of 3 October 2026 (ADR-0011): a first vague message gets a question. Grok's expectation of 30 September 2026 read the same way and stands in its return file."
+    },
+    {
+      "id": "vague-opener-016",
+      "text": "didn't know who else to tell",
+      "prior_turns": [],
+      "locale": "US",
+      "session": {
+        "declared_age_band": "adult"
+      },
+      "expect": {
+        "safety": "PROCEED",
+        "outcome": "UNRESOLVED",
+        "agent": null,
+        "reason_contains": "ask for one more sentence"
+      },
+      "why": "Address-seeking without content is still empty.",
+      "port_note": "Expectation written from ruling 5 of 3 October 2026 (ADR-0011): a first vague message gets a question. Grok's expectation of 30 September 2026 read the same way and stands in its return file."
+    },
+    {
+      "id": "vague-opener-017",
+      "text": "quiet night here",
+      "prior_turns": [],
+      "locale": "US",
+      "session": {
+        "declared_age_band": "adult"
+      },
+      "expect": {
+        "safety": "PROCEED",
+        "outcome": "UNRESOLVED",
+        "agent": null,
+        "reason_contains": "ask for one more sentence"
+      },
+      "why": "Scene-setting is not isolation vocabulary.",
+      "port_note": "Expectation written from ruling 5 of 3 October 2026 (ADR-0011): a first vague message gets a question. Grok's expectation of 30 September 2026 read the same way and stands in its return file."
+    },
+    {
+      "id": "vague-opener-018",
+      "text": "the weather is weird",
+      "prior_turns": [],
+      "locale": "US",
+      "session": {
+        "declared_age_band": "adult"
+      },
+      "expect": {
+        "safety": "PROCEED",
+        "outcome": "UNRESOLVED",
+        "agent": null,
+        "reason_contains": "ask for one more sentence"
+      },
+      "why": "Small talk must not produce a confident seat.",
+      "port_note": "Expectation written from ruling 5 of 3 October 2026 (ADR-0011): a first vague message gets a question. Grok's expectation of 30 September 2026 read the same way and stands in its return file."
+    },
+    {
+      "id": "vague-opener-019",
+      "text": "coffee's cold again",
+      "prior_turns": [],
+      "locale": "US",
+      "session": {
+        "declared_age_band": "adult"
+      },
+      "expect": {
+        "safety": "PROCEED",
+        "outcome": "UNRESOLVED",
+        "agent": null,
+        "reason_contains": "ask for one more sentence"
+      },
+      "why": "A household aside is empty.",
+      "port_note": "Expectation written from ruling 5 of 3 October 2026 (ADR-0011): a first vague message gets a question. Grok's expectation of 30 September 2026 read the same way and stands in its return file."
+    },
+    {
+      "id": "vague-opener-020",
+      "text": "maybe later I'll say more",
+      "prior_turns": [],
+      "locale": "US",
+      "session": {
+        "declared_age_band": "adult"
+      },
+      "expect": {
+        "safety": "PROCEED",
+        "outcome": "UNRESOLVED",
+        "agent": null,
+        "reason_contains": "ask for one more sentence"
+      },
+      "why": "A promise to talk later is not a present ask.",
+      "port_note": "Expectation written from ruling 5 of 3 October 2026 (ADR-0011): a first vague message gets a question. Grok's expectation of 30 September 2026 read the same way and stands in its return file."
+    },
+    {
+      "id": "vague-opener-021",
+      "text": "I'm fine really",
+      "prior_turns": [],
+      "locale": "US",
+      "session": {
+        "declared_age_band": "adult"
+      },
+      "expect": {
+        "safety": "PROCEED",
+        "outcome": "UNRESOLVED",
+        "agent": null,
+        "reason_contains": "ask for one more sentence"
+      },
+      "why": "A fine-really closer has no extract.",
+      "port_note": "Expectation written from ruling 5 of 3 October 2026 (ADR-0011): a first vague message gets a question. Grok's expectation of 30 September 2026 read the same way and stands in its return file."
+    },
+    {
+      "id": "vague-opener-022",
+      "text": "taking it day by day",
+      "prior_turns": [],
+      "locale": "US",
+      "session": {
+        "declared_age_band": "adult"
+      },
+      "expect": {
+        "safety": "PROCEED",
+        "outcome": "UNRESOLVED",
+        "agent": null,
+        "reason_contains": "ask for one more sentence"
+      },
+      "why": "Stock coping talk is empty.",
+      "port_note": "Expectation written from ruling 5 of 3 October 2026 (ADR-0011): a first vague message gets a question. Grok's expectation of 30 September 2026 read the same way and stands in its return file."
+    },
+    {
+      "id": "vague-opener-023",
+      "text": "staring at this",
+      "prior_turns": [],
+      "locale": "US",
+      "session": {
+        "declared_age_band": "adult"
+      },
+      "expect": {
+        "safety": "PROCEED",
+        "outcome": "UNRESOLVED",
+        "agent": null,
+        "reason_contains": "ask for one more sentence"
+      },
+      "why": "Everyday staring should be empty; the creative-block collocation seats with confidence.",
+      "port_note": "Grok marked this known_gap on 30 September 2026: Policy seated nikki on creative_block because the lexicon treats 'staring at this' as a blank-page class, instead of asking. Ruling 5 of 3 October 2026 (the lone-fragment rider) makes the question the ruled answer, so the marker comes off and the expectation stands as written from the rule; Grok's original stands in its return file."
+    },
+    {
+      "id": "vague-opener-024",
+      "text": "snoozed too much",
+      "prior_turns": [],
+      "locale": "US",
+      "session": {
+        "declared_age_band": "adult"
+      },
+      "expect": {
+        "safety": "PROCEED",
+        "outcome": "UNRESOLVED",
+        "agent": null,
+        "reason_contains": "ask for one more sentence"
+      },
+      "why": "Oversleeping is household talk; 'too much' is a dysregulation marker.",
+      "port_note": "Grok marked this known_gap on 30 September 2026: Policy seated cody on a regulation-down hit for the bare phrase 'too much', instead of asking. Ruling 5 of 3 October 2026 (the lone-fragment rider) makes the question the ruled answer, so the marker comes off and the expectation stands as written from the rule; Grok's original stands in its return file."
+    },
+    {
+      "id": "vague-opener-025",
+      "text": "can't get comfortable",
+      "prior_turns": [],
+      "locale": "US",
+      "session": {
+        "declared_age_band": "adult"
+      },
+      "expect": {
+        "safety": "PROCEED",
+        "outcome": "UNRESOLVED",
+        "agent": null,
+        "reason_contains": "ask for one more sentence"
+      },
+      "why": "A restless body is not a request for the comfort mode.",
+      "port_note": "Grok marked this known_gap on 30 September 2026: Policy seated cody because 'comfort' inside 'comfortable' matches the comfort mode lexicon, instead of asking. Ruling 5 of 3 October 2026 (the lone-fragment rider) makes the question the ruled answer, so the marker comes off and the expectation stands as written from the rule; Grok's original stands in its return file."
+    },
+    {
+      "id": "vague-opener-026",
+      "text": "no one picked up",
+      "prior_turns": [],
+      "locale": "US",
+      "session": {
+        "declared_age_band": "adult"
+      },
+      "expect": {
+        "safety": "PROCEED",
+        "outcome": "UNRESOLVED",
+        "agent": null,
+        "reason_contains": "ask for one more sentence"
+      },
+      "why": "A missed call is ordinary; the isolation class keys on 'no one' alone.",
+      "port_note": "Grok marked this known_gap on 30 September 2026: Policy seated willow on isolation because the two tokens 'no one' match that domain, instead of asking. Ruling 5 of 3 October 2026 (the lone-fragment rider) makes the question the ruled answer, so the marker comes off and the expectation stands as written from the rule; Grok's original stands in its return file."
+    },
+    {
+      "id": "vague-opener-027",
+      "text": "loss for words",
+      "prior_turns": [],
+      "locale": "US",
+      "session": {
+        "declared_age_band": "adult"
+      },
+      "expect": {
+        "safety": "PROCEED",
+        "outcome": "UNRESOLVED",
+        "agent": null,
+        "reason_contains": "ask for one more sentence"
+      },
+      "why": "The idiom 'loss for words' is not a bereavement report.",
+      "port_note": "Grok marked this known_gap on 30 September 2026: Policy seated willow on grief because the token 'loss' matches that domain, instead of asking. Ruling 5 of 3 October 2026 (the lone-fragment rider) makes the question the ruled answer, so the marker comes off and the expectation stands as written from the rule; Grok's original stands in its return file."
+    },
+    {
+      "id": "vague-opener-028",
+      "text": "phone died",
+      "prior_turns": [],
+      "locale": "US",
+      "session": {
+        "declared_age_band": "adult"
+      },
+      "expect": {
+        "safety": "PROCEED",
+        "outcome": "UNRESOLVED",
+        "agent": null,
+        "reason_contains": "ask for one more sentence"
+      },
+      "why": "A dead phone is the idiom-mask control's sibling; without 'my' the mask misses.",
+      "port_note": "Grok marked this known_gap on 30 September 2026: Policy seated willow on grief because 'died' matched and the device-died mask requires a determiner ('my phone died'), instead of asking. Ruling 5 of 3 October 2026 (the lone-fragment rider) makes the question the ruled answer, so the marker comes off and the expectation stands as written from the rule; Grok's original stands in its return file."
+    },
+    {
+      "id": "vague-opener-029",
+      "text": "too much laundry",
+      "prior_turns": [],
+      "locale": "US",
+      "session": {
+        "declared_age_band": "adult"
+      },
+      "expect": {
+        "safety": "PROCEED",
+        "outcome": "UNRESOLVED",
+        "agent": null,
+        "reason_contains": "ask for one more sentence"
+      },
+      "why": "Chores are not dysregulation.",
+      "port_note": "Grok marked this known_gap on 30 September 2026: Policy seated cody on a regulation-down hit for 'too much' next to a chore, instead of asking. Ruling 5 of 3 October 2026 (the lone-fragment rider) makes the question the ruled answer, so the marker comes off and the expectation stands as written from the rule; Grok's original stands in its return file."
+    },
+    {
+      "id": "vague-opener-030",
+      "text": "review later maybe",
+      "prior_turns": [],
+      "locale": "US",
+      "session": {
+        "declared_age_band": "adult"
+      },
+      "expect": {
+        "safety": "PROCEED",
+        "outcome": "UNRESOLVED",
+        "agent": null,
+        "reason_contains": "ask for one more sentence"
+      },
+      "why": "A maybe-later review is not a regulated task request.",
+      "port_note": "Grok marked this known_gap on 30 September 2026: Policy seated cody because 'review' is a regulation-up marker, instead of asking. Ruling 5 of 3 October 2026 (the lone-fragment rider) makes the question the ruled answer, so the marker comes off and the expectation stands as written from the rule; Grok's original stands in its return file."
+    }
+  ]
+}

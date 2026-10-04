@@ -64,6 +64,13 @@ def obligation_words(obligation: str, roster: Mapping[str, AgentProfile]) -> str
             "the person is talking about someone else's situation, not their own; "
             "keep it that way"
         )
+    elif obligation == "ask_question":
+        # Ruling 5 of 3 October 2026: the stabilizer seats on the third vague
+        # message in a row with a question attached, not a plan.
+        words = (
+            "you were seated after three vague messages in a row: ask one plain "
+            "question about what is going on, and offer no plan yet"
+        )
     else:
         words = obligation
     return f"{words} [{obligation}]"

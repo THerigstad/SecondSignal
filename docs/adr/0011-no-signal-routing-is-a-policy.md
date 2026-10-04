@@ -33,13 +33,18 @@ router acts on, preferring the stabilizer because there is no topic to weigh.
 **Nobody is seated by alphabet.** On the first empty turn of a session the
 outcome is `UNRESOLVED`: no agent is seated, the reason reads
 "no routable signal; nobody seated; ask for one more sentence", and the
-surface asks. From the second consecutive empty turn the **named seat**
-receives the caller — `NO_SIGNAL_SEAT = "calder"` — with the trace reading
-"stabilizer=calder by policy". The seat is one constant, reviewable and
-reversible in one line, and it must name an agent that profile loading
-certifies as a stabilizer (safe at full dysregulation, no contraindications).
-When a held boundary or a required disclosure has to be delivered and there
-is no topic to route on, the named seat delivers it.
+surface asks. On the second vague turn in a row the surface asks a second,
+different question, and nobody is seated; from the third in a row the
+**stabilizer seat** receives the caller, with a question attached and never a
+plan, and the trace reading "stabilizer by policy" (ruling 5 of 3 October
+2026; until then the seat came on the second turn). The seat is a role
+resolved from the roster at load (`find_stabilizers`), never an id written
+into the router, and it must be an agent that profile loading certifies as a
+stabilizer (safe at full dysregulation, no contraindications). A lone weak
+word or fragment ("phone died", "too much laundry") never seats anyone and
+never sets a hold; it gets the question (the rider to ruling 5). When a held
+boundary or a required disclosure has to be delivered and there is no topic
+to route on, the stabilizer seat delivers it.
 
 The operator delegated the choice of seat with the instruction to take the
 safest option. This is it: the house asks before any persona is seated, and

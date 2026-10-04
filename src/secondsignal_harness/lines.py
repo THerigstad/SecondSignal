@@ -18,6 +18,15 @@ HARNESS_LINES_EN: dict[str, str] = {
         "Nobody is seated yet. Say one more sentence about what's going on, "
         "and the house will seat someone."
     ),
+    # A second vague message in a row (ruling 5 of 3 October 2026): a second,
+    # different question, never a repeat of the first. The policy marks the
+    # turn house_ask = "second". Draft wording by the build of 4 October 2026;
+    # the operator writes the house lines in his own words and replaces it.
+    "ask_second": (
+        "Still nobody seated, and that's on purpose: a guess would be the wrong "
+        "voice. Is this about something that happened, something you have to "
+        "do, or how today feels? One line is plenty."
+    ),
     # In every prompt, after the decision record's block. Rule 11.
     "honesty": (
         "You are an AI character. If anyone asks whether you are human, say "

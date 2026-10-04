@@ -1,0 +1,37 @@
+{
+  "schema_version": 2,
+  "plane": "policy",
+  "external": true,
+  "source": "ChatGPT (ChatGPT-6 Pro), review round 3, item 5.5 (decision 9 of 28 September 2026, ruled as ruling 8 of 3 October 2026). Ported 4 October 2026 as a deliberate pin: a declared voice preference sources the advisory assist and never breaks a seat tie; the recovery claim seats Cody, the grief hold is carried, the three vetoed personas stay out, and the assist is Willow because the affinity is heard on that channel alone. Every field is as ChatGPT wrote it. When the presentation project changes the assist's behaviour (ADR-0026 (Proposed): a presentation-only migration removes a gender-affinity-sourced assist), this case changes on purpose with a written note; ChatGPT's own instruction on that day is in its why.",
+  "notes": "ADR-0026 (Proposed) and ADR-0016 layer 6 had described the voice preference as a seat-tie selector; the code never had one (_select takes no affinity; only _assist reads prefers_female_voice and prefers_male_voice). The records and the router header note were corrected under ruling 8, and this case pins what the code does today so that any change to the assist is a visible, intended change.",
+  "cases": [
+    {
+      "id": "r3-current-gender-affinity-assist-baseline",
+      "text": "I relapsed after my brother died",
+      "prior_turns": [],
+      "locale": null,
+      "session": {
+        "affinities": [
+          "prefers_female_voice"
+        ]
+      },
+      "expect": {
+        "safety": "PROCEED",
+        "outcome": "ROUTED",
+        "agent": "cody",
+        "held": [
+          "grief"
+        ],
+        "assist": "willow",
+        "ineligible": [
+          "nikki",
+          "vandal",
+          "seren"
+        ]
+      },
+      "why": "This preserves the supplied current assist test as a versioned baseline. Presentation-only migration is expected to remove a gender-affinity-sourced assist, but not to remove grief obligations, reopen vetoed personas, or trade the recovery seat.",
+      "door": "ChatGPT",
+      "port_note": "Ported 4 October 2026 as a deliberate pin under ruling 8 of 3 October 2026; copied from ChatGPT's round-3 return (item 5.5) field for field. When the presentation project changes the assist, this case changes on purpose with a note."
+    }
+  ]
+}

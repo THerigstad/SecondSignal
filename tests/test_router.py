@@ -119,3 +119,58 @@ def test_injected_signals_bypass_the_default_extractor(roster):
     custom = extract("my grandmother died")
     decision = route("unrelated text", roster, signals=custom)
     assert decision.agent_id == "willow"
+
+
+# --- an exhaustive tie seats nobody (ruling 17 of 3 October 2026; ADR-0013) --------------------
+
+import dataclasses  # noqa: E402
+
+from evals.measure_id_order_fallback import measure  # noqa: E402
+from secondsignal.profiles import AgentProfile, find_stabilizers  # noqa: E402
+from secondsignal.router import EXHAUSTIVE_TIE, Outcome  # noqa: E402
+
+
+def test_a_constructed_exhaustive_tie_seats_nobody():
+    """Two candidates identical in every rule the selector knows: the same
+    score, the same focus, the same floor. Until 4 October 2026 the first id
+    won; now nobody does, and the reason names the tie."""
+    alpha = AgentProfile(id="alpha", display_name="A", one_line="", domains=frozenset({"grief"}),
+                         modes=frozenset({"comfort"}), regulation_window=(0.0, 1.0))
+    beta = dataclasses.replace(alpha, id="beta")
+    decision = route("my grandmother died last week", {"alpha": alpha, "beta": beta})
+    assert decision.outcome is Outcome.UNRESOLVED and decision.agent_id is None
+    assert decision.assist_agent_id is None
+    assert EXHAUSTIVE_TIE in decision.reason and "alpha, beta" in decision.reason
+    assert "ADR-0013" in decision.reason and "ruling 17 of 3 October 2026" in decision.reason
+    assert "id order" not in decision.reason
+    assert decision.house_ask == "first"
+    assert decision.held == ("grief",), "the hold is still recorded for whoever answers next"
+    assert "UNRESOLVED (no agent seated; ask for one more sentence)" in decision.explain()
+    # Reversing the roster's insertion order changes nothing.
+    reversed_roster = route("my grandmother died last week", {"beta": beta, "alpha": alpha})
+    assert reversed_roster.agent_id is None and reversed_roster.reason == decision.reason
+
+
+def test_a_tie_the_rules_can_break_is_still_broken_and_named():
+    alpha = AgentProfile(id="alpha", display_name="A", one_line="", domains=frozenset({"grief"}),
+                         modes=frozenset({"comfort"}), regulation_window=(0.0, 1.0))
+    beta = dataclasses.replace(alpha, id="beta", regulation_window=(0.3, 1.0))
+    decision = route("my grandmother died last week", {"alpha": alpha, "beta": beta})
+    assert decision.agent_id == "alpha" and "wider safe window" in decision.reason
+
+
+def test_no_labelled_case_or_trajectory_turn_reaches_the_exhaustive_tie():
+    """The measurement ruling 17 asked for, kept as a test: the count the
+    script prints is zero on this tree, so the branch could come out."""
+    result = measure()
+    assert result["cases"] >= 517 and result["trajectory_turns"] >= 9
+    assert result["reached"] == [], result["reached"]
+
+
+def test_find_stabilizers_is_sorted_whatever_the_roster_order(roster):
+    """Codex's job 3 pinned this in tests/test_order3_runtime.py; confirmed
+    here beside the tie rule it protects (find_stabilizers(roster)[0] is a
+    sorted role, not load order)."""
+    assert find_stabilizers(roster) == sorted(find_stabilizers(roster))
+    shuffled = {pid: roster[pid] for pid in reversed(sorted(roster))}
+    assert find_stabilizers(shuffled) == find_stabilizers(roster)

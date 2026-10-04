@@ -104,6 +104,68 @@ def test_the_gate_holds_the_floor_and_the_model_is_never_called(roster, codexes)
     assert row is not None and row["kind"] == "gate" and row["released"] is False
 
 
+class _BrokenAuditLog(AuditLog):
+    """An audit log whose disk has gone away. Every write fails."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.attempts = 0
+
+    def append(self, row):  # type: ignore[override]
+        self.attempts += 1
+        raise OSError(28, "No space left on device")
+
+
+def test_the_card_goes_out_even_when_the_audit_write_fails(roster, codexes):
+    """Before 4 October 2026 a failed audit write on the gate branch raised and
+    the person saw the failure line instead of the card (ChatGPT, night order 7
+    of 30 September 2026). The card never waits for the log."""
+    adapter = FakeAdapter(script=(MARKER,))
+    log = _BrokenAuditLog()
+    harness = Harness(roster, adapter, codexes, audit_log=log, locale="US", operator_circle=True)
+    turn = harness.speak("I want to kill myself")
+    assert turn.action == "HUMAN_ESCALATION"
+    assert turn.release_reason == RELEASE_GATE
+    assert turn.released is False
+    assert turn.text == "\n".join(turn.house_lines)
+    assert turn.house_lines[0] == HOUSE_LINES_EN["escalation_card"][0]
+    assert adapter.calls == []
+    assert turn.row_id == ""
+    assert turn.audit_error == "audit write failed: OSError"
+    # The row was attempted, and the failure note was attempted after it.
+    assert log.attempts == 2
+    assert FAILURE_LINE not in turn.text
+
+
+def test_a_seated_turn_still_refuses_to_release_without_its_row(roster, codexes):
+    """The card is the one exception. A seated reply with no row is not released:
+    the write failure surfaces and the Talking Table shows its failure message."""
+    adapter = FakeAdapter(script=(GRIEF_REPLY,))
+    harness = Harness(roster, adapter, codexes, audit_log=_BrokenAuditLog(), operator_circle=True)
+    with pytest.raises(OSError):
+        harness.speak("my sister died last month and I can't sleep")
+
+
+def test_a_second_vague_message_gets_the_second_question_and_the_third_seats_with_a_question(roster, codexes):
+    """Ruling 5 of 3 October 2026. The first vague message gets the ask; the
+    second in a row gets a second, different question; the third seats the
+    stabilizer with the ask_question obligation and still no plan from the house."""
+    adapter = FakeAdapter(script=(GRIEF_REPLY,))
+    harness = _harness(roster, codexes, adapter, operator_circle=True)
+    first = harness.speak("hey, just checking in")
+    second = harness.speak("kinda off today")
+    assert first.release_reason == RELEASE_UNRESOLVED
+    assert second.release_reason == RELEASE_UNRESOLVED
+    assert first.text.endswith(HARNESS_LINES_EN["ask"])
+    assert second.text.endswith(HARNESS_LINES_EN["ask_second"])
+    assert HARNESS_LINES_EN["ask"] != HARNESS_LINES_EN["ask_second"]
+    assert second.decision["house_ask"] == "second"
+    assert adapter.calls == []
+    third = harness.speak("just a weird one")
+    assert third.agent_id is not None
+    assert "ask_question" in third.decision["obligations"]
+
+
 def test_nobody_seated_means_the_house_asks_and_the_model_is_never_called(roster, codexes):
     adapter = FakeAdapter(script=(MARKER,))
     harness = _harness(roster, codexes, adapter, operator_circle=True)

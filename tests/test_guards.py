@@ -162,16 +162,21 @@ def test_empty_extract_seats_nobody_and_says_why(roster):
     assert all(s.status == "no_signal" for s in d.ranked)
 
 
-def test_second_consecutive_empty_turn_seats_the_stabilizer_by_role(roster):
+def test_third_consecutive_empty_turn_seats_the_stabilizer_by_role(roster):
+    # Ruling 5 of 3 October 2026: the second vague message gets a second, different question;
+    # the stabilizer seats on the third, with a question attached (this test expected the second).
     session = SessionState()
     first = route("hey", roster, session=session)
-    assert first.outcome is Outcome.UNRESOLVED
+    assert first.outcome is Outcome.UNRESOLVED and first.house_ask == "first"
     second = route("so yeah", roster, session=session)
-    assert second.outcome is Outcome.ROUTED
+    assert second.outcome is Outcome.UNRESOLVED and second.house_ask == "second"
+    third = route("just tired", roster, session=session)
+    assert third.outcome is Outcome.ROUTED
     seat = no_signal_seat(roster)
-    assert second.agent_id == seat
-    assert "by role" in second.reason and seat in second.reason
-    assert NO_SIGNAL_SEAT_AFTER_TURNS == 2
+    assert third.agent_id == seat
+    assert "by role" in third.reason and seat in third.reason
+    assert "ask_question" in third.obligations
+    assert NO_SIGNAL_SEAT_AFTER_TURNS == 3
 
 
 def test_the_no_signal_seat_is_a_role_resolved_from_the_roster_not_a_literal(roster):

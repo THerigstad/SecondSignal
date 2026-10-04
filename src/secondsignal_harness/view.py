@@ -78,7 +78,12 @@ def audit_view(decision: dict[str, Any], session: SessionState | None = None) ->
         view["signals"] = decision["signals"]
     if session is not None:
         view["escalated_last_turn"] = bool(session.escalated_last_turn)
-        view["crisis_aftermath"] = bool(session.aftermath_turns > 0)
+        # Since ruling 15 of 3 October 2026 the count is spent after the decision,
+        # so the reply that spends the last count is itself inside the window;
+        # the verdict's aftermath_live says so where the session's count, read
+        # after the route, already shows zero.
+        live = safety.get("aftermath_live")
+        view["crisis_aftermath"] = bool(live) if live is not None else bool(session.aftermath_turns > 0)
         view["session_latch"] = str(session.latch)
     return view
 

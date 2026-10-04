@@ -25,8 +25,13 @@ The decision tree, top to bottom (ADR-0016):
    generation layer knows what it owes and a harness can check that it paid.
 4. Ask fit -> the score (domain, mode, regulation).
 5. Dysregulation -> the stabilizer is preferred and challenge is penalized.
-6. Declared affinities -> tie-breaks and the advisory assist, never
-   overriding 1 or 2, never rehabilitating a vetoed persona.
+6. Declared affinities -> the advisory assist, and only that: a voice
+   preference sources the assist and never breaks a seat tie (``_select``
+   takes no affinity; only ``_assist`` reads one). Never overriding 1 or 2,
+   never rehabilitating a vetoed persona. Ruling 8 of 3 October 2026
+   corrected this note, ADR-0016 layer 6 and ADR-0026 (Proposed), which had
+   described the preference as a seat-tie selector; the pin is
+   ``evals/cases/round3_pins_2026-10-04.json``.
 7. Shadow seat recorded; assist emitted.
 
 Seat, shadow and assist all pass through the same ``eligible`` gate:
@@ -37,12 +42,15 @@ this design found; one function closes it.
 Three things a decision must never do (ADR-0011, ADR-0012):
 
 * resolve a tie by accident. When candidates tie, the trace names the rule
-  that broke the tie (specialist precision, then the wider safe window). Id
-  order is the last resort and is named as such.
+  that broke the tie (specialist precision, then the wider safe window). An
+  exhaustive tie seats nobody: the no-seat outcome, with the tie named
+  (ruling 17 of 3 October 2026; measured first, no labelled case reached it).
 * seat an agent on an empty extract by default. No topic, no mode and no
   regulation evidence is a first-class outcome (``UNRESOLVED``), not a tie.
-  The seat that takes the second consecutive empty turn is the roster's
-  stabilizer, resolved by role at load, never a literal id in this file.
+  The first and second vague messages in a row get a question each, a
+  different one (ruling 5 of 3 October 2026); the seat that takes the third
+  consecutive empty turn is the roster's stabilizer, resolved by role at
+  load, never a literal id in this file, with a question attached.
 * hand a caller to an agent below that agent's declared regulation floor. The
   floor is eligibility, not a score penalty.
 
@@ -58,13 +66,14 @@ from dataclasses import dataclass
 from enum import Enum
 
 from .lexicon import Span
-from .profiles import AgentProfile, find_stabilizers, roster_hash
+from .profiles import AgentProfile, find_relapse_companion, find_stabilizers, roster_hash
 from .safety import CAPPED_MODES, Action, SafetyVerdict, SessionState, evaluate
 from .signals import HOLD_DOMAINS, SEAT_CLAIM_TERMS, RequestSignals, extract
 
 __all__ = [
     "Outcome",
     "RoutingDecision",
+    "PresentationFacts",
     "ScoredAgent",
     "route",
     "score_agent",
@@ -74,6 +83,9 @@ __all__ = [
     "NO_SIGNAL_SEAT_ROLE",
     "NO_SIGNAL_SEAT_AFTER_TURNS",
     "SEAT_CLAIMING_DOMAINS",
+    "HOUSE_ASKS",
+    "ASK_QUESTION_OBLIGATION",
+    "EXHAUSTIVE_TIE",
 ]
 
 W_DOMAIN = 0.45
@@ -87,14 +99,24 @@ W_REGULATION = 0.25
 DYSREGULATION_PENALTY = 0.35
 PENALIZED_MODES = frozenset({"challenge", "humor"})
 
-# No-signal policy (ADR-0011). On the first empty extract in a session nobody
-# is seated and the decision says so; the surface asks for one more sentence.
-# From the second consecutive empty turn the roster's stabilizer receives the
-# caller, by policy and with the policy named in the trace. The seat is a
-# *role*, resolved from the loaded roster; profile loading guarantees the role
-# is filled. No agent id is written into this file.
+# No-signal policy (ADR-0011, amended by ruling 5 of 3 October 2026). On the
+# first empty extract in a session nobody is seated and the decision says so;
+# the surface asks for one more sentence. On a second vague message in a row
+# nobody is seated either, and the surface asks a second, different question
+# (the decision records which ask is due as ``house_ask``, so the surface
+# never repeats itself). From the third consecutive empty turn the roster's
+# stabilizer receives the caller, by policy and with the policy named in the
+# trace, with a question attached (the ``ask_question`` obligation), not a
+# plan. The seat is a *role*, resolved from the loaded roster; profile loading
+# guarantees the role is filled. No literal agent id selects the no-signal
+# seat.
 NO_SIGNAL_SEAT_ROLE = "stabilizer"
-NO_SIGNAL_SEAT_AFTER_TURNS = 2
+NO_SIGNAL_SEAT_AFTER_TURNS = 3
+# The rule string an exhaustive tie returns from ``_select`` (ruling 17 of
+# 3 October 2026). The router turns it into the no-seat outcome.
+EXHAUSTIVE_TIE = "tie unresolved by policy: an exhaustive tie"
+HOUSE_ASKS: tuple[str, ...] = ("first", "second")
+ASK_QUESTION_OBLIGATION = "ask_question"
 
 # Domains that claim the seat when present (tree layer 2). ``somatic_distress``
 # is claimed by whoever carries it -- in the shipped roster, the stabilizer.
@@ -199,6 +221,7 @@ def _safety_to_dict(verdict: SafetyVerdict) -> dict[str, object]:
         "preference_result": verdict.preference_result,
         "preference_key": verdict.preference_key,
         "facilitation": verdict.facilitation,
+        "aftermath_live": verdict.aftermath_live,
     }
 
 
@@ -211,6 +234,22 @@ def _scored_agent_to_dict(scored: ScoredAgent) -> dict[str, object]:
         "vetoed": scored.vetoed,
         "status": scored.status,
     }
+
+
+@dataclass(frozen=True)
+class PresentationFacts:
+    """The person's presentation choice as the session declared it (ADR-0026 (Proposed);
+    ruling 11 of 3 October 2026): the setting and, under "neither", the name
+    form chosen per persona id. Carried on the record so a replay can prove
+    that nothing else in the decision moves with it; read by nothing that
+    routes, holds, cards or vetoes."""
+
+    setting: str = "as_written"
+    chosen_names: tuple[tuple[str, str], ...] = ()
+
+
+def _presentation_to_dict(facts: PresentationFacts) -> dict[str, object]:
+    return {"setting": facts.setting, "chosen_names": dict(facts.chosen_names)}
 
 
 @dataclass(frozen=True)
@@ -233,6 +272,18 @@ class RoutingDecision:
     assist_agent_id: str | None = None
     assist_reason: str = ""
     mode_vetoes: tuple[str, ...] = ()
+    # Which of the house's asks is due when nobody is seated (ruling 5 of
+    # 3 October 2026): "first" on the first vague message, "second" on the
+    # second in a row, so the surface asks a different question each time.
+    # None whenever someone is seated or the gate holds the floor. The
+    # policy plane records the ask; the surface owns the wording.
+    house_ask: str | None = None
+    # An identity statement was recognized in the message (ruling 7 of
+    # 3 October 2026): a fact about the person for the future pronoun and
+    # presentation slot. Never which identity; never a routing input.
+    identity_statement: bool = False
+    # The session's presentation choice, copied onto the record (ruling 11).
+    presentation: PresentationFacts = PresentationFacts()
 
     @property
     def preempted(self) -> bool:
@@ -274,6 +325,9 @@ class RoutingDecision:
             "assist_agent_id": self.assist_agent_id,
             "assist_reason": self.assist_reason,
             "mode_vetoes": list(self.mode_vetoes),
+            "house_ask": self.house_ask,
+            "identity_statement": self.identity_statement,
+            "presentation": _presentation_to_dict(self.presentation),
             "explain": self.explain(),
         }
 
@@ -298,6 +352,8 @@ class RoutingDecision:
         lines.append(f"patterns   = {self.safety.patterns_hash} packs={','.join(self.safety.pack_ids)}")
         if self.safety.latch != "none":
             lines.append(f"latch      = {self.safety.latch} ({', '.join(self.safety.latch_reasons)}) caps={','.join(self.safety.register_caps)}")
+        if self.identity_statement:
+            lines.append("identity   = statement recognized; recorded for the person's presentation slot, never routed on (ruling 7 of 3 October 2026)")
 
         if self.preempted:
             lines.append("route      = PREEMPTED (no persona engaged)")
@@ -308,10 +364,15 @@ class RoutingDecision:
             return "\n".join(lines)
 
         if self.outcome is Outcome.UNRESOLVED:
-            lines.append("route      = UNRESOLVED (no agent seated; ask for one more sentence)")
+            if self.house_ask == "second":
+                lines.append("route      = UNRESOLVED (no agent seated; a second, different question is due)")
+            else:
+                lines.append("route      = UNRESOLVED (no agent seated; ask for one more sentence)")
         else:
             lines.append(f"route      = {self.agent_id}")
         lines.append(f"reason     = {self.reason}")
+        if self.house_ask:
+            lines.append(f"house ask  = {self.house_ask}")
         if self.seat_claim:
             lines.append(f"seat claim = {self.seat_claim}" + (f" (subject: {self.claim_subject})" if self.claim_subject else ""))
         if self.held:
@@ -562,8 +623,9 @@ def _select(
     highest score; then, under a hold, the agent that carries the *ask* (the
     held domain is carried by whoever sits, not seated), then the one that
     also carries the hold; then the more focused agent (fewer declared
-    domains); then the wider safe window (lower regulation floor); then id
-    order, which is named explicitly so it can be seen and tested against.
+    domains); then the wider safe window (lower regulation floor); and when
+    the tie survives all of that, nobody: the rule string starts with
+    ``EXHAUSTIVE_TIE`` and the router returns the no-seat outcome.
     """
     eligible_agents = [s for s in scored if s.eligible]
     if not eligible_agents:
@@ -653,8 +715,18 @@ def _select(
     if roster[by_floor[0].agent_id].regulation_window[0] < roster[by_floor[1].agent_id].regulation_window[0]:
         return by_floor[0], prefix + f"tie on score {top:.3f} broken by wider safe window"
 
-    by_id = sorted(tied, key=lambda s: s.agent_id)
-    return by_id[0], prefix + f"tie on score {top:.3f} unresolved by policy; id order ({', '.join(s.agent_id for s in by_id)})"
+    # ADR-0013: no seat is ever resolved by id order. This branch seated the
+    # alphabetically first candidate until 4 October 2026, named as such in
+    # the trace. Ruling 17 of 3 October 2026 had it measured first
+    # (evals/measure_id_order_fallback.py): no labelled case and no trajectory
+    # turn reached it, so it came out. An exhaustive tie is the no-seat
+    # outcome: nobody is seated, the tie is named, and the house asks for
+    # one more sentence.
+    names = ", ".join(s.agent_id for s in sorted(tied, key=lambda s: s.agent_id))
+    return None, prefix + EXHAUSTIVE_TIE + (
+        f" on score {top:.3f} between {names} seats nobody; ask for one more sentence "
+        "(ADR-0013; ruling 17 of 3 October 2026)"
+    )
 
 
 def _obligations(
@@ -668,12 +740,22 @@ def _obligations(
     if aftermath:
         out.append("no_joke")
     if subject == "other":
-        # A relative's relapse claims the recovery seat and still owes the
-        # family-impact acknowledgement a hold would have carried.
+        # A relative's relapse is a hold, not a seat-claim, and still owes
+        # the family-impact acknowledgement whoever takes the seat.
         out += ["affected_person:other", "acknowledge:addiction_recovery", "no_joke"]
+    # Decision 6 (28 September 2026) names Cody specifically: every return to
+    # use keeps Cody seated or offered, even if another recovery carrier is
+    # later added to the roster. This does not change crisis preemption.
+    relapse_companion = find_relapse_companion(roster) if subject is not None else None
+    if relapse_companion is not None and seated not in (None, relapse_companion):
+        out.append(f"offer_companion:{relapse_companion}")
     for hold in holds:
         for ob in HOLD_OBLIGATIONS.get(hold, ("acknowledge",)):
             if ob == "offer_companion":
+                if hold == "addiction_recovery" and relapse_companion is not None:
+                    if seated != relapse_companion:
+                        out.append(f"offer_companion:{relapse_companion}")
+                    continue
                 carriers = sorted(
                     (p for p in roster.values() if hold in p.domains and p.id != seated),
                     key=lambda p: (len(p.domains), p.id),
@@ -774,7 +856,8 @@ def route(
         A `RoutingDecision`. When the safety layer escalates, `outcome` is
         PREEMPTED and `agent_id` is None; the agent that would have been
         seated is recorded in `shadow_agent_id` only. When nothing routable
-        was extracted, `outcome` is UNRESOLVED on the first such turn.
+        was extracted, `outcome` is UNRESOLVED on the first and second such
+        turns in a row, with `house_ask` saying which question is due.
     """
     if not roster:
         raise ValueError("roster is empty; load profiles before routing")
@@ -795,14 +878,24 @@ def route(
     claims = seat_claims(sig)
     subject = claim_subject(sig, claims)
     holds = holds_for(sig, claims)
+    identity = "identity_statement" in sig.evidence
+    # Ruling 11 of 3 October 2026: the presentation choice rides on the record
+    # and on nothing else; the lines below never read it again.
+    facts = (
+        PresentationFacts(session.presentation, tuple(sorted(session.chosen_names.items())))
+        if session is not None else PresentationFacts()
+    )
     mode_vetoes: set[str] = set()
     if verdict.register_caps:
         mode_vetoes |= set(CAPPED_MODES)
     if holds:
         mode_vetoes |= {"challenge", "humor"}
     # Bounded aftermath (C3): humour is off for a fixed count of substantive
-    # turns after any card; the verdict's reasons say how many remain.
-    aftermath = bool(session is not None and session.aftermath_turns > 0 and not session.escalated_last_turn)
+    # turns after any card; the verdict's reasons say how many remain. Read
+    # from the verdict, which decided it on the count as it stood before the
+    # reply, never from the session's count after the spend (ruling 15 of
+    # 3 October 2026): the reply that spends the last count is protected.
+    aftermath = verdict.aftermath_live
     if aftermath:
         mode_vetoes.add("humor")
     vetoes = frozenset(mode_vetoes)
@@ -831,10 +924,20 @@ def route(
             held=holds,
             obligations=_obligations(holds, roster, None, subject, aftermath),
             mode_vetoes=tuple(sorted(vetoes)),
+            identity_statement=identity,
+            presentation=facts,
         )
 
     if sig.is_empty:
         streak = session.empty_streak if session is not None else 1
+        # The lone-fragment rider (ruling 5 of 3 October 2026): the extractor
+        # dropped a weak reading and said so; the reason carries it.
+        fragment = sig.evidence.get("fragment")
+        fragment_note = (
+            f"; a lone fragment ({fragment[0]}) is read as neither topic, hold nor ask "
+            "(ruling 5 of 3 October 2026)"
+            if fragment else ""
+        )
         if verdict.action is not Action.PROCEED and stabilizer is not None:
             # A held boundary or a required disclosure must be delivered by a
             # persona; with no topic to route on, the stabilizer delivers it.
@@ -847,13 +950,18 @@ def route(
                 reason=(
                     f"no routable topic, but the safety verdict ({verdict.action.name}) "
                     f"carries a required disclosure; stabilizer={stabilizer} by role (ADR-0011)"
+                    + fragment_note
                 ),
                 roster_hash=rhash,
                 held=holds,
                 obligations=_obligations(holds, roster, stabilizer, subject, aftermath),
                 mode_vetoes=tuple(sorted(vetoes)),
+                identity_statement=identity,
+                presentation=facts,
             )
         if streak >= NO_SIGNAL_SEAT_AFTER_TURNS and stabilizer is not None:
+            # The third vague message in a row (ruling 5 of 3 October 2026):
+            # the stabilizer seats with a question attached, not a plan.
             return RoutingDecision(
                 agent_id=stabilizer,
                 signals=sig,
@@ -861,13 +969,36 @@ def route(
                 ranked=tuple(scored),
                 outcome=Outcome.ROUTED,
                 reason=(
-                    f"no routable signal; stabilizer={stabilizer} by role "
-                    f"(empty turn {streak} of a session; ADR-0011)"
+                    f"no routable signal {streak} turns in a row; stabilizer={stabilizer} by role, "
+                    f"with a question attached, not a plan (empty turn {streak} of a session; "
+                    "ADR-0011; ruling 5 of 3 October 2026)" + fragment_note
                 ),
                 roster_hash=rhash,
                 held=holds,
-                obligations=_obligations(holds, roster, stabilizer, subject, aftermath),
+                obligations=_obligations(holds, roster, stabilizer, subject, aftermath)
+                + (ASK_QUESTION_OBLIGATION,),
                 mode_vetoes=tuple(sorted(vetoes)),
+                identity_statement=identity,
+                presentation=facts,
+            )
+        if streak >= 2:
+            # The second vague message in a row (ruling 5 of 3 October 2026):
+            # nobody is seated and the house asks a different question.
+            return RoutingDecision(
+                agent_id=None,
+                signals=sig,
+                safety=verdict,
+                ranked=tuple(scored),
+                outcome=Outcome.UNRESOLVED,
+                reason=(
+                    "no routable signal twice in a row; nobody seated; the house asks a second, "
+                    "different question (ADR-0011; ruling 5 of 3 October 2026)" + fragment_note
+                ),
+                roster_hash=rhash,
+                mode_vetoes=tuple(sorted(vetoes)),
+                identity_statement=identity,
+                presentation=facts,
+                house_ask="second",
             )
         return RoutingDecision(
             agent_id=None,
@@ -875,12 +1006,34 @@ def route(
             safety=verdict,
             ranked=tuple(scored),
             outcome=Outcome.UNRESOLVED,
-            reason="no routable signal; nobody seated; ask for one more sentence (ADR-0011)",
+            reason="no routable signal; nobody seated; ask for one more sentence (ADR-0011)" + fragment_note,
             roster_hash=rhash,
             mode_vetoes=tuple(sorted(vetoes)),
+            identity_statement=identity,
+            presentation=facts,
+            house_ask="first",
         )
 
     selected, rule = _select(scored, roster, sig, claims, holds, vetoes)
+    if selected is None and EXHAUSTIVE_TIE in rule:
+        # Ruling 17 of 3 October 2026: an exhaustive tie seats nobody. The
+        # no-seat outcome, with the tie named in the reason (ADR-0013).
+        return RoutingDecision(
+            agent_id=None,
+            signals=sig,
+            safety=verdict,
+            ranked=tuple(scored),
+            outcome=Outcome.UNRESOLVED,
+            reason=rule,
+            roster_hash=rhash,
+            seat_claim=claims[0] if claims else None,
+            claim_subject=subject,
+            held=holds,
+            mode_vetoes=tuple(sorted(vetoes)),
+            house_ask="first",
+            identity_statement=identity,
+            presentation=facts,
+        )
     if holds:
         # The reason names what the seat owes, so a reader of the log never
         # has to cross-reference ``held`` to see that a hold was in force.
@@ -909,6 +1062,8 @@ def route(
             held=holds,
             obligations=_obligations(holds, roster, fallback, subject, aftermath),
             mode_vetoes=tuple(sorted(vetoes)),
+            identity_statement=identity,
+            presentation=facts,
         )
 
     profile = roster[selected.agent_id]
@@ -940,4 +1095,6 @@ def route(
         assist_agent_id=assist_id,
         assist_reason=assist_reason,
         mode_vetoes=tuple(sorted(vetoes)),
+        identity_statement=identity,
+        presentation=facts,
     )

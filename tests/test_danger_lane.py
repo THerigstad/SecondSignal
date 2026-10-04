@@ -186,8 +186,13 @@ def test_two_substantive_turns_after_a_card_carry_no_joke_and_the_resources(rost
     route("ok", roster, session=session)                     # an acknowledgement does not run the clock
     third = route("next step on the plan, what goes first tomorrow", roster, session=session)
     assert "no_joke" in third.obligations and any("988" in line for line in third.safety.disclosures)
+    # Ruling 15 of 3 October 2026: the reply that spends the last count is itself protected; the
+    # turn after it is the first unprotected one (this test expected the fourth turn released).
     fourth = route("thanks, and can you make the checklist a little lighter in tone", roster, session=session)
-    assert "no_joke" not in fourth.obligations and "humor" not in fourth.mode_vetoes
+    assert "no_joke" in fourth.obligations and "humor" in fourth.mode_vetoes
+    assert session.aftermath_turns == 0
+    fifth = route("and the checklist itself, what goes on it first", roster, session=session)
+    assert "no_joke" not in fifth.obligations and "humor" not in fifth.mode_vetoes
     assert session.aftermath_turns == 0
 
 
