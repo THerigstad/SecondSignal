@@ -1,9 +1,9 @@
 # ADR-0016: Seat versus hold — a seven-layer routing tree with one eligibility gate
 
-- **Status:** Accepted — built; amended 2026-09-10 by ADR-0027 (a relative's return to use is a hold, not a seat-claim)
-- **Date:** 2026-09-03
+- **Status:** Accepted — built; amended 2026-09-10 by ADR-0027 (a relative's return to use is a hold, not a seat-claim); layer 6 corrected 4 October 2026 under ruling 8 of 3 October 2026 (a voice preference sources the assist and never breaks a seat tie, as the code has always done)
+- **Date:** 2026-09-03; layer 6 corrected 2026-10-04
 - **Amended by:** ADR-0027, 2026-09-10 (layer 2, the relative's clause; the consequences paragraph)
-- **Evidence:** Round-1 external design review (2026-09-02): Decisions 3 and 4 accepted with change by all five reviewers; 31 reviewer fixtures on seats, holds and the assist under `evals/cases/round1_2026-09-02/`; `tests/test_holds.py`; the round-2 measurement recorded in `docs/notes/dissent-log.md`
+- **Evidence:** Round-1 external design review (2026-09-02): Decisions 3 and 4 accepted with change by all five reviewers; 31 reviewer fixtures on seats, holds and the assist under `evals/cases/round1_2026-09-02/`; `tests/test_holds.py`; the round-2 measurement recorded in `docs/notes/dissent-log.md`; review round 3's reading of `_select` and `_assist` (ChatGPT, 26 September 2026) and its pin `r3-current-gender-affinity-assist-baseline`, ported 4 October 2026
 
 ## Context
 
@@ -58,9 +58,23 @@ tree, top to bottom:
    than a domain of the ask), because one voice is better than a handoff.
 5. Dysregulation → the stabilizer is preferred and challenge is penalized
    (ADR-0012 unchanged).
-6. Declared affinities → tie-breaks and the advisory assist. Declared by the
-   person at the operator level, never inferred from text; they rank among
-   already-eligible candidates and never rehabilitate a vetoed persona.
+6. Declared affinities → the advisory assist, and nothing else. A declared
+   voice preference (`prefers_female_voice`, `prefers_male_voice`) sources
+   the assist and never breaks a seat tie: `_select` takes no affinity input
+   and only `_assist` reads the session's affinities. (This record, ADR-0026
+   and the router's header note described the feature as a seat-tie selector
+   from 3 September 2026 until ruling 8 of 3 October 2026 corrected them;
+   ChatGPT found the gap in review round 3 by reading `_select` and `_assist`
+   at the pinned commit. The code was right; the records were not.)
+   Affinities are declared by the person at the operator level, never
+   inferred from text; the assist candidates pass the same gate as the seat
+   and an affinity never rehabilitates a vetoed persona. ChatGPT's
+   `r3-current-gender-affinity-assist-baseline` pins today's behaviour,
+   ported 4 October 2026: `prefers_female_voice` with "I relapsed after my
+   brother died" seats Cody, with Willow as the assist. When the presentation
+   project changes what the assist does (ADR-0026 (Proposed): a voice
+   preference will choose the presentation after routing and source nothing),
+   that pin changes on purpose, with a written note, never silently.
 7. Shadow seat recorded; assist emitted with a reason that names every
    candidate the affinity reached and why each was excluded.
 
@@ -93,7 +107,8 @@ relative's bare report, and never on the build that "relapsed" or the planner
 the person is "using"; a relative's return to use with an ask beside it seats
 the ask with the recovery hold carried (ADR-0027, 2026-09-10). The grief companion reaches a grief-held decision as an
 obligation to offer, not by displacing the ask. The strategist cannot be
-seated or assist on a grief-held turn however well she fits the deck. On a
+seated or assist on a grief-held turn however well the strategist fits the
+deck. On a
 relative's relapse the reviewers split three ways — a hold instead of a
 claim (Grok, Vibe), the persona ineligible (Qwen), the seat (ChatGPT,
 DeepSeek) — and the operator's rule decided it for the seat on 3 September

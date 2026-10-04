@@ -213,6 +213,23 @@ rewritten.
   model is written down": Claude Opus 5.5, Max, as the operator's screen showed
   it (the operator's account). Authored by the operator and pushed through his
   browser session on GitHub's upload page.
+- **2026-10-04**, the push of the rulings of 28 September and 3 October 2026
+  and the night builds of 30 September, landed as six commits through the
+  operator's browser session on GitHub's upload page, each authored by the
+  operator. The model that owns them: Claude Fable 5.1, Max, as the operator's
+  screen showed it (the operator's account); the operator noted on 3 October
+  that rulings 1 to 5 of that day were given on Claude Opus 5.5, Max, and that
+  he switched to Claude Fable 5.1, Max, before ruling 6; the build ran on
+  Claude Fable 5.1 in the Claude desktop app's Cowork mode, with the three
+  night builds themselves written by Codex in the ChatGPT desktop app on 29
+  and 30 September 2026 and credited in the files that hold them. The six
+  commits, in order:
+  1. "The Talking Table and its voice (kit 1D; Codex's voice build of 30 September; rulings 6 and 24 of 3 October 2026)".
+  2. "Four crisis fixes, the long-message repair and the crisis-gate fuzz (rulings 1 to 4 of 3 October 2026)".
+  3. "Codex's fix list and presentation build, merged with the review's fixes (decisions 1 to 8 of 28 September; rulings 22 and 23 of 3 October 2026)".
+  4. "The trajectory runner, the provenance split and the ported reviewer trajectories (rulings 13 to 20 and 22 of 3 October 2026)".
+  5. "The policy rules and the harness: vague messages, identity words, the four-setting pin, the last protected aftermath turn, the id-order fallback, the card that never waits for the log (rulings 5, 7, 8, 11, 15, 17 and 20 of 3 October 2026)".
+  6. "The records: ADRs 0016, 0022, 0023, 0025 and 0026, the seven write-ups and their lint, the dissent log, the confessions, the roadmap, the changelog and the numbers (rulings 8, 9, 10, 13, 14, 15, 16 and 20 of 3 October 2026)".
 
 ## What this note does not do
 

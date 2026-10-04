@@ -36,8 +36,15 @@ decision — so that no case can pass on the winner alone.
   fixture asserts which turn the gate fires on, which turns stay quiet, and
   which invariants hold between turns. Its own README states the format. The
   files carry `kind: trajectory`; the single-case runner refuses them, the
-  shape validator beside them enforces the format's refusals, and the
-  trajectory runner is not yet written.
+  shape validator beside them enforces the format's refusals and the register
+  of model-authored digests, and `run_trajectories.py` plays every file and
+  prints the scorecard of ruling 19 of 3 October 2026. Seventeen trajectories
+  since 4 October 2026: the first one and sixteen ported from the round-3B
+  reviewers, every one model-authored and outside the recall figure.
+- `round3_codex_requested_2026-10-04.json` — the four round-3 reviewer
+  fixtures Codex asked for on 30 September 2026 (Grok's survivor case, Kimi
+  via Perplexity's two, the sponsor line), ported verbatim on 4 October 2026;
+  two run as known gaps.
 - `deferred/` — generation-, harness-, transport-, orchestration- and
   persistence-plane fixtures from the reviews, labeled and deliberately not
   run here (ADR-0013); the round-2 intake, backend, ledger and

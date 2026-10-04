@@ -12,16 +12,16 @@ he asked for each of them. The page exists because "I audit everything" is a
 claim, and a claim without receipts is the thing this project is arguing
 against.
 
-**Status: version 6, 28 September 2026. Entries C-01 to C-19 were approved
+**Status: version 7, 4 October 2026. Entries C-01 to C-19 were approved
 by the operator on 9 and 10 September 2026; C-20 was added at his instruction
 on 10 September, and its wording stays his to edit; C-21 was added at his
 instruction the same day, after the pre-push check that produced it, and its
 wording was read by him before the push; C-22 was added at his instruction
 the same night, after the sweep that ran when the push had landed; C-23 to
-C-25 were approved by him on 11 September 2026, from the demonstration page's build rounds; C-26 to C-30 were approved by him on 28 September 2026, one at a time, from review rounds 3 and 3B.** The
+C-25 were approved by him on 11 September 2026, from the demonstration page's build rounds; C-26 to C-30 were approved by him on 28 September 2026, one at a time, from review rounds 3 and 3B; C-31 was ruled by him on 26 September 2026, closing line included, for the next push; C-32 was entered on 4 October 2026 from the triage of 28 September, where he read the packet faults as the Primary Design Agent's own, and its wording, its closing line first, stays his to edit.** The
 operator approves each entry individually before it is published or linked
 from the README. Entries are written by the project's Primary Design Agent
-(Claude), which is also the subject of four of the first twelve, eleven of the thirteen after them (the other two are the operator's), and one of the five from review rounds 3 and 3B (the other four are about models and a door).
+(Claude), which is also the subject of four of the first twelve, eleven of the thirteen after them (the other two are the operator's), one of the five from review rounds 3 and 3B (the other four are about models and a door), and both of the two added on 4 October 2026.
 
 ## Read this before the entries
 
@@ -1104,6 +1104,89 @@ Qwen.
 
 *A coder would never file a bug with a failing test that passes.*
 
+### C-31. The whole commit message, in the title box, every time
+
+**The ask.** The operator's standing instruction: no engineering is asked of
+him, and the Primary Design Agent writes the commits. He approves a plan in
+plain English and reviews the result on GitHub; he never opens an editor.
+
+**What happened.** Every commit message in the repository's history up to
+25 September 2026 was written as one long line in GitHub's title box, up to
+598 characters, with no body, push after push. The agent wrote them that way
+from the first commit and never once said that a commit message has a
+standard shape (a short title line, a blank line, a body), or that these did
+not have it.
+
+**How it was caught.** By the operator, on 26 September 2026, reading his own
+history on GitHub and asking how commits are normally written.
+
+**What it cost.** A public history that does not read like a professional
+team built it, on the one page a stranger reads first. Nothing in the tree.
+Nothing is rewritten: every hash is cited by records, releases and review
+packets in the field, and this repository never force-pushes, so the long
+titles stay exactly as they are, this entry beside them.
+
+**What changed.** From the push of 4 October 2026 every commit has a short
+title line, a blank line and a body in plain sentences. And a rule the
+operator wrote on the spot, which now covers every choice the agent makes:
+any deviation from a common convention (git and GitHub norms, platform
+terms, what a professional team would do) is named at the time, with its
+trade-off, before he rules. His words: "Deviation, itself, is not bad, but
+deviation without understanding or a good reason is an avoidable error."
+
+**Grade of the ask: absent.** No written convention existed. The standard
+lived in every coder's head and in none of the agent's messages, and the one
+person who could not be expected to know it was the one left to notice.
+
+*A coder would never put the whole message in the title box.*
+
+### C-32. Five packet faults, each once
+
+**The ask.** The operator's standing order for review rounds 3 and 3B: one
+packet per model, each telling its reviewer what to read, in what order, and
+what the packet does and does not carry; for the doors that refuse a zip, a
+paste-parts edition and a single-file edition of the same packet. The review
+prompts were first written on 19 September 2026.
+
+**What happened.** Five faults in the packets, all the Primary Design
+Agent's, found between 26 and 28 September 2026. The round-3B instruction
+sheet said "five paste parts" when round 3B had six, so GLM was handed the
+round-3 files and answered the wrong round. The round-3 start file's "last
+test" pointer, meant to send the reviewer to the static presentation test,
+pointed at the profile-hash semantics test. Both packets claimed to carry no
+upstream position, while the D3 fixture file embedded the dispute notes and
+the ruling, and the round-3B test's docstring named earlier positions by
+reviewer; ChatGPT, asked to work blind, read the file and said the claim "is
+not accurate". The round-3B paste parts placed the trajectory fixture, with
+its `adjust_note`, before the run file, so a reviewer reading in order met
+the classification before the run it classified; Qwen's rerun read it in that
+order and said so. And the paste-parts edition carried a reviewer paragraph
+written for Gemini into every door that refused a zip, which is C-26's fault
+and is counted here only as the fifth of the five.
+
+**How it was caught.** By the operator (the wrong-round answer and the "five
+parts"), by the reviewers (ChatGPT on the upstream claim, Qwen on the read
+order), and by the triage of 28 September, which read every return against
+the files that were actually sent.
+
+**What it cost.** A wrong-round return and a rerun for GLM; reviewers' time
+on a pointer to the wrong test; a blind first step that was never blind on
+the one fixture the packet said was clean; and a classification read before
+its evidence. Nothing in the tree.
+
+**What changed.** A ship check runs on every edition before it enters the
+operator's folder: part counts against the files, every pointer against its
+target, the read order against the instruction, one reviewer paragraph per
+model. A landing check reads every return the minute it is saved (C-26,
+C-27). And "this packet carries no upstream position" is never written again
+without a search of the packet for dispute notes and rulings first.
+
+**Grade of the ask: clear.** The order said one packet per model, read in
+order, saying what it carries. The packets did not match the order, and the
+agent that built them had the files in front of it the whole time.
+
+*A coder would never ship a README that points at the wrong test, says the box is empty, and then asks why nobody read it blind.*
+
 ## The refusals that were right
 
 A page that records only failures teaches the wrong lesson, so the same
@@ -1167,6 +1250,11 @@ only of the files pushed.
 Every model gets its own packet, made just for it. We never ask a model who it is.
 From the next review round, the prompt is rewritten so nothing can be skipped. Every list is spelled out, every question gets its own answer space so a skipped one shows up blank, and each website's limits are built into the packet.
 When a reviewer says our code has a bug, we believe its test, not its words.
+A commit message is a title line, a blank line and a body; any choice that
+deviates from a common convention is named at the time, with its trade-off,
+before the operator rules.
+A packet's part count, its pointers, its read order and its claim about what
+it carries are checked against the files before it ships, one packet per model.
 
 ## What is not on this page yet
 

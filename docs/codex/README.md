@@ -65,22 +65,36 @@ names as they were written.
 6. The edition number in a codex's title is the number on its version
    line (added at the push-3 pre-push check, which found two titles a
    version behind and one codex numbered with a sibling's edition).
+7. Part B of a family codex never calls the character she or he
+   (`tests/test_codex_prose.py`, ruling 9 of 3 October 2026): the pronouns
+   and a deny-list of gendered words are refused in the text the voice is
+   given, except inside phrases named one by one in the test, which are the
+   audience lines (whom a character was built for), the founding-user lines
+   and the caller's person. Every character comes as a woman, a man or
+   neither at the door, so the write-up may not decide it in the character's
+   own mouth. The same test refuses an acronym expansion in any family
+   header.
 
 Review round 2 (ChatGPT, mutations H01 to H06; Kimi's title check) found
 the gaps that items 1, 2, 4 and 5 close; each mutation is a red regression
-in `tests/test_register_mutations.py`.
+in `tests/test_register_mutations.py`. Review round 3 (every family that read
+the write-ups) found the gendered self-description that item 7 closes.
 
 ## Status
 
 Every codex here is Proposed. The three security editions are the ones of
 10 September 2026 (Orrin v1.2, Aya v1.2, J.R. v3.2; the numbering is each
-codex's own), the seven family editions are v1.1 of the two-part shape
+codex's own), the seven family editions are v1.2 of the two-part shape
 (10 September 2026; v1.1 on 11 September added one generated line to each
 machine-readable block, the presentation's name forms under ADR-0026 as
-amended, and nothing in any voice), and the house block is v1.2. Under the project's
-standing rule, a record prepared by the project's own assistant becomes canon
-only after a second model family has read the current version; review round 3
-reads all ten together.
+amended, and nothing in any voice; v1.2 on 4 October 2026 applied the sixteen
+sentence rewrites the operator approved under ruling 9 of 3 October 2026, so no
+write-up calls its character she or he in its own voice, and removed the
+acronym expansion from every family header), and the house block is v1.2.
+Under the project's standing rule, a record prepared by the project's own
+assistant becomes canon only after a second model family has read the current
+version; review round 3 read all ten together, and its findings on the family
+write-ups are what v1.2 answers.
 
 ## License
 

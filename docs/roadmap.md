@@ -137,3 +137,99 @@ criterion before the next begins.
   itself does.
 - Nothing enters the repository claiming to be built when it is planned; every
   forward-looking document carries a scope note.
+
+## The gap-closure push (next), committed 3 October 2026
+
+The push after the one of 4 October 2026 is the gap-closure push, committed
+by the operator at ruling 4 of 3 October 2026 and filled by the rulings that
+followed it. Each item lands with its fixtures or not at all, and each one
+that needs a ruling gets its own, after measurement, never before.
+
+1. **The four fuzz causes and the full Unicode confusables list.** Grok's
+   fuzz of 30 September left 65 known-gap variants from four causes
+   (`evals/fuzz/`, reported as one line on every test run). Each cause is
+   measured against the Block 3 innocent-word controls before anything moves,
+   then ruled, one ruling per cause. The full Unicode confusables list is not
+   forgotten: it is measured first, against the same controls, then ruled
+   (ruling 3). The Cyrillic set is re-checked when the conversion table is
+   rebuilt from that list.
+2. **Folding spacing before routing.** Ruling 1 folded any run of spaces,
+   tabs or line breaks to one space before the crisis check only; the
+   operator's instinct was to normalize before routing too (option B) and he
+   chose A because nobody had measured what B changes to seating. The
+   measurement is this item; "k i l l" with letters spaced stays an open gap
+   until it is done.
+3. **Holds as session state.** The build of ruling 13: a grief, abuse,
+   eating-distress or recovery hold lasts the session, is renewed by mention,
+   and ends only at the session's end, after a silence longer than the
+   published threshold (eight hours, provisional and earmarked for its own
+   measurement; ADR-0022), or by an operator clearance; the card's two-turn
+   tail is unchanged. The largest change the review rounds produced (the
+   router and the gate); Grok's, Vibe's and DeepSeek's trajectories run as
+   known gaps until it lands, and the runner's attribution of a vanishing hold
+   to the documented limitation comes out with it
+   (`docs/known-limitations.md`).
+4. **The grown invariants.** Ruling 17 renamed the five trajectory invariants
+   for what they measure and said "let's not forget to grow them": the
+   per-occurrence restriction check over latches, caps, holds and scopes; the
+   card-kind assertion per turn (standard against compound); the measurement
+   of how many cases ever reach the router's id-order fallback (none, and it
+   comes out; any, and the number goes to the operator first); and the
+   stabilizer role's resolution order pinned. The independent oracle for when
+   a card was due is built (4 October 2026); the rest is owed here.
+5. **The "targets the crisis" detector, measured first.** Ruling 15: after
+   the aftermath window closes ordinary humour returns, but a joke that targets
+   the crisis itself is refused for the rest of the conversation (ADR-0023).
+   What counts as targeting is measured against controls for ordinary humour
+   after the window before any rule is written; Vibe's and Qwen's trajectories
+   are its known gaps until then.
+6. **Grok's job-10 identity pairs.** Ruling 7 took identity words out of
+   seating; the fifteen pairs plus "I am transferring" are rebuilt to the rule
+   and ported when the set-2 folder that holds Grok's return is reachable, with
+   the expected answers written from the rule and never from today's
+   behaviour.
+7. **Talking Table work queued by the rulings.** The one-tap "this was read
+   wrong" control on the crisis card, with the open field optional behind it
+   (ruling 12); the quiet on-screen resource reminder for the rest of the
+   aftermath window, closable, its closing an evidence row, never read aloud
+   (ruling 16), with the audit's attached-line check taught to accept "shown
+   on screen". (The substantive floor's reason code of ruling 20 landed in the
+   push of 4 October, written by the gate on every turn the clock looks at.)
+
+## Decisions 1–8 follow-up, ruled 28 September 2026
+
+Order 1 implements the current plate and door corrections and the approved
+relapse-subject repairs. The separate presentation project owns the rest of
+ADR-0026: a saved, disclosed four-she/three-he shuffle on skip and either;
+real non-binary characters and a reviewed drop-down list; names with two forms,
+permission for use on paid tiers and contributor credit; a finished version
+for the operator's crew to critique without forms or homework; Western and
+non-Western research using the same questions and prewritten scoring rules,
+with the operator and Claude grading and Claude not competing; per-character steering,
+named saved teams and safety free on all tiers; fixed identity answers for each
+door choice; gender-free character phrasing; and the future voices. The door
+changes to woman, man, non-binary, either only when those characters are real,
+with both under non-binary and as written retained in settings.
+
+The same project must enforce a per-person women choice on every seat,
+shadow, assist, companion offer, name card, voice and future roster member,
+without a neutral fallback. It owns the house re-offers for an explicit need,
+calm skippers and the next calm abuse turn with a man-presenting character,
+never ahead of a crisis card. The survivor case remains open until decision
+10's character write-ups and durable personal settings exist; the write-ups
+were fixed on 4 October 2026 (ruling 9 of 3 October 2026), the settings are
+not built. Named source reviewer fixtures missing from the packet were
+obtained, not reconstructed: the four Codex asked for were ported unchanged
+from the reviewers' return files on 4 October 2026
+(`evals/cases/round3_codex_requested_2026-10-04.json`), as known gaps where
+the feature they ask about is not built.
+
+ADR-0027 queues Qwen's independent subject detector and the operator-dictated
+recovery phrasing list, each future repair separately approved and paired with
+innocent-meaning controls. Six supplied decision-7 misses run as supplemental strict expected failures;
+the seventh, the sponsor line (Kimi via Perplexity run 1's
+`twins-sponsor-case-001`), was ported with the four above and runs as a known
+gap. Cody is seated or attached on the policy record on recognized
+non-emergency relapse, but the delivered sidekick behavior is decision 11,
+ruled 3 October 2026 as ADR-0025's gated assist from the hold (ruling 10):
+not built, not before a generation layer exists.

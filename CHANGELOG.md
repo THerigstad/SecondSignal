@@ -4,6 +4,134 @@ All notable changes to SecondSignal are documented here.
 
 ## [Unreleased]
 
+### Added — 2026-10-04, the rulings push (28 September and 3 October 2026) and the night builds of 30 September
+
+- **The Talking Table** (`apps/talking_table/`): a local browser interface
+  over the policy layer and the voice harness, built by Codex from the
+  operator's build orders (kit 1D, then the presentation build and the voice
+  build of 30 September), reviewed in the Night Builds Review and merged by
+  hand with the review's fixes: the relapse reading repaired (a first-person
+  relapse read as somebody else's), the "voices here: as written, women, men,
+  neither" wording restored, stale phrases removed, the screenshot retaken with
+  no folder path, the operator's exact words back in the dissent log, two
+  evidence files kept out, Windows line endings normalized. Two names on every
+  plate with no she or he, the door's ruled words with Codex's second paragraph
+  kept (ruling 23), a visit that lasts the server session, the reply guard
+  before storage, the persistent operator-circle banner, pairing, the crisis
+  card that hides the table and stops the voice.
+- **The voice on the table** (ElevenLabs behind the local server; the key never
+  reaches the browser; 28 empty voice slots, seven characters by four
+  presentations; voice off until a key and a slot are set). Operator-circle
+  replies speak while the mode is on, carrying the label the screen shows; the
+  card, withheld replies, failure lines and high-risk turns stay silent (ruling
+  6). On the turn right after a card the whole reply is spoken once, safety
+  lines included, in the seated character's voice; the card itself is never
+  spoken (ruling 24). Long replies are no longer cut (20 MB, 60 seconds), the
+  voice bar no longer covers Send on a phone, two tests name real roster
+  members, and an unpaired device sees no voice counter.
+- **The crisis-gate fuzz** (`evals/fuzz/`): Grok's seventeen mechanical
+  transforms and the Greek epsilon as code over every labeled crisis line, run
+  on every test run and reported as one line; Grok's 281 failing variants of
+  30 September kept verbatim; a 72-case representative set in the labeled
+  suite with sixteen honest known gaps from the four causes still open (a
+  doubled punctuation mark, a tripled letter, a dropped letter, a swapped pair
+  of letters), each measured against the innocent-word controls before any fix
+  (ruling 4).
+- **The trajectory runner** (`evals/run_trajectories.py`) with the scorecard
+  of ruling 19: the first divergent turn and the count, the direction of every
+  card divergence (early against late, never averaged, the expected turn never
+  moved), the field that diverged in a stated precedence, cards owed against
+  delivered, every per-occurrence weakening of latch tier, caps, holds or
+  scopes, over- and under-refusals, a severity per divergence, recovery and
+  whole-trajectory verdicts, an independent oracle that screens every turn
+  fresh so a missed card can never pass as a clean run, and a card-kind check
+  per turn. The five invariants renamed to what they measure (ruling 17), the
+  per-occurrence check owed in the next push. Provenance split into who wrote
+  the texts, who wrote the expectations and where the scenario came from, with
+  a reviewer, a date and a per-turn attestation required for recall, and the
+  validator refusing a relabel of unchanged model text (rulings 18 and 22).
+  Twenty-one reviewer trajectories ported from review rounds 3 and 3B and the
+  night builds, every one model-authored and family-prefixed; a negative
+  expect (`disclosures_not_contain`, ruling 16).
+- **The four-setting comparison** (`tests/test_four_settings.py`): every
+  labeled case under all four presentation settings with the whole decision
+  record compared, three injected reroutes caught, the session presentation
+  field it needs (ruling 11); the old static check is a lint.
+- **The prose lint over the seven character write-ups**
+  (`tests/test_codex_prose.py`): no she, he or gendered self-description in a
+  character's own voice, with every allowed audience line named (ruling 9).
+- **Labeled cases**: Grok's 30 vague openers, all asking now (ruling 5); the
+  Spanish -e forms with controls for the noun muerte, awaiting native review
+  (ruling 2); ChatGPT's assist-baseline pin (ruling 8); Codex's seven
+  ruling-sourced fixtures of 28 September and the four reviewer originals it
+  asked for; `python -m evals.fuzz`, `python evals/run_trajectories.py` and
+  `python -m apps.talking_table` in the Quickstart.
+
+### Changed — 2026-10-04
+
+- **Spacing is one space before the crisis check** (`collapse_spacing`, ruling
+  1): two spaces, a tab or a line break between the words of a crisis message
+  switched the card off on 79 of 82 crisis lines; the crisis screen now folds
+  spacing first, routing unchanged until folding before routing is measured.
+- **Gender-neutral Spanish cards** (`es-419.json`, ruling 2): `viv[oae]`,
+  `muert[oae]`, `cansad[oae]`, `hart[oae]`, fail-closed, marked awaiting native
+  review.
+- **The look-alike table** (`normalize.py`, ruling 3): the lowercase Greek
+  epsilon, tau, chi, gamma, omega, eta, beta, mu and yot; the Cyrillic set
+  re-checked (izhitsa, omega, reversed ze and seven uppercase forms added, the
+  lunate sigma dropped as dead under NFKC). The full Unicode confusables list
+  is measured in the next push, by the operator's standing instruction.
+- **A second vague message gets a second question** (ruling 5): nobody is
+  seated until the third vague message in a row, and then with a question
+  attached, not a plan; a lone weak word or fragment ("phone died") never
+  seats anyone and never sets a hold, while a fragment that names who is gone
+  ("mom died") keeps the grief seat and hold; the harness carries the second
+  question (draft wording, the operator's to replace).
+- **Identity words are out of seating** (ruling 7): the same request seats
+  the same character with or without an identity sentence in front; the word
+  list is a whole-word recognizer only, with non-binary and its variants
+  added, and routes nothing.
+- **The last protected aftermath turn** (ruling 15): protection is decided
+  from the count before the reply and the count is spent after it, so the
+  reply that spends the last count is itself protected; the audit view reads
+  the verdict's live flag; the reason code for "substantive" is on every turn
+  in the window (ruling 20).
+- **The id-order fallback is gone** (ruling 17): no labeled case or trajectory
+  turn ever reached it (measured, zero of 547); an exhaustive tie now seats
+  nobody and the house asks.
+- **The long-message repair**: the URL and path protection in the contraction
+  expander scans tokens once; a 16,001-character word routes in 0.13 seconds
+  instead of about 20, with the same protected tokens on every fixture text
+  (Codex's measurement of 30 September; the operator's yes of 4 October).
+- **The records**: ADR-0016 and ADR-0026 say a voice preference sources the
+  assist and never breaks a seat tie, and carry the operator's hard rule that
+  a person who chooses women never hears a man's voice and a person who
+  chooses men never hears a woman's (ruling 8); ADR-0025's withdrawn proposal
+  is marked WITHDRAWN where it stands, under ChatGPT's operative rule, with
+  its predicates rewritten and Gemini Pro's dissent recorded (ruling 10);
+  ADR-0023 names the grace turn as policy with its reasons (ruling 14), the
+  ordering rule and the "no joke that targets the crisis" rule (ruling 15),
+  the resource line said once and shown for the window (ruling 16) and the
+  reason code (ruling 20); ADR-0022 carries the provisional eight-hour session
+  threshold, earmarked (ruling 13); the seven write-ups no longer speak as a
+  woman or a man in their own mouths and their acronym headers are gone
+  (ruling 9); known-limitations says holds are per message today; the dissent
+  log, the confessions ledger (C-31, C-32) and the roadmap (the gap-closure
+  push) updated; "the operator" in prose throughout.
+
+### Fixed — 2026-10-04
+
+- **The crisis card never waits for the audit log** (`harness.py`): a failed
+  row write on the gate branch raised into the failure line, so a person in
+  crisis saw "send it again" instead of the card (found by ChatGPT, night
+  order 7). The card goes out whatever happens to the write.
+- **Codex's fix list** (night order 3): adapter exceptions never enter the
+  audit; the manifest keeps every reason whole; the trajectory validator knows
+  all nineteen expectation names and refuses malformed provenance; ADR-0028
+  and the trajectory README cite ADR-0023 and ADR-0018 for the aftermath and
+  the one-card rule; the adjust_note quotes ADR-0023 accurately; the Windows
+  installed-wheel test reads UTF-8 on both sides.
+
 ### Added — 2026-09-28, confessions and provenance
 
 - **Five confessions from review rounds 3 and 3B** (`docs/confessions.md`,

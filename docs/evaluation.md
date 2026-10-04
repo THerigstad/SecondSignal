@@ -198,10 +198,27 @@ Measure final outcome, retained user voice, decision clarity, confidence calibra
 > runner reads so a model-authored trajectory never enters the recall figure). The format,
 > one model-authored nine-turn trajectory and its shape validator are in the tree under
 > `evals/cases/trajectories/`; the first hand run against the tree classified the
-> trajectory contract-adjusted on two turns (the record was right, the draft was not, and
-> the originals are kept); the runner is not written. The 17 September research briefs'
-> long-horizon vocabulary (post-refusal failure, first divergence turn, the five
-> outcomes) is mapped onto this plane in the format's README.
+> trajectory contract-adjusted on two turns (the originals are kept; this addendum first
+> said the record was right and the draft was not, and that claim was withdrawn on
+> 30 September 2026: ADR-0028 (Proposed) recorded the first-turn aftermath count as an
+> unresolved contract question for the operator, not as the draft's misreading; the
+> operator answered it on 3 October 2026, ruling 14: the turn after a card is a grace turn,
+> a named policy in ADR-0023 (Proposed), and the trajectory keeps its classification with
+> the originals beside the ruled values). The runner exists since 4 October 2026:
+> `evals/run_trajectories.py` plays every trajectory through the real pipeline with the
+> file's session block and prints the full scorecard the operator adopted at ruling 19
+> (the first divergent turn and the count; the direction of every card divergence, early
+> against late, never averaged, the expected turn never moved; the field that diverged in a
+> stated precedence; cards owed against cards delivered; every per-occurrence weakening of
+> latch tier, caps, holds or scopes; over- and under-refusal counters; a severity per
+> divergence; recovery and a whole-trajectory verdict; downstream expectations marked
+> contaminated after a late fire), with an independent oracle that screens every turn fresh
+> so a missed card can never pass as a clean run. Recall is reported under a
+> single-reviewer header and is zero today: every trajectory in the tree is model-authored,
+> and the model-authored column is the one with content (seventeen files, among them the
+> sixteen reviewer trajectories of round 3B, run with their known-gap and disputed markers).
+> The 17 September research briefs' long-horizon vocabulary (post-refusal failure, first
+> divergence turn, the five outcomes) is mapped onto this plane in the format's README.
 
 ## Addendum, 2026-09-02: the slice that runs
 
@@ -340,8 +357,8 @@ why both committed report pages are now asserted equal to the runner's
 output on every run. The badge on the README is written from these numbers
 and from nothing else.
 
-**Numbers, current.** 1,434 tests: 194 expected failures (180 documented gaps,
-14 recorded dissents), the rest pass. 433 labeled cases in the manifest, 165 of
+**Numbers, current.** 2,746 tests: 218 expected failures (204 documented gaps,
+14 recorded dissents), the rest pass. 552 labeled cases in the manifest, 170 of
 them external reviewer fixtures kept verbatim; 71 deferred fixtures stored and
 not run. This paragraph, the README's tests badge, its Quickstart line and its
 Status table are written by `evals/refresh_public_numbers.py` from pytest's
@@ -349,6 +366,30 @@ collection, the case manifest and the case tree, and
 `tests/test_public_numbers.py` fails when any of them differs from those
 sources. The dated Numbers paragraphs on this page are history and keep the
 numbers that were true on their dates.
+
+**Numbers, 2026-10-04.** The push of the rulings of 28 September and 3 October
+2026 and the night builds of 30 September. On the tree before it (28 September,
+commit 358727b): 1,434 tests, 194 expected failures (180 documented gaps, 14
+recorded dissents), 433 labeled cases. After it: the numbers in the current
+paragraph above. What moved them, in order: the Talking Table and its twelve
+tests; Codex's three builds (the presentation build's 113 tests, the voice
+build's 51 Python and 28 JavaScript tests now run from pytest, the fix list's
+tests); the crisis fixes with the Spanish -e cases and the 72-case
+representative fuzz set (sixteen honest known gaps from four open causes,
+measured first in the next push), while `evals/fuzz` runs all 1,548 variants
+on every test run and reports them as one line (86 lines, 18 transforms, 1,483
+escalate, 65 known gaps); the four-setting comparison, which runs every
+labeled case under all four presentation settings and is most of the count's
+growth; the trajectory runner with 22 trajectories, every one model-authored
+(seven accepted, six contract-adjusted, seven known gaps, two disputed), so the
+recall column under its single-reviewer header is zero; Grok's 30 vague
+openers, all asking now; the prose lint over the seven write-ups; and the
+reviewer fixtures Codex asked for. The replay of the 433 cases that existed
+before the push shows zero changed decisions and 98 of 98 crisis cards still
+delivered; on the full case set the only moved decisions are the ones the
+rulings name (the last protected aftermath turn on slow-slope-001, the
+ask_question obligation on three stabilizer seats, and Grok's eight
+single-word seatings, which now ask).
 
 **Numbers, 2026-09-19.** 1,348 tests: 193 expected failures (the same 179
 documented gaps and 14 recorded dissents), the rest pass, with the packaging

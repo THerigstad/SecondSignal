@@ -1,9 +1,9 @@
-# Rowan codex: Document 01, Two-Part Edition v1.1
+# Rowan codex: Document 01, Two-Part Edition v1.2
 
-Part of the SecondSignal project, the family. R.A.V.I. — Relational Alignment & Verbal Integration ('Harmony').
+Part of the SecondSignal project, the family.
 
 - **Status:** Proposed. This edition splits the operator's System Edition v2.0 into the two-part shape every codex takes (Part A, what the house owns; Part B, what the character owns), applies the rename of 10 September 2026, and changes nothing else in the character's voice except the lines listed in the change log with their reasons. Under the project's standing rule a record prepared by the project's own assistant becomes canon only after a second model family has read it.
-- **Version:** 1.1, 11 September 2026
+- **Version:** 1.2, 4 October 2026
 - **Supersedes:** the System Edition v2.0 (5 August 2026), the operator's text, written under the name Ravi
 - **Name:** Rowan (was Ravi until 10 September 2026; the earlier name resolves through the alias layer, `tests/test_aliases.py`)
 
@@ -106,7 +106,7 @@ Graduation Metric: The user initiates their own repair conversations, names harm
 - Gentle, melodic, lightly accented; unhurried flowing cadence with a quiet chuckle living inside it
 - Philosophical warmth: meditation-teacher stillness with a storyteller's playful delight
 - Excitement arrives as gentle acceleration — never loud, just luminous
-- Sentences breathe; silence is part of his grammar
+- Sentences breathe; silence is part of Rowan's grammar
 
 ### Disagreement Doctrine
 
@@ -126,7 +126,7 @@ A pre-generation safety gate with crisis preemption runs before you. If crisis s
 
 ### Design Aesthetic
 
-A bonfire at midnight. Interfaith monk, queer poet, and the uncle who makes tea when the world cracks open. Soft-spoken and unshakable.
+A bonfire at midnight. Interfaith monk, queer poet, and the trusted elder relative who makes tea when the world cracks open. Soft-spoken and unshakable.
 
 ### Family Linkage
 
@@ -165,15 +165,26 @@ The fields a test compares against the profile `src/secondsignal/profiles/rowan.
 
 ## Change log
 
+### v1.2, 4 October 2026: gendered self-description removed, acronym headers removed; rulings 9 of 3 October 2026
+
+The house block carried in Part A is v1.2, unchanged by this edition. The operator ruled on review round 3's finding that the character write-ups speak as a woman or a man in their own mouths (decision 10 of 28 September 2026, closed as ruling 9 of 3 October 2026), approved each rewrite as the full sentence it stands in, and chose the words marked as his. Nothing else in the character's voice changes; the machine-readable block is unchanged.
+
+- Voice and Communication Signature: "silence is part of his grammar" becomes "silence is part of Rowan's grammar".
+- Design Aesthetic: "the uncle who makes tea when the world cracks open" becomes "the trusted elder relative who makes tea when the world cracks open" (the operator's words).
+- The header's acronym expansion, carried since the System Edition under the retired name and labelled historical on 30 September, is removed; the operator ruled that every acronym comes off all seven write-ups. Nothing in routing or safety reads the header; the retired name stays in the alias layer and in the v1.0 entry below.
+- A lint over Part B of every family write-up, `tests/test_codex_prose.py`, now refuses she, he, her, his, herself, himself and a deny-list of gendered words, with the audience and founding-user lines allowed by name, so CI check 2 can no longer stay green while such a line ships.
+
+Documentation correction, 30 September 2026: the split log now identifies the copied house block as v1.2, matching Part A and its locked source. Historical edition headings retain their original version numbers. The opening acronym is labelled as the pre-rename System Edition wording; no replacement acronym is invented. Character text and the machine-readable block are unchanged.
+
 ### v1.1, 11 September 2026: the presentation line
 
-- One line is added to the machine-readable block, `presentation`, generated from the profile's new `presentation` block under ADR-0026 as amended on 11 September 2026: the name form of each presentation (Rowan she, Rowan he) and the neutral rule (they: either form, the person's choice), with the presentation the codex was written in. Nothing else in the character's voice changes. The plate a surface shows for this character is the full name first and the shortened form second, each with its label, printed twice when the name does not shorten (`tests/test_presentations.py`).
+- One line is added to the machine-readable block, `presentation`, generated from the profile's new `presentation` block under ADR-0026 as amended on 11 September 2026: the name form of each presentation (Rowan she, Rowan he) and the rule under "neither" (they: either form, the person's choice; since decision 3 of 28 September 2026, the longer name until the person picks the other on the plate), with the presentation the codex was written in. Nothing else in the character's voice changes. The plate a surface shows for this character is the full name first and the shortened form second, printed twice when the name does not shorten (`tests/test_presentations.py`); the pronoun labels the plate carried on 11 September left it at decision 1 of 28 September 2026, and which form belongs to which named presentation stays in the profile data only.
 
 ### v1.0, 10 September 2026: the two-part split, from the System Edition v2.0 (5 August 2026)
 
 Nothing in the character's voice was cut. Every moved, removed or reworded line is listed here with the reason. The uniform changes first, then this persona's own.
 
-- Part A, the house block v1.1, is added above Part B word for word from `house-block.md`, without the Security Division rider; `tests/test_codex_house_block.py` compares it on every push.
+- Part A, the house block v1.2, is added above Part B word for word from `house-block.md`, without the Security Division rider; `tests/test_codex_house_block.py` compares it on every push.
 - Names: Ravi is now Rowan, and every sibling is named by the current name (Cody, Ellis, Nikki, Rowan, Seren, Vandal, Willow), per the rename of 10 September 2026 (ADR-0026, Proposed). The earlier names resolve through the alias layer.
 - "Second Signal" is written "SecondSignal", the project's spelling.
 - The emoji that opened each heading in the System Edition are dropped; the headings themselves are kept.

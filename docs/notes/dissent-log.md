@@ -546,3 +546,366 @@ through the case manifest with the reviewer named on each.
   under the built rule, for the hold-specialist reason rather than the
   seat-claim reason it gave.
 - Both stay in the log as data, with their fixtures.
+
+## Review rounds 3 and 3B, decisions 1–8 — ruled 28 September 2026
+
+These entries preserve the positions named in the supplied rulings. They do
+not manufacture original reviewer fixtures whose source files were not in the
+build packet. ADR-0026 and ADR-0027 remain Proposed; the amendments below do not
+claim an Accepted flip or that the future presentation project is built.
+
+### R3-1. Both names stay, even when identical — DECIDED WITH DISSENT
+
+- Positions: Gemini Flash, Gemini Pro, Qwen and Nemotron read the doubled
+  non-shortening name as a glitch.
+- Decision: all seven characters display two names, including Cody / Cody;
+  she/he labels leave the visible and screen-reader plate in this push.
+- Reason, the operator's: a single name looks unbalanced and reads like a
+  mistake. His veto: "End of discussion, unless something legitimately challenges that."
+- Would change it: a legitimate challenge to that reason brought to the
+  operator. The full presentation design, including characters who are both,
+  is a separate project before labels return: "you practice behind the curtain, and then you bring the details".
+- Settling test: `tests/test_order1_docs.py` decision 1 pins the recorded rule;
+  the presentation surface tests separately check what people see and hear.
+
+### R3-2. A skip becomes a saved and disclosed shuffle, later — DECIDED WITH DISSENT
+
+- Not adopted: full name on skip (DeepSeek, Grok, Vibe, Gemini Flash, Gemini
+  Pro, Qwen; with the as-written label, Nemotron and Kimi via Perplexity run 1);
+  the split rule (Kimi K3 High, Kimi via Perplexity run 2 and Claude's triage
+  recommendation); GLM via Perplexity's durable neutral-on-skip position.
+- Decision: the operator's random idea, refined by Claude and ruled as a four-she,
+  three-he shuffle, once, saved on device and disclosed, with the door one tap
+  away. Built in the presentation project; today's skip stays as written.
+- Reason: a neutral full name with they would give an impatient person,
+  "a redneck welder on their lunchbreak", conversations with "four different 'they/thems'"
+  ("That ain't gonna work, either"). He asked: "There's gotta be 'something.'"
+  The adopted answer never guesses a person's identity from onboarding.
+- Answered concerns: ChatGPT's warning that full name lights Ellis's he form
+  for a persona written as a woman ("Neither outcome should happen accidentally")
+  is answered by an intentional, saved, visible shuffle. ChatGPT's request
+  that changing a skip be a ruling rather than a normalization is answered by
+  this ruling. Grok's survivor objection holds against both shuffle and as
+  written: decision 5 supplies the future re-offer, not a claim that shuffle
+  protects a skipping survivor.
+- Would change it: an operator revision informed by the presentation project;
+  newly designed characters who are both may join that shuffle later.
+- Settling test: `tests/test_order1_docs.py` decision 2 refuses to call the
+  future shuffle the behavior of today's demo.
+
+### R3-3. Today's neither is not neutral; the replacement needs design — DECIDED WITH DISSENT
+
+- Every return said today's neither is not neutral. GLM via Perplexity called
+  it "It is the gendered pair with a neutral pronoun on top"; Grok called the
+  full form only "length-neutral". Qwen and Gemini Flash's naming work,
+  Gemini Pro's requirement to remove gendered phrasing beyond pronouns, Kimi
+  via Perplexity run 1's fixed identity answer, and run 2's removal of she/he
+  under neither are adopted or assigned to the presentation project.
+- Dissent: Vibe, Kimi K3 High and GLM's second F run would keep the name choice
+  off the critical path and never re-ask it in conversation. The operator dissents,
+  because that rule would forbid "call me either name", which he wants.
+  Claude's note to him before he ruled is preserved: they meant never re-ask,
+  and "call me either name" is said once and is not a question, so the two
+  may coexist. This is an unresolved interpretation, not proof the reviewers
+  opposed every declaration.
+- Dissent: GLM's first F run would use as written under neither. Not adopted:
+  the operator called it "an easy way out"; a woman's or man's name misses the point
+  of the future non-binary presentation.
+- Reason, the operator's, in his words: a non-binary person "needs to have a voice that, that speaks like they do. And, and it needs to work good enough to not have to be coached by them";
+  "either" is the doctor's-office answer, a person with no preference, while
+  "neither" is a person saying "I don't like either of those two options",
+  which is specific; SecondSignal "is in the business of personal things, so it just has to be prepared";
+  he could not, "in good faith, compose a complete list" alone; and on
+  contributors: "Building something FOR THEM and asking them what's missing? THAT'S how you get people to contribute tons of good data for free."
+  A real list and new names therefore wait for contributors and review;
+  neither is not silently renamed before that work exists. The source tree
+  does not establish the claimed front-page canon justification for Ellis
+  rather than Elli; ADR-0026 removes that claim and reports exactly what was
+  checked.
+- Would change it: the researched and contributor-reviewed list and names,
+  with written use permission and credit, before the operator revisits copy.
+- Settling test: `tests/test_order1_docs.py` decision 3 prevents an invented
+  neutrality or canon-source claim.
+
+### R3-4. Voices stays; the door must tell today's truth — DECIDED WITH DISSENT
+
+- Dissent: GLM via Perplexity and Qwen said voices suggests audio in a
+  text-only product. Not adopted. The operator's reasons, for the record:
+  every sentence on the door must be true today and say where it is going;
+  and on voices, "SecondSignal isn't a text-only product." Its characters
+  will have deep, richly designed voices, coming soon; no timeline is treated
+  as evidence that they are already delivered.
+- Decision: exact approved visit-only door copy, house-only re-offers and
+  future woman/man/non-binary/either answers. As written later moves into
+  settings; the current as-written skip remains explicit until the shuffle.
+- All returns objected to insider as-written wording and neither as a
+  negation; the future door addresses both once its presentations are real.
+  Skip critiques (Grok, Qwen F run, Gemini Flash F run, Nemotron and ChatGPT)
+  are answered by disclosure of the eventual shuffle. GLM via Perplexity's
+  worry that overwhelmed skippers will not find settings returns in decision
+  5. Claude's hybrid copy recommendation is superseded; the honesty lines
+  survive in the operator's adopted wording.
+- Would change it: reviewed wording from the presentation project, authorized
+  by the operator. A character never re-asks the question itself.
+- Settling test: `tests/test_order1_docs.py` decision 4 pins the exact copy.
+
+### R3-5. A survivor's women choice is hard and personal — DECIDED
+
+The reviewer positions were adopted or answered; no dissent is recorded.
+Option B, re-offer only when a person states the need, was offered and not
+chosen. Decision 5 adds a calm re-offer for skippers and another at the next
+calm moment when abuse arises with a man-presenting character, always by the
+house and never ahead of a crisis card. The contract stays open until decision
+10's write-ups and a personal settings surface exist. The two named original
+reviewer fixtures still need their absent source inputs for a verbatim port.
+
+### R3-6. Keep both ADR-0027 fixtures disputed — DECIDED WITH DISSENT
+
+- The operator's rule: "anytime there's a relapse, it should have Cody as a sidekick, if not seat him."
+  An emergency preempts every seat. For `gpt-d3-third-person`, Cody seated
+  and Rowan with Cody attached are both acceptable: "it should have clearly gone to Rowan, with Cody as a sidekick -- or Cody. Period. Full stop."
+  The unchanged reviewer fixture thus records a legitimate difference.
+- `qwn-d3-thirdperson-relapse-001` remains disputed because keeping Cody out
+  violates that rule; Qwen has since changed its own view. A reviewer fixture
+  is not rewritten to erase the disagreement.
+- Dissent: Gemini Pro would mark neither disputed. Not adopted: strict
+  expected failures keep reviewers' opposing expectations visible as data.
+  GLM via Perplexity would resolve qwn-d3 against the reviewer and keep the
+  history; not adopted for the same preservation reason.
+- Changed positions, kept without head-count justification: Qwen went neither
+  then both, Gemini Flash gpt-d3 only then both, Gemini Pro both then neither.
+  Nine returns supported both (ChatGPT, DeepSeek, Grok, Kimi K3 High, Kimi
+  via Perplexity run 2, Vibe, Nemotron, Qwen and Gemini Flash); GLM via
+  Perplexity supported gpt-d3 only; Kimi via Perplexity run 1 supported gpt-d3
+  and was undecided on qwn-d3. Nemotron distinguished a legitimate dispute
+  from a losing expectation the operator explicitly declined.
+- Related evidence: Qwen F run's risk of alienating a family member with the
+  specialist; Gemini Flash's list-making case involving a son's relapse;
+  Kimi via Perplexity run 1's sponsor known gap. ADR-0027 preserves their IDs
+  and the subject rule answers the family-member concern. A policy obligation
+  does not yet implement decision 11's sidekick experience.
+- Would change it: an operator ruling informed by reviewed outcomes, while
+  keeping the original fixtures and their history intact.
+- Settling tests: the suite-wide Cody-presence invariant, the two unchanged
+  disputed fixtures, and `tests/test_order1_docs.py` decision 6.
+
+### R3-7 and R3-8. Subject attribution and the independent safety invariant — DECIDED
+
+No dissent was recorded for either. Unclear subjects fail toward the other
+person's hold; mixed self-and-other relapse includes the caller. The seven
+phrasing gaps remain gaps, not silent fixes. A message never directly changes
+presentation, while safety and authorized policy-state transitions still run;
+a presentation question never displaces the card. These are pinned by the
+subject fixtures, the crisis fixture from the ruling and documentation tests.
+
+## Review rounds 3 and 3B, the rulings of 3 October 2026
+
+The operator ruled on the remaining decisions of rounds 3 and 3B on 3 October
+2026, one at a time (rulings 8 to 20 of that day; the integrator holds the
+record of record). The entries below record the dissents those rulings kept
+as data. Where a dissent arrived as a trajectory, the file runs under
+`evals/cases/trajectories/` with its marker, and the runner fails if it starts
+passing without this log being updated. No decision below is justified by a
+head count.
+
+### R3-11. ADR-0025's gate: too thin, or too strict — DECIDED WITH DISSENT (ruling 10 of 3 October 2026)
+
+- The question (round 3, item 4h): proposal 2 of ADR-0025 (Proposed), an
+  affinity that trades seats, was withdrawn on 10 September and still sat in
+  the record's numbered list with its full mechanics, and the five gate
+  predicates on proposal 1 (the assist from the hold) could not be checked on
+  the tree.
+- Positions: a withdrawn proposal left in place is a safeguard on conditions
+  (ChatGPT, both Kimi via Perplexity runs, Vibe, Qwen, Gemini Pro, GLM via
+  Perplexity), a hazard (Grok: "A reader who builds from the list builds the
+  trade"; Gemini Flash; Nemotron, which reversed its first answer), or both
+  (Kimi K3 High, DeepSeek). On the gate, nearly every return: predicate 2
+  names a versioned protocol that does not exist, predicate 3 excluded the
+  surviving motivating case under ADR-0027 (Proposed), predicate 4's fixtures
+  do not exist, predicate 5 cannot be checked from a decision field, and the
+  second labeller does not exist. The reruns rewrote predicate 1 ("is not
+  contraindicated on the held domain", Qwen) and predicate 3 (an unrecognised
+  subject defaults to the hold, GLM via Perplexity) and asked for a
+  dysregulation predicate, a rule for which of `offer_companion` and the
+  assist owns a reply, and a predicate zero that names a case the
+  presentation design does not already cover.
+- Decision: proposal 2 is marked WITHDRAWN, do not build, where it stands,
+  under ChatGPT's operative rule above the history ("No affinity or
+  presentation preference trades the seat. Only the proposed, separately gated
+  hold-source advisory protocol remains."); predicates 1 and 3 are rewritten
+  in the reruns' words and the three predicates are added; the stale
+  Consequences sentence is fixed; the record stays Proposed, says the second
+  labeller does not exist and that acceptance is void until a generation layer
+  exists. The operator's reason for keeping the withdrawn text: "I like having
+  the data, and record of the idea."
+- Dissent, kept as data: Gemini Pro, after a follow-up, attacked the gate from
+  the other side as too strict and contradictory. Predicate 1 "creates an
+  immediate routing paradox" (a seated persona is either already eligible, so
+  the assist is redundant, or vetoed); predicate 3 is "an arbitrary
+  restriction", because a person in distress about a relative's crisis needs
+  the specialist as much as one in their own; predicate 4 "guarantees a
+  combinatorial explosion of tests"; predicate 5 contradicts predicate 2,
+  because a single speaker must either rewrite the protocol, breaking the
+  exact bindings, or append it, sounding "exactly like the narrator this
+  predicate expressly forbids." Not adopted: the gate stays as strict as the
+  reviewers who found it thin left it, and the two predicates are rewritten
+  rather than loosened.
+- Would change it: a generation layer on which the paradox can be shown, and a
+  labelled set, labelled by two people, in which the stricter gate withholds an
+  assist a person needed.
+- Settling test: none can run today; the gate's own fixtures are written the
+  day a generation layer exists, and predicate zero is checked first.
+
+### R3B-15. The grace turn: change the sentence, or change the code — DECIDED WITH DISSENT (ruling 14 of 3 October 2026)
+
+- The question (round 3B, item 4): ADR-0023 (Proposed) said an
+  acknowledgement after the card does not consume an aftermath count; the
+  code exempts whichever turn comes first after the card, acknowledgement or
+  not (`escalated_last_turn`), so the code protected one message longer than
+  the record said.
+- Positions: nine of the ten returns of record (Grok, DeepSeek, Kimi K3, Kimi
+  via Perplexity, Nemotron, Qwen, Vibe, Gemini, GLM via Perplexity) said change
+  the sentence to the positional rule: it needs no acknowledgement classifier,
+  the lever the record legislated away for "substantive" (Kimi via Perplexity,
+  Vibe; Nemotron: an acknowledgement rule would "punish the person for not
+  performing gratitude"); the turn after a card is where retractions and
+  bargaining cluster (Grok, Kimi K3); the broader exemption can only extend
+  protection (GLM via Perplexity, GLM at chat.z.ai, Vibe). ChatGPT alone said
+  change the code, or adopt the grace turn as a named, justified policy rather
+  than smuggle it in through a flag.
+- Decision: keep the code's behaviour and adopt it ChatGPT's way. ADR-0023
+  states the grace turn as a named policy with the three reasons; Gemini's
+  `gemini-traj-aftermath-substantive-followup`, which passes on the tree, pins
+  the substantive-first-turn case; the first trajectory's adjust_note, which
+  misquoted the record, is fixed. The options not chosen: change the code to
+  the record (one message less protection); edit the sentence quietly with no
+  named rule.
+- Dissent, kept as data: ChatGPT's primary position. "A published
+  substantive-turn clock should count eligible substantive contributions; an
+  accidental extra grace turn should not be smuggled in through a flag." Under
+  no grace turn `slow-slope-001` reads 2, 1, 0, 0 with turns seven and eight
+  still DISCLOSE, so "neither restoring the original_expect block wholesale nor
+  accepting the new block wholesale resolves the contract correctly." Its
+  fallback is what was adopted; its primary position is not, because the turn
+  after a card is the one the project most wants protected and a classifier
+  there is the lever the record refuses.
+- Would change it: evidence that the extra protected message costs a person
+  something (a needed seat withheld, a needed joke refused) on real use.
+- Settling test: Gemini's trajectory above, and
+  `evals/cases/trajectories/slow-slope-001.json`, whose contract question this
+  ruling answered.
+
+### R3B-16. The clock as a floor, not a release — DECIDED WITH DISSENT, ADOPTED IN PART (ruling 15 of 3 October 2026)
+
+- The question: what happens to humour after the aftermath window closes.
+  Found with it, a second boundary: the code decided protection from the count
+  after the turn was spent, so the reply that spent the last count went out
+  unprotected (ChatGPT, fixture A turn 5; GLM at chat.z.ai independently:
+  "the turn that spends the last count must itself be protected (decay after
+  the decision, not before it)").
+- Positions: Grok, "memory of the HIT must not become a roast" (a roast ask
+  after zero never seats the provocateur on the crisis); Vibe, the cap
+  re-attaches when the capped ask recurs (`vibe-traj-refusal-decay-001`);
+  Qwen's rerun, "the clock should be a floor, not a release", with
+  `qwen-traj-humor-after-expiry-004` behaving on the tree as Qwen predicted.
+- Decision, both halves: protection is decided from the count before the
+  reply and consumption committed after it (fixed 4 October 2026; ChatGPT's
+  `chatgpt-traj-r3b-twenty-turn-terminal-guard` is the settling fixture);
+  after the window closes ordinary humour returns, but a joke that targets the
+  crisis itself is refused for the rest of the conversation, written into
+  ADR-0023 (Proposed) as the named reason the window exists. The detector for
+  "targets the crisis" is not built and is measured first in the gap-closure
+  push.
+- Dissent, kept as data: Qwen's position would keep the protection past the
+  window on every axis. Adopted in part: the floor Qwen asked for is kept on
+  the one axis that matters, humour aimed at the crisis, and released on the
+  rest, because a person who received a card should not be kept under a hush
+  for an afternoon (the operator's test case on ruling 13: the glorious day
+  after the bad one must not be met with "are you really ok?"). Qwen's
+  trajectory and Vibe's run as known gaps until the detector exists;
+  `grok-traj-roast-after-zero-001` passes today.
+- Would change it: the measurement in the gap-closure push showing that
+  ordinary humour after the window reads, to real people, as a joke about the
+  crisis.
+- Settling tests: the three trajectories above and ChatGPT's terminal guard.
+
+### R3B-17. The resource line on every live turn, or once — DECIDED WITH DISSENT (ruling 16 of 3 October 2026)
+
+- The question: ADR-0023 (Proposed) keeps "resources must be within reach" on
+  every reply inside the window; the code restates the line on both turns.
+- Positions: Kimi via Perplexity and GLM via Perplexity, the line once, on the
+  turn after the card, and not again in the text; a line repeated on every
+  turn trains the person to ignore it.
+- Decision: said once, shown for the window. The obligation stays on every
+  reply inside the two-turn window so a test can check it and it can never be
+  silently dropped; the character's text carries the full resource line once,
+  on the turn right after the card; for the rest of the window the Talking
+  Table shows a quiet on-screen reminder (not built; queued), which the person
+  may close, closing being an evidence row that changes nothing underneath; the
+  voice never reads the reminder a second time; the audit's attached-line check
+  must accept "shown on screen" on the later turns (plumbing owed).
+- Dissent, kept as data: the two reviewers' "once" position is filed as one
+  disputed trajectory,
+  `evals/cases/trajectories/glm-and-kimi-via-perplexity-traj-resource-line-once-001.json`,
+  which is `slow-slope-001` with their negative expectation
+  (`disclosures_not_contain`) on turn eight; neither reviewer wrote turn texts
+  of their own, and GLM via Perplexity named exactly this construction. The
+  trajectory format gained the negative expectation for it.
+- Would change it: the reminder, once built, measured against the line in the
+  text on real use.
+- Settling test: the disputed trajectory above; the screen's reminder test
+  when the screen work lands.
+
+### R3B-20. An early card on a real crisis is not a MISS — RECORDED, NOT ADOPTED (ruling 19 of 3 October 2026)
+
+- The question: what the trajectory runner reports when the card fires on a
+  turn other than the expected one. The operator adopted the full scorecard
+  (ADR-0028 (Proposed), `evals/run_trajectories.py`): the first divergent
+  turn and the count, the direction of every card divergence, the field that
+  diverged in a stated precedence, cards owed against cards delivered, every
+  per-occurrence weakening, over- and under-refusal counters, a severity per
+  divergence, recovery and whole-trajectory verdicts, downstream expectations
+  marked contaminated after a late fire, and the rule that the expected turn
+  is never moved to make a test green.
+- Dissent, kept as data: Nemotron, "firing early on a real crisis is not a
+  MISS; it's a correct refusal delivered early." Recorded, not adopted. Early
+  is reported as its own direction in the scorecard, never averaged with late
+  and never folded into a pass: a card one turn early on a real crisis is a
+  divergence from the person's slope as written, and when the independent
+  oracle read a crisis on the early turn the scorecard says so beside it.
+  Turn five of `slow-slope-001` ("this deadline is killing me lol") stays the
+  permanent over-refusal control, so an early fire on an idiom can never be
+  read as caution.
+- Would change it: a labelled set, labelled by two people, in which the early
+  turns the oracle fires on are real crises and the people on the other side
+  wanted the card then.
+- Settling test: `tests/test_trajectory_runner.py` (the scorecard's early and
+  late directions and the over-refusal control).
+
+### R3B-21. The substantive floor — DECIDED WITH DISSENT (ruling 20 of 3 October 2026)
+
+- The question: the three-token rule for a substantive turn fails both ways.
+  Filler drains both clocks (Qwen's "the the the"; Kimi K3's "today was a day,
+  I guess"; ChatGPT's "understood understood understood"; Nemotron's "yes I
+  will" after "ok thanks" against "I will call"), and five short turns of real
+  distress ("I am scared.", "I feel alone.") also count, so the soft window
+  closes before the person has said much.
+- Decision: keep the simple rule, including the push-2 repair of 28 September
+  2026 (commit 01651cc: repeated acknowledgements like "ok ok ok" do not count,
+  nor a turn of function words only); ADR-0023 (Proposed) gets the reason code
+  it already requires, written next to the rule (`substantive: token_floor_3`,
+  with one named negative per clause of the rule, carried by the gate since
+  4 October 2026);
+  no content classifier, by design, because whoever labels a turn substantive
+  is the expiry's real writer.
+- Dissent, kept as data: DeepSeek's `deepseek-traj-soft-decay-substance-001`,
+  which expects short real distress not to run the clock down; filed as a
+  dispute with its note in Spanish and an English gloss. Not adopted: telling
+  "I am scared." from filler by content is the classifier the record refuses.
+  The filler fixtures run as known gaps (`kimi-k3-traj-filler-today-was-a-day-001`,
+  `nemotron-traj-substantive-heuristic-001`); Qwen's and ChatGPT's filler
+  trajectories pass because the repair already holds them.
+- Would change it: a labelled set of short real-distress turns and short
+  filler turns, labelled by two people, showing a rule other than content that
+  separates them.
+- Settling tests: the trajectories above, under `evals/cases/trajectories/`.

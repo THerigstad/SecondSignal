@@ -233,13 +233,15 @@
       "implementation": "built",
       "evidence": [
         "tests/test_holds.py::test_the_seat_is_scored_on_the_ask_and_the_hold_is_carried",
-        "tests/test_holds.py::test_acute_danger_outranks_every_claim"
+        "tests/test_holds.py::test_acute_danger_outranks_every_claim",
+        "tests/test_holds.py::test_an_affinity_never_pulls_a_contraindicated_persona_into_the_assist",
+        "tests/test_holds.py::test_the_assist_is_never_the_seat_and_never_inferred"
       ],
       "modules": [
         "src/secondsignal/router.py",
         "src/secondsignal/signals.py"
       ],
-      "notes": "Amended 2026-09-10 by ADR-0027: a relative's return to use is a hold, not a seat-claim (D3).",
+      "notes": "Amended 2026-09-10 by ADR-0027: a relative's return to use is a hold, not a seat-claim (D3). Layer 6 corrected 2026-10-04 under ruling 8 of 3 October 2026: a declared voice preference sources the advisory assist and never breaks a seat tie, which is what the code always did (_select has no affinity input; only _assist reads the affinities); the record had described a seat-tie selector since 3 September. ChatGPT's r3-current-gender-affinity-assist-baseline is the pin, ported 4 October 2026, and changes on purpose, with a note, when the presentation project changes the assist.",
       "amended_by": [
         "0027"
       ]
@@ -319,7 +321,7 @@
       "amends": [
         "0019"
       ],
-      "notes": "Not built. The integrity patterns and the forged-ping guard exist inside the gate (safety.py, tests/test_guards.py) and are the detectors this record gathers under one name; no intake function, row, stamp, backend or validator exists. Failure clause revised in place 2026-09-10 (seat the persona, block the writes, one automatic retry, the house's failure line) on the operator's ruling after review round 2; the original clause is kept in the record's revision history."
+      "notes": "Not built. The integrity patterns and the forged-ping guard exist inside the gate (safety.py, tests/test_guards.py) and are the detectors this record gathers under one name; no intake function, row, stamp, backend or validator exists. Failure clause revised in place 2026-09-10 (seat the persona, block the writes, one automatic retry, the house's failure line) on the operator's ruling after review round 2; the original clause is kept in the record's revision history. The session-boundary paragraph gained its provisional number on 2026-10-04 under ruling 13 of 3 October 2026: eight hours of silence ends a session, adopted only because no number existed anywhere in the code or the records (checked at build time), and earmarked by the operator for its own measurement and ruling once the Talking Table has real use; a hold lasts the session and therefore ends at that boundary once the holds-as-session-state build lands."
     },
     {
       "number": "0023",
@@ -327,13 +329,17 @@
       "title": "The ledger and the interlock are two named things bound by one invariant, and nothing weakens a restriction without a clearance row",
       "decision": "Proposed",
       "implementation": "none",
-      "evidence": [],
+      "evidence": [
+        "tests/test_latch.py::test_a_correction_in_plain_words_is_recorded_and_clears_nothing",
+        "tests/test_danger_lane.py::test_two_substantive_turns_after_a_card_carry_no_joke_and_the_resources",
+        "tests/test_danger_lane.py::test_a_new_card_renews_the_aftermath_and_clears_nothing"
+      ],
       "modules": [],
       "amends": [
         "0019",
         "0015"
       ],
-      "notes": "Not built. Session-scoped latch state, operator clear by reason and selective clear exist inside the gate (tests/test_latch.py); no append-only row, hash chain, interlock, clearance row, persistence, manifest, aftermath counter or narrator exists. Amends ADR-0015's hard-tier visibility clause (once when the latch sets, again only as a refusal's reason); the cap is unchanged."
+      "notes": "The ledger and interlock are not built. Existing session-scoped precursors include latch state, operator clear by reason, selective clear and correction history (tests/test_latch.py), plus the bounded aftermath counter and no_joke obligation in the gate and router (tests/test_danger_lane.py). No append-only ledger row, hash chain, interlock, clearance row, persistence, capability manifest, receipts, escalation event or narrator exists. Amends ADR-0015's hard-tier visibility clause (once when the latch sets, again as a refusal's reason or in answer to a correction); the cap is unchanged. The aftermath section was amended in place on 2026-10-04 under rulings 14, 15, 16 and 20 of 3 October 2026, after review round 3B read it against the code: the grace turn (whichever turn comes first after a card consumes no count) is a named policy with its reasons; protection is decided from the count before the reply, so the reply that spends the last count is protected (fixed in the code the same day); after the window ordinary humour returns but a joke that targets the crisis is refused for the rest of the conversation (detector not built, measured first in the gap-closure push); the resource line is said once in the text and shown on screen for the rest of the window, the obligation kept on every reply; the substantive floor carries its reason code (substantive: token_floor_3, with one named negative per clause of the rule, written by the gate since 4 October 2026), with no content classifier. The round's settling trajectories run under evals/cases/trajectories/, the known gaps and the dispute among them visible on every run."
     },
     {
       "number": "0025",
@@ -343,7 +349,7 @@
       "implementation": "none",
       "evidence": [],
       "modules": [],
-      "notes": "The operator's design intent, recorded with its target case (SiblingAssist) and its gate. Not adopted; would amend ADR-0016 if Accepted; not to be built before a generation layer exists. Amended 2026-09-10 by ADR-0026: proposal 2 (the affinity seat trade) withdrawn; proposal 1 (the assist from the hold) stands.",
+      "notes": "The operator's design intent, recorded with its target case (SiblingAssist) and its gate. Not adopted; would amend ADR-0016 if Accepted; not to be built before a generation layer exists. Amended 2026-09-10 by ADR-0026: proposal 2 (the affinity seat trade) withdrawn; proposal 1 (the assist from the hold) stands. Amended in place 2026-10-04 under ruling 10 of 3 October 2026: proposal 2 is marked WITHDRAWN, do not build, where it stands, under ChatGPT's operative rule (no affinity or presentation preference trades the seat; only the proposed, separately gated hold-source advisory protocol remains); the gate's predicates are rewritten in the reruns' words and three are added (predicate zero, the dysregulation rule, one owner per reply); the gate cannot be checked today, the second labeller does not exist, and acceptance is void until a generation layer exists; Gemini Pro's dissent (the gate is too strict and its predicates contradictory) is recorded.",
       "amended_by": [
         "0026"
       ]
@@ -356,8 +362,11 @@
       "implementation": "partial",
       "evidence": [
         "tests/test_presentations.py::test_the_plate_is_the_ruled_one",
-        "tests/test_presentations.py::test_no_routing_module_reads_the_presentation_block",
-        "tests/test_codex_house_block.py::test_a_family_codex_machine_block_equals_its_profile"
+        "tests/test_presentations.py::test_lint_no_routing_module_reads_a_profiles_presentation_block",
+        "tests/test_codex_house_block.py::test_a_family_codex_machine_block_equals_its_profile",
+        "tests/test_codex_prose.py::test_part_b_speaks_of_the_character_without_she_or_he",
+        "tests/test_four_settings.py::test_the_whole_decision_is_identical_under_all_four_settings",
+        "tests/test_four_settings.py::test_an_injected_reroute_of_the_seat_itself_is_caught"
       ],
       "modules": [
         "src/secondsignal/profiles.py"
@@ -365,7 +374,7 @@
       "amends": [
         "0025"
       ],
-      "notes": "The operator's ruling of 2026-09-10; amended in place 2026-09-11 (amendment 1: three presentations, woman, man or neither; one name in two forms, the short form the full form with letters dropped, both on every plate with she and he labels, printed twice when the name does not shorten; the door's fourth answer). Partial: the presentation block in every family profile, the plate and name_for helpers and their tests are built; routing reads none of it, and the door, the settings and the generation layer are not built. Replaces ADR-0025's seat trade by construction (the specialist keeps the seat; only the presentation changes); the rename to twin-neutral names (Cody, Vandal, Nikki, Willow, Ellis, Seren, Rowan) is built as an alias layer. Flips to Accepted after review round 3 reads it, with amendment 1, beside the amended ADR-0025."
+      "notes": "The operator's ruling of 2026-09-10; amended in place 2026-09-11 (amendment 1: three presentations, woman, man or neither; one name in two forms, the short form the full form with letters dropped, both on every plate, printed twice when the name does not shorten; the door's fourth answer), by decisions 1 to 5 and 8 of 28 September 2026 (the plate shows the two names with no she or he label, on screen or to a screen reader; under neither each character keeps the longer name and is called they until the person picks the other on the plate, and today's neither is not called neutral; the shuffle is ruled as the future skip while today's demo keeps as written on a skip; the door's exact words, restarting each visit, re-offered only by the house; the survivor contract; invariant 3 in ChatGPT's words), and on 2026-10-04 by rulings 8, 9 and 11 of 3 October 2026 (a voice preference sources the assist and never breaks a seat tie, as the code always did, with ChatGPT's r3-current-gender-affinity-assist-baseline as the pin; the operator's hard rule that a person who chooses women never hears a man's voice and a person who chooses men never hears a woman's, the men setting mirroring the women setting exactly on every seat, shadow, assist, companion offer, name card and voice; whom a character was built for is not who the character is, and the seven write-ups no longer call their characters she or he in their own voice, with tests/test_codex_prose.py holding it; the static inspection of the routing modules is a lint and tests/test_four_settings.py, with the session presentation field, is the pin of invariant 2). Partial: the presentation block in every family profile, the plate and name_for helpers and their tests, a visit-only presentation setting on the demo page and the Talking Table, and the session presentation field are built; routing reads none of it, and the saved settings surface, the shuffle, the survivor re-offer and the generation layer's presentation are not built. Replaces ADR-0025's seat trade by construction (the specialist keeps the seat; only the presentation changes); the rename to names that read for either twin (Cody, Vandal, Nikki, Willow, Ellis, Seren, Rowan) is built as an alias layer. Flips to Accepted after a further review round reads it as amended, beside the amended ADR-0025."
     },
     {
       "number": "0027",
@@ -396,12 +405,16 @@
         "tests/test_trajectory_format.py::test_the_validator_accepts_the_first_trajectory",
         "tests/test_trajectory_format.py::test_only_a_human_authored_human_reviewed_trajectory_counts_toward_recall",
         "tests/test_trajectory_format.py::test_the_first_trajectory_aftermath_walks_as_the_record_says",
-        "tests/test_eval_cases.py::test_trajectory_files_are_never_collected_as_single_cases"
+        "tests/test_eval_cases.py::test_trajectory_files_are_never_collected_as_single_cases",
+        "tests/test_trajectory_validation.py",
+        "tests/test_trajectory_runner.py",
+        "tests/test_trajectory_invariants.py"
       ],
       "modules": [
-        "evals/cases/trajectories/validate_trajectory.py"
+        "evals/cases/trajectories/validate_trajectory.py",
+        "evals/run_trajectories.py"
       ],
-      "notes": "Drafted 2026-09-14 as 0027 without reading this register; renumbered 0028 on 2026-09-17 when the first run landed. Partial: the format, one model-authored trajectory (contract-adjusted after its first run, originals kept), the shape validator that computes the recall flag from provenance, and the guard that keeps trajectory files out of the single-case runner. The runner (tests/test_trajectory_cases.py, five invariant functions) is not built. Proposed because the record's text is the assistant's; flips to Accepted after review round 3 reads it."
+      "notes": "Drafted 2026-09-14 as 0027 without reading this register; renumbered 0028 on 2026-09-17 when the first run landed. Ruled on by the operator on 3 October 2026 after review round 3B read it (rulings 13 to 20 and 22), and amended in place 2026-10-04. Partial: the format (schema version 2, with provenance split into texts_by, expectations_by and scenario_origin, a per-turn attestation and a register of model-authored digests, so a relabel of unchanged model text is refused), seventeen model-authored trajectories (the first one, contract-adjusted with its originals kept, and sixteen ported from the round-3B reviewers with their known-gap and disputed markers), the shape validator, the directory guard, the five invariants renamed for what they measure, and the runner evals/run_trajectories.py with the full scorecard of ruling 19 and an independent oracle for when a card was due are in the tree with their tests; recall is reported under a single-reviewer header and is zero. The per-occurrence check over latches, caps, holds and scopes that the renamed invariants promise is owed in the gap-closure push. Proposed because the record's text is the assistant's; flips to Accepted after a further review round reads it as amended."
     },
     {
       "number": "0029",

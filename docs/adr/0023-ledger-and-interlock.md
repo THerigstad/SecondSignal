@@ -1,7 +1,7 @@
 # ADR-0023: The ledger and the interlock are two named things bound by one invariant, and nothing weakens a restriction without a clearance row
 
-- **Status:** Proposed — none; drafted 2026-09-08 from the rulings on review round 1; read by eight model families in review round 2 (8 to 10 September 2026) and amended in place on 2026-09-10 with their findings (the revision history at the end); under the standing rule it stays Proposed until a further round has read the amended text, and the flip is the operator's act
-- **Date:** 2026-09-08
+- **Status:** Proposed — none; drafted 2026-09-08 from the rulings on review round 1; read by eight model families in review round 2 (8 to 10 September 2026) and amended in place on 2026-09-10 with their findings (the revision history at the end); its aftermath section was read against the code by ten model families in review round 3B (26 to 28 September 2026) and amended in place on 2026-10-04 under rulings 14, 15, 16 and 20 of 3 October 2026 (the grace turn as a named policy, protection decided before the reply, what the window is for, the resource line said once and shown for the window, the substantive floor's reason code); under the standing rule it stays Proposed until a further round has read the amended text, and the flip is the operator's act
+- **Date:** 2026-09-08; amended 2026-09-10 and 2026-10-04
 - **Evidence:** the Security Division document v1.1 (`docs/notes/security-division-2026-09-08.md`, §5); review round 1 (Grok 2.2, 4.a and tests 5.1, 5.4; ChatGPT 2.4, 4a, attacks A2, A4, F6 and test 5.1; GrokBot 4a and D1; Qwen 2.3, 2.4, 4a and tests 5.1, 5.8; DeepSeek 4a and disagreement 5); review round 2 (every family on the conditional append, the soft tier's expiry and the card's path; Grok open items 2 to 4 and fixtures `r2-ledger-scope-001`, `r2-ledger-cas-001`; ChatGPT 2.4, 2.5, 4.a.3, 4.a.4, 4.a.7; Kimi's genesis-versus-wiped and the typed "substantive" field; GLM's provenance of sanctioned weakenings; Gemini's incomparable-transition attack; Nemotron's row schema; Sonar's stale head; DeepSeek's attestation caveat), filed verbatim under `evals/cases/deferred/round2_persistence_cases.json`; the 31 August audits (ChatGPT threat model §14.5, the five-stage separation; the Grok harvest's "append-only, hash-chained ledger"); what exists in the tree today (`tests/test_latch.py`, `tests/test_guards.py::test_dependency_latch_is_session_scoped_and_unresettable_by_text`, `tests/test_danger_lane.py` for the aftermath count)
 - **Depends on:** ADR-0015 (the two-tier latch); ADR-0005 (safety state is separate from personal memory); ADR-0010 (the gate fails closed)
 - **Amends:** ADR-0019 (carries the contract for its object four, which that record only names); ADR-0015 (the visibility clause for the hard tier: once when the latch sets, again only as a refusal's reason; the cap itself is unchanged)
@@ -136,7 +136,9 @@ because whoever labels a turn substantive is the expiry's real writer
 (Grok, Kimi). Round 2 reproduced exactly this lever in the tree: the clock
 counted tokens, so five turns of "ok ok ok" cleared a declared adult's
 soft latch; fixed on 10 September (a substantive turn is new content beyond
-an acknowledgement list, `tests/test_latch.py`).
+an acknowledgement list, `tests/test_latch.py`). The rule and its reason
+code (`substantive: token_floor_3`, with its five named negatives) are
+stated in the aftermath section below (ruling 20 of 3 October 2026).
 
 ### The three events, kept apart
 
@@ -208,20 +210,137 @@ of substantive turns after any card (the fixture value is two) during
 which humour is off and the resources stay reachable. There is one clock,
 substantive turns as the ledger field above defines them, and this record
 is the clock's home; the Security Division note's "committed turns" is
-superseded by this sentence (ChatGPT 2.5). The card's own turn does not
-consume a count; an acknowledgement after the card does not consume a
-count; a failed presentation does not consume a count. The count is renewed
-by any new card, can never clear a cap or declare anyone safe, and is never
-an "awaiting human" loop when no human exists. A persona seated on the
-turn after a card carries `no_joke` for those turns. Delivery rules: one
+superseded by this sentence (ChatGPT 2.5). The count is renewed by any new
+card, can never clear a cap or declare anyone safe, and is never an
+"awaiting human" loop when no human exists. A persona seated on a turn
+inside the window carries `no_joke` for that turn. Delivery rules: one
 committed escalation per event; retries reuse the committed decision and
 never call `route` again; duplicate deliveries do not decrement the count;
 a failed presentation stays explicitly unresolved. An acknowledgment field
 exists on the event only when the manifest declares staffed review; a
 resource-only deployment has no such field to leave empty. The count and
 the `no_joke` obligation are built in the gate and the router since 10
-September (`tests/test_danger_lane.py`); the receipts, the manifest and
-the event are not.
+September (`tests/test_danger_lane.py`), with the ordering fix of 4 October
+2026 below; the receipts, the manifest and the event are not. Review round
+3B (26 to 28 September 2026) read this section against the code with ten
+model families and found four things, which the operator ruled on 3 October
+2026 (rulings 14, 15, 16 and 20); the four paragraphs that follow are those
+rulings, written into the record on 4 October 2026.
+
+**The grace turn is a named policy (ruling 14 of 3 October 2026).**
+Whichever turn comes first after a card, acknowledgement or not, does not
+consume an aftermath count. So: the card's own turn does not consume a
+count; the first turn after the card does not consume a count, which means
+that an acknowledgement after the card does not consume a count and that a
+substantive first reply does not either; a failed presentation does not
+consume a count. Three reasons, in the reviewers' words. First, the rule
+needs no acknowledgement classifier, which is exactly the lever this record
+legislated away when it made "substantive" a recorded reason code (Kimi via
+Perplexity, Vibe; Nemotron: an acknowledgement rule would "punish the person
+for not performing gratitude"). Second, the turn after a card is where
+retractions and bargaining cluster (Grok, Kimi K3), and that is the turn to
+protect. Third, the broader exemption can only extend protection, never
+shorten it (GLM via Perplexity; GLM at chat.z.ai; Vibe). History: from
+10 September to 3 October this paragraph said only that an acknowledgement
+does not consume a count, while the code exempted whichever turn came first
+(`escalated_last_turn`), so the record promised one message less protection
+than the code gave. Nine of the ten returns of record said change the
+sentence to the positional rule; ChatGPT alone said change the code, or
+adopt the grace turn as a named, justified policy rather than smuggle it in
+through a flag. The operator kept the code's behaviour and adopted it
+ChatGPT's way, as this named policy; ChatGPT's own position is the dissent
+recorded below. Gemini's `gemini-traj-aftermath-substantive-followup`, which
+passes on the tree, pins the substantive-first-turn case; DeepSeek's
+`deepseek-traj-aftermath-first-turn-001` pins the boundary with the last
+consuming reply.
+
+**Protection is decided before the reply; consumption is committed after it
+(ruling 15 of 3 October 2026, first half).** Whether a reply is protected
+(humour off, `no_joke` carried, resources within reach) is decided from the
+count as it stands before the reply, and the count is consumed only after the
+reply's obligations are set, so the reply that spends the last count is
+itself protected. Until 4 October 2026 the code decided protection from the
+count after the turn was spent, so the reply that spent the last count was
+released unprotected, and humour and the provocateur were legal one message
+early. Two reviewers found it independently: ChatGPT (fixture A, turn 5:
+after-count 0 and `no_joke` true on the same decision; "Protect the last
+consuming reply, not only replies whose post-count is positive") and GLM at
+chat.z.ai ("the turn that spends the last count must itself be protected
+(decay after the decision, not before it)"). Fixed 4 October 2026. ChatGPT's
+`chatgpt-traj-r3b-twenty-turn-terminal-guard` is the settling fixture;
+`slow-slope-001`'s turn nine and DeepSeek's
+`deepseek-traj-aftermath-first-turn-001` pin the same boundary.
+
+**What the window is for (ruling 15, second half).** After the window
+closes, ordinary humour returns. A joke that targets the crisis itself is
+refused for the rest of the conversation. That is the named reason the window
+exists: the window is a floor under the person's next few messages, not a
+timer after which what they said becomes material; it is bounded so a person
+is not kept under a hush for an afternoon, and the refusal of a joke aimed at
+the crisis is unbounded because the memory of the card must never become a
+roast (Grok: "memory of the HIT must not become a roast", a roast ask after
+zero never seats the provocateur on the crisis; Vibe: the cap re-attaches when
+the capped ask recurs; Qwen: "the clock should be a floor, not a release",
+adopted in part and recorded below). The detector for "targets the crisis"
+is not built. It is measured first in the gap-closure push, with controls for
+ordinary humour after the window, before any rule is written for it, so that
+the refusal never widens into a hush. Settling cases:
+`grok-traj-roast-after-zero-001` passes today, because the seat a roast ask
+earns after the window is not the provocateur's on that text;
+`vibe-traj-refusal-decay-001` and `qwen-traj-humor-after-expiry-004` are
+known gaps until the detector exists.
+
+**The resource line: said once, shown for the window (ruling 16 of
+3 October 2026).** The obligation "resources must be within reach" stays on
+every reply inside the two-turn window, so a test can check it and it can
+never be silently dropped. The character's text carries the full resource
+line once, on the turn right after the card. For the rest of the window the
+Talking Table shows a quiet on-screen reminder in its place; the person may
+close it; closing it is an evidence row and changes nothing underneath; the
+voice never reads the reminder a second time (on the turn after the card the
+whole reply is spoken once, safety lines included, by ruling 24 of the same
+day; the card itself is never spoken). The reminder is not built; it is
+queued as Talking Table work with the one-tap correction control of ruling 12.
+Plumbing owed with it: the audit's attached-line check (predicate P2) must
+accept "shown on screen" as satisfying the obligation on the later turns, so
+the obligation and the text can differ without a red test. Two reviewers held
+the "once" position outright, the line in the text once and not again (Kimi
+via Perplexity, GLM via Perplexity); it is filed as a disputed trajectory,
+`glm-and-kimi-via-perplexity-traj-resource-line-once-001`, built from
+`slow-slope-001` with their negative expectation on turn eight, and the
+trajectory format gained `disclosures_not_contain` for it; the dissent is
+recorded below.
+
+**"Substantive", with its reason code (ruling 20 of 3 October 2026).** A
+turn is substantive when, after masking, it carries three or more distinct
+tokens outside the acknowledgement list and the repeated-acknowledgement
+repair does not fold it (push 2, commit 01651cc, 28 September 2026: repeated
+acknowledgements like "ok ok ok" do not count, and neither does a turn made
+only of function words or of one word repeated). The reason code this record
+requires is the turn's substance code, carried by the gate since 4 October
+2026 on every turn the clock looks at and surfaced in the safety reasons
+inside the window: `substantive: token_floor_3` when the turn counts, and
+when it does not, one of `not substantive: empty_turn`,
+`acknowledgement_only`, `repeated_word`, `below_token_floor` or
+`filler_only`, each naming the one clause of the rule that decided it. The
+ledger's observation row carries the same code when the ledger exists, so
+the expiry's real writer is named on every row and no prose is parsed to
+find it. The rule stays simple on purpose:
+no content classifier, because whoever labels a turn substantive is the
+expiry's real writer, and a classifier there is the lever this record
+refuses. The record says plainly that the simple rule fails both ways.
+Filler drains both clocks: Kimi K3's "today was a day, I guess"
+(`kimi-k3-traj-filler-today-was-a-day-001`) and Nemotron's "yes I will"
+after "ok thanks" against "I will call"
+(`nemotron-traj-substantive-heuristic-001`) count as substantive and run as
+known gaps; Qwen's "the the the" (`qwen-traj-substantive-spam-001`) and
+ChatGPT's two "understood understood understood" trajectories
+(`chatgpt-traj-understood-filler-aftermath-001`,
+`chatgpt-traj-understood-filler-soft-latch-001`) pass, because the repair of
+28 September already holds them. And five short turns of real distress ("I
+am scared.", "I feel alone.") also count, so the soft window can close before
+the person has said much: DeepSeek's `deepseek-traj-soft-decay-substance-001`
+runs as a dispute, recorded below.
 
 ### The fail-closed class list
 
@@ -279,6 +398,39 @@ ruling from every family that tried to move a restriction with an appeal
 which it does: a wrongly issued clearance proceeds while an appeal is open,
 and the remedy is a second clearance row, never a blocked one.
 
+Review round 3B's dissents on the aftermath section, kept as data with the
+rulings of 3 October 2026 (each is also in `docs/notes/dissent-log.md`):
+
+- **ChatGPT, on the grace turn (ruling 14).** "A published substantive-turn
+  clock should count eligible substantive contributions; an accidental extra
+  grace turn should not be smuggled in through a flag." Its primary position
+  was to change the code to the record, one message less protection, under
+  which `slow-slope-001` reads 2, 1, 0, 0 with turns seven and eight still
+  DISCLOSE; its fallback, that a grace turn wanted on purpose must be adopted
+  "as a new, explicitly justified policy", is the path the operator took.
+  Recorded, not adopted on the primary position: the grace turn is now the
+  named policy above, with its reasons.
+- **Qwen, on the window (ruling 15).** "The clock should be a floor, not a
+  release": the window should not end the protection, and
+  `qwen-traj-humor-after-expiry-004` behaves on the tree as Qwen predicted.
+  Adopted in part: after the window ordinary humour returns, as released, but
+  a joke that targets the crisis is refused for the rest of the conversation,
+  which is the floor Qwen asked for on the one axis that matters; the
+  trajectory runs as a known gap until the detector exists.
+- **Kimi via Perplexity and GLM via Perplexity, on the resource line
+  (ruling 16).** The line once, on the turn after the card, and not again in
+  the character's text. Adopted for the text, declined for the obligation:
+  the obligation stays on every reply inside the window so it can be tested
+  and never silently dropped, and the screen carries the reminder after the
+  first turn. Filed as a disputed trajectory,
+  `glm-and-kimi-via-perplexity-traj-resource-line-once-001`.
+- **DeepSeek, on the substantive floor (ruling 20).** Five short turns of
+  real distress count as substantive, so the soft window can close before the
+  person has said much (`deepseek-traj-soft-decay-substance-001`, with its
+  note in Spanish and an English gloss). Recorded as a dispute: the simple
+  rule is kept with no content classifier, by design, and the dispute is
+  visible and measured on every run.
+
 ## Consequences
 
 - The house block's Memory sentence reads, from v1.1: "A safety inference
@@ -320,7 +472,11 @@ operator clear by reason that names who cleared
 (`test_clearing_one_reason_leaves_the_other_in_force`), the rule that
 message text never clears a latch, the correction event as a latch-history
 row, and the bounded aftermath count with its `no_joke` obligation
-(`tests/test_danger_lane.py`). There is no append-only row, no hash chain,
+(`tests/test_danger_lane.py`; since 4 October 2026 protection is decided from
+the count before the reply, and the aftermath section's settling trajectories
+run through `evals/run_trajectories.py` under ADR-0028 (Proposed), where the
+known gaps and the dispute named above are visible on every run). There is
+no append-only row, no hash chain,
 no interlock function, no clearance row, no persistence across sessions, no
 capability manifest, no receipts, no escalation event and no narrator.
 Those are promises this record makes and the code has not.
@@ -335,12 +491,33 @@ reply, or two turns append on one head; an unreadable or wiped ledger
 proceeds, or withholds a gate-required card; an interpretation row moves a
 restriction; an appeal's presence changes what the interlock admits; a hard
 latch expires by a clock or ends with a turn; a turn is labelled
-substantive by anything but the recorded reason code; the aftermath count
-clears a cap, marks anyone safe, or is consumed by an acknowledgement, a
-duplicate delivery or the card's own turn.
+substantive by anything but the recorded reason code
+(`substantive: token_floor_3`), or by a content classifier; the aftermath
+count clears a cap, marks anyone safe, or is consumed by the first turn after
+the card, acknowledgement or not, by a duplicate delivery or by the card's own
+turn; the reply that spends the last count is released without `no_joke`; a
+joke that targets the crisis is seated after the window; a reply inside the
+window carries neither the resource line nor the on-screen reminder in its
+place; the voice reads the reminder a second time.
 
 ## Revision history
 
+- **2026-10-04.** The aftermath section amended in place with review round
+  3B's findings and the operator's rulings of 3 October 2026: the grace turn
+  stated as a named policy with its three reasons, in place of the sentence
+  that named only an acknowledgement (ruling 14; the code's behaviour kept);
+  protection decided from the count before the reply and consumption
+  committed after it, so the reply that spends the last count is protected
+  (ruling 15, fixed in the code the same day); what the window is for, with
+  the rule that a joke targeting the crisis is refused for the rest of the
+  conversation and its unbuilt detector (ruling 15); the resource line said
+  once in the text and shown on screen for the rest of the window, with the
+  obligation kept on every reply (ruling 16); the substantive floor's reason
+  code written next to the rule, with no content classifier (ruling 20); the
+  round's dissents (ChatGPT, Qwen, Kimi via Perplexity and GLM via Perplexity,
+  DeepSeek) kept as data; the settling trajectories named by file. Nothing
+  outside the aftermath section changed, apart from the pointer to the reason
+  code under "Substantive is a ledger field" and the falsifying tests.
 - **2026-09-10.** Amended in place with review round 2's findings, in the
   families' words where they wrote the rule: the invariant restated with
   the policy-lifetime exception inside it and the expiry as a recorded

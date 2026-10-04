@@ -1,7 +1,7 @@
 # ADR-0022: Intake and provenance runs after the gate and before routing, and proposes but never grants
 
-- **Status:** Proposed — none; drafted 2026-09-08 from the rulings on review round 1; read by eight model families in review round 2 (8 to 10 September 2026) and amended in place on 2026-09-10 with their findings and the operator's rulings (the revision history at the end); under the standing rule it stays Proposed until a further round has read the amended text, and the flip is the operator's act
-- **Date:** 2026-09-08
+- **Status:** Proposed — none; drafted 2026-09-08 from the rulings on review round 1; read by eight model families in review round 2 (8 to 10 September 2026) and amended in place on 2026-09-10 with their findings and the operator's rulings (the revision history at the end); the session-boundary paragraph gained its provisional number, eight hours of silence, on 2026-10-04 under ruling 13 of 3 October 2026, earmarked by the operator for its own measurement; under the standing rule it stays Proposed until a further round has read the amended text, and the flip is the operator's act
+- **Date:** 2026-09-08; amended 2026-09-10 and 2026-10-04
 - **Evidence:** the Security Division document v1.1 (`docs/notes/security-division-2026-09-08.md`, §4); review round 1 (Grok 2.1 and tests 5.2, 5.3; ChatGPT 2.2, 2.11 and tests 5.4, 5.5; GrokBot 4b); the 31 August audits that first split intake from authority (ChatGPT threat model §14; the Grok harvest's "deterministic-as-possible compiler"); what already exists in the tree without an owner (`INTEGRITY_PATTERNS` and `SESSION_WRITE_PATTERNS` in `src/secondsignal/safety.py`; `tests/test_guards.py`)
 - **Depends on:** ADR-0014 (the gate runs first); ADR-0018 (one normalizer, before every lexicon); ADR-0002 (authority is source-anchored)
 - **Amends:** ADR-0019 (carries the contract for its object two, which that record only names)
@@ -82,7 +82,23 @@ changes what the gate saw or what the gate decided.
    contexts (the gate reading the old session's latch state while intake
    opens a fresh session for routing); a boundary that arrives late applies
    to the next turn, never to the one in flight (review round 2, ChatGPT
-   4.b.1).
+   4.b.1). **The published threshold, provisional: eight hours of silence
+   ends a session.** No number existed anywhere in the code or the records
+   before 4 October 2026; the ruling of 3 October 2026 (ruling 13) adopted
+   eight hours only on the condition that none did, and the check at build
+   time found none (no constant in `src/`, no idle timeout in the Talking
+   Table's server, no figure in any record). The operator earmarked the
+   number the moment he adopted it: it is provisional, it must not stay an
+   arbitrary number, and it gets its own measurement and ruling once the
+   Talking Table has real use and real gaps between visits can be seen; the
+   rule stands whatever the number becomes. The boundary matters beyond the
+   stamp since that ruling: a hold (grief, abuse, eating distress, recovery)
+   lasts the session (ADR-0023, the holds-as-session-state build owed in the
+   gap-closure push) and therefore ends at this boundary, while a hard latch
+   does not (ADR-0015; ADR-0023 carries it past the boundary when the ledger
+   exists). Nothing implements the boundary today; it is a published rule
+   with a provisional number, which is what the stamp and the hold both need
+   before either is built.
 
 **Provenance labels are code-computed.** Round 2 (Grok's two-turn sequence;
 ChatGPT, GLM, Nemotron, DeepSeek in the language of provenance) showed the
@@ -265,6 +281,16 @@ timeout delays or changes the card.
 
 ## Revision history
 
+- **2026-10-04.** The session-boundary paragraph (question five, the stamp)
+  gains the published threshold's provisional number: eight hours of silence
+  ends a session, adopted by ruling 13 of 3 October 2026 only because no
+  number existed anywhere in the code or the records (checked at build time),
+  and earmarked by the operator for its own measurement and ruling once the
+  Talking Table has real use, so that it does not stay arbitrary. The ruling's
+  occasion was the holds: review round 3B showed a grief hold vanishing on the
+  next turn that did not name the death, and the operator ruled that a hold
+  lasts the session, which made the session boundary a safety rule as well as
+  a provenance rule. Nothing else in the record changed.
 - **2026-09-10, second revision.** Amended in place with review round 2's
   findings: the trusted session assigned before the gate; provenance labels
   code-computed with field-level write permissions; the pinned inputs; the
