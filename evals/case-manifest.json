@@ -867,6 +867,396 @@
    "disposition": "accepted"
   },
   {
+   "id": "id-ctrl-00-nonbinary",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-ctrl-01-agender",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-ctrl-02-genderfluid",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-ctrl-03-trans",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-ctrl-04-theythem",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-ctrl-05-neopronouns",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-ctrl-06-questioning",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-ctrl-07-nonbinary",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-ctrl-08-agender",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-ctrl-09-genderfluid",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-ctrl-10-trans",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-ctrl-11-theythem",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-ctrl-12-neopronouns",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-ctrl-13-questioning",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-ctrl-14-trans",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-ctrl-15-nonbinary",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-ctrl-16-agender",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-ctrl-17-genderfluid",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-ctrl-18-trans",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-ctrl-19-theythem",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-ctrl-20-neopronouns",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-ctrl-21-questioning",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-ctrl-22-nonbinary",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-ctrl-23-agender",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-ctrl-24-genderfluid",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-ctrl-25-trans",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-ctrl-26-theythem",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-ctrl-27-neopronouns",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-ctrl-28-questioning",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-ctrl-29-nonbinary",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-stmt-00-nonbinary",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-stmt-01-agender",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-stmt-02-genderfluid",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-stmt-03-trans",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-stmt-04-theythem",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-stmt-05-neopronouns",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-stmt-06-questioning",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-stmt-07-nonbinary",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-stmt-08-agender",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-stmt-09-genderfluid",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-stmt-10-trans",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-stmt-11-theythem",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-stmt-12-neopronouns",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-stmt-13-questioning",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-stmt-14-trans",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-stmt-15-nonbinary",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-stmt-16-agender",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-stmt-17-genderfluid",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-stmt-18-trans",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-stmt-19-theythem",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-stmt-20-neopronouns",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-stmt-21-questioning",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-stmt-22-nonbinary",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-stmt-23-agender",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-stmt-24-genderfluid",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-stmt-25-trans",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-stmt-26-theythem",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-stmt-27-neopronouns",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-stmt-28-questioning",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-stmt-29-nonbinary",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-wrap-crisis-direct",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-wrap-crisis-indirect",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-wrap-grok-r2-let-me-die-001",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-wrap-grok-r2-wanna-endit-001",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "id-wrap-live-modal-give-up-001",
+   "source": "identity_pairs_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
    "id": "gap-danger-from-another-person-history",
    "source": "known_gaps",
    "plane": "policy",
@@ -2795,6 +3185,306 @@
   {
    "id": "narrator-isolation-012",
    "source": "narrator_isolation",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "nd-caps-001",
+   "source": "neurodivergent_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "nd-caps-002",
+   "source": "neurodivergent_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "nd-caps-003",
+   "source": "neurodivergent_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "nd-caps-004",
+   "source": "neurodivergent_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "nd-dump-001",
+   "source": "neurodivergent_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "nd-dump-002",
+   "source": "neurodivergent_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "nd-dump-003",
+   "source": "neurodivergent_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "nd-dump-004",
+   "source": "neurodivergent_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "nd-feel-001",
+   "source": "neurodivergent_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "nd-feel-002",
+   "source": "neurodivergent_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "nd-feel-003",
+   "source": "neurodivergent_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "nd-feel-004",
+   "source": "neurodivergent_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "nd-hyper-001",
+   "source": "neurodivergent_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "nd-hyper-002",
+   "source": "neurodivergent_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "nd-hyper-003",
+   "source": "neurodivergent_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "nd-lit-001",
+   "source": "neurodivergent_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "nd-lit-002",
+   "source": "neurodivergent_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "nd-lit-003",
+   "source": "neurodivergent_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "nd-lit-004",
+   "source": "neurodivergent_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "nd-mask-001",
+   "source": "neurodivergent_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "nd-mask-002",
+   "source": "neurodivergent_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "nd-mask-003",
+   "source": "neurodivergent_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "nd-melt-001",
+   "source": "neurodivergent_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "nd-melt-002",
+   "source": "neurodivergent_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "nd-nonv-001",
+   "source": "neurodivergent_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "nd-nopunct-001",
+   "source": "neurodivergent_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "nd-nopunct-002",
+   "source": "neurodivergent_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "nd-nopunct-003",
+   "source": "neurodivergent_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "nd-nopunct-004",
+   "source": "neurodivergent_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "nd-rep-001",
+   "source": "neurodivergent_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "nd-rep-002",
+   "source": "neurodivergent_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "nd-rep-003",
+   "source": "neurodivergent_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "nd-rep-004",
+   "source": "neurodivergent_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "nd-runon-001",
+   "source": "neurodivergent_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "nd-runon-002",
+   "source": "neurodivergent_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "nd-sens-001",
+   "source": "neurodivergent_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "nd-sens-002",
+   "source": "neurodivergent_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "nd-sens-003",
+   "source": "neurodivergent_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "nd-shut-001",
+   "source": "neurodivergent_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "nd-shut-002",
+   "source": "neurodivergent_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "nd-wrap-crisis-direct",
+   "source": "neurodivergent_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "nd-wrap-crisis-indirect",
+   "source": "neurodivergent_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "nd-wrap-crisis-indirect-phrasing",
+   "source": "neurodivergent_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "nd-wrap-crisis-outranks-task",
+   "source": "neurodivergent_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "nd-wrap-grok-r2-gonna-die-001",
+   "source": "neurodivergent_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "nd-wrap-grok-r2-let-me-die-001",
+   "source": "neurodivergent_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "nd-wrap-grok-r2-wanna-die-001",
+   "source": "neurodivergent_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "nd-wrap-grok-r2-wanna-endit-001",
+   "source": "neurodivergent_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "nd-wrap-live-modal-give-up-001",
+   "source": "neurodivergent_grok_2026-09-30",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "nd-wrap-r3b-tense-present-first-person-001",
+   "source": "neurodivergent_grok_2026-09-30",
    "plane": "policy",
    "disposition": "accepted"
   },
