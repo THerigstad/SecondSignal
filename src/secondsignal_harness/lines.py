@@ -14,18 +14,20 @@ from __future__ import annotations
 
 HARNESS_LINES_EN: dict[str, str] = {
     # Nobody seated (outcome UNRESOLVED). The house asks for one more sentence.
+    # The operator's words, 4 October 2026, in the house's plain voice (the
+    # no-"I" rule of 8 September 2026 covers every house line).
     "ask": (
-        "Nobody is seated yet. Say one more sentence about what's going on, "
-        "and the house will seat someone."
+        "Say a little more about what's on your mind, and the right voice will "
+        "take it from there."
     ),
     # A second vague message in a row (ruling 5 of 3 October 2026): a second,
     # different question, never a repeat of the first. The policy marks the
-    # turn house_ask = "second". Draft wording by the build of 4 October 2026;
-    # the operator writes the house lines in his own words and replaces it.
+    # turn house_ask = "second". The operator's own words, 4 October 2026,
+    # replacing the build's draft.
     "ask_second": (
-        "Still nobody seated, and that's on purpose: a guess would be the wrong "
-        "voice. Is this about something that happened, something you have to "
-        "do, or how today feels? One line is plenty."
+        "Asking a different way, to get you the best response: is this about "
+        "something that happened, something you could use a hand with, or how "
+        "you're feeling today?"
     ),
     # In every prompt, after the decision record's block. Rule 11.
     "honesty": (
