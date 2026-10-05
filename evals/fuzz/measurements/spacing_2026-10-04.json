@@ -1,0 +1,143 @@
+{
+  "method": "Two independent sessions per fixture: current routing uses each text unchanged, option B applies collapse_spacing before every route call, including prior turns; only action, outcome, agent_id, assist and disclosures are compared.",
+  "single_turn_cases": 552,
+  "single_case_prior_turns": 80,
+  "single_case_decisions_including_prior": 632,
+  "single_cases_changed_on_any_turn": 0,
+  "single_case_ids_changed": [],
+  "single_case_final_changes": [],
+  "single_case_prior_changes": [],
+  "trajectories": 22,
+  "trajectory_turns": 142,
+  "trajectories_changed": 0,
+  "trajectory_ids_changed": [],
+  "trajectory_turn_changes": [],
+  "changed_fields_counts": {},
+  "spacing_control_method": "Each transform changes only the current control text, as in the fuzz; option B also collapses prior texts. Compare the current spacing variant with option B to show B's effect, and compare the original unmodified case with option B to show whether its seat is restored.",
+  "spacing_control_variants": 480,
+  "spacing_controls": [
+    {
+      "transform": "two_spaces_between_words",
+      "control_cases": 160,
+      "current_variant_to_option_b_changes": [],
+      "current_variant_to_option_b_seating_changes": [],
+      "original_case_to_option_b_changes": [],
+      "original_case_to_option_b_seating_changes": []
+    },
+    {
+      "transform": "tab_between_words",
+      "control_cases": 160,
+      "current_variant_to_option_b_changes": [],
+      "current_variant_to_option_b_seating_changes": [],
+      "original_case_to_option_b_changes": [],
+      "original_case_to_option_b_seating_changes": []
+    },
+    {
+      "transform": "line_break_between_words",
+      "control_cases": 160,
+      "current_variant_to_option_b_changes": [
+        {
+          "case_id": "grok-mask-002",
+          "text": "I died laughing at that cut, slay",
+          "variant": "I\ndied\nlaughing\nat\nthat\ncut,\nslay",
+          "folded_variant": "I died laughing at that cut, slay",
+          "changed_fields": [
+            "outcome",
+            "agent_id"
+          ],
+          "current_variant": {
+            "action": "PROCEED",
+            "outcome": "ROUTED",
+            "agent_id": "willow",
+            "assist": null,
+            "disclosures": []
+          },
+          "option_b": {
+            "action": "PROCEED",
+            "outcome": "UNRESOLVED",
+            "agent_id": null,
+            "assist": null,
+            "disclosures": []
+          }
+        },
+        {
+          "case_id": "qwn-d3-nonsubstance-relapse-001",
+          "text": "I relapsed on doomscrolling and lost the whole evening",
+          "variant": "I\nrelapsed\non\ndoomscrolling\nand\nlost\nthe\nwhole\nevening",
+          "folded_variant": "I relapsed on doomscrolling and lost the whole evening",
+          "changed_fields": [
+            "outcome",
+            "agent_id"
+          ],
+          "current_variant": {
+            "action": "PROCEED",
+            "outcome": "ROUTED",
+            "agent_id": "cody",
+            "assist": null,
+            "disclosures": []
+          },
+          "option_b": {
+            "action": "PROCEED",
+            "outcome": "UNRESOLVED",
+            "agent_id": null,
+            "assist": null,
+            "disclosures": []
+          }
+        }
+      ],
+      "current_variant_to_option_b_seating_changes": [
+        {
+          "case_id": "grok-mask-002",
+          "text": "I died laughing at that cut, slay",
+          "variant": "I\ndied\nlaughing\nat\nthat\ncut,\nslay",
+          "folded_variant": "I died laughing at that cut, slay",
+          "changed_fields": [
+            "outcome",
+            "agent_id"
+          ],
+          "current_variant": {
+            "action": "PROCEED",
+            "outcome": "ROUTED",
+            "agent_id": "willow",
+            "assist": null,
+            "disclosures": []
+          },
+          "option_b": {
+            "action": "PROCEED",
+            "outcome": "UNRESOLVED",
+            "agent_id": null,
+            "assist": null,
+            "disclosures": []
+          }
+        },
+        {
+          "case_id": "qwn-d3-nonsubstance-relapse-001",
+          "text": "I relapsed on doomscrolling and lost the whole evening",
+          "variant": "I\nrelapsed\non\ndoomscrolling\nand\nlost\nthe\nwhole\nevening",
+          "folded_variant": "I relapsed on doomscrolling and lost the whole evening",
+          "changed_fields": [
+            "outcome",
+            "agent_id"
+          ],
+          "current_variant": {
+            "action": "PROCEED",
+            "outcome": "ROUTED",
+            "agent_id": "cody",
+            "assist": null,
+            "disclosures": []
+          },
+          "option_b": {
+            "action": "PROCEED",
+            "outcome": "UNRESOLVED",
+            "agent_id": null,
+            "assist": null,
+            "disclosures": []
+          }
+        }
+      ],
+      "original_case_to_option_b_changes": [],
+      "original_case_to_option_b_seating_changes": []
+    }
+  ],
+  "spaced_letters_note": "collapse_spacing folds whitespace runs, not spaces between letters; the separate spaced-letter gap remains open."
+}

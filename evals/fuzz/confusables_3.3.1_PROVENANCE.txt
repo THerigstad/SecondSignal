@@ -1,0 +1,25 @@
+confusables.json: where it came from and how to check it
+
+File: confusables.json (903,167 bytes)
+SHA-256: 2d8b4774cd9dc6f233a18681bc00423ae270037437f276fc6a8b80630941fe7d
+
+Source: the data file shipped inside the Python package confusable_homoglyphs,
+version 3.3.1, published on PyPI (wheel confusable_homoglyphs-3.3.1-py2.py3-none-any.whl,
+SHA-256 84c92cb79dc7f55aa290d0762b2349abd8dee4c16fbe6f99eac978d394e2e6a1, dated
+30 January 2024). The package builds this JSON from the Unicode Consortium's
+confusables data (unicode.org/Public/security/, the file confusables.txt) and
+Scripts.txt. Licence: MIT (copyright 2016-2018 Victor Felder, 2024 Elena Grandi);
+the licence text is in the wheel's dist-info folder.
+
+Shape: a JSON object. Each key is one character; its value is a list of
+look-alikes, each {"c": the look-alike character, "n": its Unicode name}.
+9,619 keys. 1,800 keys have at least one single Latin letter among their look-alikes.
+
+Why this file and not a download: the build order forbids network use, and the
+project records which fold table produced a match (normalize.skeleton_hash), so
+the table under test must be a fixed, hashed file in the tree. When the project
+later adopts any part of this table, the measurement is re-run against the
+current unicode.org file by the integrator and the two are compared.
+
+Obtained by Claude (project manager) on 4 October 2026 from PyPI with
+`pip download --no-deps confusable_homoglyphs`, unpacked, hashed, copied here unchanged.

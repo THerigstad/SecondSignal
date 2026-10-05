@@ -11,6 +11,11 @@ word was "I"); and an eighteenth transform, the Greek epsilon, is added, because
 it was found while Grok's run was being reproduced and it was ruled with the
 rest (ruling 3 of 3 October 2026).
 
+The six stutter transforms after the Greek epsilon record the operator's own
+find of 4 October 2026 (answer 2 of 12): dictated repeated words, fillers,
+false starts and syllable stutters can interrupt a whole-phrase match. They
+are measurements of that find; the stutter cause's ruling is pending.
+
 Every transform is deterministic and pure: the same line always gives the same
 variant, so a variant that stops escalating is a reproducible finding. No new
 crisis text is written here; every variant is a mechanical change to a line
@@ -157,6 +162,58 @@ def greek_epsilon_for_e(text: str) -> str:
     return text[:i] + "ε" + text[i + 1:]
 
 
+def first_word_stuttered_with_commas(text: str) -> str:
+    """Repeat the first word three times, separated by comma and space."""
+    word = _first_word(text)
+    if word is None:
+        return text
+    return text[:word.start()] + f"{word.group(0)}, {word.group(0)}, " + text[word.start():]
+
+
+def middle_word_repeated_with_comma(text: str) -> str:
+    """Repeat the word at index len(words)//2 once, with comma and space."""
+    words = list(_WORD_RE.finditer(text))
+    if not words:
+        return text
+    word = words[len(words) // 2]
+    return text[:word.start()] + f"{word.group(0)}, " + text[word.start():]
+
+
+def um_before_the_middle_word(text: str) -> str:
+    """Insert the filler um before the word at index len(words)//2."""
+    words = list(_WORD_RE.finditer(text))
+    if not words:
+        return text
+    word = words[len(words) // 2]
+    return text[:word.start()] + "um " + text[word.start():]
+
+
+def uh_before_the_last_word(text: str) -> str:
+    """Insert the filler uh before the last word."""
+    words = list(_WORD_RE.finditer(text))
+    if not words:
+        return text
+    word = words[-1]
+    return text[:word.start()] + "uh " + text[word.start():]
+
+
+def false_start_of_two_words(text: str) -> str:
+    """Prefix the first two words, an ellipsis and a space to the whole line."""
+    words = list(_WORD_RE.finditer(text))[:2]
+    if not words:
+        return text
+    return " ".join(word.group(0) for word in words) + "... " + text
+
+
+def first_long_word_syllable_stuttered(text: str) -> str:
+    """Repeat the first letter twice with hyphens in the first longer word."""
+    word = _first_word(text, min_len=2)
+    if word is None:
+        return text
+    i = word.start()
+    return text[:i] + f"{text[i]}-{text[i]}-" + text[i:]
+
+
 TRANSFORMS: dict[str, Callable[[str], str]] = {
     "two_spaces_between_words": two_spaces_between_words,
     "tab_between_words": tab_between_words,
@@ -176,6 +233,12 @@ TRANSFORMS: dict[str, Callable[[str], str]] = {
     "one_cyrillic_or_greek_lookalike_letter": one_cyrillic_or_greek_lookalike_letter,
     "full_width_letters": full_width_letters,
     "greek_epsilon_for_e": greek_epsilon_for_e,
+    "first_word_stuttered_with_commas": first_word_stuttered_with_commas,
+    "middle_word_repeated_with_comma": middle_word_repeated_with_comma,
+    "um_before_the_middle_word": um_before_the_middle_word,
+    "uh_before_the_last_word": uh_before_the_last_word,
+    "false_start_of_two_words": false_start_of_two_words,
+    "first_long_word_syllable_stuttered": first_long_word_syllable_stuttered,
 }
 
 # The transforms that still stop the gate on some lines after the push of
@@ -188,6 +251,11 @@ KNOWN_GAP_TRANSFORMS: frozenset[str] = frozenset({
     "one_letter_repeated_three_times",
     "one_letter_dropped",
     "two_neighbouring_letters_swapped",
+    # Measured 4 October 2026, cause "stutter", the operator's find; ruling pending.
+    "middle_word_repeated_with_comma",
+    "um_before_the_middle_word",
+    "uh_before_the_last_word",
+    "first_long_word_syllable_stuttered",
 })
 
 

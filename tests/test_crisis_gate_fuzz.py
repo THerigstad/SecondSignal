@@ -57,12 +57,16 @@ def test_a_known_gap_transform_that_stops_failing_is_removed_on_purpose(result):
     )
 
 
-def test_the_known_gaps_are_the_four_causes_the_operator_ruled_on():
+def test_the_known_gaps_are_five_causes_four_ruled_on_and_the_operators_stutter_find():
     assert KNOWN_GAP_TRANSFORMS == {
         "punctuation_doubled",
         "one_letter_repeated_three_times",
         "one_letter_dropped",
         "two_neighbouring_letters_swapped",
+        "middle_word_repeated_with_comma",
+        "um_before_the_middle_word",
+        "uh_before_the_last_word",
+        "first_long_word_syllable_stuttered",
     }
 
 
