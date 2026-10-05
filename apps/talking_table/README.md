@@ -67,7 +67,14 @@ Model replies cannot supply house lines or crisis cards. The app checks output
 before the harness can store, audit, display or voice it, with the same checks
 in both operator-circle modes. It rejects detected house identity, source and
 authority claims, card/handoff labels, and character-to-human takeover language,
-including normalized case, punctuation and Unicode variants. A rejected reply
+including normalized case, punctuation and Unicode variants. It also rejects
+house-line labels and claims about the reply itself, and second-person house
+identity claims such as "you are the house", including contractions and plural
+forms. Executable `javascript:`, `vbscript:` and `data:` URL schemes are rejected
+as bare text when a non-whitespace character immediately follows the colon;
+colon-space prose remains allowed. Before these checks, the detection copy folds
+look-alike letters through the project's `SKELETON` map without rewriting an
+accepted reply. A rejected reply
 uses the existing fixed failure message; the rejected text is discarded. The
 policy alone supplies the real card and house lines. These are deterministic
 language checks with regression coverage, not a proof of recognition of every
@@ -164,16 +171,19 @@ revision, never the voice state or anything else that moves with a turn.
 
 ## Optional voice and lights
 
-The table still works when `static/voice.js`, `lights.py`, or `static/sigils.html`
-is missing; the server serves a placeholder for an absent `voice.js`. The page
-loads `voice.js` and, when `window.SecondSignalVoice` exists, calls `speak` with
-the server's token only, `stopAll`, `updateState`, and `setMuted`. There is no
-microphone or browser speech recognition: `canListen` is false. On a card turn
-the page calls `stopAll` once and never calls `speak`.
-
-If `apps.talking_table.lights` is present, its `set_scene(persona_id, state)` hook
-receives `seated`, `card`, or `idle` after turns. Hook failures do not change or
-delay a turn. An added `static/sigils.html` is served at that path.
+Voice and room lights are optional, and the lights module and
+`static/sigils.html` are now in the tree. Lights start in pretend mode: they
+choose the scene without sending anything to bulbs. Enter a Govee key only in
+the computer's Settings panel, **Lights key**, then turn on **Lights on real
+bulbs**; **Remember lights on this computer** protects it with this Windows
+account, otherwise **New session** or shutdown clears it. The key never belongs
+in a chat, a file in the tree, or a packet. The lights follow whoever the policy
+seats, and the crisis card is always white. A light failure never changes or
+delays a turn. The lights view opens at `/static/sigils.html`; the Stream Deck
+addresses in `LIGHTS.md` work too. Voice uses only checked replies and the
+server's single-use token, and a card stops it; there is no microphone or
+browser speech recognition. The table still works if either optional module
+is missing.
 
 ## Local checks
 

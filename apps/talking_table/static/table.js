@@ -205,6 +205,10 @@
     $("voice-remember").checked = Boolean(settings.voice_remember);
     $("voice-key").value = "";
     $("voice-key-status").textContent = settings.voice_key_set ? "A voice key is set. Leave blank to keep it; its value is never returned to the page." : "No voice key is set.";
+    $("lights-enabled").checked = Boolean(settings.lights_enabled);
+    $("lights-remember").checked = Boolean(settings.lights_remember);
+    $("lights-key").value = "";
+    $("lights-key-status").textContent = settings.lights_key_set ? "A lights key is set. Leave blank to keep it; its value is never returned to the page." : "No lights key is set.";
     drawVoiceSlots(config);
     $("operator-circle").checked = Boolean(settings.operator_circle);
     $("api-key").value = "";
@@ -215,7 +219,7 @@
     $("settings-storage").textContent = config.storage;
     $("sigils-link").hidden = !config.sigils_available;
     const remote = !config.local;
-    for (const id of ["model-settings", "voice-settings", "circle-settings", "network-settings"]) $(id).disabled = remote;
+    for (const id of ["model-settings", "voice-settings", "lights-settings", "circle-settings", "network-settings"]) $(id).disabled = remote;
     $("save-settings").hidden = remote;
     $("remote-settings-note").hidden = !remote;
     const phone = config.phone || {};
@@ -432,7 +436,7 @@
   $("message").addEventListener("keydown", event => { if (event.key === "Enter" && !event.shiftKey && !event.isComposing) { event.preventDefault(); send(); } });
   $("settings-open").addEventListener("click", () => showSettings());
   $("settings-close").addEventListener("click", () => $("settings-dialog").close());
-  $("settings-dialog").addEventListener("close", () => { $("api-key").value = ""; $("voice-key").value = ""; });
+  $("settings-dialog").addEventListener("close", () => { $("api-key").value = ""; $("voice-key").value = ""; $("lights-key").value = ""; });
   $("operator-circle").addEventListener("change", () => { state.circleDirty = true; });
   $("adapter").addEventListener("change", () => { modelFields(); if ($("adapter").value === "fake") $("model").value = "fake-1"; else if ($("model").value === "fake-1") $("model").value = ""; });
   $("settings-form").addEventListener("submit", async event => {
@@ -444,6 +448,10 @@
     data.voice_slots = voiceSlots();
     if ($("voice-key").value) data.voice_key = $("voice-key").value;
     $("voice-key").value = "";
+    data.lights_enabled = $("lights-enabled").checked;
+    data.lights_remember = $("lights-remember").checked;
+    if ($("lights-key").value) data.lights_key = $("lights-key").value;
+    $("lights-key").value = "";
     voiceCall("stopAll");
     if ($("api-key").value) data.key = $("api-key").value;
     $("api-key").value = "";
@@ -454,7 +462,12 @@
       status("status", "Settings saved.");
     }
     catch (error) { status("settings-status", error.message, true); }
-    finally { delete data.key; delete data.voice_key; $("save-settings").disabled = false; }
+    finally { delete data.key; delete data.voice_key; delete data.lights_key; $("save-settings").disabled = false; }
+  });
+  $("clear-lights-key").addEventListener("click", async () => {
+    $("lights-key").value = "";
+    try { applyConfig(await api("/api/settings", {clear_lights_key: true, lights_remember: false})); status("settings-status", "The saved and session lights key have been forgotten."); }
+    catch (error) { status("settings-status", error.message, true); }
   });
   $("clear-voice-key").addEventListener("click", async () => {
     $("voice-key").value = "";

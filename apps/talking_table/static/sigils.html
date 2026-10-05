@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'">
+<title>SecondSignal · Who is seated</title>
+<!--
+  sigils.html: the phone page of the room lights. A prototype for the operator
+  and adults he knows; not a crisis service. It asks GET /api/state every two
+  seconds and shows whoever the policy seated. Its ask buttons send an ordinary
+  message to POST /api/turn; the policy decides. sigils.html?ask=vandal (or any
+  id) presses that button once. Plain JavaScript, no build step, nothing
+  fetched from anywhere but the Talking Table that serves it.
+-->
+<style>
+:root{--ivory:#F5F1E8;--charcoal:#252823;--rust:#A64527;--sage:#9B9B7F;--muted:#606458;--edge:#7F8277;--rule:#D5D2C7;--no-signal:#DBDBD2;color-scheme:light;font:14px/23px system-ui,sans-serif;color:var(--charcoal);background:var(--ivory)}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%}body{min-height:100svh;display:flex;flex-direction:column;background:var(--ivory)}
+button{font:600 14px/22px system-ui,sans-serif;color:inherit;border:1px solid var(--edge);border-radius:4px;background:var(--ivory);padding:10px 12px;min-height:44px;cursor:pointer;text-align:left;touch-action:manipulation}
+button:hover:enabled{text-decoration:underline;text-underline-offset:4px}button:disabled{cursor:wait;color:var(--muted)}
+:focus-visible{outline:3px solid var(--charcoal);outline-offset:4px;box-shadow:0 0 0 4px var(--ivory)}
+h1,p{margin:0}[hidden]{display:none!important}
+.header{display:flex;gap:12px;align-items:center;min-height:64px;padding:8px 16px;border-bottom:1px solid var(--rule)}
+.header svg{width:40px;height:40px;flex-shrink:0}.header h1{font-size:21px;line-height:28px;font-weight:650;letter-spacing:-.5px}
+.header .sub{margin-left:auto;font:11.5px/20px ui-monospace,monospace;color:var(--muted);text-align:right}
+#stage{flex:1 0 auto;display:flex;flex-direction:column;justify-content:center;padding:16px;min-height:52svh}
+.plate{border:1px solid var(--edge);border-radius:5px;padding:12px 8px;background:var(--no-signal);color:var(--charcoal);min-width:0;text-align:center;overflow-wrap:anywhere}
+.plate-names,.plate-labels{display:grid;grid-template-columns:minmax(0,1fr) 12px minmax(0,1fr);align-items:center;gap:0}
+.form-name{font-size:15px;line-height:20px;font-weight:400}.form-label{font-size:12px;line-height:17px;font-weight:400}.form-label:last-child{grid-column:3}.selected{font-weight:650}
+.plate-status{font-size:12px;line-height:17px;margin-top:8px}
+.plate.seat{flex:1 0 auto;display:flex;flex-direction:column;justify-content:center;gap:12px;padding:32px 12px;min-height:40svh;border-width:2px}.plate.seat .plate-names span[aria-hidden]{font-size:28px;line-height:42px}
+.plate.seat .plate-names{grid-template-columns:minmax(0,1fr) 28px minmax(0,1fr)}.plate.seat .plate-labels{grid-template-columns:minmax(0,1fr) 28px minmax(0,1fr)}
+.plate.seat .form-name{font-size:34px;line-height:42px}.plate.seat .form-label{font-size:16px;line-height:22px}.plate.seat .plate-status{font-size:16px;line-height:22px;margin-top:16px}
+.plate.assist{margin-top:16px;background:var(--ivory);border:3px double var(--charcoal);border-top:4px solid var(--sage);padding:9px 6px 10px}
+#view-idle{text-align:center}#view-idle svg{width:min(56vw,240px);height:auto;display:block;margin:0 auto 16px}
+#view-idle p,#view-waiting p{font-size:15px;line-height:23px;font-weight:550}#view-waiting{text-align:center;color:var(--muted)}
+#view-card{flex:1 0 auto;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px}
+#card-words{font:550 23px/32px system-ui,sans-serif;color:var(--charcoal)}
+#asks{padding:16px;border-top:1px solid var(--rule)}#asks>p{font-size:13px;line-height:21px;color:var(--muted);margin-bottom:12px}
+.ask-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.ask-grid button{border-left-width:8px}
+#ask-status{font:12px/20px ui-monospace,monospace;color:var(--muted);margin-top:12px;min-height:20px;overflow-wrap:anywhere}
+#notice{padding:8px 16px;border-bottom:1px solid var(--rule);font-size:13px;line-height:20px;color:var(--charcoal)}
+body[data-state=card]{background:#FFFFFF}body[data-state=card] #notice{border-bottom-color:#FFFFFF;color:var(--muted)}
+@media(min-width:700px){#stage,#asks,#notice,.header{max-width:640px;width:100%;margin-left:auto;margin-right:auto}.ask-grid{grid-template-columns:repeat(3,1fr)}}
+</style>
+</head>
+<body data-state="waiting">
+<header class="header" id="header">
+<svg viewBox="0 0 100 100" role="img" aria-label="SecondSignal mark: two nested open doorways on one baseline"><path d="M 23 82 V 24.5 Q 23 21 26.5 21 H 73.5 Q 77 21 77 24.5 V 82" fill="none" stroke="#252823" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/><path d="M 39 82 V 47 Q 39 44 42 44 H 58 Q 61 44 61 47 V 82" fill="none" stroke="#A64527" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+<h1>SecondSignal</h1><p class="sub">Who is seated</p>
+</header>
+<p id="notice">This is a prototype for the operator and adults he knows. It is not a crisis service.</p>
+<main id="stage" aria-live="polite">
+<section id="view-waiting"><p>Waiting for the Talking Table…</p></section>
+<section id="view-idle" hidden>
+<svg viewBox="0 0 100 100" role="img" aria-label="SecondSignal mark: two nested open doorways on one baseline"><path d="M 23 82 V 24.5 Q 23 21 26.5 21 H 73.5 Q 77 21 77 24.5 V 82" fill="none" stroke="#252823" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/><path d="M 39 82 V 47 Q 39 44 42 44 H 58 Q 61 44 61 47 V 82" fill="none" stroke="#A64527" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+<p>Nobody is seated. The house is resting.</p>
+</section>
+<section id="view-seated" hidden>
+<div class="plate seat" id="seated-plate" data-state="seated"><div class="plate-names"></div><div class="plate-labels"></div><p class="plate-status">Seated</p></div>
+<div class="plate assist" id="assist-plate" data-state="assisting" hidden><div class="plate-names"></div><div class="plate-labels"></div><p class="plate-status">Assisting</p></div>
+</section>
+<section id="view-card" hidden><p id="card-words">The crisis card is on the main screen.</p></section>
+</main>
+<section id="asks" aria-label="Ask for a character">
+<p>Asking sends an ordinary message. The house decides who sits, and this page and the lights show whoever it seats.</p>
+<div class="ask-grid" id="ask-grid"></div>
+<p id="ask-status" role="status"></p>
+</section>
+<script type="application/json" id="roster">
+[{"id":"cody","name":"Cody","plate":[["Cody","she"],["Cody","he"]],"names":{"as_written":["Cody","he"],"women":["Cody","she"],"men":["Cody","he"],"neither":["Cody","they"]}},
+{"id":"ellis","name":"Ellis","plate":[["Ellis","he"],["Elli","she"]],"names":{"as_written":["Elli","she"],"women":["Elli","she"],"men":["Ellis","he"],"neither":["Ellis","they"]}},
+{"id":"nikki","name":"Nikki","plate":[["Nikki","she"],["Nik","he"]],"names":{"as_written":["Nikki","she"],"women":["Nikki","she"],"men":["Nik","he"],"neither":["Nikki","they"]}},
+{"id":"rowan","name":"Rowan","plate":[["Rowan","she"],["Rowan","he"]],"names":{"as_written":["Rowan","he"],"women":["Rowan","she"],"men":["Rowan","he"],"neither":["Rowan","they"]}},
+{"id":"seren","name":"Seren","plate":[["Seren","she"],["Seren","he"]],"names":{"as_written":["Seren","she"],"women":["Seren","she"],"men":["Seren","he"],"neither":["Seren","they"]}},
+{"id":"vandal","name":"Vandal","plate":[["Vandal","she"],["Vandal","he"]],"names":{"as_written":["Vandal","he"],"women":["Vandal","she"],"men":["Vandal","he"],"neither":["Vandal","they"]}},
+{"id":"willow","name":"Willow","plate":[["Willow","she"],["Will","he"]],"names":{"as_written":["Willow","she"],"women":["Willow","she"],"men":["Will","he"],"neither":["Willow","they"]}}]
+</script>
+<script type="application/json" id="sigil-colors">{"card": "#FFFFFF", "cody": "#2A9D9A", "ellis": "#E0B020", "idle": "#FFA050", "nikki": "#D6408C", "rowan": "#3F9A4A", "seren": "#3A62D9", "vandal": "#E8741E", "willow": "#8E6CC8"}</script>
+<script>
+'use strict';
+const ROSTER=JSON.parse(document.getElementById('roster').textContent);
+const COLOURS=JSON.parse(document.getElementById('sigil-colors').textContent||'{}');
+const BY_ID=new Map(ROSTER.map(p=>[p.id,p]));
+const SETTINGS=['as_written','women','men','neither'];
+const POLL_MS=2000;
+const $=id=>document.getElementById(id);
+let pollTimer=null,sending=false,lastState=null;
+
+function element(tag,text,cls){const el=document.createElement(tag);if(text!==undefined)el.textContent=text;if(cls)el.className=cls;return el;}
+function settingFor(id,presentation){
+  let s=presentation;
+  if(s&&typeof s==='object')s=s[id]??s.setting??s.default;
+  return SETTINGS.includes(s)?s:'as_written';
+}
+function hexOk(c){return typeof c==='string'&&/^#[0-9a-fA-F]{6}$/.test(c);}
+function luminance(hex){
+  const ch=[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)/255).map(v=>v<=0.03928?v/12.92:Math.pow((v+0.055)/1.055,2.4));
+  return 0.2126*ch[0]+0.7152*ch[1]+0.0722*ch[2];
+}
+function inkFor(hex){
+  const bg=luminance(hex),dark=luminance('#252823'),light=luminance('#F5F1E8');
+  const onDark=(Math.max(bg,dark)+0.05)/(Math.min(bg,dark)+0.05),onLight=(Math.max(bg,light)+0.05)/(Math.min(bg,light)+0.05);
+  return onDark>=onLight?'#252823':'#F5F1E8';
+}
+// The plate, drawn the way demo/index.html draws it: both name forms, labels beneath, the chosen form in bold.
+function drawPlate(plate,profile,setting){
+  const names=plate.querySelector('.plate-names'),labels=plate.querySelector('.plate-labels');
+  names.replaceChildren();labels.replaceChildren();
+  const pair=profile.names[setting]||profile.names.as_written;
+  const selected=setting==='neither'?0:profile.plate.findIndex(([n,l])=>n===pair[0]&&l===pair[1]);
+  profile.plate.forEach(([name,label],index)=>{
+    const form=element('span',name,'form-name');if(index===selected)form.classList.add('selected');
+    const shown=setting==='neither'&&index===0?pair[1]:label;
+    const lab=element('span',shown,'form-label');if(index===selected)lab.classList.add('selected');
+    names.append(form);labels.append(lab);
+    if(index===0){const slash=element('span',' / ');slash.setAttribute('aria-hidden','true');names.append(slash);}
+  });
+  plate.dataset.agentId=profile.id;
+  plate.setAttribute('aria-label',`${plate.dataset.state==='seated'?'Seated':'Assisting'}: ${pair[0]} (${pair[1]})`);
+}
+function show(view){for(const v of ['waiting','idle','seated','card'])$('view-'+v).hidden=v!==view;document.body.dataset.state=view;}
+function render(s){
+  lastState=s;
+  const state=s&&typeof s==='object'?s.state:null;
+  // The card first and alone: no plate, no name, no colour, no ask buttons.
+  if(state==='card'){
+    show('card');$('header').hidden=true;$('asks').hidden=true;
+    const seat=$('seated-plate');seat.dataset.agentId='';seat.style.background='';
+    document.title='SecondSignal · The crisis card';return;
+  }
+  $('header').hidden=false;$('asks').hidden=false;
+  const profile=state==='seated'?BY_ID.get(s.seated):undefined;
+  if(!profile){show(state==='idle'||state==='seated'?'idle':'waiting');document.title='SecondSignal · Nobody is seated';return;}
+  const seat=$('seated-plate'),colour=hexOk(s.colour)?s.colour:(hexOk(COLOURS[profile.id])?COLOURS[profile.id]:'#A64527');
+  seat.style.background=colour;seat.style.borderColor=colour;seat.style.color=inkFor(colour);
+  drawPlate(seat,profile,settingFor(profile.id,s.presentation));
+  const assist=BY_ID.get(s.assist),assistPlate=$('assist-plate');
+  if(assist&&assist.id!==profile.id){drawPlate(assistPlate,assist,settingFor(assist.id,s.presentation));assistPlate.hidden=false;}
+  else{assistPlate.hidden=true;assistPlate.dataset.agentId='';}
+  show('seated');document.title=`SecondSignal · ${profile.name} is seated`;
+}
+async function poll(){
+  clearTimeout(pollTimer);
+  try{
+    const response=await fetch('/api/state',{cache:'no-store',headers:{'Accept':'application/json'}});
+    if(!response.ok)throw new Error('status '+response.status);
+    render(await response.json());
+  }catch(error){if(!lastState)show('waiting');}
+  pollTimer=setTimeout(poll,POLL_MS);
+}
+async function ask(profile){
+  if(sending)return;
+  sending=true;for(const b of $('ask-grid').querySelectorAll('button'))b.disabled=true;
+  const text=`Could I talk to ${profile.name}?`;
+  $('ask-status').textContent=`Sending “${text}”…`;
+  try{
+    const response=await fetch('/api/turn',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text})});
+    if(!response.ok)throw new Error('status '+response.status);
+    $('ask-status').textContent=`Sent “${text}” The house decides who sits.`;
+  }catch(error){$('ask-status').textContent='The Talking Table did not take the message. Try again in a moment.';}
+  finally{sending=false;for(const b of $('ask-grid').querySelectorAll('button'))b.disabled=false;poll();}
+}
+for(const profile of ROSTER){
+  const button=element('button',`Ask for ${profile.name}`);button.type='button';button.dataset.persona=profile.id;
+  if(hexOk(COLOURS[profile.id]))button.style.borderLeftColor=COLOURS[profile.id];
+  button.addEventListener('click',()=>ask(profile));
+  $('ask-grid').append(button);
+}
+// sigils.html?ask=vandal presses the Vandal button once, for a Stream Deck key or a desktop shortcut.
+const wanted=new URLSearchParams(location.search).get('ask');
+if(wanted&&BY_ID.has(wanted.toLowerCase())){
+  history.replaceState(null,'',location.pathname);
+  $('ask-grid').querySelector(`button[data-persona="${wanted.toLowerCase()}"]`).click();
+}else{poll();}
+</script>
+</body>
+</html>

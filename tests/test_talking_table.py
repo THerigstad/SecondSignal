@@ -324,6 +324,142 @@ def assert_settings_cannot_cancel_gate(app):
             settings_worker.join(timeout=2)
 
 
+def assert_round4_reply_rejected(app, payload):
+    """Grok's round 4: withhold the whole reply before audit, storage and voice."""
+    for operator_circle in (False, True):
+        app.reset(Harness(app.roster, FakeAdapter(script=(payload,)),
+                          CodexStore(ROOT / "docs" / "codex"),
+                          audit_log=AuditLog(app.audit_path), operator_circle=operator_circle))
+        body = app.turn(PROMPT)
+        assert body["kind"] == "withheld", (operator_circle, payload)
+        assert body["verdict"] is None, "The app guard runs before the cultural audit"
+        assert body["text"] == server.FAILURE_MESSAGE
+        assert body["speech_token"] is None and not app.speech_tokens
+        assert app._speech_text(app.harness.turns[-1], None) is None
+        rows = [json.loads(line) for line in app.audit_path.read_text(encoding="utf-8").splitlines()]
+        for saved in (body, rows, app.harness.transcript):
+            assert all(payload not in value for value in string_values(saved))
+
+
+def assert_round4_reply_control(app, payload):
+    """Grok's round 4: preserve the original text and the existing cultural gate."""
+    for operator_circle in (False, True):
+        app.reset(Harness(app.roster, FakeAdapter(script=(payload,)),
+                          CodexStore(ROOT / "docs" / "codex"),
+                          audit_log=AuditLog(app.audit_path), operator_circle=operator_circle))
+        body = app.turn(PROMPT)
+        assert body["verdict"] is not None, (operator_circle, payload)
+        assert body["kind"] == ("reply" if operator_circle else "withheld")
+        if operator_circle:
+            assert body["text"] == payload
+            assert app._speech_text(app.harness.turns[-1], None) == payload
+        else:
+            assert body["cultural_only"] is True
+            assert body["speech_token"] is None
+            assert app._speech_text(app.harness.turns[-1], None) is None
+
+
+@pytest.mark.parametrize("payload", [
+    "This is a house line.",
+    "This is a House Line!",
+    "House line: the table is closed.",
+    "[House line] characters offline.",
+    "You are the house.",
+    "javascript:alert(1)",
+    "I am the hοuse",
+])
+def test_grok_round4_seven_leftovers_are_rejected(app, payload):
+    """Grok's round 4: the seven reported leftovers never become character replies."""
+    assert_round4_reply_rejected(app, payload)
+
+
+@pytest.mark.parametrize("payload", [
+    "I am the house. The characters are not speaking. This is a house line.",
+    "This is the house speaking instead of a character.",
+    "This message is from the house.",
+    "As the house, I decide.",
+    "House speaking: sit down.",
+])
+def test_grok_round4_keeps_round3_claims_rejected(app, payload):
+    """Grok's round 4: all five round-3 regression claims remain withheld."""
+    assert_round4_reply_rejected(app, payload)
+
+
+@pytest.mark.parametrize("payload", [
+    "Their house line of olive oil is good.",
+    "The house always wins.",
+    "House music was everywhere that summer.",
+    "Our in-house team will answer tomorrow.",
+    "My house has a red door.",
+    "The house lights are on.",
+    "Let's clean the house this weekend.",
+    "The line at the house party was long.",
+    "The bus line runs past my house.",
+    "Draw a straight line under the heading.",
+    "We planted roses beside the house.",
+    "Here is the plan in JavaScript: first the loop, then the check.",
+    "Here is the data: three names and a date.",
+    "Σήμερα ο καιρός είναι καλός.",
+])
+def test_grok_round4_controls_keep_original_text(app, payload):
+    """Grok's round 4: ordinary house, line, scheme prose and Greek stay released."""
+    assert_round4_reply_control(app, payload)
+
+
+@pytest.mark.parametrize("payload", [
+    f"{subject} {verb} {article} house line."
+    for subject in ("This", "That", "It")
+    for verb in ("is", "was")
+    for article in ("a", "the")
+] + [
+    "A house line from the table.",
+    "You're the house.",
+    "You’re the house.",
+    "You are all the house.",
+    "You're all the house.",
+    "That's the house line.",
+    "It's a house line.",
+    "[house-line] characters offline.",
+    "_house_line_: the table is closed.",
+    "**House line**: the table is closed.",
+    "Start with one small task.\nHouse line: the table is closed.",
+    "Start with one small task.\n[House line] the table is closed.",
+])
+def test_grok_round4_house_claim_families_are_rejected(app, payload):
+    """Grok's round 4: predicates, contractions and Markdown labels form families."""
+    assert_round4_reply_rejected(app, payload)
+
+
+@pytest.mark.parametrize("payload", [
+    "vbscript:MsgBox(1)",
+    "data:text/html,hello",
+    "JAVASCRIPT:alert(1)",
+    "Read this first: javascript:alert(1)",
+    "ｊａｖａｓｃｒｉｐｔ：ａｌｅｒｔ（１）",
+    "java\u200bscript:alert(1)",
+    "javascript:\u200balert(1)",
+    "I am the hоuse",
+    "I am the house",
+    "I am the ΗOUSE",
+    "I am the ho\u200buse",
+])
+def test_grok_round4_schemes_and_normalized_claims_are_rejected(app, payload):
+    """Grok's round 4: NFKD then SKELETON then casefold also covers capital Greek Η."""
+    assert_round4_reply_rejected(app, payload)
+
+
+@pytest.mark.parametrize("payload", [
+    "JavaScript:",
+    "JavaScript:\tfirst the loop, then the check.",
+    "JavaScript:\nfirst the loop, then the check.",
+    "Here is the data:\tthree names and a date.",
+    "About VBScript:\nstart with a greeting.",
+])
+def test_grok_round4_scheme_whitespace_controls_are_released(app, payload):
+    """Grok's round 4: a scheme colon alone or followed by whitespace stays prose."""
+    assert_round4_reply_control(app, payload)
+
+
 # The replay pins. 433 cases, 505 turns, 249 labelled escalations, 82 actual and
 # 166 known gaps at kit 1D (30 September 2026). Since 4 October 2026: the seven
 # ruling-sourced fixtures of 28 September (one escalates), the five Spanish -e
@@ -332,10 +468,10 @@ def assert_settings_cannot_cancel_gate(app):
 # named below), Grok's 30 vague openers (ruling 5), ChatGPT's assist pin (ruling 8)
 # and the four reviewer fixtures Codex asked for joined the labelled suite.
 # Recomputed at integration, 4 October.
-CASES_PIN = 552
-TURNS_PIN = 632
-LABELLED_PIN = 325
-ACTUAL_PIN = 142
+CASES_PIN = 667  # 552 at f350424; B7 of 5 October 2026 ported 115 of Grok's cases (65 identity, 50 neurodivergent)
+TURNS_PIN = 747      # 632 + the 115 single-turn cases of B7
+LABELLED_PIN = 340   # 325 + B7's 15 wrapped crisis lines (5 identity, 10 neurodivergent)
+ACTUAL_PIN = 157     # all 15 escalate; none is a known gap
 GAPS_PIN = 182
 KNOWN_GAP_CHARACTER_ANSWERS = [
     "fuzz-one-letter-dropped-other-person-weapon-001",
@@ -772,3 +908,364 @@ def test_country_setting_changes_only_the_resource_line(app):
     offered = set(re.findall(r'<select id="locale">(.*?)</select>', html, re.S)[0].split("<option value=\""))
     offered = {chunk.split('"')[0] for chunk in offered if chunk and not chunk.startswith(">")}
     assert offered == (set(RESOURCES["rows"]) - {"default"}) | {""}
+
+
+# C1 room-lights integration: the actual Table, with test-only credentials and
+# a loopback Govee stand-in. No vendor service is used by these checks.
+LIGHTS_TEST_KEY = "test-lights-key-DO-NOT-LOG-not-a-real-key"
+
+
+def _wait_for_table_lights(app):
+    drained = threading.Event()
+
+    def wait():
+        app.lights.pending.join()
+        drained.set()
+
+    threading.Thread(target=wait, daemon=True).start()
+    assert drained.wait(timeout=5), "the optional lights queue did not drain"
+
+
+def _fake_table_lights(monkeypatch, fake):
+    from apps.talking_table import lights
+
+    original_type, original_scene = lights.Lights, lights.set_scene
+    results = []
+    monkeypatch.setattr(lights, "_default", None)
+    monkeypatch.setattr(lights, "Lights", lambda api_key=None: original_type(
+        api_key=api_key, base_url=fake.base_url, min_gap_seconds=0))
+
+    def capture(persona, state, api_key=None):
+        result = original_scene(persona, state, api_key=api_key)
+        results.append(result)
+        return result
+
+    monkeypatch.setattr(lights, "set_scene", capture)
+    return results
+
+
+def test_lights_settings_default_off_and_validate_without_adopting_bad_values(app):
+    settings = app.config()["settings"]
+    assert settings["lights_enabled"] is settings["lights_remember"] is False
+    assert settings["lights_key_set"] is False and app.lights_key == ""
+    assert "lights_key" not in settings and "lights_key_blob" not in settings
+    for proposed in ({"lights_key": []}, {"lights_key": "x" * 4097},
+                     {"lights_enabled": 1}, {"lights_enabled": "true"},
+                     {"lights_remember": 0}, {"lights_remember": "false"},
+                     {"clear_lights_key": "true"}):
+        with pytest.raises(server.InputError):
+            app.update_settings(proposed)
+        assert app.lights_key == "" and app.settings["lights_enabled"] is False
+        assert not app.settings_path.exists()
+
+
+@pytest.mark.parametrize("model_remember,voice_remember,lights_remember", [
+    (model, voice, room) for model in (False, True)
+    for voice in (False, True) for room in (False, True)
+])
+def test_lights_remember_has_an_independent_protected_blob_and_session_lifetime(
+        tmp_path, monkeypatch, model_remember, voice_remember, lights_remember):
+    """The reversible test protector checks wiring; Windows supplies real DPAPI."""
+    from apps.talking_table import lights
+
+    def protect(value, *, decrypt=False):
+        return bytes(byte ^ 0xA5 for byte in value)
+
+    monkeypatch.setattr(server, "_secret_blob", protect)
+    monkeypatch.setattr(lights, "set_scene", lambda *args, **kwargs: {"error": None})
+    voice_key = "test-voice-key-for-lights-isolation-not-real"
+    first = server.TableApp(data_dir=tmp_path / "keys")
+    second = None
+    try:
+        first.update_settings({"key": TEST_KEY, "remember": model_remember,
+                               "voice_key": voice_key, "voice_remember": voice_remember,
+                               "lights_key": LIGHTS_TEST_KEY, "lights_remember": lights_remember,
+                               "lights_enabled": True})
+        exists = model_remember or voice_remember or lights_remember
+        assert first.settings_path.exists() is exists
+        stored = first.settings_path.read_text(encoding="utf-8") if exists else "{}"
+        saved = json.loads(stored)
+        for secret in (TEST_KEY, voice_key, LIGHTS_TEST_KEY):
+            assert secret not in stored
+        for name, secret, remembered in (("key_blob", TEST_KEY, model_remember),
+                                        ("voice_key_blob", voice_key, voice_remember),
+                                        ("lights_key_blob", LIGHTS_TEST_KEY, lights_remember)):
+            assert (name in saved) is remembered
+            if remembered:
+                encrypted = base64.b64decode(saved[name], validate=True)
+                assert encrypted != secret.encode()
+                assert protect(encrypted, decrypt=True).decode() == secret
+        assert "lights_key" not in saved.get("settings", {})
+        second = server.TableApp(data_dir=first.data_dir)
+        assert second.key == (TEST_KEY if model_remember else "")
+        assert second.voice_key == (voice_key if voice_remember else "")
+        assert second.lights_key == (LIGHTS_TEST_KEY if lights_remember else "")
+        assert second.settings["lights_enabled"] is lights_remember
+        first.reset()
+        _wait_for_table_lights(first)
+        assert (first.key, first.voice_key, first.lights_key) == (
+            second.key, second.voice_key, second.lights_key)
+        first.update_settings({"remember": False, "voice_remember": False,
+                               "lights_remember": False, "clear_key": True,
+                               "clear_voice_key": True, "clear_lights_key": True})
+        assert not first.settings_path.exists() and first.lights_key == ""
+    finally:
+        for instance in (first, second):
+            if instance is not None:
+                instance.update_settings({"lights_enabled": False})
+                instance.close()
+                _wait_for_table_lights(instance)
+
+
+def test_lights_remember_protection_failure_is_atomic(app, monkeypatch, caplog):
+    def unavailable(value, *, decrypt=False):
+        raise server.InputError("The computer could not protect or unlock the saved key.")
+
+    monkeypatch.setattr(server, "_secret_blob", unavailable)
+    with live(app) as listener:
+        status, body, _ = request(listener, "/api/settings", {
+            "lights_key": LIGHTS_TEST_KEY, "lights_enabled": True, "lights_remember": True})
+        assert status == 400 and LIGHTS_TEST_KEY not in json.dumps(body)
+    assert app.lights_key == "" and app.settings["lights_remember"] is False
+    assert app.settings["lights_enabled"] is False and not app.settings_path.exists()
+    assert LIGHTS_TEST_KEY not in caplog.text
+
+
+def test_lights_remember_native_protection_roundtrips_or_refuses_atomically(app):
+    # Windows sandbox identities may lack a DPAPI master key. Exercise that
+    # native refusal too; do not mistake the stand-in above for encryption.
+    try:
+        protected = server._secret_blob(LIGHTS_TEST_KEY.encode())
+        recovered = server._secret_blob(protected, decrypt=True).decode()
+    except server.InputError:
+        with pytest.raises(server.InputError, match="protect or unlock"):
+            app.update_settings({"lights_key": LIGHTS_TEST_KEY, "lights_remember": True})
+        assert app.lights_key == "" and not app.settings_path.exists()
+        assert app.settings["lights_remember"] is False
+        return
+    assert recovered == LIGHTS_TEST_KEY and protected != LIGHTS_TEST_KEY.encode()
+    app.update_settings({"lights_key": LIGHTS_TEST_KEY, "lights_remember": True})
+    stored = app.settings_path.read_text(encoding="utf-8")
+    saved = json.loads(stored)
+    assert LIGHTS_TEST_KEY not in stored
+    protected = base64.b64decode(saved["lights_key_blob"], validate=True)
+    assert protected != LIGHTS_TEST_KEY.encode()
+    assert server._secret_blob(protected, decrypt=True).decode() == LIGHTS_TEST_KEY
+    assert "key_blob" not in saved and "voice_key_blob" not in saved
+    restored = server.TableApp(data_dir=app.data_dir)
+    try:
+        assert restored.lights_key == LIGHTS_TEST_KEY
+        assert restored.key == restored.voice_key == ""
+        assert restored.config()["settings"]["lights_key_set"] is True
+        assert LIGHTS_TEST_KEY not in json.dumps(restored.config())
+    finally:
+        restored.close()
+        _wait_for_table_lights(restored)
+
+
+def test_lights_key_never_enters_config_page_turn_audit_or_logs_even_after_clearing(app, caplog):
+    with live(app) as listener:
+        status, body, _ = request(listener, "/api/settings", {"lights_key": LIGHTS_TEST_KEY})
+        assert status == 200 and body["settings"]["lights_key_set"] is True
+        responses = [body]
+        for path in ("/api/config", "/api/state", "/", "/static/table.js", "/sigils.html"):
+            status, response, headers = request(listener, path)
+            assert status == 200
+            responses.extend((response, headers))
+        assert request(listener, "/api/turn", {"text": LIGHTS_TEST_KEY})[0] == 400
+        assert request(listener, "/api/settings", {"model": LIGHTS_TEST_KEY})[0] == 400
+        app.reset(Harness(app.roster, FakeAdapter(script=(LIGHTS_TEST_KEY,)),
+                          CodexStore(ROOT / "docs" / "codex"),
+                          audit_log=AuditLog(app.audit_path), operator_circle=True))
+        status, rejected, _ = request(listener, "/api/turn", {"text": PROMPT})
+        assert status == 200 and rejected["kind"] != "reply"
+        responses.append(rejected)
+        assert request(listener, "/api/settings", {"clear_lights_key": True})[0] == 200
+        assert app.lights_key == ""
+        assert request(listener, "/api/turn", {"text": LIGHTS_TEST_KEY})[0] == 400
+        assert request(listener, "/api/settings", {"model": LIGHTS_TEST_KEY})[0] == 400
+        status, card, _ = request(listener, "/api/turn", {"text": CRISIS + " " + LIGHTS_TEST_KEY})
+        assert status == 200 and card["kind"] == "card" and card["adapter_calls"] == 0
+        responses.append(card)
+        assert LIGHTS_TEST_KEY not in repr(responses)
+        assert LIGHTS_TEST_KEY not in repr(app.harness.transcript)
+    _wait_for_table_lights(app)
+    assert LIGHTS_TEST_KEY not in caplog.text
+    for path in app.data_dir.rglob("*"):
+        if path.is_file():
+            assert LIGHTS_TEST_KEY.encode() not in path.read_bytes()
+
+
+@pytest.mark.parametrize("change,expected_key", [
+    ({"clear_lights_key": True}, None),
+    ({"lights_enabled": False}, None),
+    ({"lights_key": "test-lights-ROTATED-not-real"}, "test-lights-ROTATED-not-real"),
+])
+def test_queued_lights_read_current_key_and_switch_without_queueing_secrets(
+        app, monkeypatch, change, expected_key):
+    from apps.talking_table import lights
+
+    entered, release = threading.Event(), threading.Event()
+    calls = []
+
+    def scene(persona, state, api_key=None):
+        calls.append((persona, state, api_key))
+        if len(calls) == 1:
+            entered.set()
+            assert release.wait(timeout=5)
+        return {"error": None}
+
+    monkeypatch.setattr(lights, "set_scene", scene)
+    try:
+        app.update_settings({"lights_key": LIGHTS_TEST_KEY, "lights_enabled": True})
+        reply = app.turn(PROMPT)
+        assert entered.wait(timeout=2)
+        card = app.turn(CRISIS)
+        assert card["kind"] == "card" and not release.is_set()
+        with app.lights.pending.mutex:
+            queued = list(app.lights.pending.queue)
+        assert queued == [(None, "card")]
+        assert LIGHTS_TEST_KEY not in repr(queued)
+        app.update_settings(change)
+        release.set()
+        _wait_for_table_lights(app)
+        assert calls == [(reply["persona"], "seated", LIGHTS_TEST_KEY),
+                         (None, "card", expected_key)]
+    finally:
+        release.set()
+        app.update_settings({"lights_enabled": False})
+        _wait_for_table_lights(app)
+
+
+def test_real_table_uses_settings_key_only_for_govee_headers_and_card_white(
+        app, monkeypatch, caplog, capsys):
+    from test_lights import FakeGovee
+
+    monkeypatch.setattr(server, "_secret_blob", lambda value, decrypt=False: bytes(
+        byte ^ 0xA5 for byte in value))
+    with FakeGovee() as fake:
+        results = _fake_table_lights(monkeypatch, fake)
+        try:
+            with live(app) as listener:
+                status, _, _ = request(listener, "/api/settings", {
+                    "lights_key": LIGHTS_TEST_KEY, "lights_remember": True})
+                assert status == 200
+                stored = app.settings_path.read_text(encoding="utf-8")
+                saved = json.loads(stored)
+                assert "lights_key_blob" in saved
+                assert "key_blob" not in saved and "voice_key_blob" not in saved
+                assert LIGHTS_TEST_KEY not in stored and "lights_key" not in saved["settings"]
+                assert request(listener, "/api/turn", {"text": PROMPT})[0] == 200
+                _wait_for_table_lights(app)
+                assert fake.requests == [] and results[-1]["mode"] == "pretend"
+                request(listener, "/api/settings", {"lights_enabled": True})
+                status, card, _ = request(listener, "/api/turn", {"text": CRISIS})
+                _wait_for_table_lights(app)
+                assert status == 200 and card["kind"] == "card" and card["adapter_calls"] == 0
+                assert results[-1]["mode"] == "govee" and results[-1]["error"] is None
+                assert results[-1]["persona"] is None and results[-1]["colour"] == "#FFFFFF"
+                controls = fake.controls()
+                assert [item["payload"]["capability"]["value"] for item in controls
+                        if item["payload"]["capability"]["instance"] == "colorRgb"] == [0xFFFFFF]
+                assert [item["method"] for item in fake.requests] == ["GET", "POST", "POST"]
+                for captured in fake.requests:
+                    headers = {name.lower(): value for name, value in captured["headers"].items()}
+                    assert headers.pop("govee-api-key") == LIGHTS_TEST_KEY
+                    assert LIGHTS_TEST_KEY not in repr((headers, captured["path"], captured["body"]))
+                assert LIGHTS_TEST_KEY not in json.dumps(request(listener, "/api/config")[1])
+                fake.requests.clear()
+                request(listener, "/api/settings", {"lights_enabled": False})
+                request(listener, "/api/turn", {"text": CRISIS})
+                _wait_for_table_lights(app)
+                assert fake.requests == [] and results[-1]["mode"] == "pretend"
+                request(listener, "/api/settings", {"clear_lights_key": True, "lights_enabled": True})
+                request(listener, "/api/turn", {"text": CRISIS})
+                _wait_for_table_lights(app)
+                assert fake.requests == [] and results[-1]["mode"] == "pretend"
+        finally:
+            app.update_settings({"lights_enabled": False})
+            _wait_for_table_lights(app)
+    printed = capsys.readouterr()
+    assert LIGHTS_TEST_KEY not in caplog.text + printed.out + printed.err + repr(results)
+
+
+@pytest.mark.parametrize("fake_options", [{"status": 401}, {"slow_devices": 4}])
+def test_govee_refusal_and_timeout_return_error_dict_and_fixed_table_warning(
+        app, monkeypatch, caplog, fake_options):
+    from test_lights import FakeGovee
+
+    with FakeGovee(**fake_options) as fake:
+        results = _fake_table_lights(monkeypatch, fake)
+        try:
+            app.update_settings({"lights_key": LIGHTS_TEST_KEY, "lights_enabled": True})
+            card = app.turn(CRISIS)
+            assert card["kind"] == "card" and card["adapter_calls"] == 0
+            _wait_for_table_lights(app)
+            assert results[-1]["sent"] is False and results[-1]["error"]
+            assert "Optional lights failed; turn unchanged." in caplog.messages
+            assert LIGHTS_TEST_KEY not in caplog.text + repr(results) + repr(card)
+        finally:
+            app.update_settings({"lights_enabled": False})
+            _wait_for_table_lights(app)
+
+
+def test_sigils_alias_serves_the_page_with_exact_inline_hashes_and_keeps_table_csp(app):
+    import hashlib
+
+    with live(app) as listener:
+        status, page, headers = request(listener, "/sigils.html")
+        assert status == 200
+        assert request(listener, "/static/sigils.html")[1] == page
+        policy = headers["Content-Security-Policy"]
+        html = page.decode("utf-8").replace("\r\n", "\n").replace("\r", "\n")
+        for tag in ("script", "style"):
+            for attrs, source in re.findall(r"<" + tag + r"\b([^>]*)>(.*?)</" + tag + ">", html, re.S):
+                if tag == "script" and 'type="application/json"' in attrs:
+                    continue
+                digest = base64.b64encode(hashlib.sha256(source.encode()).digest()).decode()
+                assert "'sha256-" + digest + "'" in policy
+        assert "'unsafe-inline'" not in policy and "connect-src 'self'" in policy
+        root_policy = request(listener, "/")[2]["Content-Security-Policy"]
+        assert "script-src 'self';" in root_policy and "sha256-" not in root_policy
+
+
+def test_sigils_runs_against_real_table_and_card_screenshot_is_white(app, tmp_path):
+    from test_lights import BROWSER, PERSONA_COLOURS, _png_pixels, _rgb, _run_browser, _visible
+
+    if not BROWSER:
+        pytest.skip("headless Chrome/Chromium is absent; real Table sigils screenshot cannot run")
+    expected = Harness(app.roster, FakeAdapter(), CodexStore(ROOT / "docs" / "codex"),
+                       audit_log=AuditLog()).speak("Could I talk to Vandal?")
+    expected_state = ("card" if expected.action == "HUMAN_ESCALATION" else
+                      "seated" if expected.agent_id else "idle")
+    with live(app) as listener:
+        url = f"http://127.0.0.1:{listener.server_address[1]}/sigils.html"
+        idle = _visible(_run_browser(url))
+        assert idle.body.get("data-state") == "idle"
+        assert "Nobody is seated" in idle.text
+        asked = _visible(_run_browser(url + "?ask=vandal"))
+        state = request(listener, "/api/state")[1]
+        assert state["turn_count"] == 1 and state["state"] == expected_state
+        assert asked.body.get("data-state") == expected_state
+        if expected_state == "seated":
+            assert asked.elements["seated-plate"].get("data-agent-id") == expected.agent_id
+            assert state["seated"] == expected.agent_id
+        elif expected_state == "idle":
+            assert "Nobody is seated" in asked.text and state["seated"] is None
+        assert app.harness.transcript[0]["content"] == "Could I talk to Vandal?"
+        reply = request(listener, "/api/turn", {"text": PROMPT})[1]
+        assert reply["state"]["state"] == "seated" and reply["persona"] is not None
+        seated = _visible(_run_browser(url))
+        assert seated.body.get("data-state") == "seated"
+        assert seated.elements["seated-plate"].get("data-agent-id") == reply["persona"]
+        assert request(listener, "/api/turn", {"text": CRISIS})[1]["kind"] == "card"
+        card = _visible(_run_browser(url))
+        assert card.body.get("data-state") == "card"
+        assert "The crisis card is on the main screen." in card.text
+        assert "hidden" in card.elements["view-seated"] and "hidden" in card.elements["asks"]
+        screenshot = tmp_path / "real-card.png"
+        _run_browser(url, screenshot=screenshot)
+        width, height, pixels = _png_pixels(screenshot)
+        assert (width, height) == (390, 844)
+        assert pixels.count((255, 255, 255)) > 0.8 * len(pixels)
+        assert all(_rgb(colour) not in pixels for colour in PERSONA_COLOURS.values())

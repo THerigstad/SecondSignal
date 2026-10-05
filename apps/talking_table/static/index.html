@@ -66,7 +66,7 @@
     </div>
     <div class="dialog-heading"><div><p class="eyebrow">YOUR TABLE</p><h2 id="settings-title">Settings</h2></div><button id="settings-close" type="button" aria-label="Close settings">Close</button></div>
     <p class="dialog-prototype">A prototype for the operator and adults the operator knows. Not a crisis service.</p>
-    <p id="remote-settings-note" class="small" hidden>Model, voice, key and Wi-Fi settings are controlled on the computer.</p>
+    <p id="remote-settings-note" class="small" hidden>Model, voice, lights, key and Wi-Fi settings are controlled on the computer.</p>
     <form id="settings-form">
       <fieldset id="voice-settings"><legend>Voice · ElevenLabs</legend>
         <label class="checkbox"><input id="voice-enabled" type="checkbox"><span>Enable voice for checked replies</span></label>
@@ -77,6 +77,13 @@
         <p class="setting-note voice-slot-note">Enter your own voice IDs. Empty slots stay silent; each presentation has its own slot.</p>
         <div class="voice-slot-scroll" tabindex="0" role="region" aria-label="Character voice slots"><table class="voice-slots"><caption>Seven characters · four presentations</caption><thead><tr><th scope="col">Character</th><th scope="col">As written</th><th scope="col">Woman</th><th scope="col">Man</th><th scope="col">Neither</th></tr></thead><tbody id="voice-slots"></tbody></table></div>
         <p class="setting-note">The crisis card, withheld replies and failure lines are always silent. In operator-circle mode a released reply speaks and the voice carries the mode's label. On the turn after a crisis card the whole reply is spoken once, safety lines included.</p>
+      </fieldset>
+      <fieldset id="lights-settings"><legend>Room lights · Govee</legend>
+        <label class="checkbox"><input id="lights-enabled" type="checkbox"><span>Lights on real bulbs</span></label>
+        <label for="lights-key">Lights key</label><input id="lights-key" type="password" autocomplete="new-password" spellcheck="false" value=""><p id="lights-key-status" class="setting-note">No lights key is set.</p>
+        <p class="setting-note">Lights stay in pretend mode until a key is set and Lights on real bulbs is on; the crisis card is always white.</p>
+        <label class="checkbox"><input id="lights-remember" type="checkbox"><span>Remember lights on this computer</span></label><p class="setting-note">Protects the saved key on this Windows account. Otherwise it stays in server memory until New session or shutdown.</p>
+        <button id="clear-lights-key" class="small-button" type="button">Forget saved and session lights key</button>
       </fieldset>
       <fieldset id="model-settings"><legend>Model and access</legend>
         <label for="adapter">Model family</label><select id="adapter"><option value="fake">Pretend model</option><option value="gemini">Gemini</option><option value="openai">OpenAI</option><option value="anthropic">Anthropic</option><option value="xai">xAI</option><option value="compatible">Other compatible host</option></select>

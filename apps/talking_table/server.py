@@ -28,6 +28,7 @@ from pathlib import Path
 from typing import Callable
 
 from secondsignal.lexicon import RESOURCES
+from secondsignal.normalize import SKELETON
 from secondsignal.profiles import load_roster
 from secondsignal.safety import HOUSE_LINES_EN
 from secondsignal_harness import AuditLog, CodexStore, Harness
@@ -107,7 +108,8 @@ def _secret_blob(value: bytes, *, decrypt: bool = False) -> bytes:
 class SceneWorker:
     """One daemon worker; a stuck optional light driver cannot block a turn."""
 
-    def __init__(self):
+    def __init__(self, current_key: Callable[[], str | None] | None = None):
+        self.current_key = current_key or (lambda: None)
         self.pending: queue.Queue = queue.Queue()
         self.thread = threading.Thread(target=self._run, daemon=True, name="table-lights")
         self.thread.start()
@@ -118,17 +120,28 @@ class SceneWorker:
     def _run(self):
         while True:
             item = self.pending.get()
-            if item is None:
-                return
+            key = None
             try:
+                if item is None:
+                    return
                 module = importlib.import_module("apps.talking_table.lights")
-                module.set_scene(*item)
+                # Read the switch and key at execution, never when queuing.
+                # The original two-argument hook remains valid in pretend mode.
+                key = self.current_key()
+                result = module.set_scene(*item, api_key=key) if key else module.set_scene(*item)
+                if isinstance(result, dict) and result.get("error"):
+                    LOG.warning("Optional lights failed; turn unchanged.")
             except ModuleNotFoundError as exc:
                 if exc.name != "apps.talking_table.lights":
                     LOG.warning("Optional lights unavailable; turn unchanged.")
             except Exception:
                 # Driver messages can contain arbitrary input; do not print them.
                 LOG.warning("Optional lights failed; turn unchanged.")
+            finally:
+                # Do not retain a plaintext credential while waiting for the
+                # next scene (Settings may forget it during that wait).
+                key = None
+                self.pending.task_done()
 
     def close(self):
         self.submit(None, "idle")
@@ -157,11 +170,12 @@ class _Cancelled(Exception):
 def _reply_surface(text):
     """Normalize a detection copy, never rewrite an accepted model's words.
 
-    Compatibility letters, accents, typographic punctuation and invisible
-    formatting must not hide a reserved role. Keeping newlines here also lets
-    speaker labels be checked independently of surrounding prose.
+    Compatibility and look-alike letters, accents, typographic punctuation
+    and invisible formatting must not hide a reserved role. Keeping newlines
+    here also lets speaker labels be checked independently of surrounding prose.
     """
-    text = unicodedata.normalize("NFKD", text).casefold()
+    text = unicodedata.normalize("NFKD", text)
+    text = "".join(SKELETON.get(char, char) for char in text).casefold()
     return "".join(char for char in text
                    if unicodedata.category(char) not in {"Cf", "Mn", "Me"})
 
@@ -179,6 +193,9 @@ _HOUSE_CLAIMS = tuple(re.compile(pattern) for pattern in (
     r"on behalf of|voice of|i represent|we represent|i serve as|we serve as) "
     r"(?:the |your )?house\b",
     r"\b(?:i|we) (?:the |your )?house\b",
+    r"\byou (?:are|re) (?:all )?the house\b",
+    r"\b(?:this|that|it) (?:is|was|s) (?:a|the) house line\b",
+    r"\b(?:a|the) house line from (?:the )?table\b",
     r"\bas (?:the |your )?house (?:i|we|let|this|you)\b",
     r"\b(?:this|it|here) is (?:the |your )?house "
     r"(?:speaking|calling|addressing|answering|taking|here|now)\b",
@@ -245,9 +262,10 @@ def _reserved_reply_voice(text):
     possible natural-language impersonations can be recognized.
     """
     surface, words = _reply_surface(text), _reply_words(text)
-    if re.search(r"\[\s*(?:the\s+)?house\s*\]", surface):
+    if re.search(r"\[\s*(?:the\s+)?house(?:[\W_]+line)?\s*\]", surface):
         return True
-    if re.search(r"^[\s#>*_`-]*(?:(?:from\s+)?(?:the\s+)?house)\s*[:|]",
+    if re.search(r"^[\s#>*_`-]*(?:from\s+)?(?:the\s+)?house"
+                 r"(?:[\W_]+line)?[\s*_`]*[:|]",
                  surface, re.M):
         return True
     if re.search(r"\b(?:this|it)\s+is\s+(?:the\s+)?house\s*(?:[.!?;:]|$)",
@@ -407,9 +425,11 @@ class TableApp:
                          "remember": False, "operator_circle": False,
                          "presentation": "as_written", "chosen_names": {},
                          "voice_enabled": False, "voice_remember": False,
+                         "lights_enabled": False, "lights_remember": False,
                          "voice_slots": {}, "locale": ""}
         self.key = ""
         self.voice_key = ""
+        self.lights_key = ""
         self.key_fingerprints: set[tuple[int, bytes]] = set()
         self.roster = load_roster()
         self.settings["voice_slots"] = {
@@ -421,7 +441,7 @@ class TableApp:
         self.pairing_code = None
         self.paired: set[str] = set()
         self.pair_attempts: dict[str, list[float]] = {}
-        self.lights = SceneWorker()
+        self.lights = SceneWorker(self._lights_key)
         self._load_settings()
         self.harness = self._build_harness()
         self.state = self._idle_state()
@@ -453,13 +473,17 @@ class TableApp:
                     and any(slots[self.settings["presentation"]]
                             for slots in self.settings["voice_slots"].values()))
 
+    def _lights_key(self):
+        with self.lock:
+            return self.lights_key if self.settings["lights_enabled"] else None
+
     def _remember_key(self, key):
         if key:
             self.key_fingerprints.add((len(key), hashlib.sha256(key.encode("utf-8")).digest()))
 
     def _has_key(self, text):
         # Past credentials can be recognised without retaining their plaintext.
-        if any(key and key in text for key in (self.key, self.voice_key)):
+        if any(key and key in text for key in (self.key, self.voice_key, self.lights_key)):
             return True
         for length, digest in tuple(self.key_fingerprints):
             for offset in range(max(0, len(text) - length + 1)):
@@ -501,7 +525,9 @@ class TableApp:
         if self._contains_key([reply.text, reply.model_id, reply.usage]):
             return False
         text = _reply_surface(reply.text)
-        if re.search(r"<\s*[!/?a-zA-Z]", text) or _reserved_reply_voice(reply.text):
+        if (re.search(r"<\s*[!/?a-zA-Z]", text)
+                or re.search(r"(?:javascript|vbscript|data):\S", text)
+                or _reserved_reply_voice(reply.text)):
             return False
         names = {p.id for p in self.roster.values()}
         names.update(name for p in self.roster.values() for name, _ in p.plate)
@@ -538,11 +564,12 @@ class TableApp:
             # loading a settings file written by an older Talking Table.
             settings = self._validate_settings({k: v for k, v in saved_settings.items()
                                                 if k not in ("presentation", "chosen_names")})
-            # Each key has its own opt-in; a remembered voice must never save
-            # or restore an unremembered model credential (or the reverse).
+            # Each key has its own opt-in; remembering one cannot save or
+            # restore either of the other credentials.
             keys = {}
             for name, flag, blob_name in (("key", "remember", "key_blob"),
-                                          ("voice_key", "voice_remember", "voice_key_blob")):
+                                          ("voice_key", "voice_remember", "voice_key_blob"),
+                                          ("lights_key", "lights_remember", "lights_key_blob")):
                 keys[name] = (_secret_blob(base64.b64decode(saved[blob_name], validate=True),
                                           decrypt=True).decode("utf-8")
                               if settings[flag] else "")
@@ -550,6 +577,7 @@ class TableApp:
                 raise InputError("Saved settings could not be accepted.")
             self.settings.update(settings)
             self.key, self.voice_key = keys["key"], keys["voice_key"]
+            self.lights_key = keys["lights_key"]
             for key in keys.values():
                 self._remember_key(key)
         except Exception:
@@ -575,11 +603,17 @@ class TableApp:
             if not isinstance(value, str) or (value and value not in LOCALES):
                 raise InputError("Choose a listed country, or none.")
             result["locale"] = value
-        for name in ("remember", "operator_circle", "voice_enabled", "voice_remember"):
+        for name in ("remember", "operator_circle", "voice_enabled", "voice_remember",
+                     "lights_enabled", "lights_remember"):
             if name in proposed:
                 if not isinstance(proposed[name], bool):
                     raise InputError("A switch must be on or off.")
                 result[name] = proposed[name]
+        if "lights_key" in proposed and (not isinstance(proposed["lights_key"], str)
+                                          or len(proposed["lights_key"]) > 4096):
+            raise InputError("The lights key must be text.")
+        if "clear_lights_key" in proposed and not isinstance(proposed["clear_lights_key"], bool):
+            raise InputError("A switch must be on or off.")
         if result["adapter"] == "fake" and not result["model"]:
             result["model"] = "fake-1"
         if not result["model"] or len(result["model"]) > 200:
@@ -663,6 +697,7 @@ class TableApp:
             settings["operator_circle"] = bool(self.harness.operator_circle)
             settings["key_set"] = bool(self.key)
             settings["voice_key_set"] = bool(self.voice_key)
+            settings["lights_key_set"] = bool(self.lights_key)
             settings["voice_ready"] = self._voice_ready()
             return {
                 "settings": settings,
@@ -674,7 +709,7 @@ class TableApp:
                     f"and decisions in {self.audit_path}. Unsafe model output is discarded; known keys "
                     f"are redacted, and card records omit character-routing details. "
                     f"Conversation state, character presentation, name choices and pairing stay in memory. "
-                    f"Remembered settings and independently encrypted model and voice keys are kept in "
+                    f"Remembered settings and independently encrypted model, voice and lights keys are kept in "
                     f"{self.settings_path} only for the corresponding remember switches. "
                     f"New session clears unremembered keys and keeps existing audit logs."
                 ),
@@ -695,6 +730,7 @@ class TableApp:
             voice_candidate = proposed.get("voice_key", "")
             if not isinstance(voice_candidate, str) or len(voice_candidate) > 4096:
                 raise InputError("The voice key must be text.")
+            lights_candidate = proposed.get("lights_key", "")
             changed_host = (settings["adapter"], settings["url"]) != (
                 self.settings["adapter"], self.settings["url"])
             key = candidate.strip() or ("" if changed_host else self.key)
@@ -703,16 +739,21 @@ class TableApp:
             voice_key = voice_candidate.strip() or self.voice_key
             if proposed.get("clear_voice_key") is True:
                 voice_key = ""
-            if self._contains_key(settings, (key, voice_key, candidate.strip(), voice_candidate.strip())):
+            lights_key = lights_candidate.strip() or self.lights_key
+            if proposed.get("clear_lights_key") is True:
+                lights_key = ""
+            if self._contains_key(settings, (key, voice_key, lights_key, candidate.strip(),
+                                            voice_candidate.strip(), lights_candidate.strip())):
                 raise InputError("Put the key only in the key field.")
             # Complete the durable write before adopting the new settings.
-            if settings["remember"] or settings["voice_remember"]:
+            if settings["remember"] or settings["voice_remember"] or settings["lights_remember"]:
                 # Presentation and name choices are visit-only: they are never
                 # written, whichever remember switch is on.
                 saved = {"settings": {k: copy.deepcopy(v) for k, v in settings.items()
                                       if k not in ("presentation", "chosen_names")}}
                 for secret, flag, blob_name in ((key, "remember", "key_blob"),
-                                                (voice_key, "voice_remember", "voice_key_blob")):
+                                                (voice_key, "voice_remember", "voice_key_blob"),
+                                                (lights_key, "lights_remember", "lights_key_blob")):
                     if settings[flag]:
                         try:
                             saved[blob_name] = base64.b64encode(
@@ -726,6 +767,8 @@ class TableApp:
                     saved["settings"].update(voice_enabled=False, voice_slots={
                         persona: {presentation: "" for presentation in sorted(PRESENTATIONS)}
                         for persona in self.roster})
+                if not settings["lights_remember"]:
+                    saved["settings"]["lights_enabled"] = False
                 payload = json.dumps(saved, ensure_ascii=False)
                 temporary = self.settings_path.with_suffix(".tmp")
                 temporary.write_text(payload, encoding="utf-8")
@@ -735,8 +778,10 @@ class TableApp:
             self.settings = settings
             self.key = key
             self.voice_key = voice_key
+            self.lights_key = lights_key
             self._remember_key(key)
             self._remember_key(voice_key)
+            self._remember_key(lights_key)
             self._cancel_jobs()
             # Settings must never clear the policy latch or the conversation.
             previous = self.harness
@@ -761,6 +806,8 @@ class TableApp:
                 self.key = ""
             if not self.settings["voice_remember"]:
                 self.voice_key = ""
+            if not self.settings["lights_remember"]:
+                self.lights_key = ""
             self.settings["presentation"] = "as_written"
             self.settings["chosen_names"] = {}
             self.harness = harness if harness is not None else self._build_harness()
@@ -949,7 +996,7 @@ class TableApp:
             # Binary substring checks stay linear in the bounded audio size.
             # Credential rotation invalidates this snapshot before release.
             protected_audio = tuple(secret.encode("utf-8")
-                                    for secret in (self.key, self.voice_key) if secret)
+                                    for secret in (self.key, self.voice_key, self.lights_key) if secret)
             if self._contains_key((voice_id, text)) or not self.speech_slots.acquire(blocking=False):
                 raise InputError(VOICE_ERROR)
         complete, result = threading.Event(), []
@@ -1046,6 +1093,28 @@ def _local_addresses():
     return sorted(addresses)
 
 
+def _sigils_policy(content):
+    """Allow only this shipped page's inline script and style blocks.
+
+    The standalone lights view carries its own script and CSS. The Table's
+    normal self-only policy blocks both, so authorize their exact contents
+    for this response while keeping every connection on the local Table.
+    HTML normalizes line endings before checking CSP hashes.
+    """
+    normalized = content.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+
+    def hashes(tag):
+        blocks = re.findall(rb"<" + tag + rb"\b[^>]*>(.*?)</" + tag + rb">",
+                            normalized, re.S | re.I)
+        return " ".join("'sha256-" + base64.b64encode(hashlib.sha256(block).digest()).decode("ascii")
+                        + "'" for block in blocks) or "'none'"
+
+    return ("default-src 'none'; script-src " + hashes(b"script")
+            + "; style-src " + hashes(b"style")
+            + "; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; "
+            "base-uri 'none'; form-action 'none'")
+
+
 class TableServer(ThreadingHTTPServer):
     daemon_threads = True
     allow_reuse_address = True
@@ -1086,7 +1155,8 @@ class Handler(BaseHTTPRequestHandler):
     def send_error(self, code, message=None, explain=None):
         self._send(code, {"error": "HTTP request rejected."})
 
-    def _send(self, status, payload, content_type="application/json; charset=utf-8", cookie=None):
+    def _send(self, status, payload, content_type="application/json; charset=utf-8", cookie=None,
+              policy=None):
         # On Windows, closing with an unread POST body can reset the socket
         # before a refusal reaches the client. Discard only bounded bodies.
         if status >= 400 and self.command == "POST" and not getattr(self, "_body_read", False):
@@ -1108,7 +1178,7 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Connection", "close")
         self.send_header("X-Content-Type-Options", "nosniff")
         self.send_header("Referrer-Policy", "no-referrer")
-        self.send_header("Content-Security-Policy", "default-src 'self'; script-src 'self'; style-src 'self'; "
+        self.send_header("Content-Security-Policy", policy or "default-src 'self'; script-src 'self'; style-src 'self'; "
                          "img-src 'self' data:; media-src 'self' blob:; connect-src 'self'; "
                          "frame-ancestors 'none'; base-uri 'none'; form-action 'self'")
         if cookie:
@@ -1162,8 +1232,9 @@ class Handler(BaseHTTPRequestHandler):
         elif path == "/api/state":
             with app.lock:
                 self._send(200, dict(app.state))
-        elif path == "/" or path.startswith("/static/"):
-            relative = "index.html" if path == "/" else urllib.parse.unquote(path[8:])
+        elif path in ("/", "/sigils.html") or path.startswith("/static/"):
+            relative = ("index.html" if path == "/" else "sigils.html" if path == "/sigils.html"
+                        else urllib.parse.unquote(path[8:]))
             target = (STATIC / relative).resolve()
             if STATIC.resolve() not in target.parents or target.suffix not in {".html", ".js", ".css", ".json", ".svg"}:
                 self._send(404, {"error": "File not found."})
@@ -1183,7 +1254,8 @@ class Handler(BaseHTTPRequestHandler):
                     content = content.replace("Checking operator-circle mode…".encode("utf-8"),
                                               b"Operator-circle mode is ON." if enabled else
                                               b"Operator-circle mode is OFF.")
-                self._send(200, content, content_type + "; charset=utf-8")
+                policy = _sigils_policy(content) if target == (STATIC / "sigils.html").resolve() else None
+                self._send(200, content, content_type + "; charset=utf-8", policy=policy)
             else:
                 self._send(404, {"error": "File not found."})
         elif path == "/favicon.ico":

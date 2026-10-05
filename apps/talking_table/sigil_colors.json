@@ -1,0 +1,11 @@
+{
+  "cody": {"colour": "#2A9D9A", "brightness": 60, "why": "Steady teal for the stabilizer: cool, even, and safe to sit in at any level of distress."},
+  "ellis": {"colour": "#E0B020", "brightness": 70, "why": "Warm gold for the reframe: humour as a light switched on, not a spotlight."},
+  "nikki": {"colour": "#D6408C", "brightness": 75, "why": "Bright magenta for creative activation: the most energetic colour, for the character with a floor."},
+  "rowan": {"colour": "#3F9A4A", "brightness": 60, "why": "Living green for meaning-making: slow growth, rooted in context."},
+  "seren": {"colour": "#3A62D9", "brightness": 70, "why": "Clear blue for analysis and strategy: the cool, clear-headed seat."},
+  "vandal": {"colour": "#E8741E", "brightness": 75, "why": "Hot orange for disruption and challenge: loud, but never alarm red."},
+  "willow": {"colour": "#8E6CC8", "brightness": 45, "why": "Soft lavender, kept low, for grief and loss: dusk, not daylight."},
+  "card": {"colour": "#FFFFFF", "brightness": 55, "why": "Plain calm white at moderate brightness: no character, nothing to read into it, just enough light to see by."},
+  "idle": {"colour": "#FFA050", "brightness": 10, "power": "on", "why": "Dim warm amber when nobody is seated: the house resting, like the seven rooms in the house picture. Set power to off to switch the lights off instead."}
+}
