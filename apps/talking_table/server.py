@@ -27,6 +27,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Callable
 
+from secondsignal.lexicon import RESOURCES
 from secondsignal.profiles import load_roster
 from secondsignal.safety import HOUSE_LINES_EN
 from secondsignal_harness import AuditLog, CodexStore, Harness
@@ -40,6 +41,9 @@ LOG = logging.getLogger("talking_table")
 PROTOTYPE = "A prototype for the operator and adults the operator knows. Not a crisis service."
 FAMILIES = {"fake", "gemini", "openai", "anthropic", "xai", "compatible"}
 PRESENTATIONS = {"as_written", "women", "men", "neither"}
+# The countries a resource row exists for; "" means none declared (the
+# directory line). Read from the verified resource rows, never inferred.
+LOCALES = frozenset(key for key in RESOURCES["rows"] if key != "default")
 COOKIE = "ss_table_pair"
 MAX_BODY = 65536
 MAX_REPLY = 3500
@@ -403,7 +407,7 @@ class TableApp:
                          "remember": False, "operator_circle": False,
                          "presentation": "as_written", "chosen_names": {},
                          "voice_enabled": False, "voice_remember": False,
-                         "voice_slots": {}}
+                         "voice_slots": {}, "locale": ""}
         self.key = ""
         self.voice_key = ""
         self.key_fingerprints: set[tuple[int, bytes]] = set()
@@ -563,6 +567,14 @@ class TableApp:
                 result[name] = value.strip()
         if result["adapter"] not in FAMILIES or result["presentation"] not in PRESENTATIONS:
             raise InputError("Choose a listed model family and presentation.")
+        if "locale" in proposed:
+            # The country for the crisis card's resource line (the operator's
+            # answer 10 of 12, 4 October 2026). Declared here, never inferred;
+            # the shipped default is none, which reads the directory line.
+            value = proposed["locale"]
+            if not isinstance(value, str) or (value and value not in LOCALES):
+                raise InputError("Choose a listed country, or none.")
+            result["locale"] = value
         for name in ("remember", "operator_circle", "voice_enabled", "voice_remember"):
             if name in proposed:
                 if not isinstance(proposed[name], bool):
@@ -640,6 +652,7 @@ class TableApp:
             adapter._transport = self._transport(self.key, adapter.url)
         return Harness(self.roster, adapter, CodexStore(ROOT / "docs" / "codex"),
                        audit_log=AuditLog(self.audit_path),
+                       locale=setting["locale"] or None,
                        presentation={name: setting["presentation"] for name in self.roster},
                        chosen_names=setting["chosen_names"],
                        operator_circle=setting["operator_circle"])
@@ -729,6 +742,9 @@ class TableApp:
             previous = self.harness
             self.harness = self._build_harness()
             self.harness.session = previous.session
+            # The country applies to the conversation in progress; the session
+            # itself (latch, aftermath, holds) is never reset by a setting.
+            self.harness.session.locale = settings["locale"] or None
             self.harness.transcript = previous.transcript
             self.harness.turns = previous.turns
             self.mode_revision += 1

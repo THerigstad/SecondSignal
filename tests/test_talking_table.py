@@ -739,3 +739,36 @@ def test_lights_run_asynchronously_and_failures_never_change_turns(app, monkeypa
     assert TEST_KEY not in caplog.text
     assert_model_cannot_delay_crisis(app)
     assert_settings_cannot_cancel_gate(app)
+
+
+def test_country_setting_changes_only_the_resource_line(app):
+    """The operator's answer 10 of 12 (4 October 2026): the Table declares a
+    country in Settings, none by default. Only the card's resource line
+    changes; the policy session (latch, aftermath, holds) is never reset; a
+    country without a verified resource row is refused."""
+    from secondsignal.lexicon import RESOURCES, resource_line
+
+    assert app.settings["locale"] == ""
+    assert app.harness.session.locale is None
+    with live(app) as listener:
+        _, first, _ = request(listener, "/api/turn", {"text": CRISIS})
+        assert first["kind"] == "card"
+        assert resource_line(None) in first["text"]
+        assert "988" not in first["text"]
+        session = app.harness.session
+        assert request(listener, "/api/settings", {"locale": "US"})[0] == 200
+        assert app.harness.session is session and session.locale == "US"
+        _, second, _ = request(listener, "/api/turn", {"text": CRISIS})
+        assert second["kind"] == "card"
+        assert resource_line("US") in second["text"] and "988" in second["text"]
+    with pytest.raises(server.InputError, match="listed country"):
+        app.update_settings({"locale": "XX"})
+    with pytest.raises(server.InputError, match="listed country"):
+        app.update_settings({"locale": 7})
+    assert app.update_settings({"locale": ""})["settings"]["locale"] == ""
+    assert app.harness.session.locale is None
+    # The page offers exactly the countries that have a verified row, no more.
+    html = (ROOT / "apps" / "talking_table" / "static" / "index.html").read_text(encoding="utf-8")
+    offered = set(re.findall(r'<select id="locale">(.*?)</select>', html, re.S)[0].split("<option value=\""))
+    offered = {chunk.split('"')[0] for chunk in offered if chunk and not chunk.startswith(">")}
+    assert offered == (set(RESOURCES["rows"]) - {"default"}) | {""}

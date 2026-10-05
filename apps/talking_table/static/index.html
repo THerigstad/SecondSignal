@@ -88,6 +88,7 @@
         <label class="checkbox"><input id="remember" type="checkbox"><span>Remember on this computer</span></label><p class="setting-note">Saves the key in a settings file outside the repository. Otherwise the key stays in server memory for this session.</p>
         <button id="clear-key" class="small-button" type="button">Forget saved and session key</button>
       </fieldset>
+      <fieldset id="country-settings"><legend>Country for the resource line</legend><label for="locale">Country</label><select id="locale"><option value="">Not declared (the directory line)</option><option value="US">United States</option><option value="ES">Spain</option><option value="MX">Mexico</option><option value="CL">Chile</option><option value="AR">Argentina</option></select><p class="setting-note">Only the resource line on a crisis card changes: declared United States reads 988 and 911. Nothing is inferred from your network. Saved with Remember; otherwise it lasts for this run of the server.</p></fieldset>
       <fieldset id="circle-settings"><legend>Operator circle</legend><label class="checkbox"><input id="operator-circle" type="checkbox"><span>Operator-circle mode</span></label><p class="setting-note">Allow an otherwise passing, normal-risk reply when only the unlocked cultural layer is inconclusive, with the operator reviewing afterward.</p></fieldset>
       <div class="settings-save"><p id="settings-status" class="status" role="status"></p><button id="save-settings" class="primary" type="submit">Save settings</button></div>
     </form>

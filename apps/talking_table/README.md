@@ -48,7 +48,10 @@ remain active. A vendor call that cannot be stopped occupies a slot until it exi
 full slots withhold ordinary replies and do not prevent crisis cards.
 
 Settings choose the model family, model identifier, character presentation,
-the voice (see **Voice** below), and operator-circle mode. The character
+the voice (see **Voice** below), operator-circle mode, and the country for the
+crisis card's resource line (none by default, which reads the directory line;
+declared United States reads 988 and 911; declared, never inferred, and saved
+only with **Remember**; the operator's answer 10 of 12, 4 October 2026). The character
 presentation and name choices last for the visit, and a visit is the server
 session: they hold until **New session** or a restart, a reload or a paired
 phone joining does not reset them, and **Remember** never saves them (the

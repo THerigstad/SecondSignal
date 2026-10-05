@@ -200,6 +200,7 @@
     if (state.operatorCircle !== null) settings.operator_circle = state.operatorCircle;
     for (const [id, field] of [["adapter", "adapter"], ["model", "model"], ["vendor-url", "url"], ["presentation", "presentation"]]) $(id).value = settings[field] || (field === "presentation" ? "as_written" : "");
     $("remember").checked = Boolean(settings.remember);
+    $("locale").value = settings.locale || "";
     $("voice-enabled").checked = Boolean(settings.voice_enabled);
     $("voice-remember").checked = Boolean(settings.voice_remember);
     $("voice-key").value = "";
@@ -437,7 +438,7 @@
   $("settings-form").addEventListener("submit", async event => {
     event.preventDefault();
     if (!state.config.local) return;
-    const data = {adapter: $("adapter").value, model: $("model").value, url: $("vendor-url").value, remember: $("remember").checked, operator_circle: $("operator-circle").checked};
+    const data = {adapter: $("adapter").value, model: $("model").value, url: $("vendor-url").value, remember: $("remember").checked, operator_circle: $("operator-circle").checked, locale: $("locale").value};
     data.voice_enabled = $("voice-enabled").checked;
     data.voice_remember = $("voice-remember").checked;
     data.voice_slots = voiceSlots();
