@@ -25,8 +25,21 @@ import pytest
 
 from secondsignal import Action, Outcome, SessionState, extract, load_roster, route
 from secondsignal.signals import DOMAIN_LEXICON, IDENTITY_STATEMENT_TERMS, identity_statement
+from test_eval_cases import run_case
 
 CASES = Path(__file__).resolve().parents[1] / "evals" / "cases"
+GROK_IDENTITY_FILE = "identity_pairs_grok_2026-09-30.json"
+GROK_IDENTITY_CASES = {
+    case["id"]: case
+    for case in json.loads((CASES / GROK_IDENTITY_FILE).read_text(encoding="utf-8"))["cases"]
+}
+GROK_IDENTITY_PAIRS = tuple(
+    (control, GROK_IDENTITY_CASES[control["pair"]])
+    for control in GROK_IDENTITY_CASES.values()
+    if control["id"].startswith("id-ctrl-")
+)
+assert len(GROK_IDENTITY_PAIRS) == 30
+assert len({statement["id"] for _, statement in GROK_IDENTITY_PAIRS}) == 30
 
 # Four requests of different kinds: a planning ask, a landlord/money ask, a
 # grief line, a recovery line.
@@ -44,6 +57,16 @@ LABELLED_CRISIS_LINES = (
     ("routing.json", "crisis-indirect-phrasing"),
     ("operator_live_test_2026-09-11.json", "live-modal-give-up-001"),
     ("external_acceptance_grok_2026-09-03.json", "grok-r2-wanna-die-001"),
+)
+GROK_LABELLED_CRISIS_LINES = tuple(
+    (GROK_IDENTITY_FILE, case_id)
+    for case_id in (
+        "id-wrap-crisis-direct",
+        "id-wrap-crisis-indirect",
+        "id-wrap-grok-r2-wanna-endit-001",
+        "id-wrap-grok-r2-let-me-die-001",
+        "id-wrap-live-modal-give-up-001",
+    )
 )
 
 
@@ -71,6 +94,22 @@ def _seat(decision) -> tuple:
 
 
 # --- the same request seats the same character ---------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "control,statement", GROK_IDENTITY_PAIRS,
+    ids=[control["id"] for control, _ in GROK_IDENTITY_PAIRS],
+)
+def test_groks_thirty_identity_pairs_have_the_same_action_outcome_and_agent(control, statement, roster) -> None:
+    """Ruling 7 applies to Grok's unchanged texts with each case's own session."""
+    assert statement["id"].startswith("id-stmt-")
+    assert statement["pair"] == control["id"]
+    plain, _ = run_case(control, roster)
+    prefixed, _ = run_case(statement, roster)
+    pair = (control["id"], statement["id"])
+    assert prefixed.safety.action is plain.safety.action, pair
+    assert prefixed.outcome is plain.outcome, pair
+    assert prefixed.agent_id == plain.agent_id, pair
 
 
 @pytest.mark.parametrize("word", IDENTITY_STATEMENT_TERMS)
@@ -169,12 +208,50 @@ def test_the_recognizer_is_not_a_routing_input(roster) -> None:
 # --- the crisis card is unchanged ---------------------------------------------------------------
 
 
-@pytest.mark.parametrize("filename,case_id", LABELLED_CRISIS_LINES)
+@pytest.mark.parametrize("filename,case_id", LABELLED_CRISIS_LINES + GROK_LABELLED_CRISIS_LINES)
 def test_five_identity_wrapped_crisis_lines_still_escalate(filename: str, case_id: str, roster) -> None:
     text = _labelled_text(filename, case_id)
+    if filename == GROK_IDENTITY_FILE:
+        # Grok already supplied the wrapper; route it unchanged with its session.
+        decision, _ = run_case(GROK_IDENTITY_CASES[case_id], roster)
+        assert decision.safety.action is Action.HUMAN_ESCALATION, (case_id, text, decision.safety.reasons)
+        assert decision.preempted and decision.agent_id is None
+        assert decision.safety.card == "standard"
+        return
     for word in ("trans", "non-binary", "queer", "agender", "genderfluid"):
         decision = route(f"{_sentence(word)} {text}", roster, session=SessionState(locale="US"))
         assert decision.safety.action is Action.HUMAN_ESCALATION, (word, text, decision.safety.reasons)
         assert decision.preempted and decision.agent_id is None
         assert decision.safety.card == "standard"
         assert decision.identity_statement is True
+
+
+@pytest.mark.parametrize("text", [
+    "I'm genderfluid and I switch presentation. my grandmother died last week",
+    "I changed the presentation to neither. my grandmother died last week",
+    "I'm genderfluid. my grandmother died last week",
+])
+def test_the_projects_own_word_presentation_does_not_steal_the_grief_seat(text: str, roster) -> None:
+    """Pair 17 of Grok's identity set (found by the Codex port of 5 October 2026):
+    "presentation" was a career word, so the project's own word for how a
+    character presents (ADR-0026 (Proposed)) read as a work deck and seated the task
+    voice over the grief seat. The identity-shaped uses are masked; the
+    control sentence seats the same character as the text with the sentence."""
+    control = route("my grandmother died last week", roster, session=SessionState(locale="US"))
+    with_sentence = route(text, roster, session=SessionState(locale="US"))
+    assert control.agent_id == "willow"
+    assert with_sentence.agent_id == control.agent_id
+    assert "career" not in extract(text).domains
+
+
+@pytest.mark.parametrize("text, seat", [
+    ("I have a presentation tomorrow. my grandmother died last week", "cody"),
+    ("My sibling died and I need help preparing a work presentation.", "cody"),
+    ("the presentation went badly and I can't focus", "seren"),
+])
+def test_a_work_presentation_is_still_a_career_signal(text: str, seat: str, roster) -> None:
+    """The controls for the test above: a deck at work keeps the career signal,
+    and grief beside a task still travels as a hold on the task voice (ADR-0016)."""
+    assert "career" in extract(text).domains
+    decision = route(text, roster, session=SessionState(locale="US"))
+    assert decision.agent_id == seat

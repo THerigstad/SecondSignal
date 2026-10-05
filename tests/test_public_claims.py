@@ -252,6 +252,10 @@ def test_the_readme_sample_decision_is_the_actual_output_of_the_current_tree() -
     result = subprocess.run(
         [sys.executable, "-m", "secondsignal", prompt],
         cwd=ROOT, capture_output=True, text=True, check=True,
+        # The child writes UTF-8 (PYTHONIOENCODING); decode it as UTF-8 here too,
+        # or a Windows code page turns the middle dot into two characters
+        # (found 5 October 2026 by a Codex build on the operator's PC).
+        encoding="utf-8",
         env={"PYTHONPATH": str(ROOT / "src"), "PATH": "", "PYTHONIOENCODING": "utf-8"},
     )
     lines = result.stdout.splitlines()

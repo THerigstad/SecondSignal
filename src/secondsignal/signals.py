@@ -95,8 +95,17 @@ DOMAIN_LEXICON: dict[str, tuple[str, ...]] = {
         # due in the morning and I keep flashing on the funeral" seats the
         # agent who carries both the ask and the hold (ADR-0016).
         "deadline", "deadlines", "due at", "due tomorrow", "due in the morning",
-        "due by", "presentation", "workload", "my manager", "overtime", "the office",
+        "due by", "workload", "my manager", "overtime", "the office",
         "coworker", "co-worker",
+        # "presentation" alone is no longer a work word (5 October 2026,
+        # ruling 7's port, pair 17 of Grok's identity set): the project's own
+        # word for how a character presents (ADR-0026 (Proposed)) collided with the work
+        # deck, so "I switch presentation. my grandmother died last week"
+        # seated the task voice over the grief seat. Work-shaped phrases keep
+        # the career signal; the identity-shaped uses are masked in en.json.
+        "a presentation", "the presentation", "this presentation", "work presentation",
+        "big presentation", "presentation tomorrow", "presentation due", "presentation at work",
+        "presentation for work", "presentation went", "presentation slides", "presentation deck",
     ),
     "conflict": (
         "argument", "fight", "conflict", "betrayed", "confront", "boundary with",

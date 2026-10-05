@@ -720,7 +720,11 @@ def test_the_javascript_voice_suites_pass_offline():
     assert node, "Node is required for the offline browser contract tests (no skipped tests)"
     files = sorted((server.STATIC.parent / "tests_js").glob("*.mjs"))
     assert len(files) == 2
-    result = subprocess.run([node, "--test", *map(str, files)], capture_output=True,
+    # Ask for the TAP reporter by name: Node 24's default reporter prints no
+    # "# fail" summary line when stdout is not a terminal (found 5 October 2026
+    # by a Codex build on the operator's PC).
+    result = subprocess.run([node, "--test", "--test-reporter=tap", "--test-reporter-destination=stdout",
+                             *map(str, files)], capture_output=True,
                             text=True, timeout=120)
     summary = {line.split()[1]: line.split()[2] for line in result.stdout.splitlines()
                if line.startswith("# ") and len(line.split()) == 3

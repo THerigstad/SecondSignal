@@ -134,6 +134,11 @@
       "id": "death_of_me",
       "pattern": "\\b(the|a) death of me\\b",
       "note": "Emphasis idiom: 'this deadline will be the death of me'. Not grief, not risk."
+    },
+    {
+      "id": "presentation_identity_sense",
+      "pattern": "\\b(?:switch(?:ed|ing|es)?|chang(?:e|ed|ing|es)|choos(?:e|ing|es)|chose|set|pick(?:ed|ing|s)?|keep(?:ing|s)?|kept)\\s+(?:my\\s+|the\\s+|your\\s+|their\\s+)?presentation\\b|\\bpresentation\\s+(?:to|as|is|was)\\s+(?:neither|a woman|a man|woman|man|as written|they(?:/them)?|she(?:/her)?|he(?:/him)?)\\b",
+      "note": "The project's own word for how a character presents (ADR-0026 (Proposed): woman, man, neither, as written). 'I switch presentation' and 'set the presentation to neither' are not a work deck; 'a presentation tomorrow' still is. Added 5 October 2026 for pair 17 of Grok's identity set under ruling 7."
     }
   ],
   "window_masks": [
