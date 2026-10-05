@@ -1,7 +1,7 @@
 """One smoke test of three existing cases; no new crisis fixture text."""
 import importlib.util
-from pathlib import Path
 import sys
+from pathlib import Path
 
 
 def test_measure_three_existing_cases_and_report_shape():

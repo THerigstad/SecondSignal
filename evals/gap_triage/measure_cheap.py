@@ -8,26 +8,26 @@ from __future__ import annotations
 
 import argparse
 import ast
-from contextlib import contextmanager
-from dataclasses import dataclass
 import hashlib
 import itertools
 import json
 import os
-from pathlib import Path
 import re
 import socket
 import sys
+from contextlib import contextmanager
+from dataclasses import dataclass
+from pathlib import Path
 from typing import Callable
 from unittest.mock import patch
 
 ROOT = Path(os.environ.get("B5_REPO_ROOT", Path(__file__).resolve().parents[2])).resolve()
 sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "tests"))
-import test_eval_cases as case_runner
-from secondsignal import Action, load_roster, route
-from secondsignal import safety
-from secondsignal.normalize import collapse_spacing, normalize
+import test_eval_cases as case_runner  # noqa: E402
+
+from secondsignal import load_roster, safety  # noqa: E402
+from secondsignal.normalize import collapse_spacing, normalize  # noqa: E402
 
 HERE = ROOT / "evals" / "gap_triage"
 LOOKALIKES = {"0": "o", "1": "il", "3": "e", "4": "a", "5": "s", "7": "t", "8": "b", "@": "a", "$": "s", "!": "i"}

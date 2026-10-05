@@ -22,10 +22,10 @@ import json
 from pathlib import Path
 
 import pytest
+from test_eval_cases import run_case
 
 from secondsignal import Action, Outcome, SessionState, extract, load_roster, route
 from secondsignal.signals import DOMAIN_LEXICON, IDENTITY_STATEMENT_TERMS, identity_statement
-from test_eval_cases import run_case
 
 CASES = Path(__file__).resolve().parents[1] / "evals" / "cases"
 GROK_IDENTITY_FILE = "identity_pairs_grok_2026-09-30.json"

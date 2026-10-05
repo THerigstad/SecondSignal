@@ -23,9 +23,10 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
-from .run import _prior_text, _session
 from secondsignal import route
 from secondsignal.normalize import SKELETON, normalize
+
+from .run import _prior_text, _session
 
 TABLE_PATH = Path(__file__).with_name("confusables_3.3.1.json")
 TABLE_SHA256 = "2d8b4774cd9dc6f233a18681bc00423ae270037437f276fc6a8b80630941fe7d"

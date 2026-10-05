@@ -16,12 +16,12 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
-from .run import _ROOT, _load_single_cases, _prior_text, _session, crisis_lines
-from .transforms import TRANSFORMS
-
 from secondsignal import load_roster, route
 from secondsignal.normalize import collapse_spacing
 from secondsignal.safety import CRISIS_CLASSES
+
+from .run import _ROOT, _load_single_cases, _prior_text, _session, crisis_lines
+from .transforms import TRANSFORMS
 
 MEASUREMENTS = Path(__file__).with_name("measurements")
 DATE = "2026-10-04"
