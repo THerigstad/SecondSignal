@@ -4,6 +4,33 @@ All notable changes to SecondSignal are documented here.
 
 ## [Unreleased]
 
+### Changed — 2026-10-04 (evening), the operator's answers to the twelve questions of the push
+
+- **The house's two questions, in the operator's words.** The first ask
+  (nobody seated) and the second ask (ruling 5: a second, different question
+  after two vague messages in a row) are now his words, kept in the house's
+  plain voice under the no-"I" rule of 8 September 2026; the test pins only
+  that the two asks differ. The question of whether the house may ever say
+  "I" is parked as its own future ruling, with the round-1 reviewers'
+  reasoning to be set beside his.
+- **The Talking Table declares a country for the resource line**, none by
+  default: a Settings choice from the verified resource rows, never
+  inferred; declared United States reads 988 and 911 on a crisis card, none
+  reads the directory line; the choice applies to the conversation in
+  progress without resetting the policy session and is saved only with
+  Remember (answer 10 of 12). One test, one line on the Table's page.
+- The other ten answers changed no file: the short-fragment rule stays as
+  built (its kin-and-animal rider confirmed), the two turns after a card stay
+  withheld in operator-circle mode until two humans lock the cultural rubric
+  (the rubric sheet is now owed, with the second reviewer named), "we both
+  relapsed" stays the person's own claim with Kimi's fixture a known gap,
+  ADR-0025's one-owner-per-reply line stands, C-32's closing line stays the
+  draft until the operator's words come, the security write-ups get their own
+  later ruling, the self-questioning phrases stay routing signals, the bare
+  word "gender" stays on the proof list, Grok's fifteen identity pairs and the
+  0.4.0 release wait for the gap-closure push. Record: the operator's answers
+  of 4 October 2026, kept with the project's private records.
+
 ### Added — 2026-10-04, the rulings push (28 September and 3 October 2026) and the night builds of 30 September
 
 - **The Talking Table** (`apps/talking_table/`): a local browser interface

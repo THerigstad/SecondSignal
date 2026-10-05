@@ -230,6 +230,14 @@ rewritten.
   4. "The trajectory runner, the provenance split and the ported reviewer trajectories (rulings 13 to 20 and 22 of 3 October 2026)".
   5. "The policy rules and the harness: vague messages, identity words, the four-setting pin, the last protected aftermath turn, the id-order fallback, the card that never waits for the log (rulings 5, 7, 8, 11, 15, 17 and 20 of 3 October 2026)".
   6. "The records: ADRs 0016, 0022, 0023, 0025 and 0026, the seven write-ups and their lint, the dissent log, the confessions, the roadmap, the changelog and the numbers (rulings 8, 9, 10, 13, 14, 15, 16 and 20 of 3 October 2026)".
+- **2026-10-04** (evening), the operator's answers to the push's twelve
+  questions, landed as three commits through the operator's browser session
+  on GitHub's upload page, each authored by the operator, the model Claude
+  Fable 5.1, Max, as the operator's screen showed it (the operator's account),
+  in the Claude desktop app's Cowork mode. The three commits, in order:
+  1. "Both house questions in the operator's own words (answer 1 of 12, 4 October 2026)".
+  2. "The Talking Table declares a country for the resource line, none by default (answer 10 of 12, 4 October 2026)".
+  3. "The changelog and this ledger for the operator's twelve answers (4 October 2026)".
 
 ## What this note does not do
 
