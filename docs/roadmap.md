@@ -185,7 +185,9 @@ that needs a ruling gets its own, after measurement, never before.
    are its known gaps until then.
 6. **Grok's job-10 identity pairs.** Ruling 7 took identity words out of
    seating; the fifteen pairs plus "I am transferring" are rebuilt to the rule
-   and ported when the set-2 folder that holds Grok's return is reachable, with
+   and ported in `evals/cases/identity_pairs_grok_2026-09-30.json`, alongside
+   `evals/cases/neurodivergent_grok_2026-09-30.json` (order B7, resumed on
+   34a7296 under the operator's answers of 5 October 2026), with
    the expected answers written from the rule and never from today's
    behaviour.
 7. **Talking Table work queued by the rulings.** The one-tap "this was read

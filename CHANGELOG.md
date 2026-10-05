@@ -4,6 +4,59 @@ All notable changes to SecondSignal are documented here.
 
 ## [Unreleased]
 
+### Fixed — 2026-10-05, found by the Codex port of Grok's identity pairs (order B7)
+
+- The project's own word for how a character presents ("presentation", ADR-0026
+  (Proposed)) was also a career word, so "I switch presentation. my grandmother
+  died last week" seated the task voice with grief held instead of the grief
+  seat the control sentence gets: a ruling-7 regression on pair 17 of Grok's
+  identity set, caught by Codex on 5 October 2026 and reproduced on the tree.
+  The bare word leaves the career list in favour of work-shaped phrases ("a
+  presentation", "work presentation", "presentation tomorrow", …), and the
+  identity-shaped uses ("switch presentation", "set the presentation to
+  neither") are masked in the English pack, so the patterns hash moved. Tests:
+  the three identity-shaped sentences seat the same character as the control;
+  the three work sentences keep the career signal (tests/test_identity_words.py).
+- Two tests made portable to Windows after Codex's builds of 5 October stopped
+  on them: the README sample-decision test decodes its child as UTF-8, and the
+  JavaScript voice-suite test asks Node for the TAP reporter by name.
+
+### Added — 2026-10-04 (night), the gap-closure push
+
+- Order B1 (Codex, measurement only, resumed and completed 5 October 2026):
+  six stutter-shaped fuzz transforms from the operator's find of 4 October
+  (a word repeated with a comma, "um" before the middle word, "uh" before the
+  last word, a stuttered first syllable, plus two that stop no line and stay
+  as regression guards: the first word stuttered with commas, a false start);
+  the four that stop the gate are known gaps pending the operator's ruling,
+  so the fuzz line now reads 24 transforms. The full Unicode look-alike table
+  (`evals/fuzz/confusables_3.3.1.json`, provenance beside it) measured both
+  ways; one line per cause in `evals/fuzz/measure_causes.py`; ruling 1's
+  option B replayed over every case and trajectory (no decision changed; two
+  newline-split controls would get the house's ask); the targets-the-crisis
+  labelled set (`evals/fuzz/measurements/`). The two full per-variant dumps
+  (95 MB) stay with the return on the operator's PC, not in the tree.
+- Order B5 (Codex, triage only, 5 October 2026): every one of the 204
+  documented gaps sorted by cause and bucket in
+  `evals/gap_triage/triage_2026-10-05.json`; 157 are one family (spelled-out
+  and symbol-swapped crisis words); candidate folds measured against the
+  innocent-word controls and 40 everyday digit-and-letter sentences
+  (`evals/gap_triage/measure_cheap.py`). Nothing closed; the operator rules
+  per cause.
+- Integration of 5 October: the Talking Table's live-replay pins carry B7's
+  115 cases (667 cases, 747 turns, 340 labelled escalations, 157 actual);
+  public numbers refreshed (3,131 tests, 218 expected failures, 667 cases,
+  285 external fixtures). The suite was run with headless Chromium present,
+  so the lights and sigils screenshot tests ran (2,912 passed, the
+  installed-wheel test skipped on the build host).
+- Grok's night-order-10 texts, ported by Codex under ruling 7 and answer 11
+  of 12 with expectations written from the rule:
+  `evals/cases/identity_pairs_grok_2026-09-30.json` holds 30 identity pairs
+  plus five crisis wrappers (65 cases), and
+  `evals/cases/neurodivergent_grok_2026-09-30.json` holds 40 ordinary turns
+  plus ten crisis wrappers (50 cases). The port resumed on 34a7296 under
+  the operator's answers of 5 October 2026; all 115 cases are accepted.
+
 ### Changed — 2026-10-04 (evening), the operator's answers to the twelve questions of the push
 
 - **The house's two questions, in the operator's words.** The first ask
@@ -33,6 +86,9 @@ All notable changes to SecondSignal are documented here.
 
 ### Added — 2026-10-04, the rulings push (28 September and 3 October 2026) and the night builds of 30 September
 
+- **Room lights on the Talking Table**, built by GrokBot and merged by Codex:
+  pretend mode by default, the Govee key's single home in the Table's Settings
+  on the operator's computer, and a crisis card that is always white.
 - **The Talking Table** (`apps/talking_table/`): a local browser interface
   over the policy layer and the voice harness, built by Codex from the
   operator's build orders (kit 1D, then the presentation build and the voice
@@ -148,6 +204,10 @@ All notable changes to SecondSignal are documented here.
 
 ### Fixed — 2026-10-04
 
+- **The Talking Table's reply guard** closes the seven leftovers found by
+  Grok in break order 7, round 4: house-line labels and self-claims,
+  second-person house identity claims, bare executable URL schemes, and
+  look-alike letters folded through the project's skeleton for detection.
 - **The crisis card never waits for the audit log** (`harness.py`): a failed
   row write on the gate branch raised into the failure line, so a person in
   crisis saw "send it again" instead of the card (found by ChatGPT, night

@@ -123,6 +123,48 @@ where it is measured.
   closed at the merge. Measured: `evals/results/merge-2026-09-06/`.
 - **Vibe** (Mistral). Doorway: Vibe. Model and tier: not recorded. Dates:
   2026-09-05, packet sent. Built: no returned tree in the record.
+- **GrokBot** (xAI), the Grok Bot cloud agent. Model and tier: not recorded.
+  Built the five room-lights files on 29 September 2026, build order 6:
+  `apps/talking_table/lights.py`, `sigil_colors.json`, `static/sigils.html`,
+  `LIGHTS.md`, and `tests/test_lights.py`. **Codex** (OpenAI, the ChatGPT desktop
+  app; model and tier not recorded in the order) merged them on 4 October 2026,
+  order C1, onto the landed Talking Table: the Govee key moved from environment
+  and home-file sources to the Table's Settings only, with its own Windows
+  protection and remember switch. Measured by `tests/test_lights.py` and the
+  Talking Table integration tests; only fake Govee was used, never real bulbs.
+
+- **Order B1, the crisis-gate measurement (Codex, OpenAI, the ChatGPT desktop
+  app; model and tier not recorded in the order).** Stopped at the baseline
+  gate on 5 October 2026 over two Windows-only test faults, resumed under the
+  operator's answers the same day, completed on the supplied tree f350424.
+  Authored the six stutter transforms in `evals/fuzz/transforms.py`,
+  `evals/fuzz/confusables.py`, `evals/fuzz/measure_causes.py` and the
+  measurement files under `evals/fuzz/measurements/`; the operator's find of
+  4 October 2026 is the stutter cause. Claude (Anthropic, Fable 5.1, Max, as
+  the operator's screen showed it) wrote the order and shipped the
+  confusables table from the confusable_homoglyphs 3.3.1 package with its
+  provenance file.
+
+- **Order B5, the documented-gap triage (Codex, OpenAI, the ChatGPT desktop
+  app; model and tier not recorded).** 5 October 2026 on the supplied tree
+  34a7296: `evals/gap_triage/triage_2026-10-05.json`,
+  `evals/gap_triage/measure_cheap.py`, the 40 digit-token control sentences
+  and the measurement files; no policy or fixture changed. Order written by
+  Claude (Fable 5.1, Max).
+
+- **The "presentation" word fix and two portable tests, 5 October 2026.**
+  Finder of the regression: Codex (order B7, pair 17). Fix written by Claude
+  (Anthropic, Fable 5.1, Max, Cowork) on the operator's push-B branch:
+  `src/secondsignal/signals.py` (career phrases), `src/secondsignal/packs/en.json`
+  (the identity-sense mask), tests in `tests/test_identity_words.py`; and the
+  two tests made portable to Windows after the Codex builds stopped on them.
+
+- **Talking Table reply-guard repairs, C4.** Finder: **Grok** (xAI),
+  grok.com, Expert, break order 7, round 4, 29 September 2026: the seven
+  remaining reply-guard bypasses. Fixer: **Codex** (OpenAI), ChatGPT desktop
+  app, 4 October 2026 (the C4 order's build date), under the operator's ruling
+  of 4 October 2026, "A. Fix all seven." Grok model version and Codex model
+  and tier: not recorded.
 
 ## Reviewers, with doorway and tier where recorded
 
@@ -238,6 +280,22 @@ rewritten.
   1. "Both house questions in the operator's own words (answer 1 of 12, 4 October 2026)".
   2. "The Talking Table declares a country for the resource line, none by default (answer 10 of 12, 4 October 2026)".
   3. "The changelog and this ledger for the operator's twelve answers (4 October 2026)".
+
+- **2026-10-04** (night), the gap-closure push, order B7; port resumed on
+  **2026-10-05** on the operator's supplied tree 34a7296. Grok (xAI;
+  grok.com; Expert; version not recorded in this order) authored the texts
+  in night order 10 of 30 September 2026. Codex (OpenAI; Codex in the
+  ChatGPT desktop app) ported them into
+  `evals/cases/identity_pairs_grok_2026-09-30.json` (30 pairs and five
+  identity-wrapped crisis lines, 65 cases) and
+  `evals/cases/neurodivergent_grok_2026-09-30.json` (40 ordinary turns and
+  ten wrapped crisis lines, 50 cases). Expectations come from ruling 7 of
+  3 October 2026 and answer 11 of 12 of 4 October 2026: the same action,
+  outcome and seat with and without an identity sentence; and B7's
+  neurodivergent safety promise, ordinary writing never trips the card and
+  labelled crisis writing never dodges it. Control seats were measured on
+  34a7296 as authorized by the resume; Grok's saved expectations and return
+  files were not edited. This row records the port, not a new commit.
 
 ## What this note does not do
 

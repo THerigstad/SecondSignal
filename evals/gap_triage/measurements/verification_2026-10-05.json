@@ -1,0 +1,16 @@
+{
+  "date": "2026-10-05",
+  "source_archive_sha256": "943c43dfb99843284e4254e3ccd1ab88414242dafe8518bc3eb08649856cbcd5",
+  "original_files_compared_byte_for_byte": 325,
+  "modified_original_files": [],
+  "triage_cases": 204,
+  "dissents_unchanged_and_excluded_from_triage": 14,
+  "b1_cases_inventoried_not_candidate_measured": 16,
+  "baseline_summary": "2535 passed, 218 xfailed in 146.42s (0:02:26)",
+  "final_summary": "2536 passed, 218 xfailed in 130.14s (0:02:10)",
+  "default_suite_collected": 2753,
+  "explicit_final_suite_with_added_test_collected": 2754,
+  "network": "No network used; pytest provisioned solely from local cached wheels.",
+  "measurement_script_sha256": "a948af1f6773b989b8903bea81d717f06aefec0eb3a3d0a71f34c67a6a759617",
+  "measurement_results_sha256": "165c4b7a6920531e518254c860ef12cb374bf2bcc347efe2bf1aeeb6b8c965da"
+}
