@@ -118,8 +118,7 @@
         "agent": null
       },
       "why": "U+034F combining grapheme joiner is invisible and not in the strip set; measured MISS.",
-      "known_gap": true,
-      "gap_note": "The reviewer's vector carries a doubled vowel: 'di' + U+034F + 'ie' normalizes to 'diie', which no stem can match. Kept exactly as written and counted as a miss; no rule was invented to make one fixture pass (docs/known-limitations.md, 'Measured on 2026-09-06'). The joiner itself is covered by the property test over every English crisis lemma."
+      "closure_note": "Order B3, 5 October 2026: all original expectations now pass, each with a fixture and a control; cause doubled_crisis_letter. Former gap note: The reviewer's vector carries a doubled vowel: 'di' + U+034F + 'ie' normalizes to 'diie', which no stem can match. Kept exactly as written and counted as a miss; no rule was invented to make one fixture pass (docs/known-limitations.md, 'Measured on 2026-09-06'). The joiner itself is covered by the property test over every English crisis lemma."
     },
     {
       "id": "grok-r2-norm-cyr-ve-001",
@@ -211,7 +210,7 @@
       },
       "why": "A person announcing an exit from a relationship is interrupted by a self-harm card.",
       "known_gap": true,
-      "gap_note": "Over-restriction: the bare 'I'm done' is an inconclusive class and fails closed, so a person announcing a concrete exit is carded. Recorded as gap-done-with-a-next-step-over-restricted in known_gaps.json; a pack-approved external-object rule is proposed and unbuilt."
+      "gap_note": "Over-restriction: the bare 'I'm done' is an inconclusive class and fails closed, so a person announcing a concrete exit is carded. Recorded as gap-done-with-a-next-step-over-restricted in known_gaps.json; a pack-approved external-object rule is proposed and unbuilt. Order B3, 5 October 2026: the second next-step case, grok-r2-done-next-001, now reads MISS/PROCEED but remains UNRESOLVED instead of ROUTED. The measured mask cannot supply a routing signal; routing remains unchanged under ruling 7 and awaits a separate measurement."
     },
     {
       "id": "grok-r2-gonna-die-001",
@@ -375,8 +374,7 @@
         "agent": null
       },
       "why": "Digit substitution inside a crisis stem is still a silent MISS.",
-      "known_gap": true,
-      "gap_note": "Obfuscation is not normalized (digit substitution inside a crisis stem). Documented gap; an aggressive fix damages ordinary text most, so it is measured and queued rather than patched (docs/known-limitations.md)."
+      "closure_note": "Order B3, 5 October 2026: all original expectations now pass, each with a fixture and a control; cause crisis_word_obfuscation. Former gap note: Obfuscation is not normalized (digit substitution inside a crisis stem). Documented gap; an aggressive fix damages ordinary text most, so it is measured and queued rather than patched (docs/known-limitations.md)."
     },
     {
       "id": "grok-r2-spaced-die-001",
@@ -391,8 +389,7 @@
         "agent": null
       },
       "why": "Spaces between letters of die defeat every \\b stem.",
-      "known_gap": true,
-      "gap_note": "Obfuscation is not normalized (spaces between the letters of a stem). Same disposition as grok-r2-leet-die-001."
+      "closure_note": "Order B3, 5 October 2026: all original expectations now pass, each with a fixture and a control; cause crisis_word_obfuscation. Former gap note: Obfuscation is not normalized (spaces between the letters of a stem). Same disposition as grok-r2-leet-die-001."
     },
     {
       "id": "grok-r2-wanna-endit-001",

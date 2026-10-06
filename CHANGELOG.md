@@ -4,6 +4,42 @@ All notable changes to SecondSignal are documented here.
 
 ## [Unreleased]
 
+### Fixed — 2026-10-05, order B3 (the broom's fixes, ruled by the operator from the B1 and B5 measurements)
+
+- **Doubled punctuation, ruling 1:** three documented gaps closed; the four
+  failing fuzz variants recover, measured by order B1. The crisis screen
+  collapses a run of the same punctuation mark on its own copy.
+- **Tripled letters, ruling 2:** four documented gaps closed; the sixteen
+  failing fuzz variants recover, measured by order B1. Routing is unchanged.
+- **Repeated words and fillers, ruling 5:** 88 of 97 previously failing
+  stutter variants recover under the original candidate, measured by order
+  B1. The operator then authorized the extra stutter repairs exposed by the
+  enlarged live corpus: all nine original residuals and thirteen additional
+  compound variants now recover, with the existing controls kept. Hyphen
+  syllables, an underscore repeat boundary and vocabulary-gated attached
+  filler fragments account for those 22 recoveries.
+- **Narrow crisis-word obfuscation, ruling 9:** 25 documented gaps
+  closed under the combined ruled folds, measured by order B5. Separators
+  join single-character runs; short digit/symbol tokens map only to crisis
+  vocabulary words as measured;
+  132 obfuscation cases remain open for order B5b.
+- **Spoken idioms, ruling 10:** five of six documented gaps closed by the
+  five measured masks, measured by order B5; `gap-spoken-we-end-summary`
+  remains a gap.
+- **Explicit next step, ruling 11:** one of two documented gaps closed,
+  measured by order B5; `grok-r2-done-next-001` remains open.
+- **Thing subject, ruling 11:** one documented gap closed by the bounded
+  subject mask, measured by order B5, with the labelled crisis control kept.
+- **Doubled vowel, ruling 11:** the one external documented gap closes,
+  measured by order B5; one repeated vowel is removed only when exactly one
+  crisis-vocabulary word results.
+- **The fourth crisis-gate control list:** forty digit-token sentences from
+  the B5 measurement now run in `tests/test_crisis_gate.py` and must all
+  avoid the card.
+- **The targets-the-crisis oracle, ruling 8:** one test holds the saved file
+  to twelve labelled requests and A/B/C/D counts 5/1/1/5. Any future rule
+  must pass it; no targets-the-crisis rule is implemented in this order.
+
 ### Fixed — 2026-10-05, found by the Codex port of Grok's identity pairs (order B7)
 
 - The project's own word for how a character presents ("presentation", ADR-0026
@@ -23,6 +59,20 @@ All notable changes to SecondSignal are documented here.
 
 ### Added — 2026-10-04 (night), the gap-closure push
 
+- Order B5b (Codex, measurement only, 5 October 2026): the five candidates the
+  operator sent back for numbers, measured before the real crisis screen and
+  never inside it (`evals/gap_triage/measure_rest.py`, results in
+  `evals/gap_triage/measurements/rest_2026-10-05.json`): a guarded one-letter
+  matcher for dropped and swapped letters (18 of 45 fuzz variants, zero new
+  control cards); the corrected confusables table with plain letters and
+  digits never as sources (5,763 of 5,853 look-alike variants, zero real cards
+  lost); the wider de-obfuscation fold (114 of the 134 remaining hidden-word
+  cases, zero new cards on 43 sentences, 260 everyday cases and the 40
+  digit-token sentences; the 20 it misses all need a leading zero read as d);
+  the same fold against the nine stutter leftovers (4 of 9); and narrowed
+  recovery aliases, which turn out to be a routing question (5 of 7 in routing
+  scope, all eight everyday controls released). Rulings follow; nothing
+  closes in this order.
 - Order B1 (Codex, measurement only, resumed and completed 5 October 2026):
   six stutter-shaped fuzz transforms from the operator's find of 4 October
   (a word repeated with a comma, "um" before the middle word, "uh" before the

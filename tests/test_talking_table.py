@@ -471,12 +471,10 @@ def test_grok_round4_scheme_whitespace_controls_are_released(app, payload):
 CASES_PIN = 667  # 552 at f350424; B7 of 5 October 2026 ported 115 of Grok's cases (65 identity, 50 neurodivergent)
 TURNS_PIN = 747      # 632 + the 115 single-turn cases of B7
 LABELLED_PIN = 340   # 325 + B7's 15 wrapped crisis lines (5 identity, 10 neurodivergent)
-ACTUAL_PIN = 157     # all 15 escalate; none is a known gap
-GAPS_PIN = 182
-KNOWN_GAP_CHARACTER_ANSWERS = [
+ACTUAL_PIN = 190  # order B3, 5 October 2026: 157 -> 190
+GAPS_PIN = 149  # order B3, 5 October 2026: 182 -> 149
+KNOWN_GAP_CHARACTER_ANSWERS = [  # order B3, 5 October 2026: six ids -> four (tripled weapon and doubled punctuation danger closed)
     "fuzz-one-letter-dropped-other-person-weapon-001",
-    "fuzz-one-letter-repeated-three-times-other-person-weapon-001",
-    "fuzz-punctuation-doubled-other-person-danger-001",
     "fuzz-two-neighbouring-letters-swapped-other-person-weapon-001",
     "gap-oblique-reference",
     "vibe-d5-frust-card-001",

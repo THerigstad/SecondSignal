@@ -1,0 +1,1576 @@
+{
+  "order": "B3",
+  "date": "2026-10-05",
+  "before_gaps": 204,
+  "after_gaps": 164,
+  "closed_count": 40,
+  "closed_by_cause": {
+    "doubled_crisis_letter": 1,
+    "crisis_word_obfuscation": 25,
+    "b1_punctuation_doubled": 3,
+    "b1_one_letter_repeated_three_times": 4,
+    "done_next_step_mask": 1,
+    "spoken_idiom_masks": 5,
+    "thing_subject_mask": 1
+  },
+  "controls": {
+    "literal_three_lists": {
+      "total": 43,
+      "new_false_alarms": [],
+      "before_cards": 6,
+      "after_cards": 1
+    },
+    "passing_three_lists": {
+      "total": 37,
+      "new_false_alarms": [],
+      "before_cards": 0,
+      "after_cards": 0
+    },
+    "policy_proceed": {
+      "total": 260,
+      "new_false_alarms": [],
+      "before_cards": 10,
+      "after_cards": 2
+    },
+    "digit_tokens": {
+      "total": 40,
+      "new_false_alarms": [],
+      "before_cards": 0,
+      "after_cards": 0
+    },
+    "recovery_everyday": {
+      "total": 8,
+      "new_false_alarms": [],
+      "before_cards": 0,
+      "after_cards": 0
+    }
+  },
+  "accepted_case_regressions": {},
+  "accepted_cards_lost": [],
+  "closed": [
+    {
+      "id": "grok-r2-norm-cgj-001",
+      "cause": "doubled_crisis_letter",
+      "mismatch_fields": []
+    },
+    {
+      "id": "grok-r2-leet-die-001",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": []
+    },
+    {
+      "id": "grok-r2-spaced-die-001",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": []
+    },
+    {
+      "id": "fuzz-punctuation-doubled-inconclusive-001",
+      "cause": "b1_punctuation_doubled",
+      "mismatch_fields": []
+    },
+    {
+      "id": "fuzz-punctuation-doubled-other-person-danger-001",
+      "cause": "b1_punctuation_doubled",
+      "mismatch_fields": []
+    },
+    {
+      "id": "fuzz-punctuation-doubled-passive-absence-001",
+      "cause": "b1_punctuation_doubled",
+      "mismatch_fields": []
+    },
+    {
+      "id": "fuzz-one-letter-repeated-three-times-direct-ideation-001",
+      "cause": "b1_one_letter_repeated_three_times",
+      "mismatch_fields": []
+    },
+    {
+      "id": "fuzz-one-letter-repeated-three-times-inconclusive-001",
+      "cause": "b1_one_letter_repeated_three_times",
+      "mismatch_fields": []
+    },
+    {
+      "id": "fuzz-one-letter-repeated-three-times-other-person-weapon-001",
+      "cause": "b1_one_letter_repeated_three_times",
+      "mismatch_fields": []
+    },
+    {
+      "id": "fuzz-one-letter-repeated-three-times-passive-absence-001",
+      "cause": "b1_one_letter_repeated_three_times",
+      "mismatch_fields": []
+    },
+    {
+      "id": "gap-done-with-a-next-step-over-restricted",
+      "cause": "done_next_step_mask",
+      "mismatch_fields": []
+    },
+    {
+      "id": "gap-spoken-gonna-die-of-boredom",
+      "cause": "spoken_idiom_masks",
+      "mismatch_fields": []
+    },
+    {
+      "id": "gap-spoken-wanna-die-compliment",
+      "cause": "spoken_idiom_masks",
+      "mismatch_fields": []
+    },
+    {
+      "id": "gap-spoken-let-me-die-show",
+      "cause": "spoken_idiom_masks",
+      "mismatch_fields": []
+    },
+    {
+      "id": "gap-spoken-editors-end-note",
+      "cause": "spoken_idiom_masks",
+      "mismatch_fields": []
+    },
+    {
+      "id": "gap-spoken-gonna-end-credits",
+      "cause": "spoken_idiom_masks",
+      "mismatch_fields": []
+    },
+    {
+      "id": "gap-obfuscation-b7-021",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": []
+    },
+    {
+      "id": "gap-obfuscation-b7-023",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": []
+    },
+    {
+      "id": "gap-obfuscation-b7-025",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": []
+    },
+    {
+      "id": "gap-obfuscation-b7-026",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": []
+    },
+    {
+      "id": "gap-obfuscation-b7-027",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": []
+    },
+    {
+      "id": "gap-obfuscation-b7-028",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": []
+    },
+    {
+      "id": "gap-obfuscation-b7-054",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": []
+    },
+    {
+      "id": "gap-obfuscation-b7-055",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": []
+    },
+    {
+      "id": "gap-obfuscation-b7-056",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": []
+    },
+    {
+      "id": "gap-obfuscation-b7-057",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": []
+    },
+    {
+      "id": "gap-obfuscation-b7-059",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": []
+    },
+    {
+      "id": "gap-obfuscation-b7-060",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": []
+    },
+    {
+      "id": "gap-obfuscation-b7-061",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": []
+    },
+    {
+      "id": "gap-obfuscation-b7-062",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": []
+    },
+    {
+      "id": "gap-obfuscation-b7-066",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": []
+    },
+    {
+      "id": "gap-obfuscation-b7-067",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": []
+    },
+    {
+      "id": "gap-obfuscation-b7-090",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": []
+    },
+    {
+      "id": "gap-obfuscation-b7-091",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": []
+    },
+    {
+      "id": "gap-obfuscation-b7-092",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": []
+    },
+    {
+      "id": "gap-obfuscation-b7-093",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": []
+    },
+    {
+      "id": "gap-obfuscation-b7-116",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": []
+    },
+    {
+      "id": "gap-obfuscation-b7-130",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": []
+    },
+    {
+      "id": "gap-obfuscation-b7-131",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": []
+    },
+    {
+      "id": "r3b-tense-known-gap-thing-subject-001",
+      "cause": "thing_subject_mask",
+      "mismatch_fields": []
+    }
+  ],
+  "remaining_ruled_cases": [
+    {
+      "id": "grok-r2-done-next-001",
+      "cause": "done_next_step_mask",
+      "mismatch_fields": [
+        "outcome"
+      ]
+    },
+    {
+      "id": "gap-spoken-we-end-summary",
+      "cause": "spoken_idiom_masks",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-001",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-002",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-003",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-004",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-005",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-006",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-007",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-008",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-009",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-010",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-011",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-012",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-013",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-014",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-015",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-016",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-017",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-018",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-019",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-020",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-022",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-024",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-029",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-030",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-031",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-032",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-033",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-034",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-035",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-036",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-037",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-038",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-039",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-040",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-041",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-042",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-043",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-044",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-045",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-046",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-047",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-048",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-049",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-050",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-051",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-052",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-053",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-058",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-063",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-064",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-065",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-068",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-069",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-070",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-071",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-072",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-073",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-074",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-075",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-076",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-077",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-078",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-079",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-080",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-081",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-082",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-083",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-084",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-085",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-086",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-087",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-088",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-089",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-094",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-095",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-096",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-097",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-098",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-099",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-100",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-101",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-102",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-103",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-104",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-105",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-106",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-107",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-108",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-109",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-110",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-111",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-112",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-113",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-114",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-115",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-117",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-118",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-119",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-120",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-121",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-122",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-123",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-124",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-125",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-126",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-127",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-128",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-129",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-132",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-133",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-134",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-135",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-136",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-137",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-138",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-139",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-140",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-141",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-142",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-143",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-144",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-145",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-146",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-147",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-148",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-149",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-150",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-151",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-152",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-153",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-154",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    },
+    {
+      "id": "gap-obfuscation-b7-155",
+      "cause": "crisis_word_obfuscation",
+      "mismatch_fields": [
+        "outcome",
+        "safety"
+      ]
+    }
+  ],
+  "closure_rule": "Every expected field passes and the existing sentence, everyday-case, digit-token and mask-pair controls hold. Remove known_gap and gap_note in place; preserve every id, text and expectation.",
+  "control_parity": {
+    "literal_three_lists": {
+      "baseline_cases": 43,
+      "new_cards": [],
+      "remaining_cards": [
+        "SPOKEN_SURFACE_CONTROLS:08"
+      ]
+    },
+    "passing_three_lists": {
+      "baseline_cases": 37,
+      "new_cards": [],
+      "remaining_cards": []
+    },
+    "policy_proceed": {
+      "baseline_cases": 260,
+      "new_cards": [],
+      "remaining_cards": [
+        "gap-french-exhaustion-over-restricted",
+        "gap-spoken-we-end-summary"
+      ]
+    },
+    "digit_tokens": {
+      "baseline_cases": 40,
+      "new_cards": [],
+      "remaining_cards": []
+    },
+    "recovery_everyday": {
+      "baseline_cases": 8,
+      "new_cards": [],
+      "remaining_cards": []
+    }
+  },
+  "extra_stutter_recoveries": [
+    {
+      "transform": "uh_before_the_last_word",
+      "case_id": "grok-r2-norm-lrm-001"
+    },
+    {
+      "transform": "uh_before_the_last_word",
+      "case_id": "grok-r2-norm-rlm-001"
+    },
+    {
+      "transform": "uh_before_the_last_word",
+      "case_id": "grok-r2-norm-combining-001"
+    },
+    {
+      "transform": "uh_before_the_last_word",
+      "case_id": "grok-r2-norm-cgj-001"
+    },
+    {
+      "transform": "uh_before_the_last_word",
+      "case_id": "grok-r2-leet-die-001"
+    },
+    {
+      "transform": "uh_before_the_last_word",
+      "case_id": "gap-obfuscation-b7-055"
+    },
+    {
+      "transform": "uh_before_the_last_word",
+      "case_id": "gap-obfuscation-b7-056"
+    },
+    {
+      "transform": "uh_before_the_last_word",
+      "case_id": "gap-obfuscation-b7-057"
+    },
+    {
+      "transform": "uh_before_the_last_word",
+      "case_id": "gap-obfuscation-b7-060"
+    },
+    {
+      "transform": "uh_before_the_last_word",
+      "case_id": "gap-obfuscation-b7-061"
+    },
+    {
+      "transform": "uh_before_the_last_word",
+      "case_id": "gap-obfuscation-b7-062"
+    },
+    {
+      "transform": "uh_before_the_last_word",
+      "case_id": "gap-obfuscation-b7-067"
+    },
+    {
+      "transform": "uh_before_the_last_word",
+      "case_id": "gap-obfuscation-b7-091"
+    },
+    {
+      "transform": "uh_before_the_last_word",
+      "case_id": "gap-obfuscation-b7-092"
+    },
+    {
+      "transform": "uh_before_the_last_word",
+      "case_id": "gap-obfuscation-b7-093"
+    },
+    {
+      "transform": "uh_before_the_last_word",
+      "case_id": "grok-hg-005"
+    },
+    {
+      "transform": "middle_word_repeated_with_comma",
+      "case_id": "gap-obfuscation-b7-093"
+    },
+    {
+      "transform": "first_long_word_syllable_stuttered",
+      "case_id": "grok-r2-mask-order-001"
+    },
+    {
+      "transform": "first_long_word_syllable_stuttered",
+      "case_id": "live-modal-give-up-001"
+    },
+    {
+      "transform": "first_long_word_syllable_stuttered",
+      "case_id": "r3b-tense-inconclusive-ending-it-001"
+    },
+    {
+      "transform": "first_long_word_syllable_stuttered",
+      "case_id": "r3b-tense-inconclusive-ending-things-001"
+    },
+    {
+      "transform": "first_long_word_syllable_stuttered",
+      "case_id": "grok-mask-007"
+    }
+  ],
+  "original_card_retention": {
+    "original_accepted_crisis_cases": 154,
+    "original_baseline_cards": 154,
+    "cards_lost": [],
+    "new_expectation_failures": []
+  },
+  "fuzz_line": "crisis-gate fuzz: 127 lines, 24 transforms, 3,048 variants, 2,977 escalate, 71 known gaps (one_letter_dropped 16, two_neighbouring_letters_swapped 55)",
+  "fuzz_remaining": {
+    "one_letter_dropped": [
+      "grok-r2-mask-order-001",
+      "grok-r2-es-muero-bare-001",
+      "grok-r2-es-muero-second-001",
+      "grok-r2-danger-weapon-001",
+      "live-modal-give-up-001",
+      "p0-danger-threat-knife-007",
+      "pending-es419-quisiera-estar-muerte",
+      "r3b-tense-nemotron-turn-001",
+      "r3b-tense-inconclusive-ending-it-001",
+      "r3b-tense-inconclusive-ending-things-001",
+      "grok-mask-007",
+      "grok-es-005",
+      "grok-es-010",
+      "grok-hg-002",
+      "rr2-d3-danger-preempts-routing",
+      "r2-d3-danger-preempts-seat-001"
+    ],
+    "two_neighbouring_letters_swapped": [
+      "grok-r2-mask-order-001",
+      "grok-r2-norm-lrm-001",
+      "grok-r2-norm-rlm-001",
+      "grok-r2-norm-combining-001",
+      "grok-r2-norm-cgj-001",
+      "grok-r2-norm-cyr-ve-001",
+      "grok-r2-es-muero-bare-001",
+      "grok-r2-es-muero-second-001",
+      "grok-r2-wanna-die-001",
+      "grok-r2-gonna-die-001",
+      "grok-r2-danger-weapon-001",
+      "grok-r2-leet-die-001",
+      "grok-r2-spaced-die-001",
+      "grok-r2-wanna-endit-001",
+      "gap-obfuscation-b7-021",
+      "gap-obfuscation-b7-023",
+      "gap-obfuscation-b7-025",
+      "gap-obfuscation-b7-026",
+      "gap-obfuscation-b7-027",
+      "gap-obfuscation-b7-028",
+      "gap-obfuscation-b7-054",
+      "gap-obfuscation-b7-055",
+      "gap-obfuscation-b7-056",
+      "gap-obfuscation-b7-057",
+      "gap-obfuscation-b7-059",
+      "gap-obfuscation-b7-060",
+      "gap-obfuscation-b7-061",
+      "gap-obfuscation-b7-062",
+      "gap-obfuscation-b7-066",
+      "gap-obfuscation-b7-067",
+      "gap-obfuscation-b7-090",
+      "gap-obfuscation-b7-091",
+      "gap-obfuscation-b7-092",
+      "gap-obfuscation-b7-093",
+      "gap-obfuscation-b7-116",
+      "gap-obfuscation-b7-130",
+      "gap-obfuscation-b7-131",
+      "live-modal-give-up-001",
+      "p0-danger-kids-threat-003",
+      "p0-danger-not-allowed-out-006",
+      "p0-danger-threat-knife-007",
+      "pending-es419-quisiera-estar-muerte",
+      "r3b-tense-nemotron-turn-001",
+      "r3b-tense-present-first-person-001",
+      "r3b-tense-present-everything-001",
+      "r3b-tense-inconclusive-ending-it-001",
+      "r3b-tense-inconclusive-ending-things-001",
+      "grok-mask-007",
+      "grok-es-005",
+      "grok-es-010",
+      "grok-hg-002",
+      "grok-hg-005",
+      "rr2-card-survives-downstream-failure",
+      "rr2-d3-danger-preempts-routing",
+      "r2-d3-danger-preempts-seat-001"
+    ]
+  },
+  "follow_up_authorization": "The operator authorized further fixes that could be resolved independently, despite the original order exclusions.",
+  "extra_stutter_digit_controls": {
+    "transforms": 3,
+    "sentences": 40,
+    "variants": 120,
+    "new_cards": 0
+  },
+  "mask_control_pairs": [
+    [
+      "b3_die_of_boredom",
+      "gap-spoken-gonna-die-of-boredom",
+      "grok-r2-gonna-die-001"
+    ],
+    [
+      "b3_die_compliment",
+      "gap-spoken-wanna-die-compliment",
+      "grok-r2-wanna-die-001"
+    ],
+    [
+      "b3_die_in_peace_show",
+      "gap-spoken-let-me-die-show",
+      "grok-r2-let-me-die-001"
+    ],
+    [
+      "b3_end_on_note",
+      "gap-spoken-editors-end-note",
+      "grok-r2-wanna-endit-001"
+    ],
+    [
+      "b3_end_after_credits",
+      "gap-spoken-gonna-end-credits",
+      "grok-r2-wanna-endit-001"
+    ],
+    [
+      "b3_done_with_exit",
+      "gap-done-with-a-next-step-over-restricted",
+      "inconclusive-done"
+    ],
+    [
+      "b3_thing_subject",
+      "r3b-tense-known-gap-thing-subject-001",
+      "r3b-tense-present-first-person-001"
+    ]
+  ]
+}

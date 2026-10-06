@@ -34,14 +34,17 @@ The measurement that justified this module is in
 from __future__ import annotations
 
 import hashlib
+import itertools
 import re
 import unicodedata
 from dataclasses import dataclass
+from functools import lru_cache
 
 __all__ = [
     "normalize",
     "analyze",
     "collapse_spacing",
+    "screen_fold",
     "Normalized",
     "NORMALIZE_FORMS",
     "SKELETON",
@@ -233,6 +236,137 @@ def collapse_spacing(text: str) -> str:
     first-person comma rule) are unchanged.
     """
     return _SPACING_RE.sub(" ", text).strip()
+
+
+# Order B3, rulings 1, 2, 5, 9 and 11 of 5 October 2026. These candidates
+# were measured in orders B1/B5; only crisis_screen calls the combined fold.
+_SCREEN_LOOKALIKES = {"0": "o", "1": "il", "3": "e", "4": "a", "5": "s", "7": "t", "8": "b", "@": "a", "$": "s", "!": "i"}
+_SCREEN_CHAR = r"[a-z0-9@$!]"
+_SCREEN_SEPARATED = re.compile(r"(?<![\w@$!])" + _SCREEN_CHAR + r"(?:[ ._-]" + _SCREEN_CHAR + r")+(?![\w@$!])", re.I)
+_SCREEN_TOKEN = re.compile(r"(?<![\w@$!])[a-z0-9@$!]+(?![\w@$!])", re.I)
+
+
+@lru_cache(maxsize=1)
+def _screen_vocabulary() -> frozenset[str]:
+    """Derive B5's literal vocabulary lazily, avoiding the import cycle.
+
+    The gate's English classes and English pack hits are the only sources;
+    regex escapes are removed before literal runs of three letters are read.
+    No regex expansion, manual word list or masks contribute vocabulary.
+    """
+    from .lexicon import PACKS
+    from .safety import _ENGLISH_PATTERN_STRINGS
+
+    patterns = list(_ENGLISH_PATTERN_STRINGS) + [pattern.pattern for _, _, pattern in PACKS["en"].hits]
+    return frozenset(
+        word.lower() for pattern in patterns
+        for word in re.findall(r"[a-zA-Z]{3,}", re.sub(r"\\[A-Za-z]", " ", pattern))
+    )
+
+
+def _screen_separators(text: str) -> str:
+    return _SCREEN_SEPARATED.sub(lambda match: re.sub(r"[ ._-]", "", match.group()), text)
+
+
+def _screen_punctuation(text: str) -> str:
+    return re.sub(r"(.)\1+", lambda match: match[1] if unicodedata.category(match[1]).startswith("P")
+                  else match[0], text, flags=re.DOTALL)
+
+
+def _screen_tripled_letters(text: str) -> str:
+    return re.sub(r"([^\W\d_])\1{2,}", r"\1", text)
+
+
+def _screen_stutter(text: str) -> str:
+    # The operator additionally authorized independently resolvable causes on
+    # 5 October 2026. The B3 follow-up replay covers these compound stutters
+    # against the existing ordinary controls and every accepted crisis card.
+    text = re.sub(r"(?<!\w)([^\W\d_])(?:-\1)+-(?=\1)", "", text, flags=re.IGNORECASE)
+    # Preserve the existing punctuation separator, removing only the filler
+    # and the whitespace it introduced before the next character fragment.
+    text = re.sub(r"(?<=[._-])(?:uhm|erm|um|uh)\s+(?=[a-z0-9@$!])", "", text, flags=re.IGNORECASE)
+
+    def join_fragments(match: re.Match[str]) -> str:
+        token = match[1] + match[2]
+        if len(token) > 6:
+            return match[0]
+        # The filler can be attached to a fragment after Unicode stripping.
+        # Join only if the already-approved token folds reach the vocabulary;
+        # the ordinary downstream steps still perform and record those folds.
+        mapped = _screen_lookalikes(token)
+        final = _screen_doubled_vowel(mapped)
+        return token if final in _screen_vocabulary() else match[0]
+
+    text = re.sub(
+        r"(?<![\w@$!])([a-z0-9@$!]+?)(?:uhm|erm|um|uh)\s+([a-z0-9@$!]+)(?![\w@$!])",
+        join_fragments, text, flags=re.IGNORECASE,
+    )
+    text = re.sub(r"\b(?:um|uh|erm|uhm)\b", "", text, flags=re.IGNORECASE)
+    text = collapse_spacing(text)
+    repeated = re.compile(r"\b([^\W\d_]+)(?:\s*,\s*|\s+)\1(?=\b|_)", re.IGNORECASE)
+    while True:
+        folded = repeated.sub(r"\1", text)
+        if folded == text:
+            return text
+        text = folded
+
+
+def _screen_lookalikes(text: str) -> str:
+    vocabulary = _screen_vocabulary()
+
+    def replace(match: re.Match[str]) -> str:
+        token = match.group()
+        if len(token) > 6 or not any(ch in _SCREEN_LOOKALIKES for ch in token):
+            return token
+        possibilities = itertools.product(*(_SCREEN_LOOKALIKES.get(ch, ch) for ch in token.lower()))
+        options = sorted({"".join(chars) for chars in possibilities} & vocabulary)
+        return options[0] if options else token
+
+    return _SCREEN_TOKEN.sub(replace, text)
+
+
+def _screen_doubled_vowel(text: str) -> str:
+    # This normalize call is part of the measured B5 candidate, not a general
+    # edit-distance rule. It also expands spoken forms restored by earlier folds.
+    text = normalize(text)
+    vocabulary = _screen_vocabulary()
+
+    def fold(match: re.Match[str]) -> str:
+        token = match.group()
+        if token in vocabulary:
+            return token
+        candidates = {
+            token[:repeat.start()] + token[repeat.start() + 1:]
+            for repeat in re.finditer(r"([aeiou])\1", token)
+        } & vocabulary
+        return next(iter(candidates)) if len(candidates) == 1 else token
+
+    return re.sub(r"(?<!\w)[a-z]+(?!\w)", fold, text)
+
+
+def screen_fold(text: str) -> tuple[str, tuple[str, ...]]:
+    """The measured B3 folds and the names of those that changed this copy.
+
+    The caller supplies its existing Unicode-normalized analysis. Routing and
+    session monitors keep their existing input; only the crisis screen reads
+    this copy. Punctuation and stutter precede separators so the fuzzed
+    separated-letter fixtures remain recoverable (order B3, 5 October 2026).
+    """
+    changed: list[str] = []
+    for name, fold in (
+        ("collapse_spacing", collapse_spacing),
+        ("doubled_punctuation", _screen_punctuation),
+        ("tripled_letters", _screen_tripled_letters),
+        ("stutter", _screen_stutter),
+        ("separators", _screen_separators),
+        ("lookalikes", _screen_lookalikes),
+        ("doubled_vowel", _screen_doubled_vowel),
+    ):
+        folded = fold(text)
+        if folded != text:
+            changed.append(name)
+            text = folded
+    return text, tuple(changed)
 
 
 def skeleton_hash() -> str:

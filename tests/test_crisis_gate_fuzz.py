@@ -5,10 +5,10 @@ Grok's crisis-gate fuzz of 30 September 2026 (night order 4) applied seventeen
 mechanical transforms to the 82 labelled crisis lines and found 281 variants
 that switched the card off, from four causes. Three causes were closed on
 4 October (spacing, rulings 1; a Greek look-alike, ruling 3; the epsilon is the
-eighteenth transform). The four that remain (a doubled punctuation mark, a
-tripled letter, a dropped letter, a swapped pair of letters) are carried as
-known gaps for the gap-closure push, where each is measured against the
-innocent-word controls and ruled one at a time.
+eighteenth transform). Order B3 of 5 October closes doubled punctuation and
+tripled letters; dropped and swapped letters stay documented gaps. The
+operator-authorized follow-up closes the remaining stutter variants, including
+the compound variants found while fuzzing the newly recovered crisis lines.
 
 Grok's 281 original variants are kept verbatim in
 ``evals/fuzz/grok_fuzz_2026-09-30.json`` as the record of the finding; the
@@ -19,6 +19,7 @@ crisis line is fuzzed the day it is added.
 from __future__ import annotations
 
 import json
+from collections import Counter
 from pathlib import Path
 
 import pytest
@@ -29,6 +30,9 @@ from secondsignal import load_roster
 
 ROOT = Path(__file__).resolve().parents[1]
 GROK_FILE = ROOT / "evals" / "fuzz" / "grok_fuzz_2026-09-30.json"
+TARGETS_THE_CRISIS_FILE = (
+    ROOT / "evals" / "fuzz" / "measurements" / "targets_the_crisis_labels_2026-10-04.json"
+)
 
 
 @pytest.fixture(scope="module")
@@ -57,37 +61,37 @@ def test_a_known_gap_transform_that_stops_failing_is_removed_on_purpose(result):
     )
 
 
-def test_the_known_gaps_are_five_causes_four_ruled_on_and_the_operators_stutter_find():
-    assert KNOWN_GAP_TRANSFORMS == {
-        "punctuation_doubled",
-        "one_letter_repeated_three_times",
+def test_the_known_gap_transforms_are_the_two_remaining_after_order_b3():
+    assert KNOWN_GAP_TRANSFORMS == {  # Order B3, 5 October 2026: 8 -> 2; removed punctuation_doubled, one_letter_repeated_three_times, middle_word_repeated_with_comma, um_before_the_middle_word, uh_before_the_last_word, first_long_word_syllable_stuttered.
         "one_letter_dropped",
         "two_neighbouring_letters_swapped",
-        "middle_word_repeated_with_comma",
-        "um_before_the_middle_word",
-        "uh_before_the_last_word",
-        "first_long_word_syllable_stuttered",
     }
 
 
 def test_groks_281_variants_are_kept_and_the_closed_causes_now_escalate():
-    """Grok's file is the record. Its spacing variants (three transforms, 237
-    lines) escalate now; its other 44 are the four causes still open."""
+    """Keep all 281 original variants: 256 escalate and 25 remain documented gaps."""
     doc = json.loads(GROK_FILE.read_text(encoding="utf-8"))
     cases = doc["cases"]
     assert len(cases) == 281
     roster = load_roster()
-    closed = ("two_spaces_between_words", "tab_between_words", "line_break_between_words")
+    closed = (  # Order B3, 5 October 2026: 3 -> 5; added punctuation_doubled and one_letter_repeated_three_times.
+        "two_spaces_between_words", "tab_between_words", "line_break_between_words",
+        "punctuation_doubled", "one_letter_repeated_three_times",
+    )
+    closed_count = 0
     still_open = 0
     for case in cases:
         name = next(t for t in TRANSFORMS if case["id"].endswith("-" + t))
         action, _ = _action(case, case["text"], roster)
         if name in closed:
             assert action == "HUMAN_ESCALATION", (case["id"], action)
+            closed_count += 1
         else:
             assert name in KNOWN_GAP_TRANSFORMS, (case["id"], name)
+            assert action != "HUMAN_ESCALATION", (case["id"], "remove its known-gap classification")
             still_open += 1
-    assert still_open == 44
+    assert closed_count == 256  # Order B3, 5 October 2026: 237 -> 256 closed historic variants.
+    assert still_open == 25  # Order B3, 5 October 2026: 44 -> 25 still-open historic variants.
 
 
 def test_every_transform_is_deterministic_and_changes_a_crisis_line():
@@ -95,3 +99,12 @@ def test_every_transform_is_deterministic_and_changes_a_crisis_line():
         for name in TRANSFORMS:
             once, twice = apply(name, case["text"]), apply(name, case["text"])
             assert once == twice
+
+
+def test_targets_the_crisis_oracle_keeps_twelve_labelled_requests():
+    """Any future "targets the crisis" rule must pass this file (ruling 8, order B3)."""
+    doc = json.loads(TARGETS_THE_CRISIS_FILE.read_text(encoding="utf-8"))
+    rows = doc["turns"]
+    assert len(rows) >= 12
+    assert all(row["label"] in {"A", "B", "C", "D"} for row in rows)
+    assert Counter(row["label"] for row in rows) == {"A": 5, "B": 1, "C": 1, "D": 5}

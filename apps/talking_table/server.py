@@ -153,12 +153,15 @@ def _card_decision(record):
     safety = record.get("safety", {})
     fields = ("action", "disclosures", "crisis_read", "crisis_classes",
               "lexicon_status", "card", "card_order", "patterns_hash", "pack_ids",
-              "latch", "register_caps")
+              "latch", "register_caps", "screen_folds")
+    explanation = "safety = HUMAN_ESCALATION\nThe crisis card holds the floor."
+    if safety.get("screen_folds"):
+        explanation += "\nScreen read a folded copy: " + ", ".join(safety["screen_folds"])
     return {
         "outcome": record.get("outcome"), "agent_id": None,
         "assist_agent_id": None, "shadow_agent_id": None,
         "safety": {key: copy.deepcopy(safety[key]) for key in fields if key in safety},
-        "explain": "safety = HUMAN_ESCALATION\nThe crisis card holds the floor.",
+        "explain": explanation,
         "presentation_note": "Character-routing details are omitted from this card record.",
     }
 

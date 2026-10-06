@@ -216,6 +216,7 @@ def _safety_to_dict(verdict: SafetyVerdict) -> dict[str, object]:
         "pack_ids": list(verdict.pack_ids),
         "patterns_hash": verdict.patterns_hash,
         "normalized_forms": list(verdict.normalized_forms),
+        "screen_folds": list(verdict.screen_folds),
         "mixed_script_tokens": verdict.mixed_script_tokens,
         "frustration_frame": verdict.frustration_frame,
         "preference_result": verdict.preference_result,
@@ -343,6 +344,8 @@ class RoutingDecision:
             lines.append("extract    = EMPTY (no topic, no mode, no regulation evidence)")
 
         lines.append(f"safety     = {self.safety.action.name}  (crisis read: {self.safety.crisis_read}, lexicon: {self.safety.lexicon_status})")
+        if self.safety.screen_folds:
+            lines.append("screen     = folded copy: " + ", ".join(self.safety.screen_folds))
         for reason in self.safety.reasons:
             lines.append(f"             - {reason}")
         if self.safety.masked_spans:

@@ -357,7 +357,7 @@ why both committed report pages are now asserted equal to the runner's
 output on every run. The badge on the README is written from these numbers
 and from nothing else.
 
-**Numbers, current.** 3,131 tests: 218 expected failures (204 documented gaps,
+**Numbers, current.** 3,232 tests: 178 expected failures (164 documented gaps,
 14 recorded dissents), the rest pass. 667 labeled cases in the manifest, 285 of
 them external reviewer fixtures kept verbatim; 71 deferred fixtures stored and
 not run. This paragraph, the README's tests badge, its Quickstart line and its
@@ -390,6 +390,19 @@ delivered; on the full case set the only moved decisions are the ones the
 rulings name (the last protected aftermath turn on slow-slope-001, the
 ask_question obligation on three stabilizer seats, and Grok's eight
 single-word seatings, which now ask).
+
+**Numbers, 2026-10-05, order B3.** The broom's fixes, ruled by the operator
+from the B1 and B5 measurements: 40 of 204 documented gaps close,
+leaving 164 documented gaps and the same fourteen recorded dissents.
+Each closure has its existing fixture and a control; the fixtures remain
+ordinary expectations after their markers move. The folds run only on the
+crisis screen's copy and the record names the folds used. The full replay's
+line is: crisis-gate fuzz: 127 lines, 24 transforms, 3,048 variants, 2,977 escalate, 71 known gaps (one_letter_dropped 16, two_neighbouring_letters_swapped 55). Grok's 281 saved fuzz fixtures now classify as
+256 closed and 25 still open. The forty digit-token
+controls join the gate tests, and the twelve labelled targets-the-crisis
+requests are pinned as the oracle for a future rule; no such rule is built.
+The current-numbers paragraph above is refreshed from pytest and the case
+manifest after these changes.
 
 **Numbers, 2026-09-19.** 1,348 tests: 193 expected failures (the same 179
 documented gaps and 14 recorded dissents), the rest pass, with the packaging

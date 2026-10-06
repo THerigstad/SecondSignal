@@ -145,6 +145,11 @@ where it is measured.
   confusables table from the confusable_homoglyphs 3.3.1 package with its
   provenance file.
 
+- **Order B5b, the second measurement (Codex, OpenAI, the ChatGPT desktop
+  app; model and tier not recorded).** 5 October 2026 on the supplied tree
+  e04780b: `evals/gap_triage/measure_rest.py`, its results file and one test;
+  measurement only, nothing closed. All replays used FakeAdapter; no vendor
+  model was called.
 - **Order B5, the documented-gap triage (Codex, OpenAI, the ChatGPT desktop
   app; model and tier not recorded).** 5 October 2026 on the supplied tree
   34a7296: `evals/gap_triage/triage_2026-10-05.json`,
@@ -165,6 +170,15 @@ where it is measured.
   app, 4 October 2026 (the C4 order's build date), under the operator's ruling
   of 4 October 2026, "A. Fix all seven." Grok model version and Codex model
   and tier: not recorded.
+
+- **Order B3, the broom's fixes (Codex, OpenAI, the ChatGPT desktop app;
+  model and tier not recorded).** 5 October 2026 on the supplied tree
+  e04780b: the measured crisis-screen folds (`screen_fold` in
+  `src/secondsignal/normalize.py`), the seven English masks, the fixture and
+  control tests, the forty closures and the public-number refresh, under the
+  operator's rulings of 5 October from the B1 and B5 measurements; the extra
+  stutter repairs were authorized by the operator during the run. All replays
+  used FakeAdapter; no vendor model was called.
 
 ## Reviewers, with doorway and tier where recorded
 

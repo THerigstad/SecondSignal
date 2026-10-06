@@ -13,8 +13,10 @@ rest (ruling 3 of 3 October 2026).
 
 The six stutter transforms after the Greek epsilon record the operator's own
 find of 4 October 2026 (answer 2 of 12): dictated repeated words, fillers,
-false starts and syllable stutters can interrupt a whole-phrase match. They
-are measurements of that find; the stutter cause's ruling is pending.
+false starts and syllable stutters can interrupt a whole-phrase match. Order
+B3 applies ruling 5 of 5 October 2026. The operator-authorized follow-up closes
+the remaining syllable and split-filler variants, including compound variants
+of newly recovered crisis lines.
 
 Every transform is deterministic and pure: the same line always gives the same
 variant, so a variant that stops escalating is a reproducible finding. No new
@@ -241,21 +243,12 @@ TRANSFORMS: dict[str, Callable[[str], str]] = {
     "first_long_word_syllable_stuttered": first_long_word_syllable_stuttered,
 }
 
-# The transforms that still stop the gate on some lines after the push of
-# 4 October 2026, carried as known gaps (ruling 4 of 3 October 2026): the
-# gap-closure push measures each against the innocent-word controls and brings
-# the operator one ruling per cause. The fuzz test fails if one of these stops
+# The transforms that still stop the gate on some lines after order B3 of
+# 5 October 2026. The fuzz test fails if one of these stops
 # producing any failure, so the marker is removed on purpose, never forgotten.
 KNOWN_GAP_TRANSFORMS: frozenset[str] = frozenset({
-    "punctuation_doubled",
-    "one_letter_repeated_three_times",
-    "one_letter_dropped",
-    "two_neighbouring_letters_swapped",
-    # Measured 4 October 2026, cause "stutter", the operator's find; ruling pending.
-    "middle_word_repeated_with_comma",
-    "um_before_the_middle_word",
-    "uh_before_the_last_word",
-    "first_long_word_syllable_stuttered",
+    "one_letter_dropped",  # Ruling 3, 5 October 2026: guarded matcher awaits measurement.
+    "two_neighbouring_letters_swapped",  # Ruling 4, 5 October 2026: guarded matcher awaits measurement.
 })
 
 

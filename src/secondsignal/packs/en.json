@@ -139,6 +139,49 @@
       "id": "presentation_identity_sense",
       "pattern": "\\b(?:switch(?:ed|ing|es)?|chang(?:e|ed|ing|es)|choos(?:e|ing|es)|chose|set|pick(?:ed|ing|s)?|keep(?:ing|s)?|kept)\\s+(?:my\\s+|the\\s+|your\\s+|their\\s+)?presentation\\b|\\bpresentation\\s+(?:to|as|is|was)\\s+(?:neither|a woman|a man|woman|man|as written|they(?:/them)?|she(?:/her)?|he(?:/him)?)\\b",
       "note": "The project's own word for how a character presents (ADR-0026 (Proposed): woman, man, neither, as written). 'I switch presentation' and 'set the presentation to neither' are not a work deck; 'a presentation tomorrow' still is. Added 5 October 2026 for pair 17 of Grok's identity set under ruling 7."
+    },
+    {
+      "id": "b3_die_of_boredom",
+      "pattern": "\\bdie(?= of boredom\\b)",
+      "scope": "crisis_only",
+      "note": "Order B3, ruling 10 of 5 October 2026; measured by order B5; releases gap-spoken-gonna-die-of-boredom. Applies only to the crisis screen copy."
+    },
+    {
+      "id": "b3_die_compliment",
+      "pattern": "\\b(?:wanna|want to) die(?=,\\s*(?:that|this|the|your) (?:dress|outfit|look|design) is (?:gorgeous|beautiful|amazing)\\b)",
+      "scope": "crisis_only",
+      "note": "Order B3, ruling 10 of 5 October 2026; measured by order B5; releases gap-spoken-wanna-die-compliment. Applies only to the crisis screen copy."
+    },
+    {
+      "id": "b3_die_in_peace_show",
+      "pattern": "\\b(?:let me|lemme) die in peace(?=,\\s*i(?:'m| am) watching (?:my|the|a) (?:show|movie|series)\\b)",
+      "scope": "crisis_only",
+      "note": "Order B3, ruling 10 of 5 October 2026; measured by order B5; releases gap-spoken-let-me-die-show. Applies only to the crisis screen copy."
+    },
+    {
+      "id": "b3_end_on_note",
+      "pattern": "\\bend it(?= on (?:a |the )?(?:hopeful|positive|happy|high|good) note\\b)",
+      "scope": "crisis_only",
+      "note": "Order B3, ruling 10 of 5 October 2026; measured by order B5; releases gap-spoken-editors-end-note. Applies only to the crisis screen copy."
+    },
+    {
+      "id": "b3_end_after_credits",
+      "pattern": "\\bend it(?= after the credits\\b)",
+      "scope": "crisis_only",
+      "note": "Order B3, ruling 10 of 5 October 2026; measured by order B5; releases gap-spoken-gonna-end-credits. Applies only to the crisis screen copy."
+    },
+    {
+      "id": "b3_done_with_exit",
+      "pattern": "\\bi(?:'m| am) done(?=,\\s*i (?:need to (?:figure out how to )?leave|want out)\\b)",
+      "scope": "crisis_only",
+      "note": "Order B3, ruling 11 of 5 October 2026; measured by order B5; releases gap-done-with-a-next-step-over-restricted. Applies only to the crisis screen copy."
+    },
+    {
+      "id": "b3_thing_subject",
+      "pattern": "(\\b(?:the|a|this|that) (?:season(?: finale)?|show|band|game) (?:is|was) )ending it all\\b",
+      "scope": "crisis_only",
+      "note": "Order B3, ruling 11 of 5 October 2026; measured by order B5; releases r3b-tense-known-gap-thing-subject-001. Applies only to the crisis screen copy.",
+      "preserve_group": 1
     }
   ],
   "window_masks": [

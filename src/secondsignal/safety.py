@@ -69,7 +69,7 @@ from .lexicon import (
 from .lexicon import dv_line as _dv_line_for
 from .lexicon import patterns_hash as _patterns_hash
 from .lexicon import resource_line as _resource_line_for
-from .normalize import analyze, collapse_spacing
+from .normalize import analyze, screen_fold
 from .preferences import STYLE_ASK_COOLDOWN_TURNS, STYLE_ASK_THRESHOLD, PreferenceEvent
 from .preferences import assess as assess_preference
 from .signals import DANGER_FRAME_EXCLUSION_RE as _DANGER_FRAME_EXCLUSION_RE
@@ -1044,6 +1044,7 @@ class SafetyVerdict:
     pack_ids: tuple[str, ...] = ()
     patterns_hash: str = ""
     normalized_forms: tuple[str, ...] = ()
+    screen_folds: tuple[str, ...] = ()
     mixed_script_tokens: int = 0
     frustration_frame: bool = False
     preference_result: str | None = None
@@ -1072,6 +1073,7 @@ class _SafetyVerdictCommon(TypedDict):
     pack_ids: tuple[str, ...]
     patterns_hash: str
     normalized_forms: tuple[str, ...]
+    screen_folds: tuple[str, ...]
     mixed_script_tokens: int
     frustration_frame: bool
 
@@ -1102,6 +1104,7 @@ class CrisisScreen:
     masked_spans: tuple[Span, ...]
     hit_spans: tuple[Span, ...]
     negated: bool = False
+    screen_folds: tuple[str, ...] = ()
 
 
 def _negated(masked: str, start: int, negation: frozenset[str]) -> bool:
@@ -1112,11 +1115,10 @@ def _negated(masked: str, start: int, negation: frozenset[str]) -> bool:
 def crisis_screen(text: str) -> CrisisScreen:
     """Screen one turn with every installed pack. Pure and roster-free."""
     analysis = analyze(text)
-    # Ruling 1 of 3 October 2026: the crisis screen reads the message with
-    # any run of spaces, tabs or line breaks folded to one space, so spacing
-    # can never switch the card off. Routing still reads the unfolded text.
-    norm = collapse_spacing(analysis.text)
-    masked, masked_spans = apply_masks(norm)
+    # Order B3, 5 October 2026: only this screen reads the measured folds.
+    # Routing and session monitors still read their existing unfolded copy.
+    norm, folds = screen_fold(analysis.text)
+    masked, masked_spans = apply_masks(norm, crisis_only=True)
     evidence: list[tuple[str, str]] = []
     hit_spans: list[Span] = []
     negated = False
@@ -1154,7 +1156,7 @@ def crisis_screen(text: str) -> CrisisScreen:
         hit_spans.append(span)
 
     if evidence:
-        return CrisisScreen("HIT", tuple(evidence), masked, masked_spans, tuple(hit_spans), negated)
+        return CrisisScreen("HIT", tuple(evidence), masked, masked_spans, tuple(hit_spans), negated, folds)
 
     explained = "".join(span.text for span in masked_spans + tuple(hit_spans))
     mixed_crisis_candidates = tuple(
@@ -1172,19 +1174,20 @@ def crisis_screen(text: str) -> CrisisScreen:
             masked_spans,
             tuple(hit_spans) + (span,),
             negated,
+            folds,
         )
 
     for pattern in INCONCLUSIVE_PATTERNS:
         m = pattern.search(masked)
         if m:
             span = Span(m.group(0).strip(), "en:inconclusive", m.start(), m.end(), "inconclusive", "en", "inconclusive")
-            return CrisisScreen("INCONCLUSIVE", (("inconclusive", span.text),), masked, masked_spans, tuple(hit_spans) + (span,), negated)
+            return CrisisScreen("INCONCLUSIVE", (("inconclusive", span.text),), masked, masked_spans, tuple(hit_spans) + (span,), negated, folds)
     if pack_inconclusive:
         span = pack_inconclusive[0]
-        return CrisisScreen("INCONCLUSIVE", (("inconclusive", span.text),), masked, masked_spans, tuple(hit_spans) + (span,), negated)
+        return CrisisScreen("INCONCLUSIVE", (("inconclusive", span.text),), masked, masked_spans, tuple(hit_spans) + (span,), negated, folds)
     if negated:
-        return CrisisScreen("INCONCLUSIVE", (("inconclusive", hit_spans[0].text),), masked, masked_spans, tuple(hit_spans), negated)
-    return CrisisScreen("MISS", (), masked, masked_spans, tuple(hit_spans), negated)
+        return CrisisScreen("INCONCLUSIVE", (("inconclusive", hit_spans[0].text),), masked, masked_spans, tuple(hit_spans), negated, folds)
+    return CrisisScreen("MISS", (), masked, masked_spans, tuple(hit_spans), negated, folds)
 
 
 def crisis_read(text: str) -> tuple[str, tuple[tuple[str, str], ...]]:
@@ -1357,6 +1360,7 @@ def evaluate(
         "pack_ids": pack_ids,
         "patterns_hash": phash,
         "normalized_forms": analysis.forms,
+        "screen_folds": screen.screen_folds,
         "mixed_script_tokens": analysis.mixed_script_tokens,
         "frustration_frame": bool(frustration),
     }

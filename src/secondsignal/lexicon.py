@@ -107,6 +107,8 @@ class Pack:
     inconclusive: tuple[tuple[str, re.Pattern[str]], ...]
     house_lines: dict = field(default_factory=dict)
     source_hash: str = ""
+    crisis_only_masks: frozenset[str] = frozenset()
+    mask_preserve_groups: dict[str, int] = field(default_factory=dict)
 
 
 def _compile(pattern: str) -> re.Pattern[str]:
@@ -125,9 +127,19 @@ def load_pack(path: str | Path) -> Pack:
         ids.add(entry_id)
 
     regex_masks = []
+    crisis_only_masks = set()
+    mask_preserve_groups = {}
     for m in data.get("regex_masks", ()):
         claim(m["id"], "regex_masks")
-        regex_masks.append((m["id"], _compile(m["pattern"])))
+        pattern = _compile(m["pattern"])
+        regex_masks.append((m["id"], pattern))
+        if m.get("scope") == "crisis_only":
+            crisis_only_masks.add(m["id"])
+        if "preserve_group" in m:
+            group = int(m["preserve_group"])
+            if not 1 <= group <= pattern.groups:
+                raise ValueError(f"mask {m['id']!r}: invalid preserve_group {group}")
+            mask_preserve_groups[m["id"]] = group
 
     window_masks = []
     for m in data.get("window_masks", ()):
@@ -172,6 +184,8 @@ def load_pack(path: str | Path) -> Pack:
         inconclusive=tuple(inconclusive),
         house_lines=dict(data.get("house_lines", {})),
         source_hash=digest,
+        crisis_only_masks=frozenset(crisis_only_masks),
+        mask_preserve_groups=mask_preserve_groups,
     )
 
 
@@ -269,20 +283,31 @@ def _same_clause(
 
 
 
-def apply_masks(norm: str, packs: tuple[Pack, ...] | None = None) -> tuple[str, tuple[Span, ...]]:
+def apply_masks(
+    norm: str, packs: tuple[Pack, ...] | None = None, *, crisis_only: bool = False,
+) -> tuple[str, tuple[Span, ...]]:
     """Blank every masked span (same length, so offsets survive) and return
-    the masked text with the spans, in the order they were applied."""
+    the masked text with the spans, in the order they were applied.
+
+    Order B3, ruling 7 of 5 October 2026: the new crisis-only masks are
+    opt-in, so extraction and session monitors keep their existing input.
+    A preserved prefix group retains the measured thing-subject context.
+    """
     packs = packs if packs is not None else tuple(PACKS.values())
     masked = norm
     spans: list[Span] = []
 
     for pack in packs:
         for pattern_id, pattern in pack.regex_masks:
+            if pattern_id in pack.crisis_only_masks and not crisis_only:
+                continue
             for m in pattern.finditer(masked):
                 if not m.group(0).strip():
                     continue
-                spans.append(Span(m.group(0), pattern_id, m.start(), m.end(), "mask", pack.id))
-                masked = _blank(masked, m.start(), m.end())
+                group = pack.mask_preserve_groups.get(pattern_id)
+                start = m.end(group) if group is not None else m.start()
+                spans.append(Span(masked[start:m.end()], pattern_id, start, m.end(), "mask", pack.id))
+                masked = _blank(masked, start, m.end())
 
     tokens = tokenize(masked)
     desire_spans = _present_desire_spans(masked)
