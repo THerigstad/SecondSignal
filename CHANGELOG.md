@@ -4,6 +4,51 @@ All notable changes to SecondSignal are documented here.
 
 ## [Unreleased]
 
+### Added — 2026-10-05, order T1 (Table kit one: the Decision Card, how replies are presented, the composer, the low-demand view)
+
+- Order M1 (Codex, measurement only, 5 October 2026): near-tie doors (idea-list
+  item 35) counted on the 809 labelled turns at three margins (150 of 809 would show
+  two plates at 5 percent, 151 at 10 and 15; 46 are exact ties at the cutoff; Cody and
+  Seren tie most often), and the gate's cost (item 55): the crisis screen under 2 ms on
+  an ordinary message and 146 ms on a 16,000-character one, routing 329 ms on the
+  longest, nothing waiting on the model slots; a 7,000-turn week's audit file (45 MB)
+  makes every write re-read the whole file, about 400 ms, which a crisis card waits on.
+  Scripts and results under `evals/near_tie/` and `evals/gate_cost/`; rulings follow;
+  nothing changes in the code from this order.
+- **Item 7, Decision Card:** an open plain layer from the deterministic receipt,
+  followed by the unchanged technical evidence; both layers nameless on a card.
+- **Item 8, regulation line:** the plain layer states when the dysregulation cap
+  made challenge voices ineligible.
+- **Item 9, phone explanation:** a separate, default-off switch uses the same
+  receipt formatter on the phone page.
+- **Item 10, receipts:** non-crisis turns write sanitized `receipts.jsonl` beside
+  audit rows; the privacy copy names it and excludes raw stems and patterns.
+- **Item 11, How replies are presented:** six confirmed style keys with three
+  front switches and finer controls; remembered style lives apart from keys.
+- **Item 12, humour:** a capped none-to-gallows dial and a separate grief opt-in
+  that changes the seated specialist's instructions, never the seat.
+- **Item 13, remembered presentation:** presentation and chosen names are kept
+  across restarts under the Remember switch, never beside a key; the Table's
+  "lasts for this visit" sentence and the two tests that pinned the old
+  behaviour changed with the ruling, old and new values on the changed lines.
+- **Item 14, effort contract:** one next action with the rest of a model reply
+  folded; house lines, hold obligations and the card stay outside the budget.
+- **Item 15, bilingual line:** three declared language styles in the this-turn
+  block, with the unreviewed Spanish pack and native review status stated.
+- **Item 16, coping setup:** one skippable question proposes style keys and
+  requires confirmation; skipped or unconfirmed answers store nothing.
+- **Item 17, presentation previews:** existing codex lines for every character
+  and presentation, with voice controls only for configured, available slots.
+- **Item 18, composer:** immediate recoverable submissions, explicit terminal
+  states, Stop waiting, Pause this view, modifier-Enter and crisis priority.
+- **Item 19, low-demand view:** client-only reading and focus order, labelled
+  switch, and the whole table behind an explicit control.
+- **Item 20, Resources:** a pinned control with declared-country link/call actions
+  that does not change the spoken-once resource rule.
+- **House-block lock refresh:** Part A is deliberately versioned for declared
+  presentation instructions, synchronized across codexes and relocked through
+  the existing lock-test helper; fixed house lines and all policy remain intact.
+
 ### Fixed — 2026-10-05, order B3 (the broom's fixes, ruled by the operator from the B1 and B5 measurements)
 
 - **Doubled punctuation, ruling 1:** three documented gaps closed; the four

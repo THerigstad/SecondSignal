@@ -13,6 +13,21 @@ with the rulings of 3 October on review rounds 3 and 3B (holds are per
 message today; the character write-ups are fixed; the survivor fixtures are
 ported).
 
+## Table kit one — 5 October 2026, order T1
+
+Presentation is now a remembered setting under the Remember switch (item 13 of the
+operator's idea list, ruled yes on 5 October 2026); the two earlier tests that pinned the
+visit-only behaviour and its "lasts for this visit" sentence were updated as that ruled
+behaviour change, with the old and new values on the changed lines. This is the first Hang On slice, not durable
+conversation recovery: submitted writing is recoverable in the open page, and
+Stop waiting cancels the view's wait, not an already-running vendor operation.
+Text previews come from the codexes; no real voice or vendor has been exercised.
+Keyboard order, labels and switch semantics are checked in the local browser
+tests, not claimed as a completed human assistive-technology or usability review.
+The Spanish pack remains unreviewed with native review in progress. Current
+holds still last only the turn; this order does not close persistent holds, the
+164 documented gaps or the fourteen recorded dissents.
+
 ## The measured closures of 5 October 2026 (order B3)
 
 The operator's rulings from the B1 and B5 measurements close

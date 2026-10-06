@@ -180,6 +180,20 @@ where it is measured.
   stutter repairs were authorized by the operator during the run. All replays
   used FakeAdapter; no vendor model was called.
 
+- **Order M1, near-tie doors and the gate's cost (Codex, OpenAI, the ChatGPT
+  desktop app; model and tier not recorded).** 5 October 2026 on the supplied
+  tree 7221949: `evals/near_tie/measure_near_tie.py`, `evals/gate_cost/measure_gate_cost.py`,
+  their results files and one test each; measurement only, nothing closed. All
+  replays used FakeAdapter; no vendor model was called.
+- **Order T1, Table kit one (Codex, OpenAI, the ChatGPT desktop app; model and tier not recorded).** 5 October 2026 on the supplied tree 7221949: the
+  Decision Card and sanitized receipts, phone explanation, confirmed reply-style
+  settings and capped prompt instructions, grief-humour and language styles,
+  codex presentation previews and coping setup, the recoverable composer,
+  low-demand view and Resources control, with Python and JavaScript checks.
+  Item 13 (remembered presentation) changed the behaviour two existing tests
+  pinned; the operator ruled the change in and the tests moved with it. All
+  model checks use FakeAdapter; no vendor was called.
+
 ## Reviewers, with doorway and tier where recorded
 
 The reviews themselves are catalogued in

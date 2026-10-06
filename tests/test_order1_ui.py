@@ -99,9 +99,10 @@ console.log(JSON.stringify({plates:document.querySelectorAll('.plate').map(p=>({
 
 
 @pytest.mark.parametrize("path", ["apps/talking_table/static/index.html", "demo/index.html"])
-def test_exact_current_visit_door_words(path):
+def test_exact_presentation_door_words(path):  # Order T1, 2026-10-05: current_visit -> presentation copy pin.
     source = (ROOT / path).read_text(encoding="utf-8")
-    assert DOOR in source
+    expected = DOOR if path.startswith("demo/") else 'This describes the characters, not you. Remember on this computer saves this choice across restarts. New session resets the current choice.'  # Order T1, 2026-10-05: Table visit-only copy -> remembered; demo unchanged.
+    assert expected in source
     assert '<option value="as_written">' in source
     assert '<option value="neither">' in source
 
@@ -127,7 +128,7 @@ console.log(JSON.stringify([header.textContent,assist.textContent]));
     assert json.loads(result.stdout) == ["Elli", "Will is assisting."]
 
 
-def test_visit_presentation_is_not_restored_from_remembered_settings(tmp_path, monkeypatch):
+def test_presentation_is_restored_from_remembered_settings(tmp_path, monkeypatch):  # Order T1, 2026-10-05: not_restored -> restored.
     monkeypatch.setattr(server, "_secret_blob", lambda value, **kwargs: value)
     first = server.TableApp(data_dir=tmp_path / "table")
     second = None
@@ -139,8 +140,8 @@ def test_visit_presentation_is_not_restored_from_remembered_settings(tmp_path, m
         stored = json.loads(first.settings_path.read_text(encoding="utf-8"))["settings"]
         assert "presentation" not in stored and "chosen_names" not in stored
         second = server.TableApp(data_dir=tmp_path / "table")
-        assert second.settings["presentation"] == "as_written"
-        assert second.settings["chosen_names"] == {}
+        assert second.settings["presentation"] == "neither"  # Order T1, 2026-10-05: as_written -> remembered neither.
+        assert second.settings["chosen_names"] == {"ellis": "Elli"}  # Order T1, 2026-10-05: empty -> remembered name choice.
         assert second.settings["remember"] is True
         assert first.reset()["settings"]["presentation"] == "as_written"
         assert first.settings["chosen_names"] == {}

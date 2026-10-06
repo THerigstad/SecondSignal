@@ -666,9 +666,8 @@ def test_the_turn_after_a_card_speaks_whole_in_operator_circle_mode_only_if_rele
 
 def test_presentation_and_name_choice_hold_for_the_visit_across_reload_and_a_paired_phone(
         tmp_path, monkeypatch):
-    """A visit is the server session (the operator's answer of 4 October 2026):
-    the choice holds until New session or a restart; a reload or a paired phone
-    joining does not reset it; Remember never saves it."""
+    """The optional T1 version remembers presentation separately from credentials;
+    reload and paired phones retain it, while New session still resets the live view."""
     monkeypatch.setattr(server, "_secret_blob", lambda value, **kwargs: value)
     app = server.TableApp(data_dir=tmp_path / "table")
     second = None
@@ -691,7 +690,7 @@ def test_presentation_and_name_choice_hold_for_the_visit_across_reload_and_a_pai
             joined = request(phone, "/api/config", headers={"Cookie": cookie})[1]["settings"]
             assert joined["presentation"] == "neither" and joined["chosen_names"] == chosen
             monkeypatch.setattr(server.Handler, "is_local", property(lambda self: True))
-            # Remember, for the voice or the model, never writes the choice.
+            # Order T1, 2026-10-05: voice Remember stays separate; model Remember saves choices in preferences.json.
             request(local, "/api/settings", {"voice_remember": True, "voice_key": VOICE_KEY})
             stored = json.loads(app.settings_path.read_text(encoding="utf-8"))["settings"]
             assert "presentation" not in stored and "chosen_names" not in stored
@@ -704,7 +703,7 @@ def test_presentation_and_name_choice_hold_for_the_visit_across_reload_and_a_pai
             request(local, "/api/settings", {"presentation": "women"})
             request(local, "/api/network", {"enabled": False})
         second = server.TableApp(data_dir=tmp_path / "table")  # a restart
-        assert second.settings["presentation"] == "as_written"
+        assert second.settings["presentation"] == "women"  # Order T1, 2026-10-05: as_written -> women after remembered restart.
         assert second.settings["chosen_names"] == {}
         assert second.settings["voice_remember"] is True and second.voice_key == VOICE_KEY
     finally:
@@ -719,7 +718,7 @@ def test_the_javascript_voice_suites_pass_offline():
     node = shutil.which("node")
     assert node, "Node is required for the offline browser contract tests (no skipped tests)"
     files = sorted((server.STATIC.parent / "tests_js").glob("*.mjs"))
-    assert len(files) == 2
+    assert len(files) == 4  # Order T1, 2026-10-05: 2 -> 4 JavaScript suite files.
     # Ask for the TAP reporter by name: Node 24's default reporter prints no
     # "# fail" summary line when stdout is not a terminal (found 5 October 2026
     # by a Codex build on the operator's PC).

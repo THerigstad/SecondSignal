@@ -35,6 +35,9 @@ from secondsignal_harness import AuditLog, CodexStore, Harness
 from secondsignal_harness.__main__ import _adapter
 from secondsignal_harness.adapters import AdapterError, AdapterReply
 from secondsignal_harness.harness import RELEASE_OPERATOR_CIRCLE, RELEASE_SHIP
+from secondsignal_harness.prompt import LANGUAGE_STYLES, STYLE_VALUES, applied_preferences
+
+from .table_kit import decision_receipt, presentation_samples, resources
 
 ROOT = Path(__file__).resolve().parents[2]
 STATIC = Path(__file__).resolve().parent / "static"
@@ -302,6 +305,10 @@ class _TurnJob:
         self.gate = False
         self.result = None
         self.error = False
+        self.receipt = None
+        self.record = None
+        self.accepted = False
+        self.model_calls = 0
         self.revision = 0
         self.harness = copy.copy(app.harness)
         self.harness.session = copy.deepcopy(app.harness.session)
@@ -309,6 +316,10 @@ class _TurnJob:
         self.harness.turns = []
         self.harness.adapter = _GuardedAdapter(self, app.harness.adapter)
         self.harness.audit_log = _TableAudit(self, app.harness.audit_log)
+        self.harness.decision_observer = self.observe
+
+    def observe(self, record):
+        self.record = record
 
     def boundary(self, *, gate=False):
         if not self.ready.is_set():
@@ -327,6 +338,13 @@ class _TurnJob:
             # No vendor exception, traceback or arbitrary object reaches a log.
             self.error = True
         finally:
+            # Only this cancelled worker waits for its own receipt. The crisis
+            # worker never waits for this file or takes its independent lock.
+            if self.cancelled.is_set() and self.accepted and self.receipt is None and self.record:
+                try:
+                    self.app._cancelled_receipt(self)
+                except Exception:
+                    LOG.warning("A superseded decision receipt could not be saved.")
             self.ready.set()
             self.done.set()
 
@@ -349,6 +367,7 @@ class _GuardedAdapter:
 
         def call():
             try:
+                job.model_calls += 1
                 result.append(self.adapter.complete(system, messages, max_tokens=max_tokens))
             except BaseException:
                 # Even a scripted exception may contain an unknown credential.
@@ -394,11 +413,30 @@ class _TableAudit:
             safe["user_text"] = app._redact(safe.get("user_text", ""))
             safe["adapter"] = "not_called"
         else:
+            safe["actual_model_calls"] = job.model_calls
+            if not job.model_calls:
+                safe["declared_preferences"] = {}
+                safe["preference_adjustments"] = []
+                safe["presentation_instructions"] = {}
             safe = app._redact(safe)
         with app.audit_lock:
             if job.cancelled.is_set():
                 raise _Cancelled()
-            return self.sink.append(safe)
+            row_id = self.sink.append(safe)
+        names = {persona: profile.name_for(
+            job.harness.presentation.get(persona, "as_written"),
+            job.harness.chosen_names.get(persona))[0]
+            for persona, profile in app.roster.items()}
+        receipt = decision_receipt(safe, names)
+        if not gate:
+            receipt = app._redact(receipt)
+            receipt["audit_row_id"] = row_id
+            # A slow receipt never owns the audit lock the card needs.
+            with app.receipt_lock:
+                receipt_id = app.receipts.append(receipt)
+                receipt = app.receipts.read(receipt_id)
+        job.receipt = receipt
+        return row_id
 
 
 class TableApp:
@@ -411,12 +449,17 @@ class TableApp:
         self.data_dir.mkdir(parents=True, exist_ok=True)
         self.settings_path = self.data_dir / "settings.json"
         self.audit_path = self.data_dir / "audit.jsonl"
+        self.receipt_path = self.data_dir / "receipts.jsonl"
+        self.preferences_path = self.data_dir / "preferences.json"
+        self.receipts = AuditLog(self.receipt_path)
         self.lock = threading.RLock()
         self.audit_lock = threading.Lock()
+        self.receipt_lock = threading.Lock()
         self.model_slots = threading.BoundedSemaphore(4)
         self.speech_slots = threading.BoundedSemaphore(2)
         self.speech_transport = speech_transport or self._voice_transport
         self.speech_tokens = {}
+        self.preview_snapshot = None
         self.voice_revision = time.time_ns() // 1_000_000
         self.jobs = set()
         self.session_id = secrets.token_hex(12)
@@ -429,7 +472,9 @@ class TableApp:
                          "presentation": "as_written", "chosen_names": {},
                          "voice_enabled": False, "voice_remember": False,
                          "lights_enabled": False, "lights_remember": False,
-                         "voice_slots": {}, "locale": ""}
+                         "voice_slots": {}, "locale": "",
+                         "declared_preferences": {}, "humour_grief": False,
+                         "language_style": "match"}
         self.key = ""
         self.voice_key = ""
         self.lights_key = ""
@@ -446,7 +491,9 @@ class TableApp:
         self.pair_attempts: dict[str, list[float]] = {}
         self.lights = SceneWorker(self._lights_key)
         self._load_settings()
+        self._load_preferences()
         self.harness = self._build_harness()
+        self._samples = presentation_samples(self.roster, self.harness.codexes, PRESENTATIONS)
         self.state = self._idle_state()
 
     def _idle_state(self):
@@ -467,7 +514,12 @@ class TableApp:
         (the operator's answer of 4 October 2026 to Codex's recommended fix)."""
         return {**self._shell_state(),
                 "voice_enabled": self.settings["voice_enabled"],
-                "voice_ready": self._voice_ready(), "voice_revision": self.voice_revision}
+                "voice_ready": self._voice_ready() or self._preview_ready(),
+                "voice_revision": self.voice_revision}
+
+    def _preview_ready(self):
+        return bool(self.settings["voice_enabled"] and self.voice_key
+                    and self.preview_snapshot == self._speech_snapshot())
 
     def _voice_ready(self):
         # Operator-circle mode no longer silences the voice (ruling 6 of
@@ -546,6 +598,7 @@ class TableApp:
     def _cancel_jobs(self):
         self.voice_revision += 1
         self.speech_tokens.clear()
+        self.preview_snapshot = None
         for job in self.jobs:
             job.cancelled.set()
 
@@ -554,6 +607,66 @@ class TableApp:
                 "assist": None, "text": "", "house_lines": [], "card": None,
                 "verdict": None, "decision": {}, "speech_token": None,
                 "state": dict(self.state)}
+
+    def _cancelled_receipt(self, job):
+        applied, adjustments = applied_preferences(job.record, job.harness.declared_preferences)
+        names = {persona: profile.name_for(
+            job.harness.presentation.get(persona, "as_written"),
+            job.harness.chosen_names.get(persona))[0] for persona, profile in self.roster.items()}
+        receipt = decision_receipt({
+            "decision": job.record, "action": job.record["safety"]["action"],
+            "turn_index": job.harness.session.turn_count, "adapter_calls": job.model_calls,
+            "release_reason": "superseded", "released": False,
+            "declared_preferences": applied if job.model_calls else {},
+            "preference_adjustments": adjustments if job.model_calls else (),
+            "presentation_instructions": ({
+                "language_style": job.harness.language_style,
+                **({"humour_grief_opt_in": True} if job.harness.humour_grief else {}),
+            } if job.model_calls else {}),
+        }, names)
+        receipt["audit_row_id"] = None
+        receipt = self._redact(receipt)
+        with self.receipt_lock:
+            receipt_id = self.receipts.append(receipt)
+            job.receipt = self.receipts.read(receipt_id)
+
+    def presentation_previews(self):
+        previews = copy.deepcopy(self._samples)
+        for presentation, personas in previews.items():
+            for persona, sample in personas.items():
+                sample["voice_available"] = bool(
+                    self.settings["voice_enabled"] and self.voice_key
+                    and self.settings["voice_slots"][persona][presentation]
+                    and self.state["state"] != "card")
+        return previews
+
+    def preview(self, payload):
+        """Issue a capability for a codex quotation, never browser-supplied text."""
+        if not isinstance(payload, dict) or set(payload) != {"persona", "presentation"}:
+            raise InputError("Choose a listed presentation preview.")
+        persona, presentation = payload["persona"], payload["presentation"]
+        if (not isinstance(persona, str) or persona not in self.roster
+                or not isinstance(presentation, str) or presentation not in PRESENTATIONS):
+            raise InputError("Choose a listed presentation preview.")
+        with self.lock:
+            sample = self.presentation_previews()[presentation][persona]
+            if not sample["voice_available"]:
+                raise InputError(VOICE_ERROR)
+            self.speech_tokens.clear()
+            token = secrets.token_urlsafe(32)
+            voice_id = self.settings["voice_slots"][persona][presentation]
+            if self._contains_key((voice_id, sample["text"])):
+                raise InputError(VOICE_ERROR)
+            self.speech_tokens[token] = (self._speech_snapshot(), voice_id, sample["text"], True)
+            # Polling must not stop a preview merely because the currently
+            # saved presentation has no slot. Every normal invalidation still
+            # revokes this snapshot together with the single-use token.
+            self.preview_snapshot = self._speech_snapshot()
+            self.state.update(self._mode_state())
+            snapshot = dict(self.state)
+            snapshot["voice_ready"] = True
+            return {"kind": "reply", "speech_token": token, "state": snapshot,
+                    "text": sample["text"], "preview": True}
 
     def _load_settings(self):
         if not self.settings_path.exists():
@@ -575,7 +688,7 @@ class TableApp:
                                           ("lights_key", "lights_remember", "lights_key_blob")):
                 keys[name] = (_secret_blob(base64.b64decode(saved[blob_name], validate=True),
                                           decrypt=True).decode("utf-8")
-                              if settings[flag] else "")
+                              if settings[flag] and blob_name in saved else "")
             if self._contains_key(settings, keys.values()):
                 raise InputError("Saved settings could not be accepted.")
             self.settings.update(settings)
@@ -585,6 +698,26 @@ class TableApp:
                 self._remember_key(key)
         except Exception:
             LOG.warning("Saved settings could not be read; using the pretend model.")
+
+    def _load_preferences(self):
+        # Separate from every credential blob and keyed only by this local file.
+        if not self.preferences_path.exists():
+            return
+        try:
+            saved = json.loads(self.preferences_path.read_text(encoding="utf-8"))
+            if not isinstance(saved, dict) or set(saved) - {
+                    "declared_preferences", "humour_grief", "language_style",
+                    "presentation", "chosen_names"}:
+                raise InputError("Saved presentation settings could not be accepted.")
+            settings = self._validate_settings(saved)
+            if self._contains_key(settings):
+                raise InputError("Saved presentation settings could not be accepted.")
+            self.settings.update(settings)
+            # The separate file is itself the remember opt-in. A missing or
+            # unreadable credential blob cannot erase declared presentation.
+            self.settings["remember"] = True
+        except Exception:
+            LOG.warning("Declared presentation settings could not be read; using defaults.")
 
     def _validate_settings(self, proposed):
         if not isinstance(proposed, dict):
@@ -606,8 +739,21 @@ class TableApp:
             if not isinstance(value, str) or (value and value not in LOCALES):
                 raise InputError("Choose a listed country, or none.")
             result["locale"] = value
+        if "declared_preferences" in proposed:
+            declared = proposed["declared_preferences"]
+            if (not isinstance(declared, dict) or set(declared) - set(STYLE_VALUES)
+                    or any(not isinstance(value, str) or value not in STYLE_VALUES[key]
+                           for key, value in declared.items())):
+                raise InputError("Choose only listed reply presentation settings.")
+            # Saving the settings form is the person's explicit confirmation.
+            result["declared_preferences"] = dict(declared)
+        if "language_style" in proposed:
+            style = proposed["language_style"]
+            if not isinstance(style, str) or style not in LANGUAGE_STYLES:
+                raise InputError("Choose a listed language style.")
+            result["language_style"] = style
         for name in ("remember", "operator_circle", "voice_enabled", "voice_remember",
-                     "lights_enabled", "lights_remember"):
+                     "lights_enabled", "lights_remember", "humour_grief"):
             if name in proposed:
                 if not isinstance(proposed[name], bool):
                     raise InputError("A switch must be on or off.")
@@ -692,6 +838,9 @@ class TableApp:
                        locale=setting["locale"] or None,
                        presentation={name: setting["presentation"] for name in self.roster},
                        chosen_names=setting["chosen_names"],
+                       declared_preferences=setting["declared_preferences"],
+                       humour_grief=setting["humour_grief"],
+                       language_style=setting["language_style"],
                        operator_circle=setting["operator_circle"])
 
     def config(self, local=True):
@@ -701,7 +850,7 @@ class TableApp:
             settings["key_set"] = bool(self.key)
             settings["voice_key_set"] = bool(self.voice_key)
             settings["lights_key_set"] = bool(self.lights_key)
-            settings["voice_ready"] = self._voice_ready()
+            settings["voice_ready"] = self._voice_ready() or self._preview_ready()
             return {
                 "settings": settings,
                 "roster": [{"id": p.id, "plate": p.plate, "one_line": p.one_line,
@@ -711,7 +860,11 @@ class TableApp:
                     f"Audit logs keep messages, accepted model output (including audit-withheld replies), "
                     f"and decisions in {self.audit_path}. Unsafe model output is discarded; known keys "
                     f"are redacted, and card records omit character-routing details. "
-                    f"Conversation state, character presentation, name choices and pairing stay in memory. "
+                    f"Non-crisis decision receipts are in {self.receipt_path}; they omit message text, "
+                    f"raw stems and crisis patterns. Confirmed reply preferences are remembered in "
+                    f"{self.preferences_path} under Remember, separately from credentials. "
+                    f"Presentation and name choices are also remembered in {self.preferences_path} "
+                    f"under Remember. Conversation state and pairing stay in memory. "
                     f"Remembered settings and independently encrypted model, voice and lights keys are kept in "
                     f"{self.settings_path} only for the corresponding remember switches. "
                     f"New session clears unremembered keys and keeps existing audit logs."
@@ -721,6 +874,8 @@ class TableApp:
                           "urls": self.phone_server.urls if self.phone_server and local else []},
                 "local": local,
                 "sigils_available": (STATIC / "sigils.html").is_file(),
+                "presentation_previews": self.presentation_previews(),
+                "resource": resources(self.settings["locale"] or None),
                 "state": dict(self.state),
             }
 
@@ -749,15 +904,17 @@ class TableApp:
                                             voice_candidate.strip(), lights_candidate.strip())):
                 raise InputError("Put the key only in the key field.")
             # Complete the durable write before adopting the new settings.
+            settings_payload = None
             if settings["remember"] or settings["voice_remember"] or settings["lights_remember"]:
-                # Presentation and name choices are visit-only: they are never
-                # written, whichever remember switch is on.
+                # Presentation and style belong in their separate local file,
+                # never beside any encrypted credential blob.
                 saved = {"settings": {k: copy.deepcopy(v) for k, v in settings.items()
-                                      if k not in ("presentation", "chosen_names")}}
+                                      if k not in ("presentation", "chosen_names", "declared_preferences",
+                                                   "humour_grief", "language_style")}}
                 for secret, flag, blob_name in ((key, "remember", "key_blob"),
                                                 (voice_key, "voice_remember", "voice_key_blob"),
                                                 (lights_key, "lights_remember", "lights_key_blob")):
-                    if settings[flag]:
+                    if settings[flag] and secret:
                         try:
                             saved[blob_name] = base64.b64encode(
                                 _secret_blob(secret.encode("utf-8"))).decode("ascii")
@@ -772,12 +929,14 @@ class TableApp:
                         for persona in self.roster})
                 if not settings["lights_remember"]:
                     saved["settings"]["lights_enabled"] = False
-                payload = json.dumps(saved, ensure_ascii=False)
-                temporary = self.settings_path.with_suffix(".tmp")
-                temporary.write_text(payload, encoding="utf-8")
-                temporary.replace(self.settings_path)
-            else:
-                self.settings_path.unlink(missing_ok=True)
+                settings_payload = json.dumps(saved, ensure_ascii=False)
+            preferences_payload = None
+            if settings["remember"]:
+                preference_payload = {key: settings[key] for key in (
+                    "declared_preferences", "humour_grief", "language_style",
+                    "presentation", "chosen_names")}
+                preferences_payload = json.dumps(preference_payload)
+            self._persist_settings(settings_payload, preferences_payload)
             self.settings = settings
             self.key = key
             self.voice_key = voice_key
@@ -799,6 +958,34 @@ class TableApp:
             self.state["presentation"] = settings["presentation"]
             self.state.update(self._mode_state())
             return self.config()
+
+    def _persist_settings(self, settings_payload, preferences_payload):
+        """Stage both independent files; an ordinary I/O failure adopts neither."""
+        updates = ((self.preferences_path, preferences_payload),
+                   (self.settings_path, settings_payload))
+        originals = {path: path.read_bytes() if path.exists() else None for path, _ in updates}
+        changed = []
+        try:
+            for path, payload in updates:
+                if payload is not None:
+                    path.with_suffix(".tmp").write_text(payload, encoding="utf-8")
+            for path, payload in updates:
+                if payload is None:
+                    path.unlink(missing_ok=True)
+                else:
+                    path.with_suffix(".tmp").replace(path)
+                changed.append(path)
+        except OSError:
+            for path in reversed(changed):
+                previous = originals[path]
+                if previous is None:
+                    path.unlink(missing_ok=True)
+                else:
+                    path.write_bytes(previous)
+            raise InputError("The computer could not save these settings; the previous settings remain.") from None
+        finally:
+            for path, _ in updates:
+                path.with_suffix(".tmp").unlink(missing_ok=True)
 
     def reset(self, harness: Harness | None = None):
         with self.lock:
@@ -842,6 +1029,7 @@ class TableApp:
             self.revision += 1
             job.revision = self.revision
             self.jobs.add(job)
+            job.accepted = True
             # Commit only the routed session, before any optional model call.
             # Preserve identity for settings/session consumers. Completion must
             # never copy an old session back over a newer crisis latch.
@@ -875,10 +1063,17 @@ class TableApp:
         persona = None if gate else turn.agent_id
         assist = None if gate else turn.decision.get("assist_agent_id")
         state = "card" if gate else "seated" if persona else "idle"
+        public_decision = _card_decision(turn.decision) if gate else turn.decision
+        receipt = job.receipt or decision_receipt({
+            "action": turn.action, "decision": public_decision,
+            "release_reason": turn.release_reason}, {})
         self.state = {"seated": persona, "assist": assist, "state": state,
                       "presentation": self.settings["presentation"],
                       "turn_count": self.harness.session.turn_count,
                       "session_id": self.session_id, "revision": job.revision,
+                      "receipt": receipt, "card": turn.text if gate else None,
+                      "card_revision": job.revision if gate else None,
+                      "decision": public_decision if gate else None,
                       **self._mode_state()}
         self.harness.transcript.extend(self._redact(job.harness.transcript[-1:]))
         # The turn before this one on the screen; a superseded turn never got there.
@@ -896,7 +1091,10 @@ class TableApp:
                 turn.text if gate else turn.text.replace(HOUSE_LINES_EN["failure"], FAILURE_MESSAGE)),
             "house_lines": list(turn.house_lines) if turn.released else [],
             "card": turn.text if gate else None,
-            "verdict": verdict, "decision": _card_decision(turn.decision) if gate else turn.decision,
+            "verdict": verdict, "decision": public_decision,
+            "receipt": receipt,
+            "effort_contract": (not gate and turn.released
+                                and turn.declared_preferences.get("pace") == "one_step"),
             "action": turn.action, "adapter_calls": turn.adapter_calls,
             "display_name": self.roster[persona].name_for(
                 self.settings["presentation"], self.settings["chosen_names"].get(persona)
@@ -914,7 +1112,7 @@ class TableApp:
             voice_id = self.settings["voice_slots"][persona][self.settings["presentation"]]
             if voice_id and not self._contains_key(text):
                 token = secrets.token_urlsafe(32)
-                self.speech_tokens[token] = (self._speech_snapshot(), voice_id, text)
+                self.speech_tokens[token] = (self._speech_snapshot(), voice_id, text, False)
                 result["speech_token"] = token
         return result if gate else self._redact(result)
 
@@ -991,10 +1189,14 @@ class TableApp:
             raise InputError(VOICE_ERROR)
         with self.lock:
             issued = self.speech_tokens.pop(payload["speech_token"], None)
+            preview = bool(issued and issued[3])
+            ready = (self.settings["voice_enabled"] and self.voice_key
+                     if preview else self._voice_ready())
             if (not issued or issued[0] != self._speech_snapshot()
-                    or not self._voice_ready() or self.state["state"] != "seated"):
+                    or not ready or self.state["state"] == "card"
+                    or (not preview and self.state["state"] != "seated")):
                 raise InputError(VOICE_ERROR)
-            snapshot, voice_id, text = issued
+            snapshot, voice_id, text, _ = issued
             key = self.voice_key
             # Binary substring checks stay linear in the bounded audio size.
             # Credential rotation invalidates this snapshot before release.
@@ -1035,8 +1237,11 @@ class TableApp:
         if any(secret in raw for secret in protected_audio):
             raise InputError(VOICE_ERROR)
         with self.lock:
-            if (snapshot != self._speech_snapshot() or not self._voice_ready()
-                    or self.state["state"] != "seated"):
+            ready = (self.settings["voice_enabled"] and self.voice_key
+                     if preview else self._voice_ready())
+            if (snapshot != self._speech_snapshot() or not ready
+                    or self.state["state"] == "card"
+                    or (not preview and self.state["state"] != "seated")):
                 raise InputError(VOICE_ERROR)
         return raw
 
@@ -1112,7 +1317,7 @@ def _sigils_policy(content):
         return " ".join("'sha256-" + base64.b64encode(hashlib.sha256(block).digest()).decode("ascii")
                         + "'" for block in blocks) or "'none'"
 
-    return ("default-src 'none'; script-src " + hashes(b"script")
+    return ("default-src 'none'; script-src 'self' " + hashes(b"script")
             + "; style-src " + hashes(b"style")
             + "; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; "
             "base-uri 'none'; form-action 'none'")
@@ -1235,6 +1440,9 @@ class Handler(BaseHTTPRequestHandler):
         elif path == "/api/state":
             with app.lock:
                 self._send(200, dict(app.state))
+        elif path == "/api/resources":
+            with app.lock:
+                self._send(200, resources(app.settings["locale"] or None))
         elif path in ("/", "/sigils.html") or path.startswith("/static/"):
             relative = ("index.html" if path == "/" else "sigils.html" if path == "/sigils.html"
                         else urllib.parse.unquote(path[8:]))
@@ -1292,6 +1500,8 @@ class Handler(BaseHTTPRequestHandler):
                 self._send(200, app.turn(payload.get("text")))
             elif path == "/api/voice":
                 self._send(200, app.voice(payload), "audio/mpeg")
+            elif path == "/api/presentation/preview":
+                self._send(200, app.preview(payload))
             elif path == "/api/settings":
                 self._send(200, app.update_settings(payload))
             elif path == "/api/session/reset":

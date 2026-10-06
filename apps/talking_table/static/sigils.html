@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'">
 <title>SecondSignal · Who is seated</title>
 <!--
   sigils.html: the phone page of the room lights. A prototype for the operator
@@ -42,7 +42,10 @@ h1,p{margin:0}[hidden]{display:none!important}
 #ask-status{font:12px/20px ui-monospace,monospace;color:var(--muted);margin-top:12px;min-height:20px;overflow-wrap:anywhere}
 #notice{padding:8px 16px;border-bottom:1px solid var(--rule);font-size:13px;line-height:20px;color:var(--charcoal)}
 body[data-state=card]{background:#FFFFFF}body[data-state=card] #notice{border-bottom-color:#FFFFFF;color:var(--muted)}
+.phone-tools{padding:12px 16px 76px;font-size:13px;line-height:21px}.phone-tools label{display:flex;gap:10px;align-items:center;min-height:44px;cursor:pointer}.phone-tools input{width:20px;height:20px;accent-color:var(--charcoal)}#phone-decision{max-width:640px;width:100%;margin:0 auto;padding:0 16px 24px;white-space:pre-wrap;overflow-wrap:anywhere}
+#phone-resources-open{position:fixed;right:max(16px,env(safe-area-inset-right));bottom:max(16px,env(safe-area-inset-bottom));z-index:2;background:#FFFFFF;box-shadow:0 2px 8px #25282314}dialog{color:var(--charcoal);background:var(--ivory);border:1px solid var(--edge);border-radius:6px;padding:20px;max-width:560px;width:calc(100% - 32px);max-height:85svh}dialog::backdrop{background:#25282355}dialog h2{font-size:20px;margin:0}dialog .dialog-heading{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:16px}#phone-resource-line{white-space:pre-wrap}#phone-resource-actions{display:flex;flex-direction:column;align-items:flex-start;gap:8px;margin-top:16px}#phone-resource-actions a{color:inherit;display:inline-flex;align-items:center;min-height:44px;text-underline-offset:4px}#phone-resource-status{margin-top:12px;color:var(--muted)}
 @media(min-width:700px){#stage,#asks,#notice,.header{max-width:640px;width:100%;margin-left:auto;margin-right:auto}.ask-grid{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:700px){.phone-tools{max-width:640px;width:100%;margin-left:auto;margin-right:auto}}
 </style>
 </head>
 <body data-state="waiting">
@@ -68,6 +71,15 @@ body[data-state=card]{background:#FFFFFF}body[data-state=card] #notice{border-bo
 <div class="ask-grid" id="ask-grid"></div>
 <p id="ask-status" role="status"></p>
 </section>
+<section class="phone-tools" id="phone-tools" aria-label="Page controls">
+<label for="phone-decision-enabled"><input type="checkbox" id="phone-decision-enabled" role="switch" aria-checked="false">Show Decision Card explanation</label>
+</section>
+<p id="phone-decision" aria-live="polite" aria-atomic="true" hidden></p>
+<button type="button" id="phone-resources-open" aria-haspopup="dialog">Resources</button>
+<dialog id="phone-resources" aria-labelledby="phone-resources-title" hidden>
+<div class="dialog-heading"><h2 id="phone-resources-title">Resources</h2><button type="button" id="phone-resources-close">Close</button></div>
+<p id="phone-resource-line"></p><div id="phone-resource-actions"></div><p id="phone-resource-status" role="status"></p>
+</dialog>
 <script type="application/json" id="roster">
 [{"id":"cody","name":"Cody","plate":[["Cody","she"],["Cody","he"]],"names":{"as_written":["Cody","he"],"women":["Cody","she"],"men":["Cody","he"],"neither":["Cody","they"]}},
 {"id":"ellis","name":"Ellis","plate":[["Ellis","he"],["Elli","she"]],"names":{"as_written":["Elli","she"],"women":["Elli","she"],"men":["Ellis","he"],"neither":["Ellis","they"]}},
@@ -78,6 +90,7 @@ body[data-state=card]{background:#FFFFFF}body[data-state=card] #notice{border-bo
 {"id":"willow","name":"Willow","plate":[["Willow","she"],["Will","he"]],"names":{"as_written":["Willow","she"],"women":["Willow","she"],"men":["Will","he"],"neither":["Willow","they"]}}]
 </script>
 <script type="application/json" id="sigil-colors">{"card": "#FFFFFF", "cody": "#2A9D9A", "ellis": "#E0B020", "idle": "#FFA050", "nikki": "#D6408C", "rowan": "#3F9A4A", "seren": "#3A62D9", "vandal": "#E8741E", "willow": "#8E6CC8"}</script>
+<script src="/static/table.js"></script>
 <script>
 'use strict';
 const ROSTER=JSON.parse(document.getElementById('roster').textContent);
@@ -121,16 +134,50 @@ function drawPlate(plate,profile,setting){
   plate.setAttribute('aria-label',`${plate.dataset.state==='seated'?'Seated':'Assisting'}: ${pair[0]} (${pair[1]})`);
 }
 function show(view){for(const v of ['waiting','idle','seated','card'])$('view-'+v).hidden=v!==view;document.body.dataset.state=view;}
+function renderDecision(){
+  const enabled=$('phone-decision-enabled').checked===true;
+  $('phone-decision-enabled').setAttribute('aria-checked',String(enabled));
+  const formatter=window.SecondSignalDecisionCard;
+  const text=enabled&&lastState&&lastState.receipt&&typeof formatter==='function'?formatter(lastState.receipt):'';
+  if($('phone-decision').textContent!==text)$('phone-decision').textContent=text;
+  $('phone-decision').hidden=!text;
+}
+async function openResources(){
+  $('phone-resources').hidden=false;
+  $('phone-resources').showModal();
+  $('phone-resource-status').textContent='Loading resources…';
+  $('phone-resource-line').textContent='';$('phone-resource-actions').replaceChildren();
+  try{
+    const response=await fetch('/api/resources',{cache:'no-store',headers:{'Accept':'application/json'}});
+    if(!response.ok)throw new Error('resources unavailable');
+    const resource=await response.json();
+    $('phone-resource-line').textContent=resource.text||'';
+    for(const action of resource.actions||[]){
+      if(typeof action.url!=='string')continue;
+      let address;
+      try{address=new URL(action.url);}catch(error){continue;}
+      if(!['https:','tel:','sms:'].includes(address.protocol))continue;
+      const link=element('a',action.label);link.href=action.url;
+      if(address.protocol==='https:'){link.target='_blank';link.rel='noopener noreferrer';}
+      $('phone-resource-actions').append(link);
+    }
+    $('phone-resource-status').textContent='';
+  }catch(error){$('phone-resource-status').textContent='Resources could not be loaded. Try again when the Table is connected.';}
+}
 function render(s){
   lastState=s;
+  renderDecision();
   const state=s&&typeof s==='object'?s.state:null;
   // The card first and alone: no plate, no name, no colour, no ask buttons.
   if(state==='card'){
     show('card');$('header').hidden=true;$('asks').hidden=true;
+    $('phone-tools').hidden=true;$('phone-resources-open').hidden=true;
+    $('phone-resources').close();$('phone-resources').hidden=true;
     const seat=$('seated-plate');seat.dataset.agentId='';seat.style.background='';
     document.title='SecondSignal · The crisis card';return;
   }
   $('header').hidden=false;$('asks').hidden=false;
+  $('phone-tools').hidden=false;$('phone-resources-open').hidden=false;
   const profile=state==='seated'?BY_ID.get(s.seated):undefined;
   if(!profile){show(state==='idle'||state==='seated'?'idle':'waiting');document.title='SecondSignal · Nobody is seated';return;}
   const seat=$('seated-plate'),colour=hexOk(s.colour)?s.colour:(hexOk(COLOURS[profile.id])?COLOURS[profile.id]:'#A64527');
@@ -168,6 +215,10 @@ for(const profile of ROSTER){
   button.addEventListener('click',()=>ask(profile));
   $('ask-grid').append(button);
 }
+$('phone-decision-enabled').addEventListener('change',renderDecision);
+$('phone-resources-open').addEventListener('click',openResources);
+$('phone-resources-close').addEventListener('click',()=>{$('phone-resources').close();$('phone-resources').hidden=true;$('phone-resources-open').focus();});
+$('phone-resources').addEventListener('close',()=>{$('phone-resources').hidden=true;});
 // sigils.html?ask=vandal presses the Vandal button once, for a Stream Deck key or a desktop shortcut.
 const wanted=new URLSearchParams(location.search).get('ask');
 if(wanted&&BY_ID.has(wanted.toLowerCase())){

@@ -4,8 +4,8 @@ A prototype for the operator and adults the operator knows. Not a crisis service
 
 The table is a local browser interface to the repository's policy layer and
 voice harness. It uses Python's standard library and plain browser JavaScript.
-The policy and harness are the ones in `src/`, unchanged, including their
-documented gaps. A crisis card appears only when the policy escalates; the app
+The policy and harness are the ones in `src/`; the policy decisions and their
+documented gaps are unchanged. A crisis card appears only when the policy escalates; the app
 never changes that decision.
 
 Built by Codex (the ChatGPT desktop app's coding mode) on 29 and 30 September
@@ -35,10 +35,23 @@ repository root does the same as the launcher.
 Type a message, then press **Send**. The policy selects the seated character and
 any assist; the page lights their plates. House lines remain separate from
 character replies. A crisis turn shows only the card and stops voice playback.
-The **why** drawer shows the policy's explanation and the harness's audit verdict.
-On crisis turns it shows a nameless summary of the safety action; the
-card and safety action are unchanged, but character-routing details are omitted
-from both the response and its audit row. Other turns retain the policy explanation.
+The **Decision Card** opens with plain words from the same receipt object saved
+beside the audit: who sat, the holds and their current-turn duration, who was set
+aside and why, whether the gate or audit withheld speech, and whether a model was
+called. A dysregulation cap adds: “Challenge voices were ineligible because this
+turn read as dysregulated.” Any reduction of declared humour is explained here.
+The second layer, **Technical record**, keeps the previous raw evidence. Both
+layers are nameless on a crisis turn; character-routing details remain omitted
+from the response and crisis audit row. Neither layer is written by a model.
+
+Submitted writing appears immediately and stays recoverable through **Restore to
+editor**. Restoring preserves any newer draft. Each submission visibly ends as
+completed, withheld, failed, superseded or cancelled. **Stop waiting** ends the
+local wait; **Pause this view** holds ordinary display updates without resetting
+the policy session. A crisis card bypasses pause, supersedes pending replies and
+stays above any late response. Enter inserts a line; Ctrl+Enter, Command+Enter or
+**Send** submits. This is the first honest slice of Hang On, built where the Table
+already controls it.
 
 You can send another message while a model is waiting. Each turn runs the policy
 before key or message-content checks. Model work runs outside the session lock;
@@ -52,16 +65,68 @@ the voice (see **Voice** below), operator-circle mode, and the country for the
 crisis card's resource line (none by default, which reads the directory line;
 declared United States reads 988 and 911; declared, never inferred, and saved
 only with **Remember**; the operator's answer 10 of 12, 4 October 2026). The character
-presentation and name choices last for the visit, and a visit is the server
-session: they hold until **New session** or a restart, a reload or a paired
-phone joining does not reset them, and **Remember** never saves them (the
-operator's answer of 4 October 2026). Operator-circle mode starts off. It permits an otherwise
+presentation and name choices are saved separately in `preferences.json` with
+**Remember on this computer** in this version. They survive a server restart
+without being stored beside a key. Without Remember they last for the visit
+only. **New session** resets the active presentation and name choices, while
+the last remembered choice stays saved for the next restart; saving a new
+choice replaces it and turning Remember off removes it. A reload or a paired
+phone joining does not reset the active choice. Operator-circle mode starts off. It permits an otherwise
 eligible reply only when the cultural audit is unlocked and only for the operator
 and known adults; it never overrides the crisis gate or other audit failures.
 The screen and settings dialog continuously show the active mode, including on
 card and pairing screens. Other open tabs and phones refresh this status every
 second and when brought back into view. A lost connection retains the last
 confirmed status until the server can be reached again.
+
+### How replies are presented
+
+The settings surface starts with **One step at a time**, **Shorter replies** and
+**Plain wording first**. **More** exposes directness, delivery order, format and
+the humour dial from none to gallows. These are the six existing style keys;
+saving the setting is the person's confirmation. Message text never stores them.
+With **Remember**, these choices, the grief-humour opt-in and language style live
+in `preferences.json`, separately from keys; without Remember they are in memory.
+The harness reads confirmed preferences through `effective_preferences` and
+applies the turn's register caps before adding the **Declared preferences:** line
+to the house's this-turn block. No declared style changes routing or house lines.
+
+One step at a time asks for one next action, with the remaining model reply under
+**Show the rest**. House lines, hold obligations and the crisis card stay outside
+that budget. **Humour helps me grieve** changes an instruction only: humour can
+reach a grief turn through the seated specialist's voice and protocols, never by
+putting the humorist on the grief seat; the policy's no-joke obligations still bind.
+
+Language style offers the language just used, English for Spanish writing, or
+technical words kept in English. The Spanish pack is unreviewed and its native
+review is in progress. These instructions make no new language-coverage claim.
+
+The skippable coping-style setup asks, “When life hits hard, do you reach for
+jokes, quiet, a plan, or a person?” It previews declared keys and requires an
+explicit confirmation before adopting them. Skipping stores nothing.
+
+Before applying character presentation, text previews show a line from each
+character's existing codex in each presentation. A voice preview appears only
+when its presentation has a configured voice ID and voice access is ready; it
+uses the existing protected voice path. No preview text is generated.
+
+Presentation and chosen names are remembered across restarts under the Remember
+switch, like the other remembered settings, and never beside a key (idea-list
+item 13, ruled 5 October 2026).
+
+### Low-demand view and Resources
+
+**Low-demand view** asks for no diagnosis. It puts the current reply, its speaker
+and the composer first, with the seven plates behind **Show the whole table**.
+The Decision Card's plain layer stays first. The switch is labelled and announced,
+and focus follows the displayed reading order. The view is entirely local: no
+request carries it, and switching it does not change a session or decision.
+It adds no sound or animation.
+
+The **Resources** button stays pinned in the top toolbar in both views, including when the
+card is showing. It opens the existing resource line for the declared country,
+with link or call actions; without a declared country it shows the directory.
+Opening it never spends or repeats the character's spoken-once resource line.
 
 Model replies cannot supply house lines or crisis cards. The app checks output
 before the harness can store, audit, display or voice it, with the same checks
@@ -100,7 +165,14 @@ when the server starts again.
 
 By default, audit records and remembered settings are stored outside the repository, in
 `~/.secondsignal/talking-table/`, where `~` means the current user's home folder.
-The page shows the actual storage location. The audit log includes submitted
+The page shows the actual storage location. `audit.jsonl` keeps audit rows;
+`receipts.jsonl` keeps a separate sanitized receipt for each non-crisis turn:
+seat, holds and obligations, veto reasons, roster hash, audit verdicts, release
+rule, fold receipt and the declared preferences actually applied. It contains
+no message text, raw stems or crisis patterns. The page reads that same receipt
+object; crisis turns have a nameless in-memory summary and no receipt file row.
+`preferences.json` stores presentation/name choices and confirmed reply-style settings only when
+Remember is selected and contains no credential. The audit log includes submitted
 messages, accepted model output including replies withheld by the harness audit,
 decisions, and audit verdicts. The app discards oversized output, markup, detected
 house/character impersonation, credential echoes, and model exception text before
@@ -179,7 +251,9 @@ bulbs**; **Remember lights on this computer** protects it with this Windows
 account, otherwise **New session** or shutdown clears it. The key never belongs
 in a chat, a file in the tree, or a packet. The lights follow whoever the policy
 seats, and the crisis card is always white. A light failure never changes or
-delays a turn. The lights view opens at `/static/sigils.html`; the Stream Deck
+delays a turn. The lights view opens at `/static/sigils.html`; its separate **Explain this turn**
+switch is off by default and adds no new explanation until enabled. When enabled,
+it uses the same receipt-to-plain-words formatter as the Table's Decision Card; the Stream Deck
 addresses in `LIGHTS.md` work too. Voice uses only checked replies and the
 server's single-use token, and a card stops it; there is no microphone or
 browser speech recognition. The table still works if either optional module

@@ -374,12 +374,12 @@ following hold:
 
 ## Relationship to the current implementation
 
-The profile block and name helpers exist. The browser demo and Talking Table
-have visit-only choices; the generation harness passes presentation and chosen
-names into its prompt. The demo keeps choices in page memory. Talking Table
-keeps them in the running server's session memory; New session or a server
-restart clears them, and Remember excludes presentation and chosen names from
-the saved settings. Under neither a plate click selects either existing form;
+The profile block and name helpers exist. The browser demo has a visit-only
+choice kept in page memory; the generation harness passes presentation and
+chosen names into its prompt. The Talking Table, since order T1 of 5 October
+2026 (idea-list item 13), keeps presentation and chosen names across restarts
+under its Remember switch, never beside a key; New session resets the current
+choice, and the door's copy says so. Under neither a plate click selects either existing form;
 readable character headings, table-center names and assist labels update with
 the setting. Policy identifiers remain canonical in the diagnostic record. None of this establishes durable saved teams, complete
 non-binary characters, survivor-contract closure or verified model behavior.

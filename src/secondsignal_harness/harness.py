@@ -13,7 +13,7 @@ from __future__ import annotations
 import hashlib
 import time
 from collections.abc import Callable, Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any
 
 from secondsignal.jr import AuditRequest, audit, payload_hash
@@ -25,7 +25,7 @@ from .adapters import AdapterReply, Message, ModelAdapter
 from .audit_log import AuditLog
 from .codex import CodexStore
 from .lines import HARNESS_LINES_EN
-from .prompt import ChosenNames, Presentation, build_prompt, build_turn_block
+from .prompt import ChosenNames, Presentation, applied_preferences, build_prompt, build_turn_block
 from .view import audit_view
 
 FAILURE_LINE: str = HOUSE_LINES_EN["failure"]
@@ -56,6 +56,9 @@ class Turn:
     adapter_calls: int
     decision: dict[str, Any]
     notice: str | None = None
+    declared_preferences: dict[str, str] = field(default_factory=dict)
+    preference_adjustments: tuple[str, ...] = ()
+    presentation_instructions: dict[str, str | bool] = field(default_factory=dict)
     audit_error: str | None = None
     """Set only on a gate turn whose audit row could not be written. The card
     went out anyway; ``row_id`` is empty; the failure is on the turn so the
@@ -81,6 +84,10 @@ class Harness:
         locale: str | None = None,
         presentation: Presentation | None = None,
         chosen_names: ChosenNames | None = None,
+        declared_preferences: Mapping[str, str] | None = None,
+        humour_grief: bool = False,
+        language_style: str | None = None,
+        decision_observer: Callable[[dict[str, Any]], None] | None = None,
         operator_circle: bool = False,
         max_turns: int = 12,
         max_tokens: int = 600,
@@ -94,6 +101,10 @@ class Harness:
         self.session = session if session is not None else SessionState(locale=locale)
         self.presentation = dict(presentation or {})
         self.chosen_names = dict(chosen_names or {})
+        self.declared_preferences = dict(declared_preferences or {})
+        self.humour_grief = bool(humour_grief)
+        self.language_style = language_style
+        self.decision_observer = decision_observer
         self.operator_circle = bool(operator_circle)
         self.max_turns = int(max_turns)
         self.max_tokens = int(max_tokens)
@@ -152,6 +163,16 @@ class Harness:
         house_lines = tuple(str(d) for d in (safety.get("disclosures") or ()))
         first_turn = self.session.turn_count == 1
         notice = HARNESS_LINES_EN["operator_circle"] if (self.operator_circle and first_turn) else None
+
+        # A surface may retain the already-routed noncrisis record for a
+        # superseded receipt. The observer is a cheap in-memory notification,
+        # never a policy input: it receives its own copy, its errors are ignored,
+        # and the crisis path never calls it or waits for a receipt writer.
+        if action != "HUMAN_ESCALATION" and self.decision_observer is not None:
+            try:
+                self.decision_observer(_json_safe(record))
+            except Exception:
+                pass
 
         self.transcript.append({"role": "user", "content": text})
 
@@ -214,10 +235,20 @@ class Harness:
             return turn
 
         # 3. Seated: prompt, one model, compose, audit, row, release or withhold.
+        applied, adjustments = applied_preferences(record, self.declared_preferences)
+        instructions: dict[str, str | bool] = {}
+        if self.language_style is not None:
+            instructions["language_style"] = self.language_style
+        if self.humour_grief:
+            # This records the opt-in instruction, never a claim that humour
+            # appeared in a reply or that a no-humour obligation was lifted.
+            instructions["humour_grief_opt_in"] = True
         system_text = self.codexes.system_text(agent_id)
         turn_block = build_turn_block(
             record, roster=self.roster, presentation=self.presentation,
             chosen_names=self.chosen_names, locale=self.session.locale,
+            declared_preferences=self.declared_preferences, humour_grief=self.humour_grief,
+            language_style=self.language_style,
         )
         system, messages = build_prompt(system_text, turn_block, self.transcript, max_turns=self.max_turns)
         prompt_digest = _digest(system + "\n".join(m["content"] for m in messages))
@@ -231,12 +262,16 @@ class Harness:
                 house_lines=list(house_lines), released=False, release_reason=RELEASE_FAILURE,
                 error=error, adapter_calls=calls, prompt_digest=prompt_digest,
                 codex_digest=codex_digest, decision=_json_safe(record),
+                declared_preferences=applied, preference_adjustments=list(adjustments),
+                presentation_instructions=instructions,
             )
             self._remember(out, spoken_by_house=True)
             turn = Turn(
                 text=out, outcome=outcome, action=action, agent_id=agent_id, released=False,
                 release_reason=RELEASE_FAILURE, persona_text=None, house_lines=house_lines,
                 verdict=None, row_id=row_id, adapter_calls=calls, decision=record, notice=notice,
+                declared_preferences=applied, preference_adjustments=adjustments,
+                presentation_instructions=instructions,
             )
             self.turns.append(turn)
             return turn
@@ -261,13 +296,16 @@ class Harness:
             persona_text=persona_text, house_lines=list(house_lines), composed=composed,
             bound_hash=bound, verdict=verdict.as_dict(), released=released,
             release_reason=reason, decision=_json_safe(record),
+            declared_preferences=applied, preference_adjustments=list(adjustments),
+            presentation_instructions=instructions,
         )
         self._remember(out, spoken_by_house=not released)
         turn = Turn(
             text=out, outcome=outcome, action=action, agent_id=agent_id, released=released,
             release_reason=reason, persona_text=persona_text, house_lines=house_lines,
             verdict=verdict.as_dict(), row_id=row_id, adapter_calls=calls, decision=record,
-            notice=notice,
+            notice=notice, declared_preferences=applied, preference_adjustments=adjustments,
+            presentation_instructions=instructions,
         )
         self.turns.append(turn)
         return turn

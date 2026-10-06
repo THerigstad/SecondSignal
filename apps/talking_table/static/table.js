@@ -1,9 +1,31 @@
 /* The surface displays the harness result. It never decides a safety action. */
 "use strict";
 (() => {
+  // One deterministic formatter for the Table, phone and Stream Deck. The
+  // receipt is the same safe object written beside audit.jsonl, never model text.
+  function decisionSummary(receipt) {
+    if (!receipt || typeof receipt !== "object") return "Decision receipt unavailable.";
+    if (receipt.gate_withheld) return "The crisis card holds the floor. No character is seated. The gate withheld speech. No model was called.";
+    const names = receipt.display_names || {};
+    const name = id => names[id] || id;
+    const clauses = [receipt.seat ? name(receipt.seat) + " sat." : "No character was seated."];
+    if (receipt.assist) clauses.push(name(receipt.assist) + " assisted.");
+    const holds = receipt.holds || [];
+    clauses.push(holds.length ? "Held: " + holds.map(hold => hold.domain + " (" + hold.duration + ")").join("; ") + "." : "No holds were active.");
+    for (const item of receipt.set_aside || receipt.vetoes || []) clauses.push(name(item.persona) + " was set aside: " + item.reason + ".");
+    clauses.push(receipt.audit_withheld ? "The audit withheld speech." : "Neither the gate nor the audit withheld speech.");
+    clauses.push(receipt.model_called ? "A model was called." : "No model was called.");
+    if (receipt.regulation) clauses.push(receipt.regulation);
+    for (const reason of receipt.preference_adjustments || []) clauses.push(reason);
+    return clauses.join(" ");
+  }
+  window.SecondSignalDecisionCard = decisionSummary;
+  // The phone imports only the shared formatter above.
+  if (!document.getElementById("composer")) return;
   const $ = id => document.getElementById(id);
   const state = {config: null, busy: false, ready: false, count: 0, last: null,
     request: 0, rendered: 0, cardBarrier: 0, epoch: 0, pending: new Set(),
+    submissions: new Map(), paused: false, queued: [], lowDemand: false, showTable: false, lastCardRevision: -1, serverSession: null,
     operatorCircle: null, modeRevision: -1, modePolling: false, circleDirty: false};
   const familyLabels = {fake: "Pretend model · free", gemini: "Gemini", openai: "OpenAI", anthropic: "Anthropic", xai: "xAI", compatible: "Compatible host"};
 
@@ -67,7 +89,15 @@
   async function pollOperatorMode() {
     if (state.modePolling) return;
     state.modePolling = true;
-    try { await api("/api/state"); }
+    try {
+      const snapshot = await api("/api/state");
+      adoptSession(snapshot);
+      if (snapshot.state === "card" && typeof snapshot.card === "string" &&
+          Number.isSafeInteger(snapshot.card_revision) && snapshot.card_revision > state.lastCardRevision) {
+        receiveCard({kind: "card", card: snapshot.card, receipt: snapshot.receipt,
+          decision: snapshot.decision || {}, verdict: null, state: snapshot});
+      }
+    }
     catch (_) { voiceCall("stopAll"); /* Silence while server state is unknown. */ }
     finally { state.modePolling = false; }
   }
@@ -89,6 +119,8 @@
     $("presentation").disabled = updating || !state.ready || !state.config || !state.config.local;
     document.querySelectorAll(".form-choice").forEach(button => { button.disabled = updating || !state.ready || !state.config.local; });
     $("send").firstChild.textContent = "Send ";
+    $("stop-waiting").disabled = state.pending.size === 0;
+    $("save-presentation").disabled = updating || !state.ready || !state.config || !state.config.local;
   }
 
   function voiceCall(method, argument) {
@@ -193,6 +225,7 @@
 
   function applyConfig(config) {
     state.config = config;
+    adoptSession(config.state);
     state.circleDirty = false;
     applyOperatorMode(config);
     const settings = config.settings;
@@ -201,6 +234,8 @@
     for (const [id, field] of [["adapter", "adapter"], ["model", "model"], ["vendor-url", "url"], ["presentation", "presentation"]]) $(id).value = settings[field] || (field === "presentation" ? "as_written" : "");
     $("remember").checked = Boolean(settings.remember);
     $("locale").value = settings.locale || "";
+    applyStyleControls(settings);
+    renderPreviews();
     $("voice-enabled").checked = Boolean(settings.voice_enabled);
     $("voice-remember").checked = Boolean(settings.voice_remember);
     $("voice-key").value = "";
@@ -219,7 +254,7 @@
     $("settings-storage").textContent = config.storage;
     $("sigils-link").hidden = !config.sigils_available;
     const remote = !config.local;
-    for (const id of ["model-settings", "voice-settings", "lights-settings", "circle-settings", "network-settings"]) $(id).disabled = remote;
+    for (const id of ["model-settings", "voice-settings", "lights-settings", "circle-settings", "network-settings", "presentation-settings"]) $(id).disabled = remote;
     $("save-settings").hidden = remote;
     $("remote-settings-note").hidden = !remote;
     const phone = config.phone || {};
@@ -277,8 +312,106 @@
     return slots;
   }
 
-  function whyDrawer(turn) {
-    const details = el("details", null, "why");
+  function applyStyleControls(settings) {
+    const prefs = settings.declared_preferences || {};
+    $("one-step").checked = prefs.pace === "one_step";
+    $("shorter").checked = prefs.verbosity === "short";
+    $("plain-wording").checked = prefs.directness === "plain";
+    for (const [id, key] of [["style-directness", "directness"], ["style-delivery", "delivery_order"], ["style-format", "format"], ["style-humour", "humor_tolerance"]]) $(id).value = prefs[key] || "";
+    $("humour-grief").checked = Boolean(settings.humour_grief);
+    $("language-style").value = settings.language_style || "match";
+  }
+
+  function styleValues() {
+    const prefs = {};
+    if ($("one-step").checked) prefs.pace = "one_step";
+    if ($("shorter").checked) prefs.verbosity = "short";
+    for (const [id, key] of [["style-directness", "directness"], ["style-delivery", "delivery_order"], ["style-format", "format"], ["style-humour", "humor_tolerance"]]) if ($(id).value) prefs[key] = $(id).value;
+    if ($("plain-wording").checked) prefs.directness = "plain";
+    return prefs;
+  }
+
+  function renderPreviews() {
+    const target = $("presentation-previews");
+    target.replaceChildren();
+    if (!state.config) return;
+    const previews = state.config.presentation_previews || {};
+    for (const [choice, title] of [["as_written", "As written"], ["women", "Woman"], ["men", "Man"], ["neither", "Neither"]]) {
+      const group = el("details", null, "preview-group");
+      group.open = choice === $("presentation").value;
+      group.append(el("summary", title));
+      for (const profile of state.config.roster) {
+        const preview = (previews[choice] || {})[profile.id];
+        if (!preview || typeof preview.text !== "string") continue;
+        const pair = profile.names[choice] || profile.names.as_written;
+        const row = el("section", null, "presentation-preview");
+        row.append(el("h3", pair[0]), el("p", preview.text), el("p", "From " + preview.source, "small"));
+        if (preview.voice_available === true) {
+          const play = el("button", "Hear " + pair[0] + " · " + title);
+          play.type = "button";
+          play.addEventListener("click", async () => {
+            play.disabled = true;
+            try {
+              const sample = await api("/api/presentation/preview", {persona: profile.id, presentation: choice});
+              voiceCall("updateState", sample.state);
+              voiceCall("speak", sample);
+            } catch (error) { status("status", error.message, true); }
+            finally { play.disabled = false; }
+          });
+          row.append(play);
+        }
+        group.append(row);
+      }
+      target.append(group);
+    }
+  }
+
+  function applyView() {
+    const card = state.last && state.last.kind === "card";
+    $("workspace").classList.toggle("low-demand", state.lowDemand);
+    $("low-demand").setAttribute("aria-checked", String(state.lowDemand));
+    $("whole-table").hidden = !state.lowDemand || Boolean(card);
+    $("whole-table").textContent = state.showTable ? "Hide the whole table" : "Show the whole table";
+    $("whole-table").setAttribute("aria-expanded", String(state.showTable));
+    $("table-panel").hidden = Boolean(card) || (state.lowDemand && !state.showTable);
+    $("submission-history").open = !state.lowDemand;
+  }
+
+  async function showResources() {
+    if (!$("resources-dialog").open) $("resources-dialog").showModal();
+    const target = $("resources-content");
+    target.replaceChildren(el("p", "Loading the declared resource line…"));
+    try {
+      const resource = await api("/api/resources");
+      target.replaceChildren(el("p", resource.text));
+      for (const action of resource.actions || []) {
+        if (!/^(https:\/\/|tel:|sms:)/.test(action.url)) continue;
+        const link = el("a", action.label, "resource-action");
+        link.href = action.url;
+        if (action.url.startsWith("https:")) { link.target = "_blank"; link.rel = "noopener noreferrer"; }
+        target.append(link);
+      }
+    } catch (error) { target.replaceChildren(el("p", error.message)); }
+  }
+
+  const copingStyles = {
+    jokes: {humor_tolerance: "light", directness: "gentle"},
+    quiet: {pace: "one_step", verbosity: "short", humor_tolerance: "none"},
+    plan: {pace: "one_step", delivery_order: "summary_first", format: "numbered"},
+    person: {directness: "gentle", format: "prose"},
+  };
+  const copingDescriptions = {
+    jokes: "Light humour; gentle directness.",
+    quiet: "One step at a time; shorter replies; no humour.",
+    plan: "One step at a time; summary first; numbered steps.",
+    person: "Gentle directness; prose.",
+  };
+
+  function decisionCard(turn) {
+    const details = el("details", null, "why decision-card");
+    details.open = true;
+    const plain = el("p", decisionSummary(turn.receipt), "decision-plain");
+    const technical = el("details", null, "technical-record");
     const body = el("div", null, "why-content");
     const trace = turn.decision && turn.decision.explain;
     const isCard = turn.kind === "card";
@@ -286,8 +419,29 @@
     const note = turn.decision && turn.decision.presentation_note;
     if (typeof note === "string" && note) body.append(el("p", note, "notice"));
     body.append(el("h4", "Audit verdict"), el("pre", turn.verdict === null || turn.verdict === undefined ? "No model reply was audited on this turn." : JSON.stringify(turn.verdict, null, 2)));
-    details.append(el("summary", "Why this turn?"), body);
+    technical.append(el("summary", "Technical record"), body);
+    details.append(el("summary", "Decision Card"), plain, technical);
     return details;
+  }
+
+  function renderReply(article, turn) {
+    const text = String(turn.text || "");
+    const obligations = turn.receipt && turn.receipt.obligations || [];
+    // Obligations can live in any model paragraph: keep their complete reply
+    // visible rather than guessing which sentences fulfil them.
+    const effort = Boolean(turn.effort_contract) && !obligations.length;
+    let cut = effort ? text.search(/\n\s*\n/) : -1;
+    if (effort && cut < 0) {
+      const sentence = /[.!?](?:["”']?)(\s+)(?=\S)/.exec(text);
+      if (sentence) cut = sentence.index + sentence[0].length - sentence[1].length;
+    }
+    if (cut > 0 && text.slice(cut).trim()) {
+      article.append(el("p", text.slice(0, cut), "reply-text"));
+      const rest = el("details", null, "reply-rest");
+      rest.append(el("summary", "Show the rest"), el("p", text.slice(cut), "reply-text"));
+      article.append(rest);
+    } else article.append(el("p", text, "reply-text"));
+    if (turn.house_lines && turn.house_lines.length) article.append(el("p", turn.house_lines.join("\n"), "house-text"));
   }
 
   function showSettings(focusCircle = false) {
@@ -308,28 +462,31 @@
     if (isCard) {
       voiceCall("stopAll");
       if ($("settings-dialog").open) $("settings-dialog").close();
+      if ($("resources-dialog").open) $("resources-dialog").close();
     }
     paintTable(turn);
+    applyView();
     $("workspace").classList.toggle("card-mode", isCard);
-    $("table-panel").hidden = isCard;
+    $("table-panel").hidden = isCard || (state.lowDemand && !state.showTable);
     $("transcript").hidden = isCard;
     $("empty-state").hidden = true;
     $("crisis").hidden = !isCard;
     $("crisis").replaceChildren();
     if (isCard) {
-      $("crisis").append(el("p", turn.card, "card-text"), whyDrawer(turn));
+      $("crisis").append(el("p", turn.card, "card-text"), decisionCard(turn));
       const archivedCard = el("article", null, "turn past-card");
       archivedCard.dataset.kind = "card";
-      archivedCard.append(el("p", turn.card, "house-text"), whyDrawer(turn));
+      archivedCard.append(el("p", turn.card, "house-text"), decisionCard(turn));
       $("transcript").append(archivedCard);
       status("status", "");
       return;
     }
-    const article = el("article", null, "turn");
+    document.querySelectorAll(".turn").forEach(node => node.classList.toggle("current-turn", false));
+    const article = el("article", null, "turn current-turn");
     article.dataset.kind = turn.kind;
     const topline = el("div", null, "turn-topline");
     topline.append(el("span", "TURN " + String(state.count).padStart(2, "0")), el("span", turn.verdict ? "Audit · " + turn.verdict.status : turn.adapter_calls > 0 ? "Model reply unavailable" : "No model called"));
-    article.append(topline, el("p", input, "user-message"));
+    article.append(topline);
     if (turn.persona) {
       const header = el("div", null, "reply-header");
       const name = el("h3", nameOf(turn.persona), "character-name");
@@ -338,8 +495,7 @@
       article.append(header);
     }
     if (turn.kind === "reply") {
-      article.append(el("p", turn.text, "reply-text"));
-      if (turn.house_lines && turn.house_lines.length) article.append(el("p", turn.house_lines.join("\n"), "house-text"));
+      renderReply(article, turn);
     } else {
       article.append(el("p", turn.text, "house-text"));
     }
@@ -358,7 +514,7 @@
       note.append(link, document.createTextNode("."));
       article.append(note);
     }
-    article.append(whyDrawer(turn));
+    article.append(decisionCard(turn));
     $("transcript").append(article);
     $("transcript").scrollTop = $("transcript").scrollHeight;
     // Only the server's single-use token reaches the voice, never the text. An
@@ -370,6 +526,70 @@
     status("status", "");
   }
 
+  function finishSubmission(request, outcome, detail = "") {
+    const submission = state.submissions.get(request);
+    if (!submission || submission.outcome !== "pending") return false;
+    submission.outcome = outcome;
+    submission.node.dataset.state = outcome;
+    submission.label.textContent = outcome[0].toUpperCase() + outcome.slice(1) + (detail ? " · " + detail : "");
+    if (submission.timer && typeof window.clearTimeout === "function") window.clearTimeout(submission.timer);
+    state.pending.delete(request);
+    setBusy(state.busy);
+    return true;
+  }
+
+  function adoptSession(snapshot, currentRequest) {
+    if (!snapshot || !snapshot.session_id || snapshot.session_id === state.serverSession) return;
+    const previous = state.serverSession;
+    state.serverSession = snapshot.session_id;
+    state.lastCardRevision = -1;
+    if (previous !== null) {
+      state.epoch += 1;
+      for (const pending of [...state.pending]) if (pending !== currentRequest) finishSubmission(pending, "superseded", "The server session changed; your writing is recoverable.");
+      state.cardBarrier = currentRequest === undefined ? state.request : currentRequest - 1;
+      state.queued = [];
+    }
+  }
+
+  function addSubmission(request, input) {
+    const node = el("article", null, "submission");
+    node.dataset.state = "pending";
+    node.dataset.request = String(request);
+    const label = el("p", "Pending", "submission-status");
+    label.setAttribute("role", "status");
+    const restore = el("button", "Restore to editor");
+    restore.type = "button";
+    restore.addEventListener("click", () => {
+      // Preserve a newer draft too: restoration appends with a blank line.
+      const draft = $("message").value;
+      $("message").value = draft ? draft + "\n\n" + input : input;
+      $("message").focus();
+      status("status", draft ? "Submitted writing added after your current draft." : "Submitted writing restored to the editor.");
+    });
+    node.append(el("p", input, "user-message"), label, restore);
+    $("submissions").append(node);
+    $("submission-history").open = true;
+    const submission = {node, label, input, outcome: "pending", timer: null};
+    state.submissions.set(request, submission);
+    if (typeof window.setTimeout === "function") submission.timer = window.setTimeout(() => {
+      finishSubmission(request, "failed", "The wait timed out; your writing is recoverable.");
+    }, 90000);
+  }
+
+  function receiveCard(turn, request) {
+    const cardRevision = turn.state && turn.state.card_revision;
+    // A poll can show a card before its POST returns. A repeated snapshot must
+    // neither add a second turn nor supersede a later follow-up to that card.
+    if (Number.isSafeInteger(cardRevision) && cardRevision <= state.lastCardRevision) return;
+    state.cardBarrier = state.request;
+    state.lastCardRevision = Math.max(state.lastCardRevision,
+      Number.isSafeInteger(turn.state && turn.state.card_revision) ? turn.state.card_revision : -1);
+    for (const pending of [...state.pending]) finishSubmission(pending, pending === request ? "completed" : "superseded", "The crisis card holds the floor.");
+    state.queued = [];
+    if (state.paused) $("view-status").textContent = "View paused. The crisis card is shown immediately.";
+    renderTurn(turn, "");
+  }
+
   async function send() {
     const input = $("message").value;
     if (state.busy || !state.ready || !input.trim()) return;
@@ -377,22 +597,31 @@
     const request = ++state.request;
     const epoch = state.epoch;
     state.pending.add(request);
-    // Clear at submission: a late completion must never erase a newer draft.
+    addSubmission(request, input);
+    // Only submission clears the editor: completion cannot erase a newer draft.
     $("message").value = "";
     setBusy(state.busy);
     status("status", "The policy is reading this turn…");
     try {
       const turn = await api("/api/turn", {text: input});
-      if (epoch !== state.epoch || turn.superseded) return;
-      if (turn.kind === "card") {
-        // Invalidate every request already in flight, including requests sent
-        // after this card request. Only a new submission may replace this card.
-        state.cardBarrier = state.request;
-      } else if (request <= state.cardBarrier || request < state.rendered) return;
+      if (epoch !== state.epoch) { finishSubmission(request, "superseded"); return; }
+      adoptSession(turn.state, request);
+      // Even a cancelled wait or paused view must immediately admit a card.
+      if (turn.kind === "card") { receiveCard(turn, request); return; }
+      const submission = state.submissions.get(request);
+      if (!submission || submission.outcome !== "pending") return;
+      if (turn.superseded || request <= state.cardBarrier || request < state.rendered) {
+        finishSubmission(request, "superseded"); return;
+      }
       state.rendered = Math.max(state.rendered, request);
-      renderTurn(turn, input);
+      const outcome = turn.release_reason === "failure" || turn.kind === "failure" ? "failed" : turn.kind === "withheld" ? "withheld" : "completed";
+      finishSubmission(request, outcome, state.paused ? "Ready when you resume this view." : "");
+      if (state.paused) {
+        state.queued = [{turn, input, request}];
+        $("view-status").textContent = "View paused. A reply is ready.";
+      } else renderTurn(turn, input);
     } catch (error) {
-      if (epoch === state.epoch && request === state.request && request > state.cardBarrier) status("status", error.message, true);
+      if (finishSubmission(request, "failed", error.message)) status("status", error.message, true);
     } finally {
       state.pending.delete(request);
       setBusy(state.busy);
@@ -432,8 +661,61 @@
     }
   }
 
+  $("stop-waiting").addEventListener("click", () => {
+    voiceCall("stopAll");
+    for (const request of [...state.pending]) finishSubmission(request, "cancelled", "Stopped waiting in this view; the session is unchanged.");
+    status("status", "Stopped waiting. Your writing is recoverable. A crisis card can still appear.");
+  });
+  $("pause-view").addEventListener("click", () => {
+    state.paused = !state.paused;
+    voiceCall("stopAll");
+    $("pause-view").setAttribute("aria-pressed", String(state.paused));
+    $("pause-view").textContent = state.paused ? "Resume this view" : "Pause this view";
+    $("view-status").textContent = state.paused ? "View paused. The session continues; crisis cards still appear." : "";
+    if (!state.paused) {
+      const queued = state.queued;
+      state.queued = [];
+      for (const entry of queued) if (entry.request > state.cardBarrier) renderTurn(entry.turn, entry.input);
+    }
+  });
+  $("low-demand").addEventListener("change", () => { state.lowDemand = $("low-demand").checked; applyView(); });
+  $("whole-table").addEventListener("click", () => { state.showTable = !state.showTable; applyView(); });
+  $("resources-open").addEventListener("click", showResources);
+  $("resources-close").addEventListener("click", () => $("resources-dialog").close());
+  $("plain-wording").addEventListener("change", () => { $("style-directness").value = $("plain-wording").checked ? "plain" : ""; });
+  $("style-directness").addEventListener("change", () => { $("plain-wording").checked = $("style-directness").value === "plain"; });
+  $("onboarding-open").addEventListener("click", () => {
+    $("onboarding-panel").hidden = false;
+    $("onboarding-choice").value = "";
+    $("onboarding-confirm").disabled = true;
+    $("onboarding-preview").textContent = "Nothing is saved until you confirm.";
+    $("onboarding-choice").focus();
+  });
+  $("onboarding-choice").addEventListener("change", () => {
+    const choice = $("onboarding-choice").value;
+    $("onboarding-preview").textContent = copingDescriptions[choice] ? copingDescriptions[choice] + " Confirm to store these declared choices. They replace the six current style choices; other settings stay as they are." : "Nothing is saved until you confirm.";
+    $("onboarding-confirm").disabled = !copingStyles[choice];
+  });
+  $("onboarding-skip").addEventListener("click", () => {
+    $("onboarding-panel").hidden = true;
+    $("onboarding-choice").value = "";
+    $("onboarding-confirm").disabled = true;
+    $("onboarding-preview").textContent = "Nothing is saved until you confirm.";
+    $("onboarding-open").focus();
+  });
+  $("onboarding-confirm").addEventListener("click", async () => {
+    const preferences = copingStyles[$("onboarding-choice").value];
+    if (!preferences || !state.config.local) return;
+    $("onboarding-confirm").disabled = true;
+    try {
+      applyConfig(await api("/api/settings", {declared_preferences: preferences, remember: $("remember").checked}));
+      $("onboarding-panel").hidden = true;
+      status("settings-status", "Your declared style choices are confirmed and saved.");
+    } catch (error) { status("settings-status", error.message, true); }
+    finally { $("onboarding-confirm").disabled = false; }
+  });
   $("composer").addEventListener("submit", event => { event.preventDefault(); send(); });
-  $("message").addEventListener("keydown", event => { if (event.key === "Enter" && !event.shiftKey && !event.isComposing) { event.preventDefault(); send(); } });
+  $("message").addEventListener("keydown", event => { if (event.key === "Enter" && (event.ctrlKey || event.metaKey) && !event.isComposing) { event.preventDefault(); send(); } });
   $("settings-open").addEventListener("click", () => showSettings());
   $("settings-close").addEventListener("click", () => $("settings-dialog").close());
   $("settings-dialog").addEventListener("close", () => { $("api-key").value = ""; $("voice-key").value = ""; $("lights-key").value = ""; });
@@ -443,6 +725,9 @@
     event.preventDefault();
     if (!state.config.local) return;
     const data = {adapter: $("adapter").value, model: $("model").value, url: $("vendor-url").value, remember: $("remember").checked, operator_circle: $("operator-circle").checked, locale: $("locale").value};
+    data.declared_preferences = styleValues();
+    data.humour_grief = $("humour-grief").checked;
+    data.language_style = $("language-style").value;
     data.voice_enabled = $("voice-enabled").checked;
     data.voice_remember = $("voice-remember").checked;
     data.voice_slots = voiceSlots();
@@ -480,7 +765,12 @@
     try { applyConfig(await api("/api/settings", {clear_key: true, remember: false})); status("settings-status", "The saved and session key have been forgotten."); }
     catch (error) { status("settings-status", error.message, true); }
   });
-  $("presentation").addEventListener("change", async () => {
+  $("presentation").addEventListener("change", () => { renderPreviews(); $("presentation-previews").hidden = false; });
+  $("presentation-preview-open").addEventListener("click", () => {
+    renderPreviews(); $("presentation-previews").hidden = !$("presentation-previews").hidden;
+  });
+  $("save-presentation").addEventListener("click", async () => {
+    if (!state.config.local) return;
     voiceCall("stopAll");
     const presentation = $("presentation").value;
     setBusy(true);
@@ -509,11 +799,15 @@
       voiceCall("stopAll");
       state.last = null;
       state.count = 0;
+      state.lastCardRevision = -1;
+      state.queued = [];
+      state.submissions.clear();
+      $("submissions").replaceChildren();
       $("transcript").replaceChildren();
       $("transcript").hidden = false;
       $("crisis").replaceChildren();
       $("crisis").hidden = true;
-      $("table-panel").hidden = false;
+      $("table-panel").hidden = state.lowDemand && !state.showTable;
       $("workspace").classList.remove("card-mode");
       $("empty-state").hidden = false;
       $("message").value = "";

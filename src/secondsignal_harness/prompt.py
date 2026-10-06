@@ -11,6 +11,7 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 from typing import Any
 
+from secondsignal.preferences import effective_preferences
 from secondsignal.profiles import AgentProfile
 
 from .adapters import Message
@@ -18,6 +19,68 @@ from .lines import HARNESS_LINES_EN
 
 Presentation = Mapping[str, str]  # agent_id -> "as_written" | "women" | "men" | "neither"
 ChosenNames = Mapping[str, str]  # agent_id -> the name form chosen under "neither"
+
+
+# These finite settings belong to the voice; the policy's ask-once flow is unchanged.
+STYLE_VALUES: dict[str, tuple[str, ...]] = {
+    "pace": ("one_step", "steady"),
+    "verbosity": ("short", "standard", "detailed"),
+    "directness": ("plain", "gentle", "direct", "blunt"),
+    "delivery_order": ("summary_first", "details_first"),
+    "format": ("prose", "bullets", "numbered"),
+    "humor_tolerance": ("none", "light", "gallows"),
+}
+LANGUAGE_STYLES: dict[str, str] = {
+    "match": "answer in the language the person just used",
+    "spanish_to_english": "give the English for what the person wrote in Spanish",
+    "technical_english": "answer in the language the person just used, keeping technical words in English",
+}
+_CAPPED_STYLE = {
+    "pace": "one_step", "verbosity": "short", "directness": "plain",
+    "delivery_order": "summary_first", "format": "prose", "humor_tolerance": "none",
+}
+_STYLE_LABELS = {
+    "pace": "pace", "verbosity": "length", "directness": "wording",
+    "delivery_order": "delivery order", "format": "format", "humor_tolerance": "humour",
+}
+_STYLE_WORDS = {
+    "one_step": "one step at a time", "steady": "steady pace", "short": "short replies",
+    "standard": "usual length", "detailed": "more detail", "plain": "plain wording first",
+    "gentle": "gentle", "direct": "direct", "blunt": "blunt",
+    "summary_first": "summary first", "details_first": "details first",
+    "prose": "prose", "bullets": "bullet points", "numbered": "numbered steps",
+    "none": "none", "light": "light", "gallows": "gallows, only within the seated voice's protocols",
+}
+
+
+def applied_preferences(
+    decision: Mapping[str, Any], declared: Mapping[str, str] | None,
+) -> tuple[dict[str, str], tuple[str, ...]]:
+    """Read confirmed style through the policy mask, then constrain its shape.
+
+    A register cap binds every presentation key. This voice-only shape never
+    writes policy preferences, lifts an obligation, or changes its decision.
+    Unknown values cannot become prompt text.
+    """
+    selected = {
+        key: value for key, value in (declared or {}).items()
+        if key in STYLE_VALUES and value in STYLE_VALUES[key]
+    }
+    safety = decision.get("safety") or {}
+    caps = tuple(str(cap) for cap in (safety.get("register_caps") or ()))
+    effective: dict[str, str] = effective_preferences(selected, caps)
+    adjustments: list[str] = []
+    if caps:
+        effective = {key: _CAPPED_STYLE[key] for key in effective}
+        if any(effective[key] != selected[key] for key in effective if key != "humor_tolerance"):
+            adjustments.append("Presentation was simplified because the active register caps bind this turn.")
+        if "humor_tolerance" in selected and selected["humor_tolerance"] != "none":
+            adjustments.append("Humour was lowered to none because the active register caps bind this turn.")
+    if "no_joke" in (decision.get("obligations") or ()) and "humor_tolerance" in effective:
+        if effective["humor_tolerance"] != "none":
+            adjustments.append("Humour was lowered to none because this turn carries the no-humour obligation.")
+        effective["humor_tolerance"] = "none"
+    return effective, tuple(adjustments)
 
 PRESENTATION_WORDS: dict[str, str] = {
     "as_written": "as written",
@@ -91,6 +154,9 @@ def build_turn_block(
     presentation: Presentation | None = None,
     chosen_names: ChosenNames | None = None,
     locale: str | None = None,
+    declared_preferences: Mapping[str, str] | None = None,
+    humour_grief: bool = False,
+    language_style: str | None = None,
 ) -> str:
     """The house's block for one seated turn, written from the decision record."""
     agent_id = decision.get("agent_id")
@@ -124,6 +190,28 @@ def build_turn_block(
         f"Declared locale: {locale or 'none declared'}",
         f"Assist persona: {_display(roster, assist) if isinstance(assist, str) else 'none'}",
     ]
+    applied, _ = applied_preferences(decision, declared_preferences)
+    if applied:
+        lines.append("Declared preferences: " + "; ".join(
+            f"{_STYLE_LABELS[key]}: {_STYLE_WORDS[applied[key]]}" for key in STYLE_VALUES if key in applied
+        ) + ". All hold obligations, register caps and house lines still bind.")
+    if applied.get("pace") == "one_step":
+        lines.append(
+            'Effort contract: give one next action in the first paragraph; put any remaining detail '
+            'in later paragraphs for "Show the rest". House lines, hold obligations and the crisis '
+            'card stay outside this budget and must never be delayed, folded or omitted. '
+            'If an obligation permits no plan, ask its required question instead of giving an action.'
+        )
+    if humour_grief:
+        lines.append(
+            "Humour helps me grieve: on a grief turn, humour may come only through the seated "
+            "specialist's own voice, inside that specialist's protocols. This never seats the humorist; "
+            "a no-humour obligation or register cap still forbids humour."
+        )
+    if language_style is not None:
+        if language_style not in LANGUAGE_STYLES:
+            raise ValueError("unknown language style")
+        lines.append(f"Language style: {LANGUAGE_STYLES[language_style]}; never translate or restate house lines.")
     if disclosures:
         lines.append(
             f"Attached house lines ({len(disclosures)}). The house speaks these itself, "
@@ -163,6 +251,9 @@ def build_prompt(
 
 
 __all__ = [
+    "LANGUAGE_STYLES",
+    "STYLE_VALUES",
+    "applied_preferences",
     "PRESENTATION_WORDS",
     "build_prompt",
     "build_turn_block",
