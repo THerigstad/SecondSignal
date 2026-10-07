@@ -5,7 +5,7 @@
   // receipt is the same safe object written beside audit.jsonl, never model text.
   function decisionSummary(receipt) {
     if (!receipt || typeof receipt !== "object") return "Decision receipt unavailable.";
-    if (receipt.gate_withheld) return "The crisis card holds the floor. No character is seated. The gate withheld speech. No model was called.";
+    if (receipt.gate_withheld) return "The crisis card holds the floor. No character is seated. The gate withheld speech. No model was called." + (receipt.aftermath ? " " + receipt.aftermath : "");
     const names = receipt.display_names || {};
     const name = id => names[id] || id;
     const clauses = [receipt.seat ? name(receipt.seat) + " sat." : "No character was seated."];
@@ -20,12 +20,34 @@
     return clauses.join(" ");
   }
   window.SecondSignalDecisionCard = decisionSummary;
-  // The phone imports only the shared formatter above.
+  // Order T2: shared presentation-only helpers; none reads message contents.
+  function biographyRows(profile, nameFor) {
+    const words = values => (values || []).map(value => String(value).replace(/_/g, " ")).join(", ");
+    const rows = [{label: "What this character is for", text: words(profile.domains)},
+      {label: "Ways of working", text: words(profile.modes)},
+      {label: "Will not take on", text: words(profile.contraindications) || "—"}];
+    if (profile.handoffs && Object.keys(profile.handoffs).length) rows.push({label: "Hands off to", text: Object.entries(profile.handoffs).map(([condition, id]) => condition.replace(/_/g, " ") + ": " + nameFor(id)).join("; ")});
+    return rows;
+  }
+  function createSprint(now = () => Date.now()) {
+    let persona = null, remaining = 0, until = 0, running = false;
+    function snapshot() {
+      if (running) remaining = Math.max(0, until - now());
+      if (remaining === 0) { persona = null; running = false; }
+      return {persona, remaining, running};
+    }
+    return {snapshot, start(id) { persona = id; remaining = 25 * 60 * 1000; until = now() + remaining; running = true; },
+      toggle() { snapshot(); if (!persona) return; running = !running; if (running) until = now() + remaining; },
+      stop() { persona = null; remaining = 0; running = false; }};
+  }
+  window.SecondSignalT2 = {biographyRows, createSprint};
+  // The phone imports the shared formatter and profile biography helpers above.
   if (!document.getElementById("composer")) return;
   const $ = id => document.getElementById(id);
   const state = {config: null, busy: false, ready: false, count: 0, last: null,
     request: 0, rendered: 0, cardBarrier: 0, epoch: 0, pending: new Set(),
     submissions: new Map(), paused: false, queued: [], lowDemand: false, showTable: false, lastCardRevision: -1, serverSession: null,
+    surface: {}, sprint: createSprint(), sprintTimer: null, biographyPersona: null,
     operatorCircle: null, modeRevision: -1, modePolling: false, circleDirty: false};
   const familyLabels = {fake: "Pretend model · free", gemini: "Gemini", openai: "OpenAI", anthropic: "Anthropic", xai: "xAI", compatible: "Compatible host"};
 
@@ -92,6 +114,7 @@
     try {
       const snapshot = await api("/api/state");
       adoptSession(snapshot);
+      if (state.config) applySurface(snapshot);
       if (snapshot.state === "card" && typeof snapshot.card === "string" &&
           Number.isSafeInteger(snapshot.card_revision) && snapshot.card_revision > state.lastCardRevision) {
         receiveCard({kind: "card", card: snapshot.card, receipt: snapshot.receipt,
@@ -142,7 +165,7 @@
 
   function namePair(profile) {
     const settings = state.config.settings;
-    const choice = settings.presentation || "as_written";
+    const choice = (settings.presentation_overrides || {})[profile.id] || settings.presentation || "as_written";
     const pair = profile.names[choice] || profile.names.as_written;
     const chosen = settings.chosen_names && settings.chosen_names[profile.id];
     return choice === "neither" && chosen ? [chosen, "they"] : pair;
@@ -164,22 +187,24 @@
       plate.title = profile.one_line;
       const names = el("div", null, "plate-names");
       const pair = namePair(profile);
-      const neither = state.config.settings.presentation === "neither";
+      const neither = ((state.config.settings.presentation_overrides || {})[profile.id] || state.config.settings.presentation) === "neither";
       profile.plate.forEach(([name, pronoun], formIndex) => {
         const selected = name === pair[0] && (neither || pronoun === pair[1]);
-        const form = el(neither ? "button" : "span", name, neither ? "form-choice" : "form-name");
+        const form = el("button", name, neither ? "form-choice" : "form-name biography-name");
+        form.type = "button";
         form.classList.toggle("selected", selected);
         if (neither) {
           form.type = "button";
           form.disabled = state.busy || state.pending.size > 0 || !state.config.local;
           form.setAttribute("aria-pressed", String(selected));
           form.setAttribute("aria-label", "Choose " + name + " with they pronouns");
-          form.addEventListener("click", () => chooseName(profile.id, name));
+          form.addEventListener("click", async () => { await chooseName(profile.id, name); showBiography(profile.id); });
         }
+        if (!neither) form.addEventListener("click", () => showBiography(profile.id));
         names.append(form);
         if (formIndex === 0) names.append(el("span", "/"));
       });
-      plate.append(names, el("p", "Not seated", "plate-status"));
+      plate.append(names, el("p", "Not seated", "plate-status"), el("div", null, "plate-extras"));
       target.append(plate);
       if (index === 2) {
         const center = el("div", null, "table-center-band");
@@ -200,7 +225,9 @@
       const id = plate.dataset.persona;
       const mode = id === seated ? "seated" : id === assist ? "assisting" : "idle";
       plate.dataset.state = mode;
-      const label = mode === "seated" ? "Seated" : mode === "assisting" ? "Assisting" : "Not seated";
+      const saved = !card && state.surface && state.surface.deferred_ask === id;
+      plate.dataset.saved = String(Boolean(saved));
+      const label = mode === "seated" ? "Seated" : saved ? "Seat saved" : mode === "assisting" ? "Assisting" : "Not seated";
       plate.querySelector(".plate-status").textContent = label;
       const profile = state.config.roster.find(item => item.id === id);
       plate.setAttribute("aria-label", profile.plate.map(pair => pair[0]).join(" / ") + "; " + label);
@@ -208,6 +235,7 @@
     if ($("table-center")) $("table-center").textContent = seated ? nameOf(seated) : turn ? "No character seated" : "Waiting for a turn";
     $("table-footnote").textContent = seated ? "The policy seated " + nameOf(seated) + (assist ? "; " + nameOf(assist) + " is assisting." : ".") : "No one is seated until the policy decides.";
     $("turn-count").textContent = state.count ? state.count + (state.count === 1 ? " turn" : " turns") : "No turns yet";
+    if (typeof renderTableExtras === "function") renderTableExtras(turn);
   }
 
   function refreshPresentationNames() {
@@ -233,6 +261,14 @@
     if (state.operatorCircle !== null) settings.operator_circle = state.operatorCircle;
     for (const [id, field] of [["adapter", "adapter"], ["model", "model"], ["vendor-url", "url"], ["presentation", "presentation"]]) $(id).value = settings[field] || (field === "presentation" ? "as_written" : "");
     $("remember").checked = Boolean(settings.remember);
+    $("house-name").value = settings.house_name || "";
+    $("idle-house-name").textContent = settings.house_name || "The table is ready.";
+    $("room").value = settings.room || "";
+    $("room").disabled = !config.local;
+    $("room-note").textContent = (config.t2_copy || {}).room_note || "";
+    drawOverrides();
+    state.surface = config.state || {};
+    $("table-object").value = state.surface.object_text || "";
     $("locale").value = settings.locale || "";
     applyStyleControls(settings);
     renderPreviews();
@@ -272,6 +308,126 @@
     modelFields();
     drawTable();
     refreshPresentationNames();
+    if (state.biographyPersona && $("biography-dialog").open) showBiography(state.biographyPersona);
+  }
+
+  function drawOverrides() {
+    const target = $("presentation-overrides");
+    target.replaceChildren();
+    for (const profile of state.config.roster) {
+      const row = el("div", null, "override-row"), label = el("label", nameOf(profile.id));
+      const select = el("select"); select.id = "override-" + profile.id;
+      label.setAttribute("for", select.id); select.dataset.overridePersona = profile.id;
+      for (const [value, text] of [["", "Follow the table"], ["as_written", "As written"], ["women", "Women"], ["men", "Men"], ["neither", "Neither"]]) {
+        const option = el("option", text); option.value = value; select.append(option);
+      }
+      select.value = (state.config.settings.presentation_overrides || {})[profile.id] || "";
+      select.disabled = !state.config.local; row.append(label, select); target.append(row);
+    }
+  }
+
+  function overrideValues() {
+    const values = {};
+    document.querySelectorAll("[data-override-persona]").forEach(select => { if (select.value) values[select.dataset.overridePersona] = select.value; });
+    return values;
+  }
+
+  function showBiography(id) {
+    if (state.last && state.last.kind === "card") return;
+    const profile = state.config.roster.find(item => item.id === id);
+    if (!profile) return;
+    state.biographyPersona = id;
+    $("biography-title").textContent = nameOf(id);
+    const body = $("biography-content"); body.replaceChildren(el("p", profile.one_line));
+    for (const row of biographyRows(profile, nameOf)) body.append(el("h3", row.label), el("p", row.text));
+    if (!$("biography-dialog").open) $("biography-dialog").showModal();
+  }
+
+  function offerButton(offer, action) {
+    const button = el("button", offer.label, "table-shortcut"); button.type = "button";
+    button.dataset.persona = offer.persona; button.dataset.action = action;
+    button.addEventListener("click", () => {
+      if (state.busy || !state.ready || (state.last && state.last.kind === "card")) return;
+      if (action === "handback") { state.surface.handback = null; $("handback-offer").hidden = true; }
+      button.disabled = true;
+      const metadata = {action, target: offer.persona};
+      if (action === "second_view") {
+        if (Number.isSafeInteger(offer.source_revision)) metadata.source_revision = offer.source_revision;
+        if (typeof offer.source_session === "string") metadata.source_session = offer.source_session;
+      }
+      send(offer.text, metadata);
+    });
+    return button;
+  }
+
+  function applySurface(snapshot) {
+    if (!snapshot || typeof snapshot !== "object") return;
+    state.surface = snapshot;
+    if (typeof snapshot.house_name === "string") $("idle-house-name").textContent = snapshot.house_name || "The table is ready.";
+    if (snapshot.presentation_overrides) state.config.settings.presentation_overrides = snapshot.presentation_overrides;
+    if (snapshot.chosen_names) state.config.settings.chosen_names = snapshot.chosen_names;
+    if (typeof snapshot.presentation === "string") state.config.settings.presentation = snapshot.presentation;
+    // Keep pending writing and object drafts in place while polling shared state.
+    if (snapshot.state === "card") renderTableExtras({kind: "card"});
+    else if (!state.last || state.last.kind !== "card") paintTable(state.last);
+  }
+
+  function renderTableExtras(turn) {
+    const card = Boolean(turn && turn.kind === "card");
+    const surface = state.surface || {};
+    const seated = card ? null : turn && turn.persona;
+    $("composer-extras").hidden = card;
+    $("object-control").hidden = !seated;
+    $("object-seat").textContent = seated ? nameOf(seated) : "";
+    const handback = card ? null : surface.handback;
+    $("handback-offer").replaceChildren();
+    $("handback-offer").hidden = !handback;
+    if (handback) $("handback-offer").append(el("span", "House", "house-attribution"), offerButton(handback, "handback"));
+    document.querySelectorAll(".plate").forEach(plate => {
+      const extras = plate.querySelector(".plate-extras");
+      if (!extras) return;
+      extras.replaceChildren();
+      if (card) return;
+      const id = plate.dataset.persona;
+      if (id === seated && surface.object_text) extras.append(el("p", surface.object_text, "plate-object"));
+      if (id === seated && surface.assist_offer) {
+        const slip = el("div", null, "assist-slip");
+        slip.append(el("span", "House", "house-attribution"), offerButton(surface.assist_offer, "assist"));
+        extras.append(slip);
+      }
+      const sprint = state.sprint.snapshot();
+      if (sprint.persona === id) {
+        const shutter = el("div", null, "sprint-shutter");
+        const clock = el("span", "", "sprint-clock"); clock.dataset.sprintPersona = id;
+        const pause = el("button", sprint.running ? "Pause" : "Resume"), stop = el("button", "Stop");
+        pause.type = stop.type = "button";
+        pause.addEventListener("click", () => { state.sprint.toggle(); renderTableExtras(state.last); });
+        stop.addEventListener("click", () => { state.sprint.stop(); renderTableExtras(state.last); });
+        shutter.append(clock, pause, stop); extras.append(shutter);
+      } else if (!sprint.persona && id === seated && ["cody", "seren"].includes(id)) {
+        const start = el("button", "Start a 25-minute sprint", "sprint-start"); start.type = "button";
+        start.addEventListener("click", () => {
+          state.sprint.start(id);
+          if (state.sprintTimer === null) state.sprintTimer = window.setInterval(tickSprint, 1000);
+          renderTableExtras(state.last);
+        });
+        extras.append(start);
+      }
+    });
+    tickSprint(false);
+  }
+
+  function tickSprint(repaint = true) {
+    const sprint = state.sprint.snapshot();
+    const seconds = Math.ceil(sprint.remaining / 1000);
+    document.querySelectorAll(".sprint-clock").forEach(clock => {
+      clock.textContent = String(Math.floor(seconds / 60)).padStart(2, "0") + ":" + String(seconds % 60).padStart(2, "0");
+    });
+    if (!sprint.persona && state.sprintTimer !== null) {
+      if (typeof window.clearInterval === "function") window.clearInterval(state.sprintTimer);
+      state.sprintTimer = null;
+      if (repaint) renderTableExtras(state.last);
+    }
   }
 
   function drawVoiceSlots(config) {
@@ -441,7 +597,16 @@
       rest.append(el("summary", "Show the rest"), el("p", text.slice(cut), "reply-text"));
       article.append(rest);
     } else article.append(el("p", text, "reply-text"));
-    if (turn.house_lines && turn.house_lines.length) article.append(el("p", turn.house_lines.join("\n"), "house-text"));
+    const remainingLines = (turn.house_lines || []).filter(line => line !== turn.ask_acknowledgement);
+    if (remainingLines.length) article.append(el("p", remainingLines.join("\n"), "house-text"));
+    const controls = el("div", null, "reply-controls");
+    if (typeof turn.page_url === "string" && /^\/api\/pages\/[a-zA-Z0-9_-]+\/[0-9]+$/.test(turn.page_url)) {
+      const page = el("a", "Open as a page", "made-page");
+      page.href = turn.page_url; page.target = "_blank"; page.rel = "noopener";
+      controls.append(page);
+    }
+    for (const offer of (turn.second_opinions || []).slice(0, 3)) controls.append(offerButton(offer, "second_view"));
+    if (controls.children.length) article.append(controls);
   }
 
   function showSettings(focusCircle = false) {
@@ -456,6 +621,7 @@
 
   function renderTurn(turn, input) {
     state.last = turn;
+    state.surface = Object.assign({}, turn.state || {}, turn);
     state.count += 1;
     const isCard = turn.kind === "card";
     // One stop, no speaking path, and no previous character output on a card turn.
@@ -463,6 +629,7 @@
       voiceCall("stopAll");
       if ($("settings-dialog").open) $("settings-dialog").close();
       if ($("resources-dialog").open) $("resources-dialog").close();
+      if ($("biography-dialog").open) $("biography-dialog").close();
     }
     paintTable(turn);
     applyView();
@@ -491,9 +658,11 @@
       const header = el("div", null, "reply-header");
       const name = el("h3", nameOf(turn.persona), "character-name");
       name.dataset.persona = turn.persona;
-      header.append(name, el("span", turn.kind === "withheld" ? "Reply withheld" : "Seated by the policy"));
+      header.append(name, el("span", turn.kind === "withheld" ? "Reply withheld" : turn.second_view ? "a second view" : "Seated by the policy"));
       article.append(header);
     }
+    if (turn.tag) article.append(el("p", turn.tag, "turn-tag"));
+    if (turn.ask_acknowledgement) article.append(el("p", turn.ask_acknowledgement, "house-text ask-acknowledgement"));
     if (turn.kind === "reply") {
       renderReply(article, turn);
     } else {
@@ -548,6 +717,10 @@
       for (const pending of [...state.pending]) if (pending !== currentRequest) finishSubmission(pending, "superseded", "The server session changed; your writing is recoverable.");
       state.cardBarrier = currentRequest === undefined ? state.request : currentRequest - 1;
       state.queued = [];
+      state.sprint.stop();
+      state.surface = {};
+      $("table-object").value = "";
+      $("draft-tag").value = "";
     }
   }
 
@@ -590,8 +763,9 @@
     renderTurn(turn, "");
   }
 
-  async function send() {
-    const input = $("message").value;
+  async function send(controlText, metadata) {
+    const controlled = typeof controlText === "string";
+    const input = controlled ? controlText : $("message").value;
     if (state.busy || !state.ready || !input.trim()) return;
     voiceCall("stopAll");
     const request = ++state.request;
@@ -599,11 +773,16 @@
     state.pending.add(request);
     addSubmission(request, input);
     // Only submission clears the editor: completion cannot erase a newer draft.
-    $("message").value = "";
+    const data = Object.assign({text: input}, metadata || {});
+    if (!controlled) {
+      if ($("draft-tag").value) data.tag = $("draft-tag").value;
+      $("draft-tag").value = "";
+      $("message").value = "";
+    }
     setBusy(state.busy);
     status("status", "The policy is reading this turn…");
     try {
-      const turn = await api("/api/turn", {text: input});
+      const turn = await api("/api/turn", data);
       if (epoch !== state.epoch) { finishSubmission(request, "superseded"); return; }
       adoptSession(turn.state, request);
       // Even a cancelled wait or paused view must immediately admit a card.
@@ -661,6 +840,19 @@
     }
   }
 
+  $("biography-close").addEventListener("click", () => $("biography-dialog").close());
+  $("save-object").addEventListener("click", async () => {
+    if (state.last && state.last.kind === "card") return;
+    $("save-object").disabled = true;
+    try {
+      const result = await api("/api/object", {text: $("table-object").value});
+      $("table-object").value = result.object_text || "";
+      $("object-notice").textContent = result.object_notice || "";
+      state.surface = Object.assign({}, state.surface, result.state || {}, {object_text: result.object_text || ""});
+      renderTableExtras(state.last);
+    } catch (error) { status("object-notice", error.message, true); }
+    finally { $("save-object").disabled = false; }
+  });
   $("stop-waiting").addEventListener("click", () => {
     voiceCall("stopAll");
     for (const request of [...state.pending]) finishSubmission(request, "cancelled", "Stopped waiting in this view; the session is unchanged.");
@@ -725,6 +917,7 @@
     event.preventDefault();
     if (!state.config.local) return;
     const data = {adapter: $("adapter").value, model: $("model").value, url: $("vendor-url").value, remember: $("remember").checked, operator_circle: $("operator-circle").checked, locale: $("locale").value};
+    data.house_name = $("house-name").value;
     data.declared_preferences = styleValues();
     data.humour_grief = $("humour-grief").checked;
     data.language_style = $("language-style").value;
@@ -774,7 +967,7 @@
     voiceCall("stopAll");
     const presentation = $("presentation").value;
     setBusy(true);
-    try { applyConfig(await api("/api/settings", {presentation, chosen_names: {}})); status("status", "Presentation updated. The policy rules are unchanged."); }
+    try { applyConfig(await api("/api/settings", {presentation, chosen_names: {}, room: $("room").value, presentation_overrides: overrideValues()})); status("status", "Presentation updated. The policy rules are unchanged."); }
     catch (error) { $("presentation").value = state.config.settings.presentation; status("status", error.message, true); }
     finally { setBusy(false); }
   });
@@ -798,6 +991,10 @@
       if (request !== state.request) { applyConfig(config); return; }
       voiceCall("stopAll");
       state.last = null;
+      state.surface = {};
+      state.sprint.stop();
+      $("table-object").value = "";
+      $("draft-tag").value = "";
       state.count = 0;
       state.lastCardRevision = -1;
       state.queued = [];

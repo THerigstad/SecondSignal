@@ -6,6 +6,7 @@ import base64
 import copy
 import ctypes
 import hashlib
+import html
 import importlib
 import ipaddress
 import json
@@ -30,12 +31,14 @@ from typing import Callable
 from secondsignal.lexicon import RESOURCES
 from secondsignal.normalize import SKELETON
 from secondsignal.profiles import load_roster
-from secondsignal.safety import HOUSE_LINES_EN
+from secondsignal.safety import HOUSE_LINES_EN, crisis_screen
 from secondsignal_harness import AuditLog, CodexStore, Harness
 from secondsignal_harness.__main__ import _adapter
 from secondsignal_harness.adapters import AdapterError, AdapterReply
 from secondsignal_harness.harness import RELEASE_OPERATOR_CIRCLE, RELEASE_SHIP
+from secondsignal_harness.lines import HARNESS_LINES_EN, ROOM_LINES
 from secondsignal_harness.prompt import LANGUAGE_STYLES, STYLE_VALUES, applied_preferences
+from secondsignal_harness.table_extras import asked_agent, eligible_agents
 
 from .table_kit import decision_receipt, presentation_samples, resources
 
@@ -45,6 +48,8 @@ LOG = logging.getLogger("talking_table")
 PROTOTYPE = "A prototype for the operator and adults the operator knows. Not a crisis service."
 FAMILIES = {"fake", "gemini", "openai", "anthropic", "xai", "compatible"}
 PRESENTATIONS = {"as_written", "women", "men", "neither"}
+DRAFT_TAGS = {"", "plan", "letter", "verse", "list", "unsent"}
+REMEMBERED_EXTRAS = ("house_name", "room", "presentation_overrides")
 # The countries a resource row exists for; "" means none declared (the
 # directory line). Read from the verified resource rows, never inferred.
 LOCALES = frozenset(key for key in RESOURCES["rows"] if key != "default")
@@ -290,14 +295,24 @@ def _reserved_reply_voice(text):
         for part in line if isinstance(line, tuple) else (line,):
             if isinstance(part, str) and len(part) > 30 and _reply_words(part) in words:
                 return True
+    # T2's fixed house copy remains outside the character's voice, including
+    # normalized spelling and the name slots in the two offer templates.
+    for key in ("ask_acknowledgement", "handback_offer", "assist_offer",
+                "made_page_footer", "object_refused", "card_aftermath", "room_note"):
+        parts = re.split(r"(\{[A-Za-z_]+\})", HARNESS_LINES_EN[key])
+        pattern = r" *".join(r"\w+(?: \w+){0,12}" if part.startswith("{") else
+                             re.escape(_reply_words(part)) for part in parts if part)
+        if re.search(r"\b" + pattern + r"\b", words):
+            return True
     return False
 
 
 class _TurnJob:
     """The supplied Harness routes once; only its optional model work can wait."""
 
-    def __init__(self, app, text):
+    def __init__(self, app, text, *, tag="", action=None, target=None):
         self.app, self.text = app, text
+        self.action, self.target = action, target
         self.ready = threading.Event()
         self.admitted = threading.Event()
         self.done = threading.Event()
@@ -314,6 +329,9 @@ class _TurnJob:
         self.harness.session = copy.deepcopy(app.harness.session)
         self.harness.transcript = copy.deepcopy(app.harness.transcript)
         self.harness.turns = []
+        self.harness.room = app.settings["room"] or None
+        self.harness.object_text = app.object_text
+        self.harness.draft_tag = tag
         self.harness.adapter = _GuardedAdapter(self, app.harness.adapter)
         self.harness.audit_log = _TableAudit(self, app.harness.audit_log)
         self.harness.decision_observer = self.observe
@@ -464,6 +482,14 @@ class TableApp:
         self.jobs = set()
         self.session_id = secrets.token_hex(12)
         self.revision = 0
+        self.object_text = ""
+        self.object_notice = None
+        self.deferred_ask = None
+        self._handback_ready = False
+        self._last_record = None
+        self._last_released = False
+        self._last_revision = 0
+        self.pages = {}
         # Separate from turn revisions, which reset with each conversation.
         # Milliseconds fit exactly in browser integers and order server restarts.
         self.mode_revision = time.time_ns() // 1_000_000
@@ -474,7 +500,8 @@ class TableApp:
                          "lights_enabled": False, "lights_remember": False,
                          "voice_slots": {}, "locale": "",
                          "declared_preferences": {}, "humour_grief": False,
-                         "language_style": "match"}
+                         "language_style": "match", "house_name": "", "room": "",
+                         "presentation_overrides": {}}
         self.key = ""
         self.voice_key = ""
         self.lights_key = ""
@@ -500,7 +527,101 @@ class TableApp:
         return {"seated": None, "assist": None, "state": "idle",
                 "presentation": self.settings["presentation"], "turn_count": 0,
                 "session_id": self.session_id, "revision": self.revision,
+                **self._extras_state(),
                 **self._mode_state()}
+
+    def _presentation_for(self, persona):
+        return self.settings["presentation_overrides"].get(persona, self.settings["presentation"])
+
+    def _name_for(self, persona):
+        return self.roster[persona].name_for(
+            self._presentation_for(persona), self.settings["chosen_names"].get(persona))[0]
+
+    def _ask_control(self, persona, key):
+        name = self._name_for(persona)
+        return {"persona": persona,
+                "label": HARNESS_LINES_EN[key].format(Asked=name, Assist=name, Name=name),
+                "text": f"Could I talk to {name}?"}
+
+    def _extras_state(self):
+        """Only explicit controls and the already returned record feed the display."""
+        record = self._last_record or {}
+        seated = record.get("agent_id")
+        eligible = eligible_agents(record)
+        handback = (self._ask_control(self.deferred_ask, "handback_offer")
+                    if self._handback_ready and self.deferred_ask in eligible
+                    and self.deferred_ask != seated else None)
+        assist = record.get("assist_agent_id")
+        slip = (self._ask_control(assist, "assist_offer")
+                if seated and assist in self.roster else None)
+        opinions = []
+        # The standing held-turn limit is shared across the optional house
+        # offers; the always-available handback and assist use those slots first.
+        opinion_limit = max(0, 2 - bool(handback) - bool(slip)) if record.get("held") else 3
+        if self._last_released and opinion_limit:
+            for persona in eligible:
+                if persona in self.roster and persona != seated:
+                    line = HARNESS_LINES_EN["second_opinion"].format(Name=self._name_for(persona))
+                    opinions.append({"persona": persona, "label": line, "text": line,
+                                     "source_revision": self._last_revision,
+                                     "source_session": self.session_id})
+                if len(opinions) == opinion_limit:
+                    break
+        if self._last_revision in self.pages:
+            opinions = copy.deepcopy(self.pages[self._last_revision][2])
+        return {"house_name": self.settings["house_name"],
+                "presentation_overrides": dict(self.settings["presentation_overrides"]),
+                "chosen_names": dict(self.settings["chosen_names"]),
+                "deferred_ask": self.deferred_ask, "handback": handback,
+                "assist_offer": slip, "second_opinions": opinions,
+                "object_text": self.object_text, "object_notice": self.object_notice}
+
+    @staticmethod
+    def _one_line(value, limit, label):
+        if (not isinstance(value, str) or len(value) > limit
+                or any(unicodedata.category(char) in {"Cc", "Zl", "Zp"} for char in value)):
+            raise InputError(HARNESS_LINES_EN["t2_one_line"].format(label=label, limit=limit))
+        return value.strip()
+
+    def set_object(self, text):
+        with self.lock:
+            if self.state["state"] == "card":
+                return {"object_text": "", "object_notice": None, "state": dict(self.state)}
+            if not isinstance(text, str):
+                raise InputError(HARNESS_LINES_EN["t2_one_line"].format(label="Object on the table", limit=60))
+            # The public pure crisis screen checks this declaration alone. It
+            # never advances or annotates the real policy session.
+            if crisis_screen(text).read != "MISS":
+                self.object_text = ""
+                self.object_notice = HARNESS_LINES_EN["object_refused"]
+            else:
+                value = self._one_line(text, 60, "Object on the table")
+                if self._has_key(value):
+                    raise InputError("Keep keys in the key field, outside the conversation.")
+                self.object_text, self.object_notice = value, None
+            self.state.update(self._extras_state())
+            return {"object_text": self.object_text, "object_notice": self.object_notice,
+                    "state": dict(self.state)}
+
+    def made_page(self, path):
+        """Serve an already released turn, never text supplied by a browser."""
+        with self.lock:
+            prefix = "/api/pages/" + self.session_id + "/"
+            index = path[len(prefix):] if path.startswith(prefix) else ""
+            saved = self.pages.get(int(index)) if re.fullmatch(r"[0-9]{1,20}", index) else None
+            if not saved or self.state["state"] == "card":
+                return None
+            turn, name, _ = saved
+            if not turn.released or not turn.persona_text or self._contains_key((turn.persona_text, name)):
+                return None
+            return ("<!doctype html><html lang=\"en\"><meta charset=\"utf-8\">"
+                    "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">"
+                    "<title>" + html.escape(name) + "</title>"
+                    "<link rel=\"stylesheet\" href=\"/static/table.css\">"
+                    "<main class=\"made-page\"><p class=\"byline\">" + html.escape(name) + "</p>"
+                    "<pre class=\"made-text\">" + html.escape(turn.persona_text) + "</pre>"
+                    "<footer>" + html.escape(HARNESS_LINES_EN["made_page_footer"])
+                    + "</footer></main></html>").encode("utf-8")
 
     def _shell_state(self):
         """The mode, which an unpaired device may see: it is shell status, and
@@ -525,8 +646,8 @@ class TableApp:
         # Operator-circle mode no longer silences the voice (ruling 6 of
         # 3 October 2026); the released kinds decide, in _finish_job.
         return bool(self.settings["voice_enabled"] and self.voice_key
-                    and any(slots[self.settings["presentation"]]
-                            for slots in self.settings["voice_slots"].values()))
+                    and any(slots[self._presentation_for(persona)]
+                            for persona, slots in self.settings["voice_slots"].items()))
 
     def _lights_key(self):
         with self.lock:
@@ -679,7 +800,7 @@ class TableApp:
             # Presentation is visit-only in the current push, including when
             # loading a settings file written by an older Talking Table.
             settings = self._validate_settings({k: v for k, v in saved_settings.items()
-                                                if k not in ("presentation", "chosen_names")})
+                                                if k not in ("presentation", "chosen_names", *REMEMBERED_EXTRAS)})
             # Each key has its own opt-in; remembering one cannot save or
             # restore either of the other credentials.
             keys = {}
@@ -707,7 +828,7 @@ class TableApp:
             saved = json.loads(self.preferences_path.read_text(encoding="utf-8"))
             if not isinstance(saved, dict) or set(saved) - {
                     "declared_preferences", "humour_grief", "language_style",
-                    "presentation", "chosen_names"}:
+                    "presentation", "chosen_names", *REMEMBERED_EXTRAS}:
                 raise InputError("Saved presentation settings could not be accepted.")
             settings = self._validate_settings(saved)
             if self._contains_key(settings):
@@ -731,6 +852,20 @@ class TableApp:
                 result[name] = value.strip()
         if result["adapter"] not in FAMILIES or result["presentation"] not in PRESENTATIONS:
             raise InputError("Choose a listed model family and presentation.")
+        if "house_name" in proposed:
+            result["house_name"] = self._one_line(proposed["house_name"], 40, "The table's name")
+        if "room" in proposed:
+            room = proposed["room"]
+            if not isinstance(room, str) or room not in {"", *ROOM_LINES}:
+                raise InputError(HARNESS_LINES_EN["t2_room_invalid"])
+            result["room"] = room
+        if "presentation_overrides" in proposed:
+            overrides = proposed["presentation_overrides"]
+            if (not isinstance(overrides, dict) or set(overrides) - set(self.roster)
+                    or any(not isinstance(value, str) or value not in PRESENTATIONS
+                           for value in overrides.values())):
+                raise InputError(HARNESS_LINES_EN["t2_override_invalid"])
+            result["presentation_overrides"] = dict(overrides)
         if "locale" in proposed:
             # The country for the crisis card's resource line (the operator's
             # answer 10 of 12, 4 October 2026). Declared here, never inferred;
@@ -836,11 +971,12 @@ class TableApp:
         return Harness(self.roster, adapter, CodexStore(ROOT / "docs" / "codex"),
                        audit_log=AuditLog(self.audit_path),
                        locale=setting["locale"] or None,
-                       presentation={name: setting["presentation"] for name in self.roster},
+                       presentation={name: self._presentation_for(name) for name in self.roster},
                        chosen_names=setting["chosen_names"],
                        declared_preferences=setting["declared_preferences"],
                        humour_grief=setting["humour_grief"],
                        language_style=setting["language_style"],
+                       room=setting["room"] or None,
                        operator_circle=setting["operator_circle"])
 
     def config(self, local=True):
@@ -854,6 +990,9 @@ class TableApp:
             return {
                 "settings": settings,
                 "roster": [{"id": p.id, "plate": p.plate, "one_line": p.one_line,
+                            "domains": sorted(p.domains), "modes": sorted(p.modes),
+                            "contraindications": sorted(p.contraindications),
+                            "handoffs": dict(p.handoffs),
                             "names": {v: p.name_for(v, self.settings["chosen_names"].get(p.id))
                                       for v in sorted(PRESENTATIONS)}} for p in self.roster.values()],
                 "storage": (
@@ -875,6 +1014,9 @@ class TableApp:
                 "local": local,
                 "sigils_available": (STATIC / "sigils.html").is_file(),
                 "presentation_previews": self.presentation_previews(),
+                "t2_copy": {key: HARNESS_LINES_EN[key] for key in (
+                    "room_note", "handback_offer", "assist_offer", "second_opinion",
+                    "made_page_footer", "object_refused")},
                 "resource": resources(self.settings["locale"] or None),
                 "state": dict(self.state),
             }
@@ -910,7 +1052,7 @@ class TableApp:
                 # never beside any encrypted credential blob.
                 saved = {"settings": {k: copy.deepcopy(v) for k, v in settings.items()
                                       if k not in ("presentation", "chosen_names", "declared_preferences",
-                                                   "humour_grief", "language_style")}}
+                                                   "humour_grief", "language_style", *REMEMBERED_EXTRAS)}}
                 for secret, flag, blob_name in ((key, "remember", "key_blob"),
                                                 (voice_key, "voice_remember", "voice_key_blob"),
                                                 (lights_key, "lights_remember", "lights_key_blob")):
@@ -935,6 +1077,9 @@ class TableApp:
                 preference_payload = {key: settings[key] for key in (
                     "declared_preferences", "humour_grief", "language_style",
                     "presentation", "chosen_names")}
+                # Preserve the T1 file shape when every T2 control is unset.
+                preference_payload.update({key: settings[key] for key in REMEMBERED_EXTRAS
+                                           if settings[key]})
                 preferences_payload = json.dumps(preference_payload)
             self._persist_settings(settings_payload, preferences_payload)
             self.settings = settings
@@ -956,6 +1101,8 @@ class TableApp:
             self.harness.turns = previous.turns
             self.mode_revision += 1
             self.state["presentation"] = settings["presentation"]
+            if self.state["state"] != "card":
+                self.state.update(self._extras_state())
             self.state.update(self._mode_state())
             return self.config()
 
@@ -1000,19 +1147,54 @@ class TableApp:
                 self.lights_key = ""
             self.settings["presentation"] = "as_written"
             self.settings["chosen_names"] = {}
+            self.settings["presentation_overrides"] = {}
+            self.object_text, self.object_notice = "", None
+            self.deferred_ask = None
+            self._handback_ready = False
+            self._last_record = None
+            self._last_released = False
+            self._last_revision = 0
+            self.pages.clear()
             self.harness = harness if harness is not None else self._build_harness()
             self.mode_revision += 1
             self.state = self._idle_state()
             self.lights.submit(None, "idle")
             return self.config()
 
-    def turn(self, text):
+    def _control_error(self, text, action, target, source_revision, source_session):
+        if action is None and target is None and source_revision is None and source_session is None:
+            return None
+        if (not isinstance(action, str) or action not in ("ask", "handback", "assist", "second_view")
+                or not isinstance(target, str) or target not in self.roster):
+            return HARNESS_LINES_EN["t2_control_unavailable"]
+        if action == "ask":
+            expected = f"Could I talk to {self._name_for(target)}?"
+        else:
+            fields = self._extras_state()
+            choices = (fields["second_opinions"] if action == "second_view" else
+                       [fields["handback" if action == "handback" else "assist_offer"]])
+            if action == "second_view" and (source_revision is not None or source_session is not None):
+                if (type(source_revision) is not int or source_session != self.session_id
+                        or source_revision not in self.pages):
+                    return HARNESS_LINES_EN["t2_control_unavailable"]
+                choices = self.pages[source_revision][2]
+            match = next((choice for choice in choices if choice and choice["persona"] == target), None)
+            if match is None or self.state["state"] == "card":
+                return HARNESS_LINES_EN["t2_control_unavailable"]
+            expected = match["text"]
+        return None if text == expected else HARNESS_LINES_EN["t2_control_unchanged"]
+
+    def turn(self, text, *, tag="", action=None, target=None,
+             source_revision=None, source_session=None):
         # Transport/type limits are needed to obtain text. Content checks happen
         # only AFTER the unchanged harness has run the policy gate on that text.
         if not isinstance(text, str):
             raise InputError("Write a message of 1 to 16000 characters.")
         with self.lock:
-            job = _TurnJob(self, text)
+            tag_valid = isinstance(tag, str) and tag in DRAFT_TAGS
+            # Bad metadata never prevents the raw message's crisis gate.
+            control_error = self._control_error(text, action, target, source_revision, source_session)
+            job = _TurnJob(self, text, tag=tag if tag_valid else "", action=action, target=target)
             threading.Thread(target=job.run, daemon=True, name="table-turn").start()
             job.ready.wait()
             if job.error:
@@ -1025,11 +1207,18 @@ class TableApp:
                     job.admitted.set()
                     raise InputError("Write a message of 1 to 16000 characters." if invalid else
                                      "Keep keys in the key field, outside the conversation.")
+                if not tag_valid or control_error:
+                    job.cancelled.set()
+                    job.admitted.set()
+                    raise InputError(control_error or HARNESS_LINES_EN["t2_tag_invalid"])
             self._cancel_jobs()
             self.revision += 1
             job.revision = self.revision
             self.jobs.add(job)
             job.accepted = True
+            if not job.gate and action == "handback":
+                self.deferred_ask = None
+                self._handback_ready = False
             # Commit only the routed session, before any optional model call.
             # Preserve identity for settings/session consumers. Completion must
             # never copy an old session back over a newer crisis latch.
@@ -1067,6 +1256,21 @@ class TableApp:
         receipt = job.receipt or decision_receipt({
             "action": turn.action, "decision": public_decision,
             "release_reason": turn.release_reason}, {})
+        if not gate:
+            declared = (job.target if job.action in {"ask", "assist"} else
+                        asked_agent(turn.decision, self.roster))
+            if declared and declared != persona:
+                self.deferred_ask = declared
+                self._handback_ready = False
+            elif self.deferred_ask == persona:
+                self.deferred_ask = None
+                self._handback_ready = False
+            else:
+                self._handback_ready = True
+            self._last_record = turn.decision
+            self._last_released = turn.released
+            self._last_revision = job.revision
+            self.object_notice = None
         self.state = {"seated": persona, "assist": assist, "state": state,
                       "presentation": self.settings["presentation"],
                       "turn_count": self.harness.session.turn_count,
@@ -1074,6 +1278,7 @@ class TableApp:
                       "receipt": receipt, "card": turn.text if gate else None,
                       "card_revision": job.revision if gate else None,
                       "decision": public_decision if gate else None,
+                      **({} if gate else self._extras_state()),
                       **self._mode_state()}
         self.harness.transcript.extend(self._redact(job.harness.transcript[-1:]))
         # The turn before this one on the screen; a superseded turn never got there.
@@ -1096,20 +1301,27 @@ class TableApp:
             "effort_contract": (not gate and turn.released
                                 and turn.declared_preferences.get("pace") == "one_step"),
             "action": turn.action, "adapter_calls": turn.adapter_calls,
-            "display_name": self.roster[persona].name_for(
-                self.settings["presentation"], self.settings["chosen_names"].get(persona)
-            )[0] if persona else None,
+            "display_name": self._name_for(persona) if persona else None,
             "presentation": self.settings["presentation"],
             "cultural_only": cultural,
             "notice": None if gate else turn.notice,
             "state": dict(self.state), "release_reason": turn.release_reason,
             "speech_token": None,
         }
+        if not gate:
+            result.update(self._extras_state())
+            result["tag"] = job.harness.draft_tag
+            result["second_view"] = bool(turn.released and job.action == "second_view")
+            result["ask_acknowledgement"] = turn.ask_acknowledgement
+            if turn.released:
+                self.pages[job.revision] = (turn, result["display_name"],
+                                            copy.deepcopy(result["second_opinions"]))
+                result["page_url"] = f"/api/pages/{self.session_id}/{job.revision}"
         # The capability names an already released, audited character reply.
         # The browser never supplies text or a character to the speech engine.
         text = self._speech_text(turn, previous) if kind == "reply" else None
         if text is not None and self._voice_ready() and persona in self.roster:
-            voice_id = self.settings["voice_slots"][persona][self.settings["presentation"]]
+            voice_id = self.settings["voice_slots"][persona][self._presentation_for(persona)]
             if voice_id and not self._contains_key(text):
                 token = secrets.token_urlsafe(32)
                 self.speech_tokens[token] = (self._speech_snapshot(), voice_id, text, False)
@@ -1443,6 +1655,12 @@ class Handler(BaseHTTPRequestHandler):
         elif path == "/api/resources":
             with app.lock:
                 self._send(200, resources(app.settings["locale"] or None))
+        elif path.startswith("/api/pages/"):
+            page = app.made_page(path)
+            if page is None:
+                self._send(404, {"error": HARNESS_LINES_EN["t2_page_missing"]})
+            else:
+                self._send(200, page, "text/html; charset=utf-8")
         elif path in ("/", "/sigils.html") or path.startswith("/static/"):
             relative = ("index.html" if path == "/" else "sigils.html" if path == "/sigils.html"
                         else urllib.parse.unquote(path[8:]))
@@ -1497,7 +1715,12 @@ class Handler(BaseHTTPRequestHandler):
             if not isinstance(payload, dict):
                 raise InputError("Send a JSON object.")
             if path == "/api/turn":
-                self._send(200, app.turn(payload.get("text")))
+                self._send(200, app.turn(payload.get("text"), tag=payload.get("tag", ""),
+                                         action=payload.get("action"), target=payload.get("target"),
+                                         source_revision=payload.get("source_revision"),
+                                         source_session=payload.get("source_session")))
+            elif path == "/api/object":
+                self._send(200, app.set_object(payload.get("text")))
             elif path == "/api/voice":
                 self._send(200, app.voice(payload), "audio/mpeg")
             elif path == "/api/presentation/preview":

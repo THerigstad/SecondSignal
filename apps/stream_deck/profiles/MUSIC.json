@@ -1,0 +1,310 @@
+{
+  "id": "music",
+  "name": "MUSIC",
+  "uuid": "B4542207-4890-5A9F-B5C9-440701F45FF7",
+  "home": "main",
+  "companions": [
+    "TESTING.json",
+    "BUILDING.json"
+  ],
+  "pages": [
+    {
+      "id": "main",
+      "name": "Page one",
+      "keys": [
+        {
+          "id": "reason",
+          "title": "Reason",
+          "kind": "open",
+          "target": "PLACEHOLDER: Reason program, file or folder path",
+          "position": [
+            0,
+            0
+          ]
+        },
+        {
+          "id": "recycle",
+          "title": "Recycle",
+          "kind": "open",
+          "target": "PLACEHOLDER: Recycle program, file or folder path",
+          "position": [
+            1,
+            0
+          ]
+        },
+        {
+          "id": "suno",
+          "title": "Suno",
+          "kind": "website",
+          "target": "PLACEHOLDER: Suno address",
+          "position": [
+            2,
+            0
+          ]
+        },
+        {
+          "id": "landr",
+          "title": "Landr",
+          "kind": "website",
+          "target": "PLACEHOLDER: Landr address",
+          "position": [
+            3,
+            0
+          ]
+        },
+        {
+          "id": "to_reason",
+          "title": "To Reason profile",
+          "kind": "switch",
+          "target": "reason",
+          "position": [
+            4,
+            0
+          ]
+        },
+        {
+          "id": "vandal_bot",
+          "title": "Vandal",
+          "kind": "website",
+          "target": "PLACEHOLDER: Vandal address",
+          "position": [
+            0,
+            1
+          ]
+        },
+        {
+          "id": "calen_bot",
+          "title": "Calen",
+          "kind": "website",
+          "target": "PLACEHOLDER: Calen address",
+          "position": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "trio_office",
+          "title": "Trio Office",
+          "kind": "open",
+          "target": "PLACEHOLDER: Trio Office program, file or folder path",
+          "position": [
+            2,
+            1
+          ]
+        },
+        {
+          "id": "bandcamp",
+          "title": "Bandcamp",
+          "kind": "website",
+          "target": "PLACEHOLDER: Bandcamp address",
+          "position": [
+            3,
+            1
+          ]
+        },
+        {
+          "id": "soundcloud",
+          "title": "SoundCloud",
+          "kind": "website",
+          "target": "PLACEHOLDER: SoundCloud address",
+          "position": [
+            4,
+            1
+          ]
+        },
+        {
+          "id": "music_ground",
+          "title": "GROUND",
+          "kind": "open",
+          "target": "PLACEHOLDER: GROUND program, file or folder path",
+          "position": [
+            0,
+            2
+          ]
+        },
+        {
+          "id": "velour_youtube",
+          "title": "Music YouTube",
+          "kind": "website",
+          "target": "PLACEHOLDER: Music YouTube address",
+          "position": [
+            1,
+            2
+          ]
+        },
+        {
+          "id": "velour_core_international",
+          "title": "Music website",
+          "kind": "website",
+          "target": "PLACEHOLDER: Music website address",
+          "position": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "fourthwall",
+          "title": "Fourthwall",
+          "kind": "website",
+          "target": "PLACEHOLDER: Fourthwall address",
+          "position": [
+            3,
+            2
+          ]
+        },
+        {
+          "id": "more",
+          "title": "More",
+          "kind": "folder",
+          "target": "more",
+          "position": [
+            4,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "id": "more",
+      "name": "Page two",
+      "keys": [
+        {
+          "id": "spotify",
+          "title": "Spotify",
+          "kind": "website",
+          "target": "PLACEHOLDER: Spotify address",
+          "position": [
+            1,
+            0
+          ]
+        },
+        {
+          "id": "youtube",
+          "title": "YouTube",
+          "kind": "website",
+          "target": "PLACEHOLDER: YouTube address",
+          "position": [
+            2,
+            0
+          ]
+        },
+        {
+          "id": "dictation",
+          "title": "Dictation",
+          "kind": "hotkey",
+          "target": "Windows+H",
+          "position": [
+            3,
+            0
+          ]
+        },
+        {
+          "id": "mic_mute",
+          "title": "Mic mute",
+          "kind": "reserved",
+          "position": [
+            4,
+            0
+          ]
+        },
+        {
+          "id": "to_testing",
+          "title": "To TESTING",
+          "kind": "switch",
+          "target": "testing",
+          "position": [
+            0,
+            1
+          ]
+        },
+        {
+          "id": "empty_1_1",
+          "title": "",
+          "kind": "empty",
+          "position": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "empty_2_1",
+          "title": "",
+          "kind": "empty",
+          "position": [
+            2,
+            1
+          ]
+        },
+        {
+          "id": "empty_3_1",
+          "title": "",
+          "kind": "empty",
+          "position": [
+            3,
+            1
+          ]
+        },
+        {
+          "id": "empty_4_1",
+          "title": "",
+          "kind": "empty",
+          "position": [
+            4,
+            1
+          ]
+        },
+        {
+          "id": "empty_0_2",
+          "title": "",
+          "kind": "empty",
+          "position": [
+            0,
+            2
+          ]
+        },
+        {
+          "id": "empty_1_2",
+          "title": "",
+          "kind": "empty",
+          "position": [
+            1,
+            2
+          ]
+        },
+        {
+          "id": "empty_2_2",
+          "title": "",
+          "kind": "empty",
+          "position": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "empty_3_2",
+          "title": "",
+          "kind": "empty",
+          "position": [
+            3,
+            2
+          ]
+        },
+        {
+          "id": "empty_4_2",
+          "title": "",
+          "kind": "empty",
+          "position": [
+            4,
+            2
+          ]
+        }
+      ]
+    }
+  ],
+  "external_profiles": {
+    "reason": {
+      "uuid": "PLACEHOLDER: imported Reason profile UUID",
+      "name": "Purchased Reason profile"
+    }
+  }
+}

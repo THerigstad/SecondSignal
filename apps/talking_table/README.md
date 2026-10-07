@@ -114,6 +114,75 @@ Presentation and chosen names are remembered across restarts under the Remember
 switch, like the other remembered settings, and never beside a key (idea-list
 item 13, ruled 5 October 2026).
 
+### Table kit two
+
+The presentation control carries the operator's onboarding sentence: “You can
+pick how everyone sounds. Who speaks is picked for your safety, and you'll
+always be told why.” Each character also has an override: as written, women,
+men, neither, or follow the table. Overrides use the existing profile name and
+presentation forms for prompts, plates, Decision Cards and biographies, and are
+remembered with the table setting under **Remember**. With no override the
+existing presentation lifecycle stays the same.
+
+Tap a name plate on the Table or phone page for its **Seat biography**: domains,
+modes, contraindications and the handoffs explicitly recorded in that profile.
+These words come from the loaded profile, never a model. Both name forms remain
+on the plate; the panel uses the active presentation's name.
+
+The ask acknowledgement has a strict evidence boundary: it attaches before a
+seated reply only if the returned record identifies the asked character and a
+different seated character. Its reason comes from the record alone. The supplied
+policy has no named-character-ask field, so ordinary message text cannot produce
+this line today; the missing field is recorded in the limitations and build log.
+Explicit character-request controls can save a deferred ask for this sitting.
+On a later turn, **Want {Asked} back now?** appears only when that character is
+eligible and has not been seated; its plate has a quiet saved mark. Tapping it
+sends **Could I talk to {Asked}?** through the ordinary pipeline. The offer clears
+on tap, when the character sits, or on **New session**. A typed name is never
+silently converted into this declared control state.
+
+**What do you call your table?** accepts one plain-text line of at most forty
+characters. It is the idle and phone-page heading and is remembered only under
+**Remember**. It never enters a model prompt, receipt or audit row. **Which room
+are you in?** offers none, Workshop, Parlor, Studio and Yard, with “You picked the
+room; the house still picks the chair.” The selected room is remembered under
+the same switch and adds its fixed working-style instruction to seated prompts.
+
+An assist already named by the decision record produces the house's narrow
+**{Assist} can be asked, too.** slip under the seated plate. Tapping it sends the
+same phone-page ask text as a new turn; merely showing the slip adds nothing to
+the prompt and calls no second model. The policy still decides the next seat.
+
+**Object on the table** accepts one line of at most sixty characters for the
+sitting. The policy's public crisis screen checks the object on its own before
+acceptance. A line that alarms is cleared with “That line belongs in the message,
+not on the table.” Accepted text appears below the seated name and in one prompt
+line, never in the routed message, remembered settings or sanitized receipt.
+**New session** clears it. A composer tag—plan, letter, verse, list, unsent or
+none—applies to the next submitted message only, appears on that turn, and adds
+one fixed prompt line. Rooms, tags and the object change how a seated character
+works, never who sits.
+
+When Cody or Seren is seated, **Start a 25-minute sprint** opens a quiet shutter
+with remaining time, **Pause** and **Stop**. The clock lives in the browser;
+no request carries it. The object field stays visible while messages continue
+through normal routing. A sidetrack can seat another character. The sprint ends
+without a sound, alarm, streak or points.
+
+Every released character reply has **Open as a page**. It opens a printable,
+saveable page containing only that released character text, its presentation
+name as byline and the house footer “Written with a seated companion, not a
+professional.” The server reads the released turn; the browser never posts the
+reply text back. Up to three **What would {Name} add?** controls are drawn from
+other eligible candidates on that turn. Held turns share a two-offer limit across
+hand-back, assist and second-view controls. Earlier replies retain their own
+eligibility and presentation names. They submit exactly those words as a
+new turn, labelled **a second view**, with one policy-selected voice per reply.
+
+A crisis card suppresses these extras. The only T2 addition on a card turn is
+the nameless first-layer Decision Card receipt: “The house held the floor. No
+character saw this message.” The model is never called for that turn.
+
 ### Low-demand view and Resources
 
 **Low-demand view** asks for no diagnosis. It puts the current reply, its speaker

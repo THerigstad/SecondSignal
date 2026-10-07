@@ -1,0 +1,448 @@
+{
+  "id": "testing",
+  "name": "TESTING SECONDSIGNAL",
+  "uuid": "FBA052D1-8F52-540E-9D31-9408612A2374",
+  "home": "main",
+  "companions": [
+    "BUILDING.json",
+    "MUSIC.json"
+  ],
+  "pages": [
+    {
+      "id": "main",
+      "name": "Page one",
+      "keys": [
+        {
+          "id": "start_table",
+          "title": "Start the Table",
+          "kind": "open",
+          "target": "PLACEHOLDER: Start the Table program, file or folder path",
+          "position": [
+            0,
+            0
+          ]
+        },
+        {
+          "id": "vandal",
+          "title": "Vandal",
+          "kind": "ask",
+          "character": "vandal",
+          "position": [
+            1,
+            0
+          ]
+        },
+        {
+          "id": "willow",
+          "title": "Willow",
+          "kind": "ask",
+          "character": "willow",
+          "position": [
+            2,
+            0
+          ]
+        },
+        {
+          "id": "cody",
+          "title": "Cody",
+          "kind": "ask",
+          "character": "cody",
+          "position": [
+            3,
+            0
+          ]
+        },
+        {
+          "id": "stop",
+          "title": "STOP",
+          "kind": "text",
+          "enter": true,
+          "target": "Stop. Hold.",
+          "position": [
+            4,
+            0
+          ]
+        },
+        {
+          "id": "to_building",
+          "title": "To BUILDING",
+          "kind": "switch",
+          "target": "building",
+          "position": [
+            0,
+            1
+          ]
+        },
+        {
+          "id": "seren",
+          "title": "Seren",
+          "kind": "ask",
+          "character": "seren",
+          "position": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "rowan",
+          "title": "Rowan",
+          "kind": "ask",
+          "character": "rowan",
+          "position": [
+            2,
+            1
+          ]
+        },
+        {
+          "id": "nikki",
+          "title": "Nikki",
+          "kind": "ask",
+          "character": "nikki",
+          "position": [
+            3,
+            1
+          ]
+        },
+        {
+          "id": "ellis",
+          "title": "Ellis",
+          "kind": "ask",
+          "character": "ellis",
+          "position": [
+            4,
+            1
+          ]
+        },
+        {
+          "id": "ground",
+          "title": "GROUND",
+          "kind": "open",
+          "target": "PLACEHOLDER: GROUND program, file or folder path",
+          "position": [
+            0,
+            2
+          ]
+        },
+        {
+          "id": "its_in",
+          "title": "It's in",
+          "kind": "text",
+          "enter": true,
+          "target": "A return landed in the kit folder. Run the full landing check now, not a glance: name the job from the file name, check the folder against everything I was handed and name anything still missing, then verify the return against its order item by item. Grade it A or F, grade first. A means every item and sub-item answered in full, the end line present, nothing cut, restarted or duplicated, nothing read by search where the order said read whole, every check answered with a verdict, no model describing itself, my own words and byline untouched, and nothing about me that does not belong in the repo. Anything less is an F; there is no third grade. On an F, say in this same message exactly what is missing or wrong and the exact line I paste back into the model's thread, before anything else moves. Then one line of what I still owe, and one next action. Do not take my impression of 'done' as the grade. This is a check, not a go: nothing lands on the repo from this message.",
+          "position": [
+            1,
+            2
+          ]
+        },
+        {
+          "id": "plan",
+          "title": "Plan",
+          "kind": "open",
+          "target": "PLACEHOLDER: Plan program, file or folder path",
+          "position": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "new_session",
+          "title": "New session",
+          "kind": "open",
+          "target": "@reset",
+          "position": [
+            3,
+            2
+          ]
+        },
+        {
+          "id": "more",
+          "title": "More",
+          "kind": "folder",
+          "target": "more",
+          "position": [
+            4,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "id": "more",
+      "name": "Page two",
+      "keys": [
+        {
+          "id": "repo",
+          "title": "Repo",
+          "kind": "website",
+          "target": "PLACEHOLDER: Repo address",
+          "position": [
+            1,
+            0
+          ]
+        },
+        {
+          "id": "checks",
+          "title": "Checks",
+          "kind": "website",
+          "target": "PLACEHOLDER: Checks address",
+          "position": [
+            2,
+            0
+          ]
+        },
+        {
+          "id": "commits",
+          "title": "Commits",
+          "kind": "website",
+          "target": "PLACEHOLDER: Commits address",
+          "position": [
+            3,
+            0
+          ]
+        },
+        {
+          "id": "table_page",
+          "title": "Table page",
+          "kind": "website",
+          "target": "PLACEHOLDER: Table page address",
+          "position": [
+            4,
+            0
+          ]
+        },
+        {
+          "id": "claude",
+          "title": "Claude",
+          "kind": "open",
+          "target": "PLACEHOLDER: Claude program, file or folder path",
+          "position": [
+            0,
+            1
+          ]
+        },
+        {
+          "id": "codex",
+          "title": "Codex",
+          "kind": "open",
+          "target": "PLACEHOLDER: Codex program, file or folder path",
+          "position": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "grok",
+          "title": "Grok",
+          "kind": "website",
+          "target": "PLACEHOLDER: Grok address",
+          "position": [
+            2,
+            1
+          ]
+        },
+        {
+          "id": "meters",
+          "title": "Meters",
+          "kind": "folder",
+          "target": "meters",
+          "position": [
+            3,
+            1
+          ]
+        },
+        {
+          "id": "flag_turn",
+          "title": "Flag this turn",
+          "kind": "reserved",
+          "position": [
+            4,
+            1
+          ]
+        },
+        {
+          "id": "dictation",
+          "title": "Dictation",
+          "kind": "hotkey",
+          "target": "Windows+H",
+          "position": [
+            0,
+            2
+          ]
+        },
+        {
+          "id": "screenshot",
+          "title": "Screenshot",
+          "kind": "hotkey",
+          "target": "Windows+Shift+S",
+          "position": [
+            1,
+            2
+          ]
+        },
+        {
+          "id": "clipboard",
+          "title": "Clipboard",
+          "kind": "hotkey",
+          "target": "Windows+V",
+          "position": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "mic_mute",
+          "title": "Mic mute",
+          "kind": "reserved",
+          "position": [
+            3,
+            2
+          ]
+        },
+        {
+          "id": "lights_check",
+          "title": "Lights check",
+          "kind": "reserved",
+          "position": [
+            4,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "id": "meters",
+      "name": "Meters",
+      "keys": [
+        {
+          "id": "claude_usage",
+          "title": "Claude usage",
+          "kind": "website",
+          "target": "PLACEHOLDER: Claude usage address",
+          "position": [
+            1,
+            0
+          ]
+        },
+        {
+          "id": "chatgpt_usage",
+          "title": "ChatGPT usage",
+          "kind": "open",
+          "target": "PLACEHOLDER: ChatGPT usage program, file or folder path",
+          "position": [
+            2,
+            0
+          ]
+        },
+        {
+          "id": "grok_usage",
+          "title": "Grok usage",
+          "kind": "website",
+          "target": "PLACEHOLDER: Grok usage address",
+          "position": [
+            3,
+            0
+          ]
+        },
+        {
+          "id": "empty_4_0",
+          "title": "",
+          "kind": "empty",
+          "position": [
+            4,
+            0
+          ]
+        },
+        {
+          "id": "empty_0_1",
+          "title": "",
+          "kind": "empty",
+          "position": [
+            0,
+            1
+          ]
+        },
+        {
+          "id": "empty_1_1",
+          "title": "",
+          "kind": "empty",
+          "position": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "empty_2_1",
+          "title": "",
+          "kind": "empty",
+          "position": [
+            2,
+            1
+          ]
+        },
+        {
+          "id": "empty_3_1",
+          "title": "",
+          "kind": "empty",
+          "position": [
+            3,
+            1
+          ]
+        },
+        {
+          "id": "empty_4_1",
+          "title": "",
+          "kind": "empty",
+          "position": [
+            4,
+            1
+          ]
+        },
+        {
+          "id": "empty_0_2",
+          "title": "",
+          "kind": "empty",
+          "position": [
+            0,
+            2
+          ]
+        },
+        {
+          "id": "empty_1_2",
+          "title": "",
+          "kind": "empty",
+          "position": [
+            1,
+            2
+          ]
+        },
+        {
+          "id": "empty_2_2",
+          "title": "",
+          "kind": "empty",
+          "position": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "empty_3_2",
+          "title": "",
+          "kind": "empty",
+          "position": [
+            3,
+            2
+          ]
+        },
+        {
+          "id": "empty_4_2",
+          "title": "",
+          "kind": "empty",
+          "position": [
+            4,
+            2
+          ]
+        }
+      ]
+    }
+  ]
+}

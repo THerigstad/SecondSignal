@@ -718,7 +718,7 @@ def test_the_javascript_voice_suites_pass_offline():
     node = shutil.which("node")
     assert node, "Node is required for the offline browser contract tests (no skipped tests)"
     files = sorted((server.STATIC.parent / "tests_js").glob("*.mjs"))
-    assert len(files) == 4  # Order T1, 2026-10-05: 2 -> 4 JavaScript suite files.
+    assert len(files) == 5  # Order T2, 2026-10-06: 4 -> 5 JavaScript suite files.
     # Ask for the TAP reporter by name: Node 24's default reporter prints no
     # "# fail" summary line when stdout is not a terminal (found 5 October 2026
     # by a Codex build on the operator's PC).

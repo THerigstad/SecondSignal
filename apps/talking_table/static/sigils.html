@@ -46,22 +46,24 @@ body[data-state=card]{background:#FFFFFF}body[data-state=card] #notice{border-bo
 #phone-resources-open{position:fixed;right:max(16px,env(safe-area-inset-right));bottom:max(16px,env(safe-area-inset-bottom));z-index:2;background:#FFFFFF;box-shadow:0 2px 8px #25282314}dialog{color:var(--charcoal);background:var(--ivory);border:1px solid var(--edge);border-radius:6px;padding:20px;max-width:560px;width:calc(100% - 32px);max-height:85svh}dialog::backdrop{background:#25282355}dialog h2{font-size:20px;margin:0}dialog .dialog-heading{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:16px}#phone-resource-line{white-space:pre-wrap}#phone-resource-actions{display:flex;flex-direction:column;align-items:flex-start;gap:8px;margin-top:16px}#phone-resource-actions a{color:inherit;display:inline-flex;align-items:center;min-height:44px;text-underline-offset:4px}#phone-resource-status{margin-top:12px;color:var(--muted)}
 @media(min-width:700px){#stage,#asks,#notice,.header{max-width:640px;width:100%;margin-left:auto;margin-right:auto}.ask-grid{grid-template-columns:repeat(3,1fr)}}
 @media(min-width:700px){.phone-tools{max-width:640px;width:100%;margin-left:auto;margin-right:auto}}
+.form-name{border:0;background:transparent;color:inherit;padding:0;text-align:center;min-width:0;font-weight:400}.form-name.selected{font-weight:650}.phone-offer{display:flex;flex-direction:column;gap:5px;margin-top:12px}.phone-offer>span{font-size:11px;text-transform:uppercase;letter-spacing:.08em}#phone-object{margin-top:12px;text-align:center}#phone-biography-content h3{font-size:14px;margin:18px 0 5px}#phone-biography-content p{font-size:14px;line-height:1.7}
 </style>
 </head>
 <body data-state="waiting">
 <header class="header" id="header">
 <svg viewBox="0 0 100 100" role="img" aria-label="SecondSignal mark: two nested open doorways on one baseline"><path d="M 23 82 V 24.5 Q 23 21 26.5 21 H 73.5 Q 77 21 77 24.5 V 82" fill="none" stroke="#252823" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/><path d="M 39 82 V 47 Q 39 44 42 44 H 58 Q 61 44 61 47 V 82" fill="none" stroke="#A64527" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-<h1>SecondSignal</h1><p class="sub">Who is seated</p>
+<h1 id="phone-house-name">SecondSignal</h1><p class="sub">Who is seated</p>
 </header>
 <p id="notice">This is a prototype for the operator and adults he knows. It is not a crisis service.</p>
 <main id="stage" aria-live="polite">
 <section id="view-waiting"><p>Waiting for the Talking Table…</p></section>
 <section id="view-idle" hidden>
 <svg viewBox="0 0 100 100" role="img" aria-label="SecondSignal mark: two nested open doorways on one baseline"><path d="M 23 82 V 24.5 Q 23 21 26.5 21 H 73.5 Q 77 21 77 24.5 V 82" fill="none" stroke="#252823" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/><path d="M 39 82 V 47 Q 39 44 42 44 H 58 Q 61 44 61 47 V 82" fill="none" stroke="#A64527" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-<p>Nobody is seated. The house is resting.</p>
+<h2 id="phone-idle-name" hidden></h2><p>Nobody is seated. The house is resting.</p>
 </section>
 <section id="view-seated" hidden>
 <div class="plate seat" id="seated-plate" data-state="seated"><div class="plate-names"></div><div class="plate-labels"></div><p class="plate-status">Seated</p></div>
+<div id="phone-assist-offer" class="phone-offer" hidden></div><div id="phone-handback" class="phone-offer" hidden></div><p id="phone-object" hidden></p>
 <div class="plate assist" id="assist-plate" data-state="assisting" hidden><div class="plate-names"></div><div class="plate-labels"></div><p class="plate-status">Assisting</p></div>
 </section>
 <section id="view-card" hidden><p id="card-words">The crisis card is on the main screen.</p></section>
@@ -80,6 +82,7 @@ body[data-state=card]{background:#FFFFFF}body[data-state=card] #notice{border-bo
 <div class="dialog-heading"><h2 id="phone-resources-title">Resources</h2><button type="button" id="phone-resources-close">Close</button></div>
 <p id="phone-resource-line"></p><div id="phone-resource-actions"></div><p id="phone-resource-status" role="status"></p>
 </dialog>
+<dialog id="phone-biography" aria-labelledby="phone-biography-title" hidden><div class="dialog-heading"><h2 id="phone-biography-title"></h2><button id="phone-biography-close" type="button">Close</button></div><div id="phone-biography-content"></div></dialog>
 <script type="application/json" id="roster">
 [{"id":"cody","name":"Cody","plate":[["Cody","she"],["Cody","he"]],"names":{"as_written":["Cody","he"],"women":["Cody","she"],"men":["Cody","he"],"neither":["Cody","they"]}},
 {"id":"ellis","name":"Ellis","plate":[["Ellis","he"],["Elli","she"]],"names":{"as_written":["Elli","she"],"women":["Elli","she"],"men":["Ellis","he"],"neither":["Ellis","they"]}},
@@ -99,13 +102,43 @@ const BY_ID=new Map(ROSTER.map(p=>[p.id,p]));
 const SETTINGS=['as_written','women','men','neither'];
 const POLL_MS=2000;
 const $=id=>document.getElementById(id);
-let pollTimer=null,sending=false,lastState=null;
+let pollTimer=null,sending=false,lastState=null,biographyFocus=null;
 
 function element(tag,text,cls){const el=document.createElement(tag);if(text!==undefined)el.textContent=text;if(cls)el.className=cls;return el;}
 function settingFor(id,presentation){
   let s=presentation;
   if(s&&typeof s==='object')s=s[id]??s.setting??s.default;
   return SETTINGS.includes(s)?s:'as_written';
+}
+function phoneName(profile,s=lastState){
+  const choice=(s&&s.presentation_overrides||{})[profile.id]||settingFor(profile.id,s&&s.presentation);
+  const pair=profile.names[choice]||profile.names.as_written;
+  return choice==='neither'&&(s&&s.chosen_names||{})[profile.id]?(s.chosen_names[profile.id]):pair[0];
+}
+async function biography(id,focus){
+  if(lastState&&lastState.state==='card')return;
+  biographyFocus=focus;
+  const dialog=$('phone-biography');dialog.hidden=false;dialog.showModal();
+  $('phone-biography-title').textContent=phoneName(BY_ID.get(id));
+  $('phone-biography-content').textContent='Loading profile…';
+  try{
+    const response=await fetch('/api/config',{cache:'no-store',headers:{'Accept':'application/json'}});
+    if(!response.ok)throw new Error('profile unavailable');
+    const config=await response.json();
+    if(lastState&&lastState.state==='card')return;
+    const profile=config.roster.find(p=>p.id===id);
+    const names=pid=>{const p=config.roster.find(p=>p.id===pid);return p?phoneName(p,{presentation:config.settings.presentation,presentation_overrides:config.settings.presentation_overrides,chosen_names:config.settings.chosen_names}):pid;};
+    $('phone-biography-title').textContent=names(id);
+    const body=$('phone-biography-content');body.replaceChildren(element('p',profile.one_line));
+    for(const row of window.SecondSignalT2.biographyRows(profile,names))body.append(element('h3',row.label),element('p',row.text));
+  }catch(error){$('phone-biography-content').textContent='Profile unavailable';}
+}
+function phoneOffer(target,offer,action){
+  target.replaceChildren();target.hidden=!offer;
+  if(!offer)return;
+  const button=element('button',offer.label);button.type='button';
+  button.addEventListener('click',()=>{target.hidden=true;sendAsk(offer.text,action,offer.persona);});
+  target.append(element('span','House'),button);
 }
 function hexOk(c){return typeof c==='string'&&/^#[0-9a-fA-F]{6}$/.test(c);}
 function luminance(hex){
@@ -122,9 +155,9 @@ function drawPlate(plate,profile,setting){
   const names=plate.querySelector('.plate-names'),labels=plate.querySelector('.plate-labels');
   names.replaceChildren();labels.replaceChildren();
   const pair=profile.names[setting]||profile.names.as_written;
-  const selected=setting==='neither'?0:profile.plate.findIndex(([n,l])=>n===pair[0]&&l===pair[1]);
+  const selected=setting==='neither'?profile.plate.findIndex(([n])=>n===phoneName(profile)):profile.plate.findIndex(([n,l])=>n===pair[0]&&l===pair[1]);
   profile.plate.forEach(([name,label],index)=>{
-    const form=element('span',name,'form-name');if(index===selected)form.classList.add('selected');
+    const form=element('button',name,'form-name');form.type='button';form.addEventListener('click',()=>biography(profile.id,form));if(index===selected)form.classList.add('selected');
     const shown=setting==='neither'&&index===0?pair[1]:label;
     const lab=element('span',shown,'form-label');if(index===selected)lab.classList.add('selected');
     names.append(form);labels.append(lab);
@@ -173,20 +206,30 @@ function render(s){
     show('card');$('header').hidden=true;$('asks').hidden=true;
     $('phone-tools').hidden=true;$('phone-resources-open').hidden=true;
     $('phone-resources').close();$('phone-resources').hidden=true;
+    $('phone-biography').close();$('phone-biography').hidden=true;
+    $('phone-handback').hidden=true;$('phone-assist-offer').hidden=true;$('phone-object').hidden=true;
     const seat=$('seated-plate');seat.dataset.agentId='';seat.style.background='';
     document.title='SecondSignal · The crisis card';return;
   }
   $('header').hidden=false;$('asks').hidden=false;
+  $('phone-house-name').textContent=s.house_name||'SecondSignal';
+  $('phone-idle-name').textContent=s.house_name||'';$('phone-idle-name').hidden=!s.house_name;
+  for(const button of $('ask-grid').querySelectorAll('button')){
+    const original=BY_ID.get(button.dataset.persona);
+    if(original){const profile=Object.prototype.hasOwnProperty.call(s,'presentation_overrides')?{...original,name:phoneName(original,s)}:original;button.textContent=`Ask for ${profile.name}`;}
+  }
   $('phone-tools').hidden=false;$('phone-resources-open').hidden=false;
   const profile=state==='seated'?BY_ID.get(s.seated):undefined;
   if(!profile){show(state==='idle'||state==='seated'?'idle':'waiting');document.title='SecondSignal · Nobody is seated';return;}
   const seat=$('seated-plate'),colour=hexOk(s.colour)?s.colour:(hexOk(COLOURS[profile.id])?COLOURS[profile.id]:'#A64527');
   seat.style.background=colour;seat.style.borderColor=colour;seat.style.color=inkFor(colour);
-  drawPlate(seat,profile,settingFor(profile.id,s.presentation));
+  drawPlate(seat,profile,(s.presentation_overrides||{})[profile.id]||settingFor(profile.id,s.presentation));
+  phoneOffer($('phone-handback'),s.handback,'handback');phoneOffer($('phone-assist-offer'),s.assist_offer,'assist');
+  $('phone-object').textContent=s.object_text||'';$('phone-object').hidden=!s.object_text;
   const assist=BY_ID.get(s.assist),assistPlate=$('assist-plate');
-  if(assist&&assist.id!==profile.id){drawPlate(assistPlate,assist,settingFor(assist.id,s.presentation));assistPlate.hidden=false;}
+  if(assist&&assist.id!==profile.id){drawPlate(assistPlate,assist,(s.presentation_overrides||{})[assist.id]||settingFor(assist.id,s.presentation));assistPlate.hidden=false;}
   else{assistPlate.hidden=true;assistPlate.dataset.agentId='';}
-  show('seated');document.title=`SecondSignal · ${profile.name} is seated`;
+  show('seated');document.title=`SecondSignal · ${phoneName(profile,s)} is seated`;
 }
 async function poll(){
   clearTimeout(pollTimer);
@@ -198,12 +241,17 @@ async function poll(){
   pollTimer=setTimeout(poll,POLL_MS);
 }
 async function ask(profile){
-  if(sending)return;
+  // A legacy Table accepts only text; a T2 state advertises its presentation map.
+  const controls=lastState&&Object.prototype.hasOwnProperty.call(lastState,'presentation_overrides');
+  if(controls)profile={...profile,name:phoneName(profile)};
+  return sendAsk(`Could I talk to ${profile.name}?`,controls?'ask':undefined,controls?profile.id:undefined);
+}
+async function sendAsk(text,action,target){
+  if(sending||(lastState&&lastState.state==='card'))return;
   sending=true;for(const b of $('ask-grid').querySelectorAll('button'))b.disabled=true;
-  const text=`Could I talk to ${profile.name}?`;
   $('ask-status').textContent=`Sending “${text}”…`;
   try{
-    const response=await fetch('/api/turn',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text})});
+    const response=await fetch('/api/turn',{method:'POST',headers:{'Content-Type':'application/json'},body:action?JSON.stringify({text,action,target}):JSON.stringify({text})});
     if(!response.ok)throw new Error('status '+response.status);
     $('ask-status').textContent=`Sent “${text}” The house decides who sits.`;
   }catch(error){$('ask-status').textContent='The Talking Table did not take the message. Try again in a moment.';}
@@ -215,6 +263,7 @@ for(const profile of ROSTER){
   button.addEventListener('click',()=>ask(profile));
   $('ask-grid').append(button);
 }
+$('phone-biography-close').addEventListener('click',()=>{$('phone-biography').close();$('phone-biography').hidden=true;if(biographyFocus)biographyFocus.focus();});
 $('phone-decision-enabled').addEventListener('change',renderDecision);
 $('phone-resources-open').addEventListener('click',openResources);
 $('phone-resources-close').addEventListener('click',()=>{$('phone-resources').close();$('phone-resources').hidden=true;$('phone-resources-open').focus();});
@@ -223,7 +272,7 @@ $('phone-resources').addEventListener('close',()=>{$('phone-resources').hidden=t
 const wanted=new URLSearchParams(location.search).get('ask');
 if(wanted&&BY_ID.has(wanted.toLowerCase())){
   history.replaceState(null,'',location.pathname);
-  $('ask-grid').querySelector(`button[data-persona="${wanted.toLowerCase()}"]`).click();
+  poll().then(()=>$('ask-grid').querySelector(`button[data-persona="${wanted.toLowerCase()}"]`).click());
 }else{poll();}
 </script>
 </body>

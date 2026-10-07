@@ -13,6 +13,21 @@ with the rulings of 3 October on review rounds 3 and 3B (holds are per
 message today; the character write-ups are fixed; the survivor fixtures are
 ported).
 
+## Table kit two — 6 October 2026, order T2
+
+The named-ask acknowledgement cannot activate on the supplied policy record:
+its ask describes domain and mode fit, and it carries no asked-character
+identity or named-ask reason kind. The harness omits the line when that evidence
+is absent; typed names never become an inferred ask. The hand-back offer works
+for an explicit character-request control in this sitting only; remembering an
+arbitrary typed named ask remains open until the record supplies its identity.
+Whether a room or a draft tag should influence seating also remains a policy
+ruling; today neither can. All seven profiles explicitly carry handoffs, so the
+biographies need no inferred destinations. The extras were exercised with
+FakeAdapter and local checks only; no live model or voice behavior, completed
+human accessibility review, persistent holds, recorded dissent or documented
+policy gap is claimed closed by this order.
+
 ## Table kit one — 5 October 2026, order T1
 
 Presentation is now a remembered setting under the Remember switch (item 13 of the
@@ -530,3 +545,7 @@ Table's live replay pins 440 cases, with a note of the move beside the number.
 The seventh requested recovery gap, the sponsor fixture, contributes no
 runnable case because its original message was not supplied; nothing is
 invented in its place.
+
+## Vocabulary research merge — 6 October 2026, order R1M
+
+The seven-return merge cannot settle the off-topic Grok, grok.com, Expert return, which supplies zero vocabulary terms; the 11 uncited entries (gender field; identity theft; who am I kidding?; I don't know myself; everyone's a little ADHD; I have OCD; that's my OCD; we're all on the spectrum; alcohol-free beer; anniversary chip; anniversary coin); or the recorded conflicts for a sensitive term for gender_identity (withheld 021), agender, crossdresser, gender diverse, passing, deadname, demand avoidance, neurodiverse, PDA, sensory sensitivity, task paralysis, Early recovery, lapse, MAT, slip, sober, sobriety. Perplexity with GPT-6 Sol Thinking has three restarted passes and no copied web addresses; the two Grok Thinking threads repeat and truncate material, and the Grok 4.7 consolidation admits unopened definitions or primary sources. No citation was fetched or verified. The requested narrow recovery-alias collision test is unavailable because the supplied pack and loader have no recovery-alias feature; a control occurrence does not substitute for that result. The candidate data and measurement under evals/vocabulary/ preserve these limits and leave every policy decision and existing lexicon unchanged.

@@ -6,6 +6,7 @@ import copy
 import re
 
 from secondsignal.lexicon import resource_line, resource_row
+from secondsignal_harness.lines import HARNESS_LINES_EN
 
 
 def decision_receipt(row, display_names):
@@ -60,6 +61,7 @@ def decision_receipt(row, display_names):
             or (key == "humour_grief_opt_in" and value is True)},
         "model_called": bool(row.get("actual_model_calls", row.get("adapter_calls", 0))),
         "gate_withheld": gate,
+        **({"aftermath": HARNESS_LINES_EN["card_aftermath"]} if gate else {}),
         "audit_withheld": bool(verdict and not row.get("released")),
         "regulation": ("Challenge voices were ineligible because this turn read as dysregulated."
                        if dysregulated and not gate else None),

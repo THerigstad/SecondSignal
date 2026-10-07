@@ -357,7 +357,7 @@ why both committed report pages are now asserted equal to the runner's
 output on every run. The badge on the README is written from these numbers
 and from nothing else.
 
-<!-- Order T1, 2026-10-05: 3,232 -> 3,301 tests --> **Numbers, current.** 3,301 tests: 178 expected failures (164 documented gaps,
+<!-- Orders T2, R1M and SD1, 2026-10-07: 3,301 -> 3,477 tests --> **Numbers, current.** 3,477 tests: 178 expected failures (164 documented gaps,
 14 recorded dissents), the rest pass. 667 labeled cases in the manifest, 285 of
 them external reviewer fixtures kept verbatim; 71 deferred fixtures stored and
 not run. This paragraph, the README's tests badge, its Quickstart line and its

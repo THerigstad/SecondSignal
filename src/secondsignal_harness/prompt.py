@@ -15,10 +15,11 @@ from secondsignal.preferences import effective_preferences
 from secondsignal.profiles import AgentProfile
 
 from .adapters import Message
-from .lines import HARNESS_LINES_EN
+from .lines import HARNESS_LINES_EN, ROOM_LINES
 
 Presentation = Mapping[str, str]  # agent_id -> "as_written" | "women" | "men" | "neither"
 ChosenNames = Mapping[str, str]  # agent_id -> the name form chosen under "neither"
+DRAFT_TAGS = ("plan", "letter", "verse", "list", "unsent")
 
 
 # These finite settings belong to the voice; the policy's ask-once flow is unchanged.
@@ -157,6 +158,9 @@ def build_turn_block(
     declared_preferences: Mapping[str, str] | None = None,
     humour_grief: bool = False,
     language_style: str | None = None,
+    room: str | None = None,
+    object_text: str = "",
+    draft_tag: str = "",
 ) -> str:
     """The house's block for one seated turn, written from the decision record."""
     agent_id = decision.get("agent_id")
@@ -190,6 +194,23 @@ def build_turn_block(
         f"Declared locale: {locale or 'none declared'}",
         f"Assist persona: {_display(roster, assist) if isinstance(assist, str) else 'none'}",
     ]
+    # These are declared presentation inputs, used only after routing. The
+    # Table screens the object separately before accepting it, never by
+    # appending it to the message the policy decides on.
+    if room:
+        if room not in ROOM_LINES:
+            raise ValueError("unknown room")
+        lines.append(ROOM_LINES[room])
+    if object_text:
+        if not isinstance(object_text, str) or len(object_text) > 60 or any(
+            ord(char) < 32 or char in "\u007f\u0085\u2028\u2029" for char in object_text
+        ):
+            raise ValueError("object must be one line of at most 60 characters")
+        lines.append(HARNESS_LINES_EN["object_line"].format(object=object_text))
+    if draft_tag:
+        if draft_tag not in DRAFT_TAGS:
+            raise ValueError("unknown draft tag")
+        lines.append(HARNESS_LINES_EN["draft_tag_line"].format(tag=draft_tag))
     applied, _ = applied_preferences(decision, declared_preferences)
     if applied:
         lines.append("Declared preferences: " + "; ".join(
@@ -251,6 +272,7 @@ def build_prompt(
 
 
 __all__ = [
+    "DRAFT_TAGS",
     "LANGUAGE_STYLES",
     "STYLE_VALUES",
     "applied_preferences",

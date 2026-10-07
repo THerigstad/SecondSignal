@@ -194,6 +194,23 @@ where it is measured.
   pinned; the operator ruled the change in and the tests moved with it. All
   model checks use FakeAdapter; no vendor was called.
 
+- **Order T2, Table kit two (Codex, OpenAI, the ChatGPT desktop app; model and tier not recorded).** 6 October 2026 on the supplied tree c0a89e9: record-only
+  ask acknowledgement with its missing-record-field limit recorded; declared
+  control hand-back offers; profile biographies; onboarding and card receipt
+  copy; the remembered table name, rooms and per-character presentations;
+  assist slips, released-reply pages, screened session objects, the client-only
+  sprint shutter, per-message tags and second-view shortcuts; the synchronized
+  house-block lock refresh and Python/JavaScript checks. The policy package
+  stays byte-identical. All model checks used FakeAdapter; no vendor was called.
+- **Order R1M, the vocabulary merge (Codex, OpenAI, the ChatGPT desktop app; model and tier not recorded).** 6 October 2026 on the supplied tree c0a89e9: merged 647 distinct vocabulary records and measured the candidates against the unchanged crisis screen, packs and ordinary controls. The seven research doors were ChatGPT; DeepSeek; Perplexity with GPT-6 Sol Thinking; Perplexity with Grok 4.7 Thinking, two threads; Perplexity with Grok 4.7; and Grok, grok.com Expert. The last supplied return was off topic and supplied no vocabulary. Citations were copied without fetching; withheld terms remain outside the tree. No policy changed, no vendor was called, and the missing pack-alias capability is an explicit unmeasured item.
+- **Order SD1, the Stream Deck kit (Codex, OpenAI, the ChatGPT desktop app; model and tier not recorded).** 6 October 2026 on the supplied tree c0a89e9:
+  the JSON-to-profile generator, offline site-letter tiles, local program icons,
+  the double-click favicon refresh and custom-art handling,
+  three example lists, local ask and reset scripts, and tests in
+  `tests/test_stream_deck.py`. The operator's three configured profiles,
+  real key lists, icon sets, key card and signposts remain outside the tree.
+  All Table integration tests use the pretend model; no vendor was called.
+
 ## Reviewers, with doorway and tier where recorded
 
 The reviews themselves are catalogued in

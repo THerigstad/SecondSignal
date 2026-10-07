@@ -1,0 +1,582 @@
+{
+  "id": "building",
+  "name": "BUILDING",
+  "uuid": "DD5604C8-63D7-5A65-8760-84B25DCFCF5D",
+  "home": "main",
+  "companions": [
+    "TESTING.json",
+    "MUSIC.json"
+  ],
+  "pages": [
+    {
+      "id": "main",
+      "name": "Page one",
+      "keys": [
+        {
+          "id": "current_push",
+          "title": "CURRENT PUSH",
+          "kind": "open",
+          "target": "PLACEHOLDER: CURRENT PUSH program, file or folder path",
+          "position": [
+            0,
+            0
+          ]
+        },
+        {
+          "id": "claude",
+          "title": "Claude",
+          "kind": "open",
+          "target": "PLACEHOLDER: Claude program, file or folder path",
+          "position": [
+            1,
+            0
+          ]
+        },
+        {
+          "id": "codex",
+          "title": "Codex",
+          "kind": "open",
+          "target": "PLACEHOLDER: Codex program, file or folder path",
+          "position": [
+            2,
+            0
+          ]
+        },
+        {
+          "id": "grok",
+          "title": "Grok",
+          "kind": "website",
+          "target": "PLACEHOLDER: Grok address",
+          "position": [
+            3,
+            0
+          ]
+        },
+        {
+          "id": "stop",
+          "title": "STOP",
+          "kind": "text",
+          "enter": true,
+          "target": "Stop. Hold.",
+          "position": [
+            4,
+            0
+          ]
+        },
+        {
+          "id": "to_music",
+          "title": "To MUSIC",
+          "kind": "switch",
+          "target": "music",
+          "position": [
+            0,
+            1
+          ]
+        },
+        {
+          "id": "doors",
+          "title": "Doors",
+          "kind": "folder",
+          "target": "doors",
+          "position": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "meters",
+          "title": "Meters",
+          "kind": "folder",
+          "target": "meters",
+          "position": [
+            2,
+            1
+          ]
+        },
+        {
+          "id": "breaks",
+          "title": "Breaks",
+          "kind": "folder",
+          "target": "breaks",
+          "position": [
+            3,
+            1
+          ]
+        },
+        {
+          "id": "dictation",
+          "title": "Dictation",
+          "kind": "hotkey",
+          "target": "Windows+H",
+          "position": [
+            4,
+            1
+          ]
+        },
+        {
+          "id": "ground",
+          "title": "GROUND",
+          "kind": "open",
+          "target": "PLACEHOLDER: GROUND program, file or folder path",
+          "position": [
+            0,
+            2
+          ]
+        },
+        {
+          "id": "its_in",
+          "title": "It's in",
+          "kind": "text",
+          "enter": true,
+          "target": "A return landed in the kit folder. Run the full landing check now, not a glance: name the job from the file name, check the folder against everything I was handed and name anything still missing, then verify the return against its order item by item. Grade it A or F, grade first. A means every item and sub-item answered in full, the end line present, nothing cut, restarted or duplicated, nothing read by search where the order said read whole, every check answered with a verdict, no model describing itself, my own words and byline untouched, and nothing about me that does not belong in the repo. Anything less is an F; there is no third grade. On an F, say in this same message exactly what is missing or wrong and the exact line I paste back into the model's thread, before anything else moves. Then one line of what I still owe, and one next action. Do not take my impression of 'done' as the grade. This is a check, not a go: nothing lands on the repo from this message.",
+          "position": [
+            1,
+            2
+          ]
+        },
+        {
+          "id": "plan",
+          "title": "Plan",
+          "kind": "open",
+          "target": "PLACEHOLDER: Plan program, file or folder path",
+          "position": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "screenshot",
+          "title": "Screenshot",
+          "kind": "hotkey",
+          "target": "Windows+Shift+S",
+          "position": [
+            3,
+            2
+          ]
+        },
+        {
+          "id": "clipboard",
+          "title": "Clipboard",
+          "kind": "hotkey",
+          "target": "Windows+V",
+          "position": [
+            4,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "id": "doors",
+      "name": "Doors",
+      "keys": [
+        {
+          "id": "gemini",
+          "title": "Gemini",
+          "kind": "website",
+          "target": "PLACEHOLDER: Gemini address",
+          "position": [
+            1,
+            0
+          ]
+        },
+        {
+          "id": "chatgpt",
+          "title": "ChatGPT",
+          "kind": "open",
+          "target": "PLACEHOLDER: ChatGPT program, file or folder path",
+          "position": [
+            2,
+            0
+          ]
+        },
+        {
+          "id": "claude",
+          "title": "Claude",
+          "kind": "open",
+          "target": "PLACEHOLDER: Claude program, file or folder path",
+          "position": [
+            3,
+            0
+          ]
+        },
+        {
+          "id": "grok",
+          "title": "Grok",
+          "kind": "website",
+          "target": "PLACEHOLDER: Grok address",
+          "position": [
+            4,
+            0
+          ]
+        },
+        {
+          "id": "deepseek",
+          "title": "DeepSeek",
+          "kind": "website",
+          "target": "PLACEHOLDER: DeepSeek address",
+          "position": [
+            0,
+            1
+          ]
+        },
+        {
+          "id": "qwen",
+          "title": "Qwen",
+          "kind": "website",
+          "target": "PLACEHOLDER: Qwen address",
+          "position": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "kimi",
+          "title": "Kimi",
+          "kind": "website",
+          "target": "PLACEHOLDER: Kimi address",
+          "position": [
+            2,
+            1
+          ]
+        },
+        {
+          "id": "vibe",
+          "title": "Vibe",
+          "kind": "open",
+          "target": "PLACEHOLDER: Vibe program, file or folder path",
+          "position": [
+            3,
+            1
+          ]
+        },
+        {
+          "id": "glm",
+          "title": "GLM",
+          "kind": "website",
+          "target": "PLACEHOLDER: GLM address",
+          "position": [
+            4,
+            1
+          ]
+        },
+        {
+          "id": "perplexity",
+          "title": "Perplexity",
+          "kind": "website",
+          "target": "PLACEHOLDER: Perplexity address",
+          "position": [
+            0,
+            2
+          ]
+        },
+        {
+          "id": "elevenlabs",
+          "title": "ElevenLabs",
+          "kind": "website",
+          "target": "PLACEHOLDER: ElevenLabs address",
+          "position": [
+            1,
+            2
+          ]
+        },
+        {
+          "id": "mic_mute",
+          "title": "Mic mute",
+          "kind": "reserved",
+          "position": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "empty_3_2",
+          "title": "",
+          "kind": "empty",
+          "position": [
+            3,
+            2
+          ]
+        },
+        {
+          "id": "empty_4_2",
+          "title": "",
+          "kind": "empty",
+          "position": [
+            4,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "id": "meters",
+      "name": "Meters",
+      "keys": [
+        {
+          "id": "claude_usage",
+          "title": "Claude usage",
+          "kind": "website",
+          "target": "PLACEHOLDER: Claude usage address",
+          "position": [
+            1,
+            0
+          ]
+        },
+        {
+          "id": "chatgpt_usage",
+          "title": "ChatGPT usage",
+          "kind": "open",
+          "target": "PLACEHOLDER: ChatGPT usage program, file or folder path",
+          "position": [
+            2,
+            0
+          ]
+        },
+        {
+          "id": "grok_usage",
+          "title": "Grok usage",
+          "kind": "website",
+          "target": "PLACEHOLDER: Grok usage address",
+          "position": [
+            3,
+            0
+          ]
+        },
+        {
+          "id": "empty_4_0",
+          "title": "",
+          "kind": "empty",
+          "position": [
+            4,
+            0
+          ]
+        },
+        {
+          "id": "empty_0_1",
+          "title": "",
+          "kind": "empty",
+          "position": [
+            0,
+            1
+          ]
+        },
+        {
+          "id": "empty_1_1",
+          "title": "",
+          "kind": "empty",
+          "position": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "empty_2_1",
+          "title": "",
+          "kind": "empty",
+          "position": [
+            2,
+            1
+          ]
+        },
+        {
+          "id": "empty_3_1",
+          "title": "",
+          "kind": "empty",
+          "position": [
+            3,
+            1
+          ]
+        },
+        {
+          "id": "empty_4_1",
+          "title": "",
+          "kind": "empty",
+          "position": [
+            4,
+            1
+          ]
+        },
+        {
+          "id": "empty_0_2",
+          "title": "",
+          "kind": "empty",
+          "position": [
+            0,
+            2
+          ]
+        },
+        {
+          "id": "empty_1_2",
+          "title": "",
+          "kind": "empty",
+          "position": [
+            1,
+            2
+          ]
+        },
+        {
+          "id": "empty_2_2",
+          "title": "",
+          "kind": "empty",
+          "position": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "empty_3_2",
+          "title": "",
+          "kind": "empty",
+          "position": [
+            3,
+            2
+          ]
+        },
+        {
+          "id": "empty_4_2",
+          "title": "",
+          "kind": "empty",
+          "position": [
+            4,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "id": "breaks",
+      "name": "Breaks",
+      "keys": [
+        {
+          "id": "youtube",
+          "title": "YouTube",
+          "kind": "website",
+          "target": "PLACEHOLDER: YouTube address",
+          "position": [
+            1,
+            0
+          ]
+        },
+        {
+          "id": "amazon",
+          "title": "Amazon",
+          "kind": "website",
+          "target": "PLACEHOLDER: Amazon address",
+          "position": [
+            2,
+            0
+          ]
+        },
+        {
+          "id": "empty_3_0",
+          "title": "",
+          "kind": "empty",
+          "position": [
+            3,
+            0
+          ]
+        },
+        {
+          "id": "empty_4_0",
+          "title": "",
+          "kind": "empty",
+          "position": [
+            4,
+            0
+          ]
+        },
+        {
+          "id": "empty_0_1",
+          "title": "",
+          "kind": "empty",
+          "position": [
+            0,
+            1
+          ]
+        },
+        {
+          "id": "empty_1_1",
+          "title": "",
+          "kind": "empty",
+          "position": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "empty_2_1",
+          "title": "",
+          "kind": "empty",
+          "position": [
+            2,
+            1
+          ]
+        },
+        {
+          "id": "empty_3_1",
+          "title": "",
+          "kind": "empty",
+          "position": [
+            3,
+            1
+          ]
+        },
+        {
+          "id": "empty_4_1",
+          "title": "",
+          "kind": "empty",
+          "position": [
+            4,
+            1
+          ]
+        },
+        {
+          "id": "empty_0_2",
+          "title": "",
+          "kind": "empty",
+          "position": [
+            0,
+            2
+          ]
+        },
+        {
+          "id": "empty_1_2",
+          "title": "",
+          "kind": "empty",
+          "position": [
+            1,
+            2
+          ]
+        },
+        {
+          "id": "empty_2_2",
+          "title": "",
+          "kind": "empty",
+          "position": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "empty_3_2",
+          "title": "",
+          "kind": "empty",
+          "position": [
+            3,
+            2
+          ]
+        },
+        {
+          "id": "empty_4_2",
+          "title": "",
+          "kind": "empty",
+          "position": [
+            4,
+            2
+          ]
+        }
+      ]
+    }
+  ]
+}

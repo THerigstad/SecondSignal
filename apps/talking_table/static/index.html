@@ -40,21 +40,24 @@
       <div class="workspace" id="workspace">
         <section class="conversation-panel" aria-labelledby="conversation-title">
           <div class="section-heading"><h2 id="conversation-title">The conversation</h2><span class="small">Policy → reply → audit</span></div>
-          <div class="empty-state" id="empty-state"><span class="empty-mark" aria-hidden="true">/</span><h3>The table is ready.</h3><p>Start with what is on your mind.<br>Every turn has a Decision Card you can read.</p></div>
+          <div class="empty-state" id="empty-state"><span class="empty-mark" aria-hidden="true">/</span><h3 id="idle-house-name">The table is ready.</h3><p>Start with what is on your mind.<br>Every turn has a Decision Card you can read.</p></div>
           <div id="transcript" aria-live="polite" aria-relevant="additions"></div>
           <section id="crisis" class="crisis" aria-label="Crisis card" aria-live="assertive" hidden></section>
           <div class="waiting-controls"><button id="stop-waiting" type="button" disabled>Stop waiting</button><button id="pause-view" type="button" aria-pressed="false">Pause this view</button><span id="view-status" class="small" role="status"></span></div>
-          <form class="composer" id="composer"><label for="message">Say something to the table</label><textarea id="message" rows="3" maxlength="16000" placeholder="Start with one sentence…" autocomplete="off" spellcheck="false" disabled></textarea><div class="compose-actions"><span class="small">Ctrl+Enter or ⌘+Enter sends · Enter adds a line</span><div><button id="microphone" class="quiet" type="button" hidden>Microphone</button><button id="send" class="primary" type="submit" disabled>Send <span aria-hidden="true">↗</span></button></div></div></form>
+          <form class="composer" id="composer"><div id="composer-extras" class="composer-extras"><div id="object-control" hidden><p id="object-seat" class="small"></p><label for="table-object">Object on the table</label><div class="object-input"><input id="table-object" type="text" maxlength="60" autocomplete="off"><button id="save-object" type="button">Place object</button></div><p id="object-notice" class="status" role="status"></p></div><label for="draft-tag">Tag this message</label><select id="draft-tag"><option value="">None</option><option value="plan">Plan</option><option value="letter">Letter</option><option value="verse">Verse</option><option value="list">List</option><option value="unsent">Unsent</option></select></div><label for="message">Say something to the table</label><textarea id="message" rows="3" maxlength="16000" placeholder="Start with one sentence…" autocomplete="off" spellcheck="false" disabled></textarea><div class="compose-actions"><span class="small">Ctrl+Enter or ⌘+Enter sends · Enter adds a line</span><div><button id="microphone" class="quiet" type="button" hidden>Microphone</button><button id="send" class="primary" type="submit" disabled>Send <span aria-hidden="true">↗</span></button></div></div></form>
           <details id="submission-history" open><summary>Submitted writing and reply states</summary><div id="submissions" aria-live="polite"></div></details>
         </section>
         <section class="table-panel" id="table-panel" aria-labelledby="table-title">
           <div class="section-heading"><h2 id="table-title">A seat at the table</h2><span class="small" id="turn-count">No turns yet</span></div>
           <div class="presentation-row"><label for="presentation">Character presentation</label><select id="presentation" disabled><option value="as_written">As written</option><option value="women">Woman</option><option value="men">Man</option><option value="neither">Neither</option></select></div>
+          <p class="presentation-note">You can pick how everyone sounds. Who speaks is picked for your safety, and you'll always be told why.</p>
+          <div class="presentation-row room-row"><label for="room">Which room are you in?</label><select id="room"><option value="">None</option><option value="workshop">Workshop</option><option value="parlor">Parlor</option><option value="studio">Studio</option><option value="yard">Yard</option></select></div><p id="room-note" class="presentation-note"></p><details class="override-controls"><summary>Per-character presentation</summary><div id="presentation-overrides"></div></details>
           <p class="presentation-note">This describes the characters, not you. Remember on this computer saves this choice across restarts. New session resets the current choice.<!-- Order T1, 2026-10-05: visit-only wording -> remembered-under-Remember wording. --></p>
           <!-- Codex's second door paragraph, kept by the operator's ruling 23 of 3 October 2026. Its first sentence changes when the shuffle (decision 2 of 28 September 2026) lands, together with the door-copy test in tests/test_order1_ui.py. -->
-          <button id="presentation-preview-open" type="button" class="small-button">Read presentation previews</button><button id="save-presentation" type="button" class="small-button" disabled>Use this presentation</button><div id="presentation-previews" hidden aria-label="Presentation previews"></div>
+          <button id="presentation-preview-open" type="button" class="small-button">Read presentation previews</button><button id="save-presentation" type="button" class="small-button" disabled>Use these presentation choices</button><div id="presentation-previews" hidden aria-label="Presentation previews"></div>
           <p class="presentation-note">Same knowledge, same rules. Leaving this unchanged uses the characters as written. Neither uses the longer name with they pronouns until you choose a name on the plate.</p>
           <div class="table-stage"><div class="table-surface" aria-hidden="true"></div><div id="plates" class="plates"></div></div>
+          <div id="handback-offer" class="house-offer" hidden></div>
           <p class="table-footnote" id="table-footnote">No one is seated until the policy decides.</p>
           <a id="sigils-link" class="small" href="/static/sigils.html" target="_blank" rel="noopener" hidden>Open the lights view</a>
         </section>
@@ -73,6 +76,7 @@
     <p id="remote-settings-note" class="small" hidden>Model, voice, lights, key and Wi-Fi settings are controlled on the computer.</p>
     <form id="settings-form">
       <fieldset id="presentation-settings"><legend>How replies are presented</legend>
+        <label for="house-name">What do you call your table?</label><input id="house-name" type="text" maxlength="40" autocomplete="off">
         <p class="setting-note">These are your declared choices. Saving confirms them. Remember keeps them on this computer; otherwise they last for this server run. They never change who sits, a hold, a house line or a crisis card.</p>
         <label class="checkbox"><input id="one-step" type="checkbox"><span>One step at a time</span></label>
         <label class="checkbox"><input id="shorter" type="checkbox"><span>Shorter replies</span></label>
@@ -122,6 +126,7 @@
     <fieldset id="network-settings"><legend>On this Wi-Fi</legend><label class="checkbox"><input id="phone-mode" type="checkbox"><span>Let my phone on this Wi-Fi use the table</span></label><p class="setting-note">Off by default. Paired browsers share this session. Use only with adults the operator knows.</p><div id="phone-details" hidden><p class="small">On the phone, open an address below and enter this code:</p><p id="pairing-code" class="pairing-code"></p><div id="phone-urls"></div></div><p id="network-status" class="status" role="status"></p></fieldset>
     <p class="dialog-storage" id="settings-storage"></p>
   </dialog>
+  <dialog id="biography-dialog" aria-labelledby="biography-title"><div class="dialog-heading"><h2 id="biography-title"></h2><button id="biography-close" type="button">Close</button></div><div id="biography-content" class="biography-content"></div></dialog>
   <dialog id="resources-dialog" aria-labelledby="resources-title"><div class="dialog-heading"><h2 id="resources-title">Resources</h2><button id="resources-close" type="button">Close</button></div><div id="resources-content"></div><p class="setting-note">For the country you declared in Settings. Opening this control does not change what a character says.</p></dialog>
 </body>
 </html>

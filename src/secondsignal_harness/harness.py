@@ -26,6 +26,7 @@ from .audit_log import AuditLog
 from .codex import CodexStore
 from .lines import HARNESS_LINES_EN
 from .prompt import ChosenNames, Presentation, applied_preferences, build_prompt, build_turn_block
+from .table_extras import ask_acknowledgement
 from .view import audit_view
 
 FAILURE_LINE: str = HOUSE_LINES_EN["failure"]
@@ -56,6 +57,7 @@ class Turn:
     adapter_calls: int
     decision: dict[str, Any]
     notice: str | None = None
+    ask_acknowledgement: str | None = None
     declared_preferences: dict[str, str] = field(default_factory=dict)
     preference_adjustments: tuple[str, ...] = ()
     presentation_instructions: dict[str, str | bool] = field(default_factory=dict)
@@ -87,6 +89,9 @@ class Harness:
         declared_preferences: Mapping[str, str] | None = None,
         humour_grief: bool = False,
         language_style: str | None = None,
+        room: str | None = None,
+        object_text: str = "",
+        draft_tag: str = "",
         decision_observer: Callable[[dict[str, Any]], None] | None = None,
         operator_circle: bool = False,
         max_turns: int = 12,
@@ -104,6 +109,9 @@ class Harness:
         self.declared_preferences = dict(declared_preferences or {})
         self.humour_grief = bool(humour_grief)
         self.language_style = language_style
+        self.room = room
+        self.object_text = object_text
+        self.draft_tag = draft_tag
         self.decision_observer = decision_observer
         self.operator_circle = bool(operator_circle)
         self.max_turns = int(max_turns)
@@ -249,6 +257,7 @@ class Harness:
             chosen_names=self.chosen_names, locale=self.session.locale,
             declared_preferences=self.declared_preferences, humour_grief=self.humour_grief,
             language_style=self.language_style,
+            room=self.room, object_text=self.object_text, draft_tag=self.draft_tag,
         )
         system, messages = build_prompt(system_text, turn_block, self.transcript, max_turns=self.max_turns)
         prompt_digest = _digest(system + "\n".join(m["content"] for m in messages))
@@ -277,7 +286,11 @@ class Harness:
             return turn
 
         persona_text = reply.text.strip()
-        composed = persona_text + ("\n\n" + "\n".join(house_lines) if house_lines else "")
+        acknowledgement = ask_acknowledgement(
+            record, roster=self.roster, presentation=self.presentation, chosen_names=self.chosen_names,
+        )
+        composed = ((acknowledgement + "\n\n") if acknowledgement else "") + persona_text
+        composed += "\n\n" + "\n".join(house_lines) if house_lines else ""
         view = audit_view(record, self.session)
         bound = payload_hash(view, composed)
         verdict = audit(
@@ -305,6 +318,7 @@ class Harness:
             release_reason=reason, persona_text=persona_text, house_lines=house_lines,
             verdict=verdict.as_dict(), row_id=row_id, adapter_calls=calls, decision=record,
             notice=notice, declared_preferences=applied, preference_adjustments=adjustments,
+            ask_acknowledgement=acknowledgement if released else None,
             presentation_instructions=instructions,
         )
         self.turns.append(turn)

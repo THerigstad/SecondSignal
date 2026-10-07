@@ -4,6 +4,60 @@ All notable changes to SecondSignal are documented here.
 
 ## [Unreleased]
 
+### Added — 2026-10-06, order T2 (Table kit two: manners when the ask and the seat differ, the Table extras, per-character presentation)
+
+- **Item 1, ask acknowledgement:** record-only attachment and centralized reason
+  clauses; the current policy record lacks named-ask identity, so it emits no
+  guessed acknowledgement. The missing field is recorded for the operator.
+- **Item 2, hand-back promise:** explicit character controls retain a deferred
+  ask for the sitting, mark its plate quietly and offer it only on a later
+  eligible turn; no typed-message inference or durable person fact.
+- **Item 3, seat biography:** profile domains, modes, contraindications and
+  explicit handoffs behind each plate on the Table and phone page.
+- **Item 4, onboarding:** the operator's exact presentation-control sentence.
+- **Item 5, aftermath receipt:** a nameless house line on the Decision Card's
+  first layer, with the no-model-call property checked on the same turn.
+- **Item 6, table name:** a forty-character plain-text idle and phone heading,
+  remembered under Remember and excluded from prompts, receipts and audit rows.
+- **Item 22, sliding note:** a house-attributed offer from the record's assist;
+  tapping sends the phone's ordinary ask without adding a second model voice.
+- **Item 23, made-thing page:** printable released text with its presentation
+  byline and the fixed house footer, served from the released turn.
+- **Item 24, object:** a session-only, sixty-character line screened by the
+  existing public crisis screen before it can enter the seated prompt.
+- **Item 25, sprint shutter:** a quiet client-only twenty-five-minute clock for
+  Cody and Seren, with pause and stop and ordinary routing throughout.
+- **Item 26, declared atelier:** none or four remembered rooms, changing only
+  the seated prompt's working instruction.
+- **Item 27, draft tag:** six composer choices, one message only, kept outside
+  the policy input and shown on the turn.
+- **Item 28, second view:** up to three shortcuts from eligible other candidates,
+  each submitting an ordinary new turn and labelling its reply a second view.
+- **Item 45, per-character presentation:** remembered overrides through the
+  existing profile presentation and name helpers, with routing unchanged.
+- **House-block lock refresh:** Part A gains the three declared object, room and
+  tag instructions, deliberately versioned, copied to all ten codexes and
+  relocked through the existing test helper. Policy files and existing tests
+  remain unchanged.
+
+### Added — 2026-10-06, order R1M (the vocabulary research merge: one sourced list from seven returns, and the candidates measured against the controls)
+
+- Part 1: 647 distinct vocabulary records with variants, per-door citations, agreement, canonical coverage and proposed uses; 67 sensitive records use placeholders only.
+- Part 2: a plain-language list and counts by category, coverage, proposed use, agreement and citation status, with the seven doors' input limitations.
+- Part 3: an offline measurement of the real crisis screen, pack matches and 381 ordinary control rows; recovery-alias collision checks explicitly remain unavailable because this supplied tree has no alias support.
+- Part 4: eleven tests for provenance, schema, redaction, canonical coverage, reproducible reports and source-write refusal; dated limitations and provenance, with test-count pins following collection.
+
+### Added — 2026-10-06, order SD1 (the Stream Deck kit: profiles generated from key lists, with icons, pages and signposts)
+
+- A key-list generator in `apps/stream_deck/` makes the three MK.2 profiles,
+  folder pages, profile switches, original tiles and real or custom icons,
+  with offline site-letter tiles, local program icons, a double-click favicon refresh,
+  visible placeholders and a position-by-position key card.
+- Standalone, quiet ask and reset scripts send the phone page's ordinary asks
+  and start a new sitting through the unchanged Talking Table endpoints.
+- Three editable example lists keep personal paths and addresses outside the
+  tree; the operator's real lists, art, profiles and signposts stay on the machine.
+
 ### Added — 2026-10-05, order T1 (Table kit one: the Decision Card, how replies are presented, the composer, the low-demand view)
 
 - Order M1 (Codex, measurement only, 5 October 2026): near-tie doors (idea-list
