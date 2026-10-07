@@ -25,7 +25,7 @@ Follow the build. Inspect the design. See what still needs testing.
 [![python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue)](pyproject.toml)
 [![license](https://img.shields.io/badge/license-MIT%20code%20%C2%B7%20CC%20BY--NC--ND%204.0%20characters-blue)](LICENSE-CONTENT)
 
-Zero runtime dependencies. Pure Python. No model calls required to run the policy layer.
+Zero runtime dependencies. Standard-library Python decides, and no model call is needed to run the policy layer. The HTML and JavaScript in this tree are its screens, the Talking Table's page and the browser demo, not the decision.
 
 **Try it in your browser:** [therigstad.github.io/SecondSignal](https://therigstad.github.io/SecondSignal/)
 runs this repository's real package under Python compiled to WebAssembly: type
