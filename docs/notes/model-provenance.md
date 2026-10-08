@@ -211,6 +211,23 @@ where it is measured.
   real key lists, icon sets, key card and signposts remain outside the tree.
   All Table integration tests use the pretend model; no vendor was called.
 
+- **Order H1, the harness kit (Codex, OpenAI, the ChatGPT desktop app; model and tier not recorded).** 7 October 2026 on the supplied tree b4e819b:
+  bounded tail verification for audit-log writes; configuration metadata on every
+  harness row; the shared reserved-voice and URL-scheme release checkpoint; the
+  folded house-line near-copy predicate; fault-injection, fixture-parity and
+  labelled replay tests; before/after gate-cost measurements and public-number
+  refresh. The policy package and Talking Table remain byte-identical. All
+  model checks used FakeAdapter or existing stand-in transports.
+- **Order T3, Table kit three (Codex, OpenAI, the ChatGPT desktop app; model and tier not recorded).** 7 October 2026 on the supplied tree b4e819b:
+  generated limitations and storage honesty, vendor terms and key attestation,
+  a local operator-token gate, named pairing scopes, versioned shared-session
+  events and reload recovery, a private review queue, audited operator latch
+  correction, weekly refused-seat counts and receipt export, logged decision
+  replay, and a cancellable lights check. Built and tested offline with
+  FakeAdapter; policy and harness source files are byte-identical to the
+  supplied tree.
+
+
 ## Reviewers, with doorway and tier where recorded
 
 The reviews themselves are catalogued in

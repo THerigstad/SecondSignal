@@ -1,7 +1,7 @@
 """The audit log: the one thing the harness may write (ADR-0014; ADR-0029 (Proposed), rule 6).
 
 A row is appended before anything is released, and the write is proven by
-reading the row back by its id. JSON lines on disk when a path is given;
+reading back the bounded tail and verifying its id, canonical bytes and write offset. JSON lines on disk when a path is given;
 in memory otherwise (tests). Rows never carry a key; the harness plants no
 secrets in them and ``tests/test_harness_contract.py`` asserts the absence
 of a planted fake key from every row.
@@ -61,12 +61,62 @@ class AuditLog:
         if self.path is not None:
             self.path.parent.mkdir(parents=True, exist_ok=True)
             with self.path.open("a", encoding="utf-8") as handle:
+                start = handle.tell()
                 handle.write(line + "\n")
                 handle.flush()
+            if not self._prove_tail(line.encode("utf-8"), row_id, start):
+                raise RuntimeError("the audit row could not be read back after the write")
         self._rows.append(json.loads(line))
-        if self.read(row_id) is None:
-            raise RuntimeError("the audit row could not be read back after the write")
         return row_id
+
+    def _prove_tail(self, expected: bytes, row_id: str, start: int) -> bool:
+        """Read at most len(expected) + 3 bytes, in chunks of at most 4096.
+
+        Find the previous newline by scanning backwards from EOF. A final
+        newline is required; LF and Windows CRLF are accepted. The offset
+        check also catches a dropped append of a row identical to the old tail.
+        No historical row or partial write is ever repaired or removed here.
+        """
+        assert self.path is not None
+        try:
+            with self.path.open("rb") as handle:
+                handle.seek(0, 2)
+                end = handle.tell()
+                if end <= start:
+                    return False
+                handle.seek(end - 1)
+                if handle.read(1) != b"\n":
+                    return False
+                position = end - 1
+                remaining = len(expected) + 2
+                pieces: list[bytes] = []
+                tail_start = position
+                while position and remaining:
+                    size = min(4096, position, remaining)
+                    position -= size
+                    remaining -= size
+                    handle.seek(position)
+                    chunk = handle.read(size)
+                    if len(chunk) != size:
+                        return False
+                    boundary = chunk.rfind(b"\n")
+                    pieces.append(chunk[boundary + 1:])
+                    tail_start = position + boundary + 1
+                    if boundary >= 0:
+                        break
+                else:
+                    if position:
+                        return False
+                payload = b"".join(reversed(pieces))
+                if payload.endswith(b"\r"):
+                    payload = payload[:-1]
+                if tail_start != start or payload != expected:
+                    return False
+                candidate = json.loads(payload)
+                return (isinstance(candidate, dict) and candidate.get("row_id") == row_id
+                        and canonical_row(candidate).encode("utf-8") == expected)
+        except (OSError, ValueError, UnicodeError, TypeError):
+            return False
 
     def read(self, row_id: str) -> dict[str, Any] | None:
         if self.path is not None:

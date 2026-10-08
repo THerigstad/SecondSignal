@@ -1,0 +1,27 @@
+{
+  "openai": {
+    "title": "OpenAI Services Agreement",
+    "url": "https://openai.com/policies/services-agreement/",
+    "summary": "OpenAI receives the conversation and character instructions sent for a reply. The OpenAI Services Agreement and the data controls for the operator's API account govern handling and retention; this summary does not certify the key's training settings. The OpenAI Services Agreement page is the authority."
+  },
+  "anthropic": {
+    "title": "Anthropic API terms",
+    "url": "https://www.anthropic.com/legal/commercial-terms",
+    "summary": "Anthropic receives the conversation and character instructions sent for a reply. Its Commercial Terms and the operator's account arrangements govern handling and retention; this summary does not certify the key's training settings. Anthropic's own Commercial Terms page is the authority."
+  },
+  "gemini": {
+    "title": "Google Gemini API terms",
+    "url": "https://ai.google.dev/gemini-api/terms",
+    "summary": "Google receives the conversation and character instructions sent for a reply. Handling, retention and permitted use can depend on the Gemini API service and billing arrangement, so a key's training settings need checking. Google's own Gemini API Additional Terms page is the authority."
+  },
+  "xai": {
+    "title": "Terms of Service - Enterprise",
+    "url": "https://x.ai/legal/terms-of-service-enterprise",
+    "summary": "xAI receives the conversation and character instructions sent for a reply. Its API agreement and the operator's account settings govern handling and retention; this summary does not certify the key's training settings. xAI's own Terms of Service - Enterprise page is the authority."
+  },
+  "compatible": {
+    "title": "Selected host API terms",
+    "url": null,
+    "summary": "The selected host receives the conversation and character instructions sent for a reply. Its handling, retention and training rules depend on that vendor and account; a compatible interface makes no promise about them. The selected vendor's own API terms page is the authority and must be checked for this host."
+  }
+}

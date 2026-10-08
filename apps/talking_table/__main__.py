@@ -25,6 +25,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--no-browser", action="store_true", help="Do not open a browser.")
     parser.add_argument("--data-dir", type=Path, default=None,
                         help="Storage folder outside the repository; mainly for isolated tests.")
+    parser.add_argument("--make-operator-token", action="store_true",
+                        help="Create the local operator token without starting the Table.")
     args = parser.parse_args(argv)
     if not 0 <= args.port <= 65535:
         parser.error("the port must be between 0 and 65535")
@@ -34,6 +36,12 @@ def main(argv: list[str] | None = None) -> int:
     try:
         from .server import TableApp, make_server
 
+        if args.make_operator_token:
+            from .t3 import make_operator_token
+            created = make_operator_token(args.data_dir or Path.home() / ".secondsignal" / "talking-table")
+            print("The local operator token was created." if created else
+                  "The local operator token already exists.", flush=True)
+            return 0
         app = TableApp(data_dir=args.data_dir)
         server = make_server(app, host="127.0.0.1", port=args.port)
         url = f"http://127.0.0.1:{server.server_address[1]}/"

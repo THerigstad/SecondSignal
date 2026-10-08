@@ -24,4 +24,15 @@ There is no Govee plugin on the deck for SecondSignal, because it would set colo
 
 Each key sends "Could I talk to NAME?" as an ordinary message; the house decides who sits. The colours live in `sigil_colors.json`; after changing them, run `python apps/talking_table/lights.py --sync-page` so the phone page matches.
 
-This is a prototype for the operator and adults he knows. It is not a crisis service.
+This is a prototype for the operator and adults the operator knows. It is not a crisis service.
+
+
+## Test lights without a turn — order T3
+
+Settings has a **Test lights** button. On the computer it posts to
+`/api/lights/check`: each roster colour, about two seconds per scene, then card
+white and idle, through the same worker and saved lamp settings. Lights off or
+no key gives: “Lights are off or not set up; nothing to show.” A real turn cancels
+the sequence and a crisis card holds the floor. Paired phones cannot start the
+check. It adds no turn, decision, receipt or audit row. The project manager can
+point the reserved Stream Deck Lights check key at this path later.

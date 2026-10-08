@@ -138,6 +138,7 @@ def test_request_cannot_choose_its_own_text_persona_or_forge_a_token(app, all_pa
 
 @pytest.mark.parametrize("change", ["turn", "settings", "reset", "card", "circle", "forget"])
 def test_capabilities_are_invalidated_by_every_conversation_change(app, all_pass, change):
+    (app.data_dir / "operator.token").write_text("a" * 64)  # Order T3, 2026-10-07: enabling without token -> local token required.
     enable(app)
     first = released(app)
     old = app.state["voice_revision"]
@@ -162,6 +163,7 @@ def test_capabilities_are_invalidated_by_every_conversation_change(app, all_pass
 # This test used to assert that an operator-circle release never receives a
 # token; that half now lives in test_an_operator_circle_reply_speaks_only_with_the_mode_on.
 def test_the_silent_kinds_stay_silent_withheld_house_failure_high_risk_and_the_card(app):
+    (app.data_dir / "operator.token").write_text("a" * 64)  # Order T3, 2026-10-07: enabling without token -> local token required.
     enable(app)
     withheld = app.turn(PROMPT)
     assert withheld["kind"] == "withheld" and withheld["speech_token"] is None
@@ -187,6 +189,7 @@ def test_the_silent_kinds_stay_silent_withheld_house_failure_high_risk_and_the_c
 
 def test_an_operator_circle_reply_speaks_only_with_the_mode_on(app):
     # Ruling 6 of 3 October 2026: operator-circle replies speak while the mode is on.
+    (app.data_dir / "operator.token").write_text("a" * 64)  # Order T3, 2026-10-07: enabling without token -> local token required.
     enable(app)
     withheld = app.turn(PROMPT)
     assert withheld["kind"] == "withheld" and withheld["cultural_only"] is True
@@ -219,6 +222,7 @@ def test_an_operator_circle_reply_speaks_only_with_the_mode_on(app):
 def test_an_operator_circle_release_is_checked_against_its_own_verdict(app, monkeypatch, flaw):
     """The Table trusts no label alone: a turn marked operator_circle speaks only
     when the verdict is the one the harness's rule 7 releases (ruling 6)."""
+    (app.data_dir / "operator.token").write_text("a" * 64)  # Order T3, 2026-10-07: enabling without token -> local token required.
     module = importlib.import_module("secondsignal_harness.harness")
     layers = dict(logical="PASS", semantic="PASS", cultural="INCONCLUSIVE", ethical="PASS")
     risk = "normal"
@@ -259,6 +263,7 @@ def test_even_ship_requires_all_four_layers_to_pass(app, all_pass, monkeypatch, 
 def test_an_all_pass_reply_speaks_in_operator_circle_mode_too(app, all_pass):
     # Ruling 6 of 3 October 2026: operator-circle replies speak while the mode is on.
     # Before the ruling this test asserted that the mode silenced even a shipped reply.
+    (app.data_dir / "operator.token").write_text("a" * 64)  # Order T3, 2026-10-07: enabling without token -> local token required.
     enable(app, operator_circle=True)
     result = app.turn(PROMPT)
     assert result["kind"] == "reply" and result["release_reason"] == "ship"
@@ -656,6 +661,7 @@ def test_the_turn_after_a_card_speaks_whole_in_operator_circle_mode_only_if_rele
     """With the cultural layer unlocked the audit calls the turn after a card high
     risk and withholds it, in operator-circle mode too, so nothing is spoken; the
     whole-reply rule applies to whatever the audit releases on that turn."""
+    (app.data_dir / "operator.token").write_text("a" * 64)  # Order T3, 2026-10-07: enabling without token -> local token required.
     enable(app, operator_circle=True)
     assert app.turn(crisis_fixture())["kind"] == "card"
     app.harness.adapter = FakeAdapter(script=(TEXT,))
@@ -718,7 +724,7 @@ def test_the_javascript_voice_suites_pass_offline():
     node = shutil.which("node")
     assert node, "Node is required for the offline browser contract tests (no skipped tests)"
     files = sorted((server.STATIC.parent / "tests_js").glob("*.mjs"))
-    assert len(files) == 5  # Order T2, 2026-10-06: 4 -> 5 JavaScript suite files.
+    assert len(files) == 6  # Order T3, 2026-10-07: 5 -> 6 JavaScript suite files.
     # Ask for the TAP reporter by name: Node 24's default reporter prints no
     # "# fail" summary line when stdout is not a terminal (found 5 October 2026
     # by a Codex build on the operator's PC).

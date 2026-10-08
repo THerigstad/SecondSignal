@@ -53,7 +53,7 @@ COLOURS = APP / "sigil_colors.json"
 LIGHTS_MD = APP / "LIGHTS.md"
 KEY = "test-key-7f3a9c-not-a-real-key-0b12"
 CARD_WORDS = "The crisis card is on the main screen."
-NOTICE = "This is a prototype for the operator and adults he knows. It is not a crisis service."
+NOTICE = "This is a prototype for the operator and adults the operator knows. It is not a crisis service."  # Order T3, 2026-10-07: role-copy pin: he -> the operator.
 PHONE = (390, 844)
 
 

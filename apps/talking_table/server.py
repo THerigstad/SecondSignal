@@ -40,6 +40,7 @@ from secondsignal_harness.lines import HARNESS_LINES_EN, ROOM_LINES
 from secondsignal_harness.prompt import LANGUAGE_STYLES, STYLE_VALUES, applied_preferences
 from secondsignal_harness.table_extras import asked_agent, eligible_agents
 
+from .t3 import COMPUTER_PATHS, TOKEN_NOTE, TableFeatures
 from .table_kit import decision_receipt, presentation_samples, resources
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -119,19 +120,52 @@ class SceneWorker:
     def __init__(self, current_key: Callable[[], str | None] | None = None):
         self.current_key = current_key or (lambda: None)
         self.pending: queue.Queue = queue.Queue()
+        self.check_lock = threading.Lock()
+        self.check_cancel = threading.Event()
         self.thread = threading.Thread(target=self._run, daemon=True, name="table-lights")
         self.thread.start()
 
     def submit(self, persona, state):
+        self.cancel_check()
         self.pending.put_nowait((persona, state))
+
+    def cancel_check(self):
+        with self.check_lock:
+            self.check_cancel.set()
+
+    def check(self, personas, interval=2.0):
+        with self.check_lock:
+            self.check_cancel.set()
+            cancelled = self.check_cancel = threading.Event()
+
+        def show():
+            for persona, state in [*((p, "seated") for p in personas), (None, "card")]:
+                if cancelled.is_set():
+                    return
+                done = threading.Event()
+                self.pending.put_nowait((persona, state, cancelled, done))
+                while not done.wait(0.05):
+                    if cancelled.is_set():
+                        return
+                if cancelled.wait(interval):
+                    return
+            self.pending.put_nowait((None, "idle", cancelled))
+
+        threading.Thread(target=show, daemon=True, name="table-lights-check").start()
 
     def _run(self):
         while True:
             item = self.pending.get()
             key = None
+            done = None
             try:
                 if item is None:
                     return
+                if len(item) >= 3:
+                    done = item[3] if len(item) == 4 else None
+                    if item[2].is_set():
+                        continue
+                    item = item[:2]
                 module = importlib.import_module("apps.talking_table.lights")
                 # Read the switch and key at execution, never when queuing.
                 # The original two-argument hook remains valid in pretend mode.
@@ -149,6 +183,8 @@ class SceneWorker:
                 # Do not retain a plaintext credential while waiting for the
                 # next scene (Settings may forget it during that wait).
                 key = None
+                if done is not None:
+                    done.set()
                 self.pending.task_done()
 
     def close(self):
@@ -325,6 +361,7 @@ class _TurnJob:
         self.accepted = False
         self.model_calls = 0
         self.revision = 0
+        self.session_id = app.session_id
         self.harness = copy.copy(app.harness)
         self.harness.session = copy.deepcopy(app.harness.session)
         self.harness.transcript = copy.deepcopy(app.harness.transcript)
@@ -437,16 +474,24 @@ class _TableAudit:
                 safe["preference_adjustments"] = []
                 safe["presentation_instructions"] = {}
             safe = app._redact(safe)
-        with app.audit_lock:
+        # An optional operator-review disk wait may not hold the card hostage.
+        # The unchanged harness already returns its card when audit writing fails.
+        if not app.audit_lock.acquire(blocking=not gate):
+            raise OSError("The audit writer is busy.")
+        try:
             if job.cancelled.is_set():
                 raise _Cancelled()
             row_id = self.sink.append(safe)
+            job.audit_row_id = row_id
+        finally:
+            app.audit_lock.release()
         names = {persona: profile.name_for(
             job.harness.presentation.get(persona, "as_written"),
             job.harness.chosen_names.get(persona))[0]
             for persona, profile in app.roster.items()}
         receipt = decision_receipt(safe, names)
         if not gate:
+            receipt["at"] = safe.get("at", time.time())
             receipt = app._redact(receipt)
             receipt["audit_row_id"] = row_id
             # A slow receipt never owns the audit lock the card needs.
@@ -457,7 +502,9 @@ class _TableAudit:
         return row_id
 
 
-class TableApp:
+class TableApp(TableFeatures):
+    input_error = InputError
+
     def __init__(self, data_dir: Path | None = None,
                  harness_factory: Callable[[], Harness] | None = None,
                  speech_transport: Callable | None = None):
@@ -515,6 +562,8 @@ class TableApp:
         self.phone_thread = None
         self.pairing_code = None
         self.paired: set[str] = set()
+        self.pairing_records: dict[str, dict] = {}
+        self.computer = {"scope": "computer"}
         self.pair_attempts: dict[str, list[float]] = {}
         self.lights = SceneWorker(self._lights_key)
         self._load_settings()
@@ -522,6 +571,7 @@ class TableApp:
         self.harness = self._build_harness()
         self._samples = presentation_samples(self.roster, self.harness.codexes, PRESENTATIONS)
         self.state = self._idle_state()
+        self._init_features()
 
     def _idle_state(self):
         return {"seated": None, "assist": None, "state": "idle",
@@ -600,6 +650,7 @@ class TableApp:
                     raise InputError("Keep keys in the key field, outside the conversation.")
                 self.object_text, self.object_notice = value, None
             self.state.update(self._extras_state())
+            self._publish()
             return {"object_text": self.object_text, "object_notice": self.object_notice,
                     "state": dict(self.state)}
 
@@ -717,6 +768,8 @@ class TableApp:
         return True
 
     def _cancel_jobs(self):
+        if hasattr(self.lights, "cancel_check"):
+            self.lights.cancel_check()
         self.voice_revision += 1
         self.speech_tokens.clear()
         self.preview_snapshot = None
@@ -746,6 +799,7 @@ class TableApp:
             } if job.model_calls else {}),
         }, names)
         receipt["audit_row_id"] = None
+        receipt["at"] = time.time()
         receipt = self._redact(receipt)
         with self.receipt_lock:
             receipt_id = self.receipts.append(receipt)
@@ -784,6 +838,7 @@ class TableApp:
             # revokes this snapshot together with the single-use token.
             self.preview_snapshot = self._speech_snapshot()
             self.state.update(self._mode_state())
+            self._publish()
             snapshot = dict(self.state)
             snapshot["voice_ready"] = True
             return {"kind": "reply", "speech_token": token, "state": snapshot,
@@ -797,6 +852,8 @@ class TableApp:
             saved_settings = saved.get("settings", {})
             if not isinstance(saved_settings, dict):
                 raise InputError("Saved settings could not be accepted.")
+            if not self.operator_token_available():
+                saved_settings = {**saved_settings, "operator_circle": False}
             # Presentation is visit-only in the current push, including when
             # loading a settings file written by an older Talking Table.
             settings = self._validate_settings({k: v for k, v in saved_settings.items()
@@ -893,6 +950,8 @@ class TableApp:
                 if not isinstance(proposed[name], bool):
                     raise InputError("A switch must be on or off.")
                 result[name] = proposed[name]
+        if result["operator_circle"] and not self.operator_token_available():
+            raise InputError(TOKEN_NOTE)
         if "lights_key" in proposed and (not isinstance(proposed["lights_key"], str)
                                           or len(proposed["lights_key"]) > 4096):
             raise InputError("The lights key must be text.")
@@ -980,6 +1039,7 @@ class TableApp:
                        operator_circle=setting["operator_circle"])
 
     def config(self, local=True):
+        self.token_ready = self.operator_token_available()
         with self.lock:
             settings = copy.deepcopy(self.settings)
             settings["operator_circle"] = bool(self.harness.operator_circle)
@@ -1006,7 +1066,11 @@ class TableApp:
                     f"under Remember. Conversation state and pairing stay in memory. "
                     f"Remembered settings and independently encrypted model, voice and lights keys are kept in "
                     f"{self.settings_path} only for the corresponding remember switches. "
-                    f"New session clears unremembered keys and keeps existing audit logs."
+                    f"New session clears unremembered keys and keeps existing audit logs. "
+                    f"review_queue.jsonl keeps explicitly flagged turn snapshots; terms.json keeps "
+                    f"vendor confirmations only under Remember, separately from keys. "
+                    f"operator.token enables the local operator-circle control and is generated "
+                    f"only by the operator's local command. Temporary .tmp files stage settings saves."
                 ),
                 "phone": {"enabled": self.phone_server is not None,
                           "code": self.pairing_code if local else None,
@@ -1018,11 +1082,12 @@ class TableApp:
                     "room_note", "handback_offer", "assist_offer", "second_opinion",
                     "made_page_footer", "object_refused")},
                 "resource": resources(self.settings["locale"] or None),
-                "state": dict(self.state),
+                "honesty": self.honesty(),
+                "state": self.sitting(),
             }
 
     def update_settings(self, proposed):
-        with self.lock:
+        with self.terms_lock, self.lock:
             settings = self._validate_settings(proposed)
             candidate = proposed.get("key", "")
             if not isinstance(candidate, str) or len(candidate) > 4096:
@@ -1081,7 +1146,8 @@ class TableApp:
                 preference_payload.update({key: settings[key] for key in REMEMBERED_EXTRAS
                                            if settings[key]})
                 preferences_payload = json.dumps(preference_payload)
-            self._persist_settings(settings_payload, preferences_payload)
+            terms_payload = json.dumps(self.confirmations) if settings["remember"] and self.confirmations else None
+            self._persist_settings(settings_payload, preferences_payload, terms_payload)
             self.settings = settings
             self.key = key
             self.voice_key = voice_key
@@ -1104,12 +1170,14 @@ class TableApp:
             if self.state["state"] != "card":
                 self.state.update(self._extras_state())
             self.state.update(self._mode_state())
+            self.pending_turn = None
+            self._publish()
             return self.config()
 
-    def _persist_settings(self, settings_payload, preferences_payload):
-        """Stage both independent files; an ordinary I/O failure adopts neither."""
+    def _persist_settings(self, settings_payload, preferences_payload, terms_payload=None):
+        """Stage independent files; an ordinary I/O failure adopts none."""
         updates = ((self.preferences_path, preferences_payload),
-                   (self.settings_path, settings_payload))
+                   (self.settings_path, settings_payload), (self.terms_path, terms_payload))
         originals = {path: path.read_bytes() if path.exists() else None for path, _ in updates}
         changed = []
         try:
@@ -1158,6 +1226,7 @@ class TableApp:
             self.harness = harness if harness is not None else self._build_harness()
             self.mode_revision += 1
             self.state = self._idle_state()
+            self._reset_features()
             self.lights.submit(None, "idle")
             return self.config()
 
@@ -1211,6 +1280,13 @@ class TableApp:
                     job.cancelled.set()
                     job.admitted.set()
                     raise InputError(control_error or HARNESS_LINES_EN["t2_tag_invalid"])
+            terms = self.terms_summary() if not job.gate and job.record and job.record.get("agent_id") else None
+            if not job.gate and job.record and job.record.get("agent_id") and terms and not terms["confirmed"]:
+                job.cancelled.set()
+                job.admitted.set()
+                error = InputError("Read the vendor terms summary and confirm the key attestation before a live reply.")
+                error.terms = terms
+                raise error
             self._cancel_jobs()
             self.revision += 1
             job.revision = self.revision
@@ -1227,6 +1303,7 @@ class TableApp:
             self.state["turn_count"] = self.harness.session.turn_count
             self.state["revision"] = self.revision
             self.state.update(self._mode_state())
+            self._posted(job)
             if job.gate:
                 # No model exists on this branch. Publish the card atomically
                 # before another turn or settings change can supersede it.
@@ -1241,9 +1318,12 @@ class TableApp:
     def _finish_job(self, job):
         """Called under the session lock; never waits for a model."""
         self.jobs.discard(job)
-        if job.cancelled.is_set():
+        if (job.cancelled.is_set() or job.session_id != self.session_id
+                or job.revision != self.revision):
             return self._superseded()
         if job.error or job.result is None:
+            self.pending_turn = None
+            self._publish()
             raise InputError("This message could not be processed. Send it again to try again.")
         turn = job.result
         gate = turn.action == "HUMAN_ESCALATION"
@@ -1326,7 +1406,9 @@ class TableApp:
                 token = secrets.token_urlsafe(32)
                 self.speech_tokens[token] = (self._speech_snapshot(), voice_id, text, False)
                 result["speech_token"] = token
-        return result if gate else self._redact(result)
+        result = result if gate else self._redact(result)
+        self._displayed(job, result)
+        return result
 
     def _speech_text(self, turn, previous):
         """What the seated character's voice may say for a released turn, or None.
@@ -1472,10 +1554,12 @@ class TableApp:
                 self.phone_server = None
                 self.pairing_code = None
                 self.paired.clear()
+                self.pairing_records.clear()
                 self.pair_attempts.clear()
                 # Shutdown may wait for a poll; keep that out of the request lock.
                 threading.Thread(target=lambda: (server.shutdown(), server.server_close()),
                                  daemon=True).start()
+            self._publish()
             return self.config()
 
     def pair(self, code, address):
@@ -1492,10 +1576,13 @@ class TableApp:
                 raise InputError("That pairing code did not match.")
             token = secrets.token_urlsafe(32)
             self.paired.add(token)
+            self.pairing_records[token] = {"scope": "phone"}
             return token
 
     def close(self):
         with self.lock:
+            self.closed = True
+            self._publish()
             self._cancel_jobs()
         self.set_network(False)
         self.lights.close()
@@ -1615,17 +1702,21 @@ class Handler(BaseHTTPRequestHandler):
             return False
         return self.headers.get("Sec-Fetch-Site", "same-origin") not in ("cross-site", "same-site")
 
-    def _paired(self):
-        if self.is_local:
-            return True
-        if self.server is not self.server.app.phone_server:
-            return False
+    def _scope(self):
         try:
             cookie = SimpleCookie(self.headers.get("Cookie", ""))
-            value = cookie[COOKIE].value if COOKIE in cookie else ""
-            return value in self.server.app.paired
+            if COOKIE in cookie:
+                record = self.server.app.pairing_records.get(cookie[COOKIE].value)
+                return record.get("scope") if record else None
+            if self.is_local:
+                return self.server.app.computer["scope"]
         except Exception:
-            return False
+            pass
+        return None
+
+    def _paired(self):
+        return self._scope() == "computer" or (
+            self.server is self.server.app.phone_server and self._scope() == "phone")
 
     def _authorize(self, path):
         if not self._origin_ok():
@@ -1640,7 +1731,56 @@ class Handler(BaseHTTPRequestHandler):
             self._send(403, {"error": "Enter the pairing code shown on the computer.",
                              "pairing_required": True, **mode})
             return False
+        if any(path == prefix or (prefix.endswith("/") and path.startswith(prefix))
+               for prefix in COMPUTER_PATHS) and self._scope() != "computer":
+            self._send(403, {"error": "Use this control on the computer."})
+            return False
         return True
+
+    def _events(self):
+        app = self.server.app
+        self.send_response(200)
+        self.send_header("Content-Type", "text/event-stream; charset=utf-8")
+        self.send_header("Cache-Control", "no-store")
+        self.send_header("X-Content-Type-Options", "nosniff")
+        self.send_header("Connection", "close")
+        self.end_headers()
+        version = -1
+        # Bound every fetch, including under constant activity. Chromium's
+        # virtual-time captures wait for pending network requests to finish.
+        deadline = time.monotonic() + 1.0
+        reconnect = False
+        try:
+            self.wfile.write(b"retry: 1000\n\n")
+            self.wfile.flush()
+            while self._paired():
+                with app.events:
+                    if app.closed:
+                        break
+                    if version == app.session_version:
+                        app.events.wait(timeout=max(0, deadline - time.monotonic()))
+                    if app.closed or not self._paired():
+                        break
+                    if time.monotonic() >= deadline:
+                        # Clients poll across this planned gap; EventSource
+                        # itself reconnects and receives the current snapshot.
+                        reconnect = True
+                        break
+                    snapshot = app.sitting() if version != app.session_version else None
+                if snapshot is not None:
+                    version = snapshot["session_version"]
+                    data = json.dumps(snapshot, ensure_ascii=False)
+                    frame = f"id: {version}\nevent: state\ndata: {data}\n\n".encode("utf-8")
+                else:
+                    frame = b": keep-alive\n\n"
+                self.wfile.write(frame)
+                self.wfile.flush()
+            if reconnect:
+                self.wfile.write(b"event: reconnect\ndata: {}\n\n")
+                self.wfile.flush()
+        except (OSError, ConnectionError):
+            pass
+        self.close_connection = True
 
     def do_GET(self):
         path = urllib.parse.urlsplit(self.path).path
@@ -1648,10 +1788,23 @@ class Handler(BaseHTTPRequestHandler):
             return
         app = self.server.app
         if path == "/api/config":
-            self._send(200, app.config(self.is_local))
+            self._send(200, app.config(self._scope() == "computer"))
         elif path == "/api/state":
-            with app.lock:
-                self._send(200, dict(app.state))
+            self._send(200, app.sitting())
+        elif path == "/api/events":
+            self._events()
+        elif path in ("/api/operator/state", "/api/replay", "/api/receipts/week", "/api/receipts/export"):
+            try:
+                if path == "/api/operator/state":
+                    value = app.correction_state()
+                elif path == "/api/replay":
+                    query = urllib.parse.parse_qs(urllib.parse.urlsplit(self.path).query)
+                    value = app.logged_decision(query.get("row_id", [None])[0])
+                else:
+                    value = app.receipt_week() if path.endswith("export") else app.refused_seats()
+                self._send(200, value)
+            except InputError as exc:
+                self._send(400, {"error": str(exc)})
         elif path == "/api/resources":
             with app.lock:
                 self._send(200, resources(app.settings["locale"] or None))
@@ -1661,14 +1814,18 @@ class Handler(BaseHTTPRequestHandler):
                 self._send(404, {"error": HARNESS_LINES_EN["t2_page_missing"]})
             else:
                 self._send(200, page, "text/html; charset=utf-8")
-        elif path in ("/", "/sigils.html") or path.startswith("/static/"):
+        elif path in ("/", "/sigils.html", "/operator.html", "/replay.html") or path.startswith("/static/"):
             relative = ("index.html" if path == "/" else "sigils.html" if path == "/sigils.html"
                         else urllib.parse.unquote(path[8:]))
+            if path in ("/operator.html", "/replay.html"):
+                relative = path[1:]
             target = (STATIC / relative).resolve()
             if STATIC.resolve() not in target.parents or target.suffix not in {".html", ".js", ".css", ".json", ".svg"}:
                 self._send(404, {"error": "File not found."})
             elif relative == "voice.js" and not target.exists():
                 self._send(200, b"/* Optional voice module is not installed. */\n", "text/javascript; charset=utf-8")
+            elif target.name in ("operator.html", "replay.html") and self._scope() != "computer":
+                self._send(403, {"error": "Open this page on the computer."})
             elif target.is_file():
                 content_type = {".js": "text/javascript", ".css": "text/css", ".html": "text/html"}.get(
                     target.suffix, mimetypes.guess_type(str(target))[0] or "application/octet-stream")
@@ -1681,7 +1838,7 @@ class Handler(BaseHTTPRequestHandler):
                     content = content.replace(b'data-mode="unknown"',
                                               b'data-mode="on"' if enabled else b'data-mode="off"')
                     content = content.replace("Checking operator-circle mode…".encode("utf-8"),
-                                              b"Operator-circle mode is ON." if enabled else
+                                              b"Operator-circle mode is ON. A prototype for the operator's circle." if enabled else
                                               b"Operator-circle mode is OFF.")
                 policy = _sigils_policy(content) if target == (STATIC / "sigils.html").resolve() else None
                 self._send(200, content, content_type + "; charset=utf-8", policy=policy)
@@ -1697,7 +1854,7 @@ class Handler(BaseHTTPRequestHandler):
         if not self._authorize(path):
             return
         app = self.server.app
-        if path in ("/api/settings", "/api/network") and not self.is_local:
+        if path in ("/api/settings", "/api/network") and self._scope() != "computer":
             self._send(403, {"error": "Change these settings on the computer."})
             return
         try:
@@ -1719,6 +1876,14 @@ class Handler(BaseHTTPRequestHandler):
                                          action=payload.get("action"), target=payload.get("target"),
                                          source_revision=payload.get("source_revision"),
                                          source_session=payload.get("source_session")))
+            elif path == "/api/terms/confirm":
+                self._send(200, app.confirm_terms(payload))
+            elif path == "/api/review/flag":
+                self._send(200, app.flag_turn(payload, self._scope()))
+            elif path == "/api/operator/clear-latch":
+                self._send(200, app.clear_careful_read(payload))
+            elif path == "/api/lights/check":
+                self._send(200, app.check_lights())
             elif path == "/api/object":
                 self._send(200, app.set_object(payload.get("text")))
             elif path == "/api/voice":
@@ -1729,7 +1894,7 @@ class Handler(BaseHTTPRequestHandler):
                 self._send(200, app.update_settings(payload))
             elif path == "/api/session/reset":
                 app.reset()
-                self._send(200, app.config(self.is_local))
+                self._send(200, app.config(self._scope() == "computer"))
             elif path == "/api/network":
                 self._send(200, app.set_network(payload.get("enabled")))
             elif path == "/api/pair":
@@ -1738,7 +1903,10 @@ class Handler(BaseHTTPRequestHandler):
             else:
                 self._send(404, {"error": "Endpoint not found."})
         except InputError as exc:
-            self._send(400, {"error": str(exc)})
+            if getattr(exc, "terms", None):
+                self._send(428, {"error": str(exc), "terms_required": True, "terms": exc.terms})
+            else:
+                self._send(400, {"error": str(exc)})
         except (ValueError, UnicodeDecodeError):
             self._send(400, {"error": "Send valid JSON and settings."})
         except Exception:

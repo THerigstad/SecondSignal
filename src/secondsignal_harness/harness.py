@@ -24,8 +24,10 @@ from secondsignal.safety import HOUSE_LINES_EN, SessionState
 from .adapters import AdapterReply, Message, ModelAdapter
 from .audit_log import AuditLog
 from .codex import CodexStore
+from .configuration import configuration, prompt_sha256, safe_identifier
 from .lines import HARNESS_LINES_EN
 from .prompt import ChosenNames, Presentation, applied_preferences, build_prompt, build_turn_block
+from .release_checks import release_checks
 from .table_extras import ask_acknowledgement
 from .view import audit_view
 
@@ -38,6 +40,7 @@ RELEASE_SHIP = "ship"
 RELEASE_OPERATOR_CIRCLE = "operator_circle"
 RELEASE_WITHHELD = "withheld"
 RELEASE_FAILURE = "failure"
+RELEASE_CHECK = "release_check"
 
 
 @dataclass(frozen=True)
@@ -123,7 +126,11 @@ class Harness:
 
     # ------------------------------------------------------------------ helpers
 
-    def _row(self, user_text: str, **fields: Any) -> str:
+    def _row(
+        self, user_text: str, *, configuration_record: Mapping[str, Any] | None = None,
+        configuration_reply: AdapterReply | None = None,
+        configuration_prompt_hash: str | None = None, **fields: Any,
+    ) -> str:
         """One row per turn. It carries the person's words, because a log the
         operator cannot read the conversation from is not an audit log."""
         row: dict[str, Any] = {
@@ -131,10 +138,18 @@ class Harness:
             "at": float(self.clock()),
             "turn_index": int(self.session.turn_count),
             "operator_circle": self.operator_circle,
-            "adapter": getattr(self.adapter, "name", "unknown"),
+            "adapter": safe_identifier(getattr(self.adapter, "name", "unknown")),
             "user_text": user_text,
         }
         row.update(fields)
+        row["configuration"] = configuration(
+            adapter=self.adapter, reply=configuration_reply,
+            prompt_hash=configuration_prompt_hash,
+            record=configuration_record or fields.get("decision", {}),
+            roster=self.roster, codexes=self.codexes, presentation=self.presentation,
+            chosen_names=self.chosen_names, max_turns=self.max_turns,
+            max_tokens=self.max_tokens, retries=self.retries,
+        )
         return self.audit_log.append(row)
 
     def _remember(self, text: str, *, spoken_by_house: bool) -> None:
@@ -209,6 +224,7 @@ class Harness:
                         text, kind="gate_audit_failure", outcome=outcome, action=action,
                         agent_id=None, house_lines=list(house_lines), released=False,
                         release_reason=RELEASE_GATE, audit_error=audit_error,
+                        configuration_record=record,
                     )
                 except Exception:
                     pass
@@ -261,6 +277,7 @@ class Harness:
         )
         system, messages = build_prompt(system_text, turn_block, self.transcript, max_turns=self.max_turns)
         prompt_digest = _digest(system + "\n".join(m["content"] for m in messages))
+        full_prompt_hash = prompt_sha256(system, messages)
         codex_digest = self.codexes.digest(agent_id)
 
         reply, calls, error = self._complete(system, messages)
@@ -270,6 +287,7 @@ class Harness:
                 text, kind="failure", outcome=outcome, action=action, agent_id=agent_id,
                 house_lines=list(house_lines), released=False, release_reason=RELEASE_FAILURE,
                 error=error, adapter_calls=calls, prompt_digest=prompt_digest,
+                configuration_prompt_hash=full_prompt_hash,
                 codex_digest=codex_digest, decision=_json_safe(record),
                 declared_preferences=applied, preference_adjustments=list(adjustments),
                 presentation_instructions=instructions,
@@ -299,12 +317,19 @@ class Harness:
                 tools=("append_audit_row",), rubric_locked=False, human_token_valid=False,
             )
         )
-        released, reason = self._release(verdict.status, verdict.layers.as_dict(), verdict.risk_class)
+        checks = release_checks(persona_text)
+        failed_checks = [name for name, result in checks.items() if result == "FAIL"]
+        if failed_checks:
+            released, reason = False, RELEASE_CHECK + ":" + ",".join(failed_checks)
+        else:
+            released, reason = self._release(verdict.status, verdict.layers.as_dict(), verdict.risk_class)
         out = composed if released else ("\n".join(house_lines) if house_lines else FAILURE_LINE)
 
         row_id = self._row(
             text, kind="seated", outcome=outcome, action=action, agent_id=agent_id,
-            model_id=reply.model_id, usage=dict(reply.usage), adapter_calls=calls,
+            model_id=safe_identifier(reply.model_id), usage=dict(reply.usage), adapter_calls=calls,
+            configuration_reply=reply, configuration_prompt_hash=full_prompt_hash,
+            release_checks=checks,
             prompt_digest=prompt_digest, codex_digest=codex_digest,
             persona_text=persona_text, house_lines=list(house_lines), composed=composed,
             bound_hash=bound, verdict=verdict.as_dict(), released=released,
@@ -362,6 +387,7 @@ __all__ = [
     "HARNESS_LINES_EN",
     "HOUSE_PREFIX",
     "Harness",
+    "RELEASE_CHECK",
     "RELEASE_FAILURE",
     "RELEASE_GATE",
     "RELEASE_OPERATOR_CIRCLE",

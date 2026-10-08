@@ -1,0 +1,139 @@
+{
+  "pytest_status": 0,
+  "files": [
+    "tests\\test_harness_contract.py",
+    "tests\\test_lights.py",
+    "tests\\test_order3_runtime.py",
+    "tests\\test_screen_fold_b3.py",
+    "tests\\test_stream_deck.py",
+    "tests\\test_t1_observer.py",
+    "tests\\test_t1_presentation.py",
+    "tests\\test_t1_table.py",
+    "tests\\test_t2_harness.py",
+    "tests\\test_t2_table.py",
+    "tests\\test_table_voice.py",
+    "tests\\test_talking_table.py"
+  ],
+  "replies": [
+    {
+      "text": "A & B\nSecond line.",
+      "released_turns": 1
+    },
+    {
+      "text": "About VBScript:\nstart with a greeting.",
+      "released_turns": 1
+    },
+    {
+      "text": "Ask a real person to help carry the table.",
+      "released_turns": 1
+    },
+    {
+      "text": "Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the list, then rest before the next one. Begin with the smallest task on the.",
+      "released_turns": 1
+    },
+    {
+      "text": "Call a friend to arrange lunch tomorrow.",
+      "released_turns": 1
+    },
+    {
+      "text": "Draw a straight line under the heading.",
+      "released_turns": 1
+    },
+    {
+      "text": "Here is a simple next step.",
+      "released_turns": 1
+    },
+    {
+      "text": "Here is the data:\tthree names and a date.",
+      "released_turns": 1
+    },
+    {
+      "text": "Here is the data: three names and a date.",
+      "released_turns": 1
+    },
+    {
+      "text": "Here is the plan in JavaScript: first the loop, then the check.",
+      "released_turns": 1
+    },
+    {
+      "text": "House music was everywhere that summer.",
+      "released_turns": 1
+    },
+    {
+      "text": "I'm sorry about your sister. Grief like that doesn't keep to a schedule, and the sleep going is part of it. Rowan is here too, later, if you want someone to talk it through with.",
+      "released_turns": 7
+    },
+    {
+      "text": "JavaScript:",
+      "released_turns": 1
+    },
+    {
+      "text": "JavaScript:\tfirst the loop, then the check.",
+      "released_turns": 1
+    },
+    {
+      "text": "JavaScript:\nfirst the loop, then the check.",
+      "released_turns": 1
+    },
+    {
+      "text": "Let's clean the house this weekend.",
+      "released_turns": 1
+    },
+    {
+      "text": "My house has a red door.",
+      "released_turns": 1
+    },
+    {
+      "text": "Okay.",
+      "released_turns": 10
+    },
+    {
+      "text": "Our in-house team will answer tomorrow.",
+      "released_turns": 1
+    },
+    {
+      "text": "PERSONA-TEXT-MARKER",
+      "released_turns": 555
+    },
+    {
+      "text": "Start with one small task tomorrow.",
+      "released_turns": 54
+    },
+    {
+      "text": "The bus line runs past my house.",
+      "released_turns": 1
+    },
+    {
+      "text": "The house always wins.",
+      "released_turns": 1
+    },
+    {
+      "text": "The house lights are on.",
+      "released_turns": 1
+    },
+    {
+      "text": "The line at the house party was long.",
+      "released_turns": 1
+    },
+    {
+      "text": "Their house line of olive oil is good.",
+      "released_turns": 1
+    },
+    {
+      "text": "Tidy the house for ten minutes, then take a break.",
+      "released_turns": 1
+    },
+    {
+      "text": "We can plan the house chores together.",
+      "released_turns": 1
+    },
+    {
+      "text": "We planted roses beside the house.",
+      "released_turns": 1
+    },
+    {
+      "text": "Σήμερα ο καιρός είναι καλός.",
+      "released_turns": 1
+    }
+  ]
+}

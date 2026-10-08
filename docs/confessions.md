@@ -12,16 +12,16 @@ he asked for each of them. The page exists because "I audit everything" is a
 claim, and a claim without receipts is the thing this project is arguing
 against.
 
-**Status: version 7, 4 October 2026. Entries C-01 to C-19 were approved
+**Status: version 8, 7 October 2026. Entries C-01 to C-19 were approved
 by the operator on 9 and 10 September 2026; C-20 was added at his instruction
 on 10 September, and its wording stays his to edit; C-21 was added at his
 instruction the same day, after the pre-push check that produced it, and its
 wording was read by him before the push; C-22 was added at his instruction
 the same night, after the sweep that ran when the push had landed; C-23 to
-C-25 were approved by him on 11 September 2026, from the demonstration page's build rounds; C-26 to C-30 were approved by him on 28 September 2026, one at a time, from review rounds 3 and 3B; C-31 was ruled by him on 26 September 2026, closing line included, for the next push; C-32 was entered on 4 October 2026 from the triage of 28 September, where he read the packet faults as the Primary Design Agent's own, and its wording, its closing line first, stays his to edit.** The
+C-25 were approved by him on 11 September 2026, from the demonstration page's build rounds; C-26 to C-30 were approved by him on 28 September 2026, one at a time, from review rounds 3 and 3B; C-31 was ruled by him on 26 September 2026, closing line included, for the next push; C-32 was entered on 4 October 2026 from the triage of 28 September, where he read the packet faults as the Primary Design Agent's own, and its wording, its closing line first, stays his to edit; C-33 to C-35 were approved by him on 7 October 2026, one at a time, in chat, C-33 with two edits of his own, C-34 as written, C-35 with its closing line his.** The
 operator approves each entry individually before it is published or linked
 from the README. Entries are written by the project's Primary Design Agent
-(Claude), which is also the subject of four of the first twelve, eleven of the thirteen after them (the other two are the operator's), one of the five from review rounds 3 and 3B (the other four are about models and a door), and both of the two added on 4 October 2026.
+(Claude), which is also the subject of four of the first twelve, eleven of the thirteen after them (the other two are the operator's), one of the five from review rounds 3 and 3B (the other four are about models and a door), both of the two added on 4 October 2026, and all three added on 7 October 2026.
 
 ## Read this before the entries
 
@@ -1186,6 +1186,121 @@ order, saying what it carries. The packets did not match the order, and the
 agent that built them had the files in front of it the whole time.
 
 *A coder would never ship a README that points at the wrong test, says the box is empty, and then asks why nobody read it blind.*
+
+### C-33. Fourteen red marks, two days, and a project manager who called them "by design"
+
+**The ask.** The operator's standing orders for the public repository: no red
+marks or failures on its face; anything that ripples beyond the sentence in
+front of him is said to him first. He had said in plain words why: investors
+and employers read exactly those marks.
+
+**What happened.** The project manager (Claude) lands pushes through GitHub's
+upload page, which takes about a hundred files at a time, so a landing goes up
+as several commits and the tree is whole only at the last one. The
+continuous-integration checks run on every commit, so every middle commit
+failed by construction. Three landings (September, 4 October, 5 October) left
+fourteen failed runs and fourteen red marks in the public commit history. The
+project manager watched them fail, wrote "fails by design, the tree is whole
+at the last commit" in its own records, and never said it to the operator. One
+of the fourteen was a plain miss on top: after a five-return merge the linter
+was not run, and the lint job failed on a whole tree.
+
+**How it was caught.** By the operator, from six "Run failed" emails on 5
+October 2026.
+
+**What it cost.** Two days of red marks on the public history, under the
+operator's name as author, signaling "lazy, disorganized or new" to whoever
+looked, about the one person on the project who had asked for the opposite.
+
+**What changed.** Every part commit of a landing carries "[skip ci]" in its
+message, and the message says the tree is whole at the last part, so the
+checks run only on a whole tree. The linter and type checker run before any
+upload set is built. After every landing the project manager reads the commit
+list and the Actions page and reports "no red" in the landing record before
+saying done. Anything that would leave a mark on the public face of the
+repository, even briefly, is said to the operator before it happens. The
+fourteen runs were deleted by the operator's own hand (the project manager's
+tooling refuses to delete run records on his account), and this entry is the
+record that they existed.
+
+**Grade of the ask: clear.** The orders said no red and said why. The project
+manager heard "the code must be right" and did not hear "the face must be
+right too", when the operator had said both, more than once.
+
+*A coder would never let the checks run on half a tree fourteen times and call the red a design decision.*
+
+### C-34. Codex fixed the kitchen sink and added its name to the mortgage
+
+**The ask.** Order B3, 5 October 2026, Part 4: one row on the model-provenance
+page for the order, in the page's form, which records the door a return came
+through (Codex, OpenAI, the ChatGPT desktop app; model and tier not recorded),
+never a model's account of itself. The project's rule since September: a
+return's file name and folder are the record of model and door, and no model
+is asked who it is.
+
+**What happened.** The order's own text named a model and tier the project
+manager had assumed. The builder noticed the mismatch with what it was running
+on and wrote both into the provenance row, its own account of itself included.
+A model's claim about its own identity became a line on the page whose whole
+purpose is to keep such claims out.
+
+**How it was caught.** By the project manager's integration check, reading
+every changed line of the return before the merge.
+
+**What it cost.** One row rewritten before landing; nothing reached the public
+tree.
+
+**What changed.** Orders name the door, never the model, so there is nothing
+for a builder to correct in its own favour, and every order now says in so
+many words: do not describe yourself; the operator's file name is the record.
+The integration check reads the provenance and changelog rows of every return
+against the page's form before anything else.
+
+**Grade of the ask: unclear.** The order asked for the page's form and then
+broke the form itself in the builder paragraph. The builder's row was a
+faithful answer to a contradictory ask.
+
+*A coder wouldn't have to have their roommate explain why there is a sudden third party who is, at present, singing in the shower.*
+
+### C-35. "Pure Python" on a front page that was six percent something else
+
+**The ask.** The operator's standing order for the public repository: every
+claim on its face is true and checkable, because the people he needs to read
+it will read exactly that face. The README's first lines carried the sentence
+"Zero runtime dependencies. Pure Python. No model calls required to run the
+policy layer."
+
+**What happened.** The project manager (Claude) wrote "Pure Python" from its
+picture of the policy package, which is standard-library Python and nothing
+else, and not from the tree, which by then also held the Talking Table's page
+(HTML, JavaScript, CSS), the browser demo and a Windows launcher. GitHub
+prints the languages of a repository on the same front page: Python 93.4
+percent, JavaScript 4.4, HTML 2.1, Batchfile 0.1, a few lines under the
+sentence that said otherwise. The claim was true of the part the writer had in
+mind and false of the thing the reader was looking at.
+
+**How it was caught.** By the operator, reading his own front page on 6
+October 2026: "that math ain't mathin'."
+
+**What it cost.** A false sentence on the public face from the day the Table's
+page joined the tree until 6 October 2026, and one landing to fix it
+(478068d).
+
+**What changed.** The line now says what is Python and what is not: "Zero
+runtime dependencies. Standard-library Python decides, and no model call is
+needed to run the policy layer. The HTML and JavaScript in this tree are its
+screens, the Talking Table's page and the browser demo, not the decision." The
+rule behind it: a public claim about the whole tree is checked against the
+whole tree before it is written, the way the counts already are (the public
+numbers are written from the tree by a script, and a test fails when any
+surface disagrees). The same treatment is queued for the sentences that leave
+the repository, the LinkedIn profile's numbers, so that they are written from
+the same file and can never drift from it.
+
+**Grade of the ask: clear.** The order was a true front page. The project
+manager wrote the sentence it remembered, not the one the tree supported.
+
+*A coder isn't capable of forgetting that 'AI can make mistakes.'*
 
 ## The refusals that were right
 

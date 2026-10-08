@@ -1,6 +1,7 @@
 """M1 gate and audit measurements; unchanged policy, FakeAdapter only, no network.
 
-Run from the repository root: python evals/gate_cost/measure_gate_cost.py
+Run from the repository root (one line):
+    python evals/gate_cost/measure_gate_cost.py --output evals/gate_cost/measurements/gate_cost_2026-10-06_h1.json
 The heavy-week audit is temporary and is removed before returning the report.
 """
 from __future__ import annotations
@@ -369,7 +370,36 @@ def audit_week(directory, turns_per_day, repeats):
                 f"For this {count:,}-turn week, {name} takes {values['median_ms']:.1f} ms "
                 f"at the median and at most {values['worst_ms']:.1f} ms in {repeats} reads."
             )
+        # H1 measures the actual append and its own proof, separately from
+        # historical lookups (which deliberately keep their original meaning).
+        proof_index = 0
+
+        def append_with_proof():
+            nonlocal proof_index
+            proof_index += 1
+            row = dict(templates[(proof_index - 1) % len(templates)])
+            row.pop("row_id", None)
+            row["at"] = 1_791_158_400.0 + 8 * 86400 + proof_index
+            return loaded.append(row)
+
+        def check_proof(row_id):
+            require(len(loaded) == count + proof_index, "append proof lost a row")
+            require(loaded._rows[-1]["row_id"] == row_id, "append proof returned the wrong id")
+
+        check_proof(append_with_proof())  # one untimed warm-up
+        append_proof = measure(append_with_proof, repeats, check_proof)
+        append_proof["proof_method"] = (
+            "bounded_tail" if hasattr(loaded, "_prove_tail") else "historical_lookup"
+        )
+        append_proof["starting_rows"] = count
+        append_proof["starting_file_bytes"] = size
+        append_proof["plain_sentence"] = (
+            f"For this {count:,}-turn week, append plus {append_proof['proof_method']} proof "
+            f"takes {append_proof['median_ms']:.3f} ms at the median and at most "
+            f"{append_proof['worst_ms']:.3f} ms in {repeats} appends."
+        )
         return {"turns_per_day": turns_per_day, "days": 7, "turns": count,
+                "append_proof": append_proof,
                 "estimate": f"{turns_per_day:,} turns/day across seven days; the full run uses 1,000/day, about 83/hour across 12 hours, as a deliberately heavy shared-Table sizing scenario, not observed traffic.",
                 "file_bytes": size, "file_mib": round(size / 1024**2, 3),
                 "bytes_per_turn": round(size / count, 3), "sha256": digest.hexdigest(),
@@ -382,7 +412,11 @@ def audit_week(directory, turns_per_day, repeats):
                 "first_open_after_generation": first_open, "measurements": measurements,
                 "read_paths": {
                     "startup_reset_settings": "TableApp._build_harness creates AuditLog(path), eagerly reading/parsing every row; reset and update_settings call it.",
-                    "append_receipt": "AuditLog.append calls read(new_row_id); read loads all text, splits lines and parses sequentially until the id; a new receipt follows the last-row path.",
+                     "append_receipt": (
+                        "AuditLog.append verifies only the bounded last line, its canonical bytes, id and write offset."
+                        if hasattr(loaded, "_prove_tail") else
+                        "AuditLog.append calls read(new_row_id); historical read scans to the new last row."
+                    ),
                     "rows": "rows() copies dictionaries already in memory and is supplemental; no separate audit-view HTTP endpoint exists.",
                 }, "temporary_file_retained": False}
     finally:
@@ -455,38 +489,19 @@ def run_report(*, repetitions=100, audit_repetitions=7, turns_per_day=1000,
                          for op in ("crisis_screen", "route"))
         table_worst = max(idle_card["worst_ms"], busy_card["worst_ms"])
         audit_worst = max(row["worst_ms"] for row in audit["measurements"].values())
-        receipt = audit["measurements"]["read_last"]
-        receipt_matters = receipt["worst_ms"] > 250
+        receipt = audit["append_proof"]
         after_sentence = (
-            f"The slowest screen/route was {gate_worst:.1f} ms "
-            f"({'above' if gate_worst > 250 else 'below'} about a quarter second); "
-            f"the slowest actual Table card return with a one-row audit was {table_worst:.1f} ms. "
-            f"The slowest standalone audit read/open was {audit_worst / 1000:.2f} seconds "
-            f"({'above' if audit_worst > 3000 else 'below'} the declared three-second meaning of 'a few seconds'). "
+            f"The slowest screen/route was {gate_worst:.1f} ms; the slowest actual "
+            f"Table card return with a one-row audit was {table_worst:.1f} ms. "
+            f"The slowest historical audit read/open was {audit_worst / 1000:.2f} seconds. "
+            + receipt["plain_sentence"] + " "
+            "Historical read(row_id) and open-time parsing remain whole-log operations. "
+            "The one-row card samples do not measure combined full-week card latency. "
+            "No fix is applied by this measurement script; it measures the imported "
+            "implementation. Finite warm runs do not establish a universal latency bound."
         )
-        after_sentence += (
-            f"The week's last-row receipt read took {receipt['median_ms']:.1f} ms at the median and "
-            f"{receipt['worst_ms']:.1f} ms at worst. Source-based inference: AuditLog.append reads this "
-            "receipt synchronously, and TableApp.turn waits for that job even on a card; "
-            + ("this scan alone can delay a week's card return beyond a quarter second, despite fast "
-               "one-row card samples. " if receipt_matters else
-               "the one-row card samples still do not measure combined full-week card latency. ")
-        )
-        if max(gate_worst, table_worst) > 250:
-            after_sentence += ("The cheapest honest gate next step is to profile repeated full-text normalization "
-                               "and folds, then measure semantics-preserving reuse of that complete analysis; "
-                               "never truncate the tail or omit the screen. ")
-        if audit_worst > 3000 or receipt_matters:
-            after_sentence += ("The cheapest honest receipt fix to test is reading back the just-appended "
-                               "canonical row at its recorded byte offset and checking its id, preserving "
-                               "on-disk receipt proof without rescanning the week. ")
-            if audit_worst > 3000:
-                after_sentence += "Measure streaming/indexed historical reads if whole-file opens still matter. "
-        if max(gate_worst, table_worst) <= 250 and audit_worst <= 3000 and not receipt_matters:
-            after_sentence += "No measured path requires a speed fix at these sizes on this machine. "
-        after_sentence += "No fix is applied; finite warm runs do not establish a universal latency bound."
         policy_accepted = next(c for c in cases if c["disposition"] in {"accepted", "contract_adjusted"})
-        return {"schema_version": 1, "date": "2026-10-05", "measurement_only": True,
+        return {"schema_version": 1, "date": "2026-10-07", "measurement_only": True,
                 "scope": "full" if full else "smoke/limited", "machine": machine(),
                 "method": {
                     "network": "Socket connect/connect_ex/bind/listen/sendto/create_connection/getaddrinfo blocked; no listener; FakeAdapter only.",
@@ -517,7 +532,7 @@ def run_report(*, repetitions=100, audit_repetitions=7, turns_per_day=1000,
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", type=Path, default=HERE / "measurements/gate_cost_2026-10-05.json")
+    parser.add_argument("--output", type=Path, default=HERE / "measurements/gate_cost_2026-10-06_h1.json")
     args = parser.parse_args(argv)
     report = run_report()
     args.output.parent.mkdir(parents=True, exist_ok=True)
@@ -535,6 +550,7 @@ def main(argv=None):
     print(f"Heavy week: {report['audit_week']['turns']} turns, {report['audit_week']['file_bytes']} bytes")
     for measurement in report["audit_week"]["measurements"].values():
         print(measurement["plain_sentence"])
+    print(report["audit_week"]["append_proof"]["plain_sentence"])
     print(report["after_sentence"])
     return 0
 

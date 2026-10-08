@@ -13,6 +13,34 @@ with the rulings of 3 October on review rounds 3 and 3B (holds are per
 message today; the character write-ups are fixed; the survivor fixtures are
 ported).
 
+## Harness kit — 7 October 2026, order H1
+
+The Table still carries its own copy of the reserved-voice guard; a later Table
+order must point the wrapper at the new harness module. The house-line near-copy
+predicate is a contiguous folded-word rule, not a semantic paraphrase detector;
+stored template slots are literal, while the copied Table predicate continues to
+recognize its seven rendered templates. Unreported model versions and missing
+locks in caller-supplied codex folders are recorded as null, never invented.
+Credential checks recognize identifier/token shapes and exclude arbitrary
+adapter state; spelling alone cannot identify every opaque secret. A seated
+presentation change necessarily changes the full prompt hash as well as the
+presentation field; no-call rows change presentation alone. Historical audit
+lookups and open-time parsing still scan the log. No live model trial, policy gap,
+recorded dissent or cultural-rubric limitation is closed by H1.
+
+## Table kit three — 7 October 2026, order T3
+
+Vendor terms summaries are PM drafts; vendor pages, account training settings,
+live models and physical lamps were not checked in the offline build. Compatible
+hosts have no universal terms URL. Reload recovery lasts only for the running
+server's shared sitting: closing a browser page does not end it, and restarting
+the server does not reconstruct it from audit files. Replay shows only retained
+record fields; crisis routing names and details remain deliberately absent.
+The weekly map is limited to receipts with a saved timestamp or a linked audit
+row. Receipt export uses the browser's save/download behavior. These Table
+surfaces close no documented policy gap or recorded dissent, and add no
+transcript-storage switch.
+
 ## Table kit two — 6 October 2026, order T2
 
 The named-ask acknowledgement cannot activate on the supplied policy record:

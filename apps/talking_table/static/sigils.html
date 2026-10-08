@@ -8,8 +8,8 @@
 <title>SecondSignal · Who is seated</title>
 <!--
   sigils.html: the phone page of the room lights. A prototype for the operator
-  and adults he knows; not a crisis service. It asks GET /api/state every two
-  seconds and shows whoever the policy seated. Its ask buttons send an ordinary
+  and adults the operator knows; not a crisis service. It asks GET /api/state every
+  second (two for a legacy Table) and shows whoever the policy seated. Its ask buttons send an ordinary
   message to POST /api/turn; the policy decides. sigils.html?ask=vandal (or any
   id) presses that button once. Plain JavaScript, no build step, nothing
   fetched from anywhere but the Talking Table that serves it.
@@ -35,8 +35,9 @@ h1,p{margin:0}[hidden]{display:none!important}
 .plate.assist{margin-top:16px;background:var(--ivory);border:3px double var(--charcoal);border-top:4px solid var(--sage);padding:9px 6px 10px}
 #view-idle{text-align:center}#view-idle svg{width:min(56vw,240px);height:auto;display:block;margin:0 auto 16px}
 #view-idle p,#view-waiting p{font-size:15px;line-height:23px;font-weight:550}#view-waiting{text-align:center;color:var(--muted)}
-#view-card{flex:1 0 auto;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px}
-#card-words{font:550 23px/32px system-ui,sans-serif;color:var(--charcoal)}
+#view-card{flex:1 0 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px 0;min-width:0;width:100%}
+#card-words{font:400 16px/24px system-ui,sans-serif;color:var(--charcoal);width:100%;min-width:0;max-width:100%;white-space:pre-wrap;overflow-wrap:anywhere}
+#card-location{font:550 23px/32px system-ui,sans-serif;color:var(--charcoal);max-width:100%;overflow-wrap:anywhere}#card-words:not([hidden])+#card-location{margin-top:24px}
 #asks{padding:16px;border-top:1px solid var(--rule)}#asks>p{font-size:13px;line-height:21px;color:var(--muted);margin-bottom:12px}
 .ask-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.ask-grid button{border-left-width:8px}
 #ask-status{font:12px/20px ui-monospace,monospace;color:var(--muted);margin-top:12px;min-height:20px;overflow-wrap:anywhere}
@@ -54,7 +55,8 @@ body[data-state=card]{background:#FFFFFF}body[data-state=card] #notice{border-bo
 <svg viewBox="0 0 100 100" role="img" aria-label="SecondSignal mark: two nested open doorways on one baseline"><path d="M 23 82 V 24.5 Q 23 21 26.5 21 H 73.5 Q 77 21 77 24.5 V 82" fill="none" stroke="#252823" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/><path d="M 39 82 V 47 Q 39 44 42 44 H 58 Q 61 44 61 47 V 82" fill="none" stroke="#A64527" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg>
 <h1 id="phone-house-name">SecondSignal</h1><p class="sub">Who is seated</p>
 </header>
-<p id="notice">This is a prototype for the operator and adults he knows. It is not a crisis service.</p>
+<p id="notice">This is a prototype for the operator and adults the operator knows. It is not a crisis service.</p>
+<p id="phone-stream-status" role="status"></p>
 <main id="stage" aria-live="polite">
 <section id="view-waiting"><p>Waiting for the Talking Table…</p></section>
 <section id="view-idle" hidden>
@@ -66,7 +68,7 @@ body[data-state=card]{background:#FFFFFF}body[data-state=card] #notice{border-bo
 <div id="phone-assist-offer" class="phone-offer" hidden></div><div id="phone-handback" class="phone-offer" hidden></div><p id="phone-object" hidden></p>
 <div class="plate assist" id="assist-plate" data-state="assisting" hidden><div class="plate-names"></div><div class="plate-labels"></div><p class="plate-status">Assisting</p></div>
 </section>
-<section id="view-card" hidden><p id="card-words">The crisis card is on the main screen.</p></section>
+<section id="view-card" hidden><p id="card-words" hidden></p><p id="card-location">The crisis card is on the main screen.</p></section>
 </main>
 <section id="asks" aria-label="Ask for a character">
 <p>Asking sends an ordinary message. The house decides who sits, and this page and the lights show whoever it seats.</p>
@@ -103,6 +105,7 @@ const SETTINGS=['as_written','women','men','neither'];
 const POLL_MS=2000;
 const $=id=>document.getElementById(id);
 let pollTimer=null,sending=false,lastState=null,biographyFocus=null;
+let sessionVersion=-1;
 
 function element(tag,text,cls){const el=document.createElement(tag);if(text!==undefined)el.textContent=text;if(cls)el.className=cls;return el;}
 function settingFor(id,presentation){
@@ -198,11 +201,19 @@ async function openResources(){
   }catch(error){$('phone-resource-status').textContent='Resources could not be loaded. Try again when the Table is connected.';}
 }
 function render(s){
+  if(Number.isSafeInteger(s.session_version)){
+    if(s.session_version<sessionVersion)return;
+    sessionVersion=s.session_version;
+    if(typeof s.operator_circle==='boolean')$('notice').textContent=s.operator_circle?'A prototype for the operator’s circle. Operator-circle mode is ON. Not a crisis service.':'A prototype for the operator and adults the operator knows. Operator-circle mode is OFF. Not a crisis service.';
+  }
+  if($('phone-stream-status'))$('phone-stream-status').textContent='';
   lastState=s;
   renderDecision();
   const state=s&&typeof s==='object'?s.state:null;
   // The card first and alone: no plate, no name, no colour, no ask buttons.
   if(state==='card'){
+    $('card-words').textContent=typeof s.card==='string'?s.card:'';
+    $('card-words').hidden=!$('card-words').textContent;
     show('card');$('header').hidden=true;$('asks').hidden=true;
     $('phone-tools').hidden=true;$('phone-resources-open').hidden=true;
     $('phone-resources').close();$('phone-resources').hidden=true;
@@ -233,12 +244,16 @@ function render(s){
 }
 async function poll(){
   clearTimeout(pollTimer);
+  let delay=1000;
   try{
     const response=await fetch('/api/state',{cache:'no-store',headers:{'Accept':'application/json'}});
     if(!response.ok)throw new Error('status '+response.status);
     render(await response.json());
-  }catch(error){if(!lastState)show('waiting');}
-  pollTimer=setTimeout(poll,POLL_MS);
+    // The original unversioned Table keeps its two-second polling contract.
+    if(sessionVersion<0)delay=POLL_MS;
+  }catch(error){if(!lastState)show('waiting');if($('phone-stream-status'))$('phone-stream-status').textContent='The table is out of reach. Reconnecting.';}
+  clearTimeout(pollTimer);
+  pollTimer=setTimeout(poll,delay);
 }
 async function ask(profile){
   // A legacy Table accepts only text; a T2 state advertises its presentation map.

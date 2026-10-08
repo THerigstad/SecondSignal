@@ -75,8 +75,9 @@ phone joining does not reset the active choice. Operator-circle mode starts off.
 eligible reply only when the cultural audit is unlocked and only for the operator
 and known adults; it never overrides the crisis gate or other audit failures.
 The screen and settings dialog continuously show the active mode, including on
-card and pairing screens. Other open tabs and phones refresh this status every
-second and when brought back into view. A lost connection retains the last
+card and pairing screens. Other open Table tabs follow the server event
+stream, with polling when that stream is unavailable. The phone page polls the
+shared sitting every second and never opens a stream. A lost connection retains the last
 confirmed status until the server can be reached again.
 
 ### How replies are presented
@@ -174,8 +175,8 @@ saveable page containing only that released character text, its presentation
 name as byline and the house footer “Written with a seated companion, not a
 professional.” The server reads the released turn; the browser never posts the
 reply text back. Up to three **What would {Name} add?** controls are drawn from
-other eligible candidates on that turn. Held turns share a two-offer limit across
-hand-back, assist and second-view controls. Earlier replies retain their own
+other eligible candidates on that turn. Held turns reserve their two optional controls for the review labels below;
+hand-back, assist and second-view controls are suppressed on those turns. Earlier replies retain their own
 eligibility and presentation names. They submit exactly those words as a
 new turn, labelled **a second view**, with one policy-selected voice per reply.
 
@@ -216,8 +217,8 @@ possible paraphrase or language.
 
 Real models may cost money. The pretend model is free.
 
-A free Gemini key from Google AI Studio works for testing. On the free tier Google
-may use what you type, so use test messages only.
+Live keys must satisfy the vendor terms and no-training attestation below.
+The pretend model is available for testing without a vendor key.
 
 Select the correct vendor and enter that vendor's model identifier and key.
 For **Other compatible host**, enter the vendor's own compatible endpoint. Keys
@@ -345,3 +346,115 @@ through the policy layer before the ordinary 16,000-character message limit.
 The policy's documented gaps and its processing time on unusually long tokens
 remain unchanged. No real model, key, microphone, light, or phone is needed for
 the local scripted regression checks.
+
+## Table kit three — 7 October 2026
+
+**Known gaps and limitations** is generated from the case manifest, package
+`__version__`, English and Spanish pack status, and ADR-0029 in the decision
+register. It states the documented gap and dissent counts, unreviewed lexicons,
+operator-circle exception and prototype scope. It appears once per package
+version in each browser; Settings reopens it. The version acknowledgment uses
+browser local storage and holds no conversation or credential.
+
+The composer explains the shared sitting before a message is sent. Closing the
+**server window** ends that sitting; closing or reloading a browser page leaves
+it available to the other paired screens until **New session** or server shutdown.
+The audit is durable, but it does not restore a sitting after a server restart.
+No transcript-storage switch is added. A turn or New session on any paired screen
+changes the same sitting on all screens.
+
+Each change has one increasing server session version. `/api/events` sends full
+current snapshots. Each stream closes after one second, even during activity;
+EventSource reconnects after its advertised one-second retry. Table and review pages poll during
+the gap, without treating a planned closure as an outage or stopping speech.
+The phone page uses `/api/state` every second and never opens an event stream,
+so virtual-time screenshots cannot stall on an in-flight stream fetch.
+Unversioned legacy Table responses retain their original two-second interval.
+The event endpoint remains available to paired phones. A failed phone poll
+shows “The table is out of reach. Reconnecting.” and retries after one second.
+Reload restores released
+and withheld replies or the current card. Remote turns, including the Stream
+Deck's existing ask POST, appear through the same path as locally submitted turns.
+Saved snapshots never replay speech. A card bypasses paused views, closes optional
+dialogs and wins over stale replies, polls and prior sessions. A lost stream says:
+“The table is out of reach. Reconnecting.” No second routing state is maintained.
+
+Before the first seated send to each live vendor, the Table displays the fixed
+summary in `vendor_terms.json` and requires both summary confirmation and:
+“This key is not used to train the vendor's models, as far as I know.” The summaries
+are PM drafts, name each vendor's own terms page as the authority, and do not
+verify account settings. Compatible hosts have separate confirmations by host;
+their own terms page must be checked because no universal terms URL exists.
+The pretend model needs no confirmation, and a crisis card never consults this
+gate. Rejected consent leaves the policy session unchanged. `terms.json` stores
+only vendor/revision acknowledgments when Remember is on; otherwise acknowledgment
+lasts for this sitting. It never sits beside an API key. Turning Remember off
+removes that file in the same settings transaction.
+
+Operator-circle starts off and the Settings switch requires `operator.token` in
+the Table's data folder. Generate it locally, without printing its value:
+
+```console
+python -m apps.talking_table --make-operator-token
+```
+
+For a custom data folder, pass the same `--data-dir` to this command and the server.
+The command refuses a folder inside the repository, does not overwrite an existing
+token, and starts no server. No token ships in the tree or appears on a page.
+Without it the disabled control says: “Operator-circle mode needs the operator's
+token on this computer.” The enabled banner says it is a prototype for the
+operator's circle. Direct test harness construction retains its explicit mode.
+
+Pairing records carry `phone` scope; loopback computer access carries `computer`
+scope. The central authorization boundary checks all settings, presentation,
+network, operator, replay, receipts-export and lights paths. A phone can send,
+reset and flag turns, but cannot change those computer settings or open the
+operator/replay pages, including through encoded static aliases. Turning phone
+access on requires dismissing this blocking warning:
+
+> The phone page travels over plain HTTP on your Wi-Fi. Anyone on this network who finds the address and the pairing code can read the table. Turn it on only on a network you trust.
+
+Each released or withheld turn has two optional labels: **this was read wrong**
+and **this missed me**. A tap saves the original decision, receipt, displayed text
+and actual house lines, visible page version and caller scope in
+`review_queue.jsonl`, privately on the computer. It changes no label, fixture or
+policy state. The project manager can turn queue items into fixtures by hand.
+A slow queue write cannot delay a card or put old content back over it.
+
+**Review a careful-side read** opens `/operator.html` on the computer. The operator
+reads the latch, enters a reason and invokes the existing
+`clear_latch(reason, actor="operator")`. A durable request row precedes the clear;
+a distinct result row records either completion or a superseded review. A changed
+sitting rejects an old review. Message text gains no way to clear the latch.
+The latch surface says: “A careful-side read is reviewed by the person who runs
+this table. The review looks at the turn, not at you.”
+
+**Voices set aside this week** counts recorded vetoes in the local Monday-to-Sunday
+week. It displays voice/reason counts only, without message text, message dates or
+streaks. **Save this week's receipt bundle** explicitly downloads those receipts
+and the roster hash; the browser's normal save/download control chooses the file.
+Older receipts use their linked audit timestamp; new receipts carry a timestamp.
+Nothing is uploaded or exported automatically.
+
+**Replay a logged decision** opens `/replay.html`; the Decision Card's technical
+layer links the current audit row. An audit or receipt row id opens the saved
+extract, ranked eligibility/score/verdict, recorded stabilizer rationale, assist,
+holds, house lines and audit verdict. It reads the logged record and never routes
+again. Crisis logs retain their existing nameless projection; omitted routing
+fields are explicitly marked unavailable, not reconstructed.
+
+**Test lights** calls `POST /api/lights/check`. When the configured lights switch
+and key are present, the existing worker shows roster colours in order, about two
+seconds after each scene completes, then card white, then idle. With lights off
+or missing a key it says: “Lights are off or not set up; nothing to show.” A real
+turn, reset or settings change cancels the remaining check; a card keeps the floor.
+The check adds no conversation, receipt, audit row or session-version change.
+
+The complete durable data-folder inventory is `audit.jsonl` (messages, accepted
+output, decisions and operator correction records), `receipts.jsonl` (sanitized
+non-crisis decision receipts), `review_queue.jsonl` (explicitly flagged snapshots),
+`settings.json` (remembered settings with encrypted credentials), `preferences.json`
+(remembered presentation/style choices), `terms.json` (remembered vendor consent),
+and the locally generated `operator.token`. Temporary `.tmp` files exist only
+while staging settings writes. No new surface stores an API key. The separate
+voice and lights remember switches retain their existing behavior.

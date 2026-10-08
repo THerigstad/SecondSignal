@@ -36,6 +36,7 @@ class AdapterReply:
     text: str
     model_id: str
     usage: dict[str, int] = field(default_factory=dict)
+    model_version: str | None = None
 
 
 class AdapterError(RuntimeError):
@@ -66,6 +67,7 @@ class FakeAdapter:
     name: str = "fake"
     model_id: str = "fake-1"
     calls: list[dict[str, Any]] = field(default_factory=list)
+    model_version: str = "1"
 
     def complete(
         self, system: str, messages: Sequence[Message], *, max_tokens: int
@@ -74,12 +76,12 @@ class FakeAdapter:
             {"system": system, "messages": [dict(m) for m in messages], "max_tokens": max_tokens}
         )
         if callable(self.script):
-            return AdapterReply(text=self.script(system, messages), model_id=self.model_id)
+            return AdapterReply(text=self.script(system, messages), model_id=self.model_id, model_version=self.model_version)
         index = min(len(self.calls) - 1, len(self.script) - 1)
         item = self.script[index]
         if isinstance(item, BaseException):
             raise item
-        return AdapterReply(text=str(item), model_id=self.model_id)
+        return AdapterReply(text=str(item), model_id=self.model_id, model_version=self.model_version)
 
 
 def _urllib_transport(url: str, headers: dict[str, str], body: bytes) -> tuple[int, bytes]:

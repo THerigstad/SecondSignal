@@ -48,8 +48,227 @@
     request: 0, rendered: 0, cardBarrier: 0, epoch: 0, pending: new Set(),
     submissions: new Map(), paused: false, queued: [], lowDemand: false, showTable: false, lastCardRevision: -1, serverSession: null,
     surface: {}, sprint: createSprint(), sprintTimer: null, biographyPersona: null,
+    serverVersion: -1, displayed: new Set(), stream: null, streamUp: false, queuedSnapshot: null,
+    limitationsSeen: null, networkResolve: null, pendingTerms: null,
     operatorCircle: null, modeRevision: -1, modePolling: false, circleDirty: false};
   const familyLabels = {fake: "Pretend model · free", gemini: "Gemini", openai: "OpenAI", anthropic: "Anthropic", xai: "xAI", compatible: "Compatible host"};
+
+  // Order T3: the server version orders every stream, poll and POST snapshot.
+  function versioned(snapshot) { return snapshot && Number.isSafeInteger(snapshot.session_version); }
+  function stale(snapshot) { return versioned(snapshot) && snapshot.session_version < state.serverVersion; }
+  function connectionLost() {
+    if ($("stream-status")) $("stream-status").textContent = "The table is out of reach. Reconnecting.";
+    voiceCall("stopAll");
+  }
+  function clearRemoteView() {
+    state.last = null; state.count = 0; state.displayed.clear();
+    state.queuedSnapshot = null;
+    $("transcript").replaceChildren(); $("transcript").hidden = false;
+    $("crisis").replaceChildren(); $("crisis").hidden = true;
+    $("empty-state").hidden = false; $("workspace").classList.remove("card-mode");
+    applyView();
+  }
+  function consumeSnapshot(snapshot, postedTurn = null, request) {
+    if (!versioned(snapshot) || stale(snapshot) || !state.config) return false;
+    const changed = state.serverSession !== null && state.serverSession !== snapshot.session_id;
+    state.serverVersion = snapshot.session_version;
+    state.config.state = snapshot;
+    adoptSession(snapshot, request);
+    if (changed) clearRemoteView();
+    if (snapshot.view_settings) {
+      const changedSettings = JSON.stringify(snapshot.view_settings) !== JSON.stringify(state.sharedSettings);
+      Object.assign(state.config.settings, snapshot.view_settings);
+      state.sharedSettings = snapshot.view_settings;
+      if (changedSettings) { drawTable(); refreshPresentationNames();
+        $("model-label").textContent = familyLabels[state.config.settings.adapter] || "Selected model"; }
+    }
+    applyOperatorMode(snapshot); applySurface(snapshot);
+    if ($("stream-status")) $("stream-status").textContent = "";
+    if ($("latch-review")) {
+      $("latch-review").hidden = !snapshot.latch || snapshot.latch === "none" || snapshot.state === "card";
+      $("latch-review").textContent = snapshot.latch_review_note || "";
+    }
+    const turns = [...(snapshot.turns || []), ...(postedTurn ? [postedTurn] : [])];
+    if (snapshot.state === "card" && typeof snapshot.card === "string") {
+      state.queuedSnapshot = null;
+      if ($("remote-pending")) $("remote-pending").hidden = true;
+      closeHonestyDialogs();
+      const card = turns.findLast ? turns.findLast(turn => turn.kind === "card") : [...turns].reverse().find(turn => turn.kind === "card");
+      receiveCard(card || {kind: "card", card: snapshot.card, receipt: snapshot.receipt,
+        decision: snapshot.decision || {}, state: snapshot}, request);
+      if (card && card.turn_id) state.displayed.add(card.turn_id);
+      return true;
+    }
+    if (state.paused) {
+      const saved = [...(state.queuedSnapshot?.turns || []), ...turns];
+      const ordered = [...new Map(saved.map(turn => [turn.turn_id, turn])).values()]
+        .sort((a, b) => (a.page_version || 0) - (b.page_version || 0));
+      state.queuedSnapshot = Object.assign({}, snapshot, {turns: ordered});
+      return true;
+    }
+    for (const saved of turns) {
+      if (!saved || !saved.turn_id || state.displayed.has(saved.turn_id)) continue;
+      const turn = Object.assign({}, saved, {speech_token: null});
+      renderTurn(turn, turn.user_text || "");
+      state.displayed.add(turn.turn_id);
+    }
+    state.surface = snapshot;
+    state.count = snapshot.turn_count || 0;
+    if ($("remote-pending")) {
+      $("remote-pending").hidden = !snapshot.pending_turn;
+      $("remote-pending").textContent = snapshot.pending_turn?.user_text || "";
+    }
+    if (snapshot.pending_turn) status("status", "A turn is waiting for its reply.");
+    paintTable(state.last);
+    // A local POST alone owns its speech capability; reloads and stream replay stay silent.
+    if (postedTurn && postedTurn.kind === "reply" && postedTurn.speech_token && !postedTurn.superseded) {
+      voiceCall("speak", {speech_token: postedTurn.speech_token, kind: "reply", state: snapshot,
+        release_reason: postedTurn.release_reason});
+    }
+    return true;
+  }
+  function startStream() {
+    if (!state.config?.honesty || state.stream || typeof window.EventSource !== "function") return;
+    const stream = state.stream = new window.EventSource("/api/events");
+    let expectedReconnect = false;
+    stream.addEventListener("state", event => {
+      expectedReconnect = false;
+      try { const snapshot = JSON.parse(event.data); state.streamUp = true; consumeSnapshot(snapshot); }
+      catch (_) { state.streamUp = false; connectionLost(); }
+    });
+    stream.addEventListener("reconnect", () => { expectedReconnect = true; });
+    stream.addEventListener("error", () => {
+      state.streamUp = false;
+      if (expectedReconnect) { expectedReconnect = false; pollOperatorMode(); }
+      else connectionLost();
+    });
+  }
+  function closeHonestyDialogs() {
+    for (const id of ["limitations-dialog", "terms-dialog", "network-warning-dialog", "refused-dialog"]) {
+      if ($(id)?.open) $(id).close();
+    }
+    if (state.networkResolve) { state.networkResolve(false); state.networkResolve = null; }
+  }
+  function showLimitations() {
+    const sheet = state.config?.honesty?.limitations;
+    if (!sheet || state.last?.kind === "card" || state.config.state?.state === "card") return;
+    $("limitations-content").replaceChildren(...sheet.lines.map(line => el("p", line)));
+    $("limitations-version").textContent = "Version " + sheet.version;
+    if (!$("limitations-dialog").open) $("limitations-dialog").showModal();
+    state.limitationsSeen = sheet.version;
+    try { window.localStorage?.setItem("secondsignal.limitations.version", sheet.version); } catch (_) {}
+  }
+  function applyHonesty(config) {
+    if (!config.honesty) return;
+    const honesty = config.honesty;
+    $("session-honesty").replaceChildren(...honesty.session_lines.map(line => el("p", line)));
+    $("operator-circle").disabled = !config.local || !honesty.operator_token_available;
+    $("operator-token-note").textContent = honesty.operator_token_available ? "" : honesty.token_note;
+    $("operator-tools").hidden = !config.local;
+    $("network-warning-copy").textContent = honesty.network_warning;
+    $("lights-check").disabled = !config.local;
+    let seen = state.limitationsSeen;
+    try { seen = window.localStorage?.getItem("secondsignal.limitations.version") || seen; } catch (_) {}
+    if (seen !== honesty.limitations.version && config.state?.state !== "card") showLimitations();
+    startStream();
+  }
+  function showTerms(terms, input) {
+    if (state.last?.kind === "card") return;
+    state.pendingTerms = terms;
+    $("terms-title").textContent = terms.title;
+    $("terms-summary").textContent = terms.summary;
+    $("terms-attestation-label").textContent = terms.attestation;
+    $("terms-authority").hidden = !terms.url;
+    if (terms.url && /^https:\/\//.test(terms.url)) $("terms-authority").href = terms.url;
+    $("terms-accepted").checked = false; $("terms-attested").checked = false;
+    $("terms-status").textContent = "";
+    if (!$("message").value) $("message").value = input;
+    $("terms-dialog").showModal();
+  }
+  function networkWarning() {
+    if (!state.config?.honesty) return Promise.resolve(true);
+    if (state.last?.kind === "card") return Promise.resolve(false);
+    $("network-warning-dialog").showModal();
+    return new Promise(resolve => { state.networkResolve = resolve; });
+  }
+  function reviewButtons(turn, article) {
+    if (!turn.turn_id || !["reply", "withheld"].includes(turn.kind)) return;
+    const controls = el("div", null, "review-controls"), note = el("span", "", "small");
+    note.setAttribute("role", "status");
+    for (const label of ["this was read wrong", "this missed me"]) {
+      const button = el("button", label); button.type = "button";
+      button.addEventListener("click", async () => {
+        for (const sibling of controls.querySelectorAll("button")) sibling.disabled = true;
+        const version = state.serverVersion;
+        try {
+          await api("/api/review/flag", {turn_id: turn.turn_id, page_version: version, label});
+          note.textContent = "Saved for the operator's review.";
+        } catch (error) {
+          note.textContent = error.message;
+          for (const sibling of controls.querySelectorAll("button")) sibling.disabled = false;
+        }
+      });
+      controls.append(button);
+    }
+    controls.append(note); article.append(controls);
+  }
+  async function refusedMap() {
+    if (!state.config?.local || state.last?.kind === "card") return;
+    $("refused-dialog").showModal();
+    $("refused-content").textContent = "Loading this week's receipts…";
+    try {
+      const result = await api("/api/receipts/week");
+      if (state.last?.kind === "card") return;
+      const lines = result.counts.map(row => el("p", row.line));
+      $("refused-content").replaceChildren(...(lines.length ? lines : [el("p", "No ineligible voices are recorded for this week.")]));
+    } catch (error) { $("refused-content").textContent = error.message; }
+  }
+  function bindHonesty() {
+    if (!$("limitations-open")) return;
+    $("limitations-open").addEventListener("click", showLimitations);
+    $("limitations-close").addEventListener("click", () => {
+      const version = state.config.honesty.limitations.version;
+      state.limitationsSeen = version;
+      try { window.localStorage?.setItem("secondsignal.limitations.version", version); } catch (_) {}
+      $("limitations-dialog").close();
+    });
+    $("terms-close").addEventListener("click", () => $("terms-dialog").close());
+    $("terms-form").addEventListener("submit", async event => {
+      event.preventDefault();
+      if (state.last?.kind === "card" || !state.pendingTerms) return;
+      const terms = state.pendingTerms;
+      try {
+        await api("/api/terms/confirm", {vendor: terms.vendor, revision: terms.revision,
+          accepted: $("terms-accepted").checked, attested: $("terms-attested").checked});
+        $("terms-dialog").close();
+        if (state.last?.kind !== "card") status("status", "Confirmed for this vendor. Your message is in the editor, ready to send.");
+      } catch (error) { $("terms-status").textContent = error.message; }
+    });
+    $("network-warning-accept").addEventListener("click", () => {
+      const resolve = state.networkResolve; state.networkResolve = null;
+      $("network-warning-dialog").close(); if (resolve) resolve(true);
+    });
+    $("network-warning-cancel").addEventListener("click", () => $("network-warning-dialog").close());
+    $("network-warning-dialog").addEventListener("close", () => {
+      if (state.networkResolve) { state.networkResolve(false); state.networkResolve = null; }
+    });
+    $("lights-check").addEventListener("click", async () => {
+      try { const result = await api("/api/lights/check", {}); $("lights-check-status").textContent = result.message; }
+      catch (error) { $("lights-check-status").textContent = error.message; }
+    });
+    $("refused-open").addEventListener("click", refusedMap);
+    $("refused-close").addEventListener("click", () => $("refused-dialog").close());
+    $("receipts-export").addEventListener("click", async () => {
+      try {
+        const bundle = await api("/api/receipts/export");
+        if (state.last?.kind === "card") return;
+        const blob = new Blob([JSON.stringify(bundle, null, 2)], {type: "application/json"});
+        const link = el("a"); link.href = URL.createObjectURL(blob);
+        link.download = "table-receipts-" + bundle.week + ".json"; link.click();
+        if (typeof window.setTimeout === "function") window.setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+      } catch (error) { $("refused-content").textContent = error.message; }
+    });
+  }
 
   function el(tag, text, className) {
     const node = document.createElement(tag);
@@ -77,6 +296,7 @@
     if (!response.ok) {
       const error = new Error(result.error || "The request could not be completed.");
       error.pairingRequired = Boolean(result.pairing_required);
+      error.termsRequired = Boolean(result.terms_required); error.terms = result.terms;
       throw error;
     }
     return result;
@@ -85,6 +305,7 @@
   function applyOperatorMode(result) {
     if (!result || typeof result !== "object") return;
     const snapshot = result.state && typeof result.state === "object" ? result.state : result;
+    if (stale(snapshot)) return;
     voiceCall("updateState", snapshot);
     const enabled = typeof snapshot.operator_circle === "boolean" ? snapshot.operator_circle : result.settings && result.settings.operator_circle;
     const revision = snapshot.mode_revision === undefined ? result.mode_revision : snapshot.mode_revision;
@@ -95,7 +316,7 @@
     } else if (state.modeRevision >= 0) return;
     state.operatorCircle = enabled;
     if (state.config) state.config.settings.operator_circle = enabled;
-    const label = "Operator-circle mode is " + (enabled ? "ON." : "OFF.");
+    const label = "Operator-circle mode is " + (enabled ? "ON. A prototype for the operator's circle." : "OFF.");
     for (const id of ["operator-circle-status", "settings-operator-circle-status"]) {
       const banner = $(id);
       if (banner.textContent !== label) banner.textContent = label;
@@ -109,10 +330,11 @@
   }
 
   async function pollOperatorMode() {
-    if (state.modePolling) return;
+    if (state.modePolling || state.streamUp) return;
     state.modePolling = true;
     try {
       const snapshot = await api("/api/state");
+      if (versioned(snapshot)) { consumeSnapshot(snapshot); return; }
       adoptSession(snapshot);
       if (state.config) applySurface(snapshot);
       if (snapshot.state === "card" && typeof snapshot.card === "string" &&
@@ -121,7 +343,7 @@
           decision: snapshot.decision || {}, verdict: null, state: snapshot});
       }
     }
-    catch (_) { voiceCall("stopAll"); /* Silence while server state is unknown. */ }
+    catch (_) { connectionLost(); /* Silence while server state is unknown. */ }
     finally { state.modePolling = false; }
   }
 
@@ -252,8 +474,9 @@
   }
 
   function applyConfig(config) {
+    if (stale(config.state)) return;
     state.config = config;
-    adoptSession(config.state);
+    if (!versioned(config.state)) adoptSession(config.state);
     state.circleDirty = false;
     applyOperatorMode(config);
     const settings = config.settings;
@@ -309,6 +532,8 @@
     drawTable();
     refreshPresentationNames();
     if (state.biographyPersona && $("biography-dialog").open) showBiography(state.biographyPersona);
+    consumeSnapshot(config.state);
+    applyHonesty(config);
   }
 
   function drawOverrides() {
@@ -374,12 +599,13 @@
 
   function renderTableExtras(turn) {
     const card = Boolean(turn && turn.kind === "card");
+    const held = Boolean(turn?.turn_id && (turn.kind === "withheld" || turn.receipt?.holds?.length));
     const surface = state.surface || {};
     const seated = card ? null : turn && turn.persona;
-    $("composer-extras").hidden = card;
-    $("object-control").hidden = !seated;
+    $("composer-extras").hidden = card || held;
+    $("object-control").hidden = !seated || !state.config.local;
     $("object-seat").textContent = seated ? nameOf(seated) : "";
-    const handback = card ? null : surface.handback;
+    const handback = card || held ? null : surface.handback;
     $("handback-offer").replaceChildren();
     $("handback-offer").hidden = !handback;
     if (handback) $("handback-offer").append(el("span", "House", "house-attribution"), offerButton(handback, "handback"));
@@ -387,7 +613,7 @@
       const extras = plate.querySelector(".plate-extras");
       if (!extras) return;
       extras.replaceChildren();
-      if (card) return;
+      if (card || held) return;
       const id = plate.dataset.persona;
       if (id === seated && surface.object_text) extras.append(el("p", surface.object_text, "plate-object"));
       if (id === seated && surface.assist_offer) {
@@ -575,6 +801,11 @@
     const note = turn.decision && turn.decision.presentation_note;
     if (typeof note === "string" && note) body.append(el("p", note, "notice"));
     body.append(el("h4", "Audit verdict"), el("pre", turn.verdict === null || turn.verdict === undefined ? "No model reply was audited on this turn." : JSON.stringify(turn.verdict, null, 2)));
+    if (state.config.local && /^[a-f0-9]{64}$/.test(turn.audit_row_id || "")) {
+      const replay = el("a", "Replay this logged decision");
+      replay.href = "/replay.html?row_id=" + encodeURIComponent(turn.audit_row_id);
+      replay.target = "_blank"; replay.rel = "noopener"; body.append(replay);
+    }
     technical.append(el("summary", "Technical record"), body);
     details.append(el("summary", "Decision Card"), plain, technical);
     return details;
@@ -606,7 +837,7 @@
       controls.append(page);
     }
     for (const offer of (turn.second_opinions || []).slice(0, 3)) controls.append(offerButton(offer, "second_view"));
-    if (controls.children.length) article.append(controls);
+    if (controls.children.length && !(turn.turn_id && turn.receipt?.holds?.length)) article.append(controls);
   }
 
   function showSettings(focusCircle = false) {
@@ -622,10 +853,11 @@
   function renderTurn(turn, input) {
     state.last = turn;
     state.surface = Object.assign({}, turn.state || {}, turn);
-    state.count += 1;
+    state.count = versioned(turn.state) && Number.isInteger(turn.state.turn_count) ? turn.state.turn_count : state.count + 1;
     const isCard = turn.kind === "card";
     // One stop, no speaking path, and no previous character output on a card turn.
     if (isCard) {
+      closeHonestyDialogs();
       voiceCall("stopAll");
       if ($("settings-dialog").open) $("settings-dialog").close();
       if ($("resources-dialog").open) $("resources-dialog").close();
@@ -654,6 +886,7 @@
     const topline = el("div", null, "turn-topline");
     topline.append(el("span", "TURN " + String(state.count).padStart(2, "0")), el("span", turn.verdict ? "Audit · " + turn.verdict.status : turn.adapter_calls > 0 ? "Model reply unavailable" : "No model called"));
     article.append(topline);
+    if (input && turn.turn_id) article.append(el("p", input, "user-message"));
     if (turn.persona) {
       const header = el("div", null, "reply-header");
       const name = el("h3", nameOf(turn.persona), "character-name");
@@ -675,7 +908,7 @@
       article.append(assist);
     }
     if (turn.notice) article.append(el("p", turn.notice, "notice"));
-    if (turn.cultural_only && turn.kind === "withheld") {
+    if (turn.cultural_only && turn.kind === "withheld" && !turn.turn_id) {
       const note = el("p", "Withheld only because the cultural audit layer is not locked. See ", "withheld-note");
       const link = el("button", "Operator-circle mode in Settings");
       link.type = "button";
@@ -684,6 +917,7 @@
       article.append(note);
     }
     article.append(decisionCard(turn));
+    reviewButtons(turn, article);
     $("transcript").append(article);
     $("transcript").scrollTop = $("transcript").scrollHeight;
     // Only the server's single-use token reaches the voice, never the text. An
@@ -759,6 +993,7 @@
       Number.isSafeInteger(turn.state && turn.state.card_revision) ? turn.state.card_revision : -1);
     for (const pending of [...state.pending]) finishSubmission(pending, pending === request ? "completed" : "superseded", "The crisis card holds the floor.");
     state.queued = [];
+    state.queuedSnapshot = null;
     if (state.paused) $("view-status").textContent = "View paused. The crisis card is shown immediately.";
     renderTurn(turn, "");
   }
@@ -784,6 +1019,14 @@
     try {
       const turn = await api("/api/turn", data);
       if (epoch !== state.epoch) { finishSubmission(request, "superseded"); return; }
+      if (versioned(turn.state)) {
+        if (turn.superseded || stale(turn.state)) { finishSubmission(request, "superseded"); return; }
+        const outcome = turn.release_reason === "failure" ? "failed" : turn.kind === "withheld" ? "withheld" : "completed";
+        const maySpeak = state.submissions.get(request)?.outcome === "pending";
+        finishSubmission(request, outcome);
+        consumeSnapshot(turn.state, Object.assign({user_text: input}, turn, maySpeak ? {} : {speech_token: null}), request);
+        return;
+      }
       adoptSession(turn.state, request);
       // Even a cancelled wait or paused view must immediately admit a card.
       if (turn.kind === "card") { receiveCard(turn, request); return; }
@@ -801,6 +1044,7 @@
       } else renderTurn(turn, input);
     } catch (error) {
       if (finishSubmission(request, "failed", error.message)) status("status", error.message, true);
+      if (error.termsRequired && epoch === state.epoch) showTerms(error.terms, input);
     } finally {
       state.pending.delete(request);
       setBusy(state.busy);
@@ -868,6 +1112,8 @@
       const queued = state.queued;
       state.queued = [];
       for (const entry of queued) if (entry.request > state.cardBarrier) renderTurn(entry.turn, entry.input);
+      const snapshot = state.queuedSnapshot; state.queuedSnapshot = null;
+      if (snapshot) consumeSnapshot(snapshot);
     }
   });
   $("low-demand").addEventListener("change", () => { state.lowDemand = $("low-demand").checked; applyView(); });
@@ -973,6 +1219,7 @@
   });
   $("phone-mode").addEventListener("change", async () => {
     const enabled = $("phone-mode").checked;
+    if (enabled && !await networkWarning()) { $("phone-mode").checked = false; return; }
     $("phone-mode").disabled = true;
     try { applyConfig(await api("/api/network", {enabled})); status("network-status", enabled ? "Phone access is on. Pair with the code above." : "Phone access is off."); }
     catch (error) { $("phone-mode").checked = Boolean(state.config.phone.enabled); status("network-status", error.message, true); }
@@ -1030,5 +1277,6 @@
   window.addEventListener("focus", pollOperatorMode);
   document.addEventListener("visibilitychange", () => { if (!document.hidden) pollOperatorMode(); });
   window.setInterval(pollOperatorMode, 1000);
+  bindHonesty();
   boot();
 })();

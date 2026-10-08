@@ -553,6 +553,7 @@ def test_live_http_replays_all_policy_cases_without_changing_any_decision(app):
 
 
 def test_seated_verdict_operator_circle_and_session_reset(app):
+    (app.data_dir / "operator.token").write_text("a" * 64)  # Order T3, 2026-10-07: enabling without token -> local token required.
     with live(app) as listener:
         config = request(listener, "/api/config")[1]
         assert config["settings"]["adapter"] == "fake"
@@ -717,6 +718,7 @@ def test_remember_settings_round_trip_uses_protection_boundary(tmp_path, monkeyp
     monkeypatch.setattr(server, "_secret_blob", protect)
     directory = tmp_path / "remembered"
     first = server.TableApp(data_dir=directory)
+    (directory / "operator.token").write_text("a" * 64)  # Order T3, 2026-10-07: enabling without token -> local token required.
     second = None
     try:
         with live(first) as listener:
@@ -766,6 +768,7 @@ def test_default_binding_origin_host_and_invalid_input_are_rejected(app):
 
 
 def test_phone_requires_pairing_once_and_cannot_change_operator_settings(app, monkeypatch):
+    (app.data_dir / "operator.token").write_text("a" * 64)  # Order T3, 2026-10-07: enabling without token -> local token required.
     with live(app) as local:
         assert request(local, "/api/settings", {"operator_circle": True})[0] == 200
         status, config, _ = request(local, "/api/network", {"enabled": True})

@@ -313,6 +313,7 @@ def test_t2_assist_slip_is_record_only_and_cannot_change_prompt(app):
 
 def test_t2_second_opinion_is_eligible_capped_at_three_and_exact_new_turn(app):
     """Second-view shortcuts contain only other eligible characters and route their exact text once."""
+    (app.data_dir / "operator.token").write_text("a" * 64)  # Order T3, 2026-10-07: enabling without token -> local token required.
     app.update_settings({"operator_circle": True})
     result = app.turn(offered_case(app)["text"])
     assert result["kind"] == "reply"
@@ -329,6 +330,7 @@ def test_t2_second_opinion_is_eligible_capped_at_three_and_exact_new_turn(app):
 
 def test_t2_earlier_reply_shortcut_keeps_its_record_and_name_snapshot(app):
     """An earlier released reply's shortcut survives later turns and names, then expires on reset."""
+    (app.data_dir / "operator.token").write_text("a" * 64)  # Order T3, 2026-10-07: enabling without token -> local token required.
     app.update_settings({"operator_circle": True, "presentation": "women"})
     result = app.turn(offered_case(app)["text"])
     choice = result["second_opinions"][0]
@@ -377,6 +379,7 @@ def test_t2_made_page_is_only_released_server_text_and_expires_with_sitting(app)
 
 def test_t2_made_page_requires_pairing_and_card_hides_old_pages(app, monkeypatch):
     """A made page uses the existing origin and pairing boundary and cannot open over an active card."""
+    (app.data_dir / "operator.token").write_text("a" * 64)  # Order T3, 2026-10-07: enabling without token -> local token required.
     app.update_settings({"operator_circle": True})
     reply = app.turn(selected(app, "normal")["text"])
     with live(app) as listener:

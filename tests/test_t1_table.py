@@ -179,6 +179,7 @@ def test_t1_settings_refuse_policy_keys_or_unconfirmed_free_text_atomically(app,
 
 def test_t1_table_settings_reach_fake_adapter_without_becoming_policy_state(app):
     """The Table passes declared settings to the prompt and receipt without writing policy preferences."""
+    (app.data_dir / "operator.token").write_text("a" * 64)  # Order T3, 2026-10-07: enabling without token -> local token required.
     app.update_settings({"declared_preferences": {"pace": "one_step"}, "operator_circle": True,
                          "humour_grief": True, "language_style": "technical_english"})
     result = app.turn(selected(app, "normal")["text"])

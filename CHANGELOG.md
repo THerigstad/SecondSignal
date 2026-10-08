@@ -4,6 +4,48 @@ All notable changes to SecondSignal are documented here.
 
 ## [Unreleased]
 
+### Added — 2026-10-07, the confessions ledger (C-33 to C-35)
+
+- Three entries approved by the operator on 7 October 2026, one at a time:
+  the fourteen red marks of the part-commit landings (C-33), the builder's
+  self-description that an order's own contradiction let onto the provenance
+  page (C-34), and the "Pure Python" front-page line (C-35), each with what
+  changed and the operator's closing line.
+
+### Changed — 2026-10-07, order H1 (the harness kit: the audit logbook's write proof, the configuration block, one release checkpoint, the house-line near-copy predicate)
+
+- **Audit-log write proof, ruling of 6 October:** appends verify the canonical last
+  line, its row id and write offset using bounded backward reads. Existing bytes,
+  row ids, historical lookups and open-time parsing remain unchanged.
+- **Item 34, configuration:** every harness row records reported model identity
+  and version, the complete prompt hash when a prompt exists, package and loaded
+  pack versions, roster and house-lock hashes, presentation and generation limits.
+  Unreported metadata is null; credential-shaped identifiers are excluded.
+- **Item 37, one release checkpoint:** the Table's reserved-voice patterns and
+  C4 URL-scheme check also run in the standalone harness and command line, with
+  named results on the row. The Table's existing wrapper is unchanged.
+- **Item 38, near-copy:** the checkpoint withholds contiguous word runs reaching
+  eighty percent of a house line of eight or more words; shorter lines require
+  a whole match after the public policy folds and punctuation/spacing collapse.
+- **Evidence and records:** fault-injected append proofs, bounded-I/O checks,
+  all existing guard fixtures, captured FakeAdapter replies and labelled replay
+  accompany before/after gate-cost measurements; the public counts are refreshed.
+
+### Added — 2026-10-07, order T3 (Table kit three: the honesty surfaces, reload-proof conversations, the review queue, the operator's correction page, the refused-seat map, the replay viewer, the lights check)
+
+- **Item 29:** generated, reopenable limitations sheet, acknowledged once per package version.
+- **Item 30:** composer storage/shared-session explanation and blocking Wi-Fi warning.
+- **Item 31:** per-vendor terms summary and key attestation before any live seated send, remembered separately from keys.
+- **Item 32:** local operator-token command, gated Settings switch and prototype banner.
+- **Item 33:** explicit phone/computer pairing scope on every operator/settings path.
+- **Item 36:** one server session version, bounded SSE with native reconnect on the computer and one-second state polling on the phone, restored replies/cards and remote-client turns with stale-response barriers. The phone page never opens a stream, so virtual-time captures have no in-flight stream fetch to wait for; the authenticated event endpoint stays available.
+- **Item 39:** two review labels snapshot untouched records, receipts, displayed text, house lines and caller scope into a private queue.
+- **Item 40:** computer-only, reasoned latch correction through the existing policy API, with request/result audit rows and stale-review protection.
+- **Item 43:** quiet weekly refused-seat counts and explicit local receipt-bundle export.
+- **Item 44:** computer-only visual replay of logged decisions, linked from the Decision Card; no recomputation.
+- **Part 4b, lights check:** computer-only roster-colour sequence, card white and idle through the existing worker, cancelled by an actual turn.
+
+
 ### Added — 2026-10-06, order T2 (Table kit two: manners when the ask and the seat differ, the Table extras, per-character presentation)
 
 - **Item 1, ask acknowledgement:** record-only attachment and centralized reason
