@@ -359,6 +359,65 @@ rewritten.
   34a7296 as authorized by the resume; Grok's saved expectations and return
   files were not edited. This row records the port, not a new commit.
 
+- **2026-10-05**, the big push's first landing: the orders of the plan of 4
+  October (B1, B5, B7, C1 and C4), one fix found by the B7 port, and the
+  lint that CI's ruff job asked for, landed as six commits through the
+  operator's browser session on GitHub's upload page, each authored by the
+  operator, the model Claude Fable 5.1, Max, as the operator's screen
+  showed it (the operator's account), in the Claude desktop app's Cowork
+  mode. The orders' builders,
+  Codex (OpenAI; the ChatGPT desktop app) for the measurements, fixes and
+  ports and GrokBot (xAI) for the lights merge, are credited in the files
+  that hold their work and in the builders' section above. The six
+  commits, in order:
+  1. "Two tests made portable to Windows, and "presentation" is no longer a bare career word (ruling 7, pair 17 of Grok's identity set, found by the Codex port of 5 October 2026)".
+  2. "The Talking Table's reply guard closes Grok's seven round-4 leftovers, and GrokBot's room lights merge in with the key living only in the Table's Settings (orders C4 and C1, 5 October 2026)".
+  3. "The crisis-gate measurement: six stutter transforms (the operator's find), the full look-alike table measured both ways, one line per cause, option B replayed, the targets-the-crisis labelled set (order B1, 5 October 2026)".
+  4. "Grok's identity pairs and neurodivergent cases ported with expectations written from ruling 7 (order B7, resumed on the fixed tree, 5 October 2026)".
+  5. "The documented-gap triage (order B5), the Table's replay pins for the new cases, the numbers and the records of 5 October 2026".
+  6. "Lint: import order in the five returned scripts and tests, and the late imports in the triage script marked as deliberate (CI #93's ruff job)".
+
+- **2026-10-05** (night) and **2026-10-06**, push B, landings 2 and 3: the
+  broom's fixes and the second measurement (orders B3 and B5b), then Table
+  kit one and the near-tie and gate-cost measurements (orders T1 and M1),
+  landed as one commit each through the operator's browser session on
+  GitHub's upload page, authored by the operator, the model Claude Fable
+  5.1, Max, as the operator's screen showed it (the operator's account), in
+  the Claude desktop app's Cowork mode; the builder, Codex (OpenAI; the
+  ChatGPT desktop app), is credited in the files and in the builders'
+  section above. The two commits, in order:
+  1. "Push B, landing 2: the broom's fixes (order B3) and the second measurement (order B5b)".
+  2. "Push B, landing 3: Table kit one (order T1) and the near-tie and gate-cost measurements (order M1)".
+
+- **2026-10-06**, the README's front-page line: one commit through the
+  operator's browser session on GitHub's upload page, authored by the
+  operator, the model Claude Fable 5.1, Max, as the operator's screen
+  showed it (the operator's account), in the Claude desktop app's Cowork
+  mode (`docs/confessions.md`, C-35):
+  1. "README: say exactly what is Python and what is not".
+
+- **2026-10-07**, push C, landings 4 and 5: Table kit two, the vocabulary
+  merge and the Stream Deck kit (orders T2, R1M and SD1), then the harness
+  kit, Table kit three and confessions C-33 to C-35 (orders H1 and T3),
+  landed as one commit each through the operator's browser session on
+  GitHub's upload page, authored by the operator, the model Claude Fable
+  5.1, Max, as the operator's screen showed it (the operator's account), in
+  the Claude desktop app's Cowork mode; the builder of the five orders,
+  Codex (OpenAI; the ChatGPT desktop app), is credited in the files and in
+  the builders' section above. The two commits, in order:
+  1. "Push C, landing 4: Table kit two (order T2), the vocabulary merge (order R1M) and the Stream Deck kit (order SD1)".
+  2. "Push C, landing 5: the harness kit (order H1), Table kit three (order T3) and confessions C-33 to C-35".
+
+- **2026-10-07** (night), the sentences that leave the repository, and this
+  ledger brought current: one commit through the operator's browser session
+  on GitHub's upload page, authored by the operator, the model Claude Fable
+  5.1, Max, as the operator's screen showed it (the operator's account), in
+  the Claude desktop app's Cowork mode. The rows above for the eleven
+  commits of 5 to 7 October were added with this commit; the ledger had
+  fallen eleven commits behind its own rule of one row per commit, and that
+  lapse is recorded here rather than back-dated. The commit:
+  1. "The sentences that leave the repository, and the commit ledger brought current (7 October 2026)".
+
 ## What this note does not do
 
 It does not rank the families and it does not count agreements. Where two

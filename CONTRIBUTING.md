@@ -57,3 +57,6 @@ what changed.
 - Any change to an accepted decision is recorded in a new ADR.
 - The counts on the public pages are current: `python evals/refresh_public_numbers.py`
   reports nothing stale (`--write` adopts the tree's numbers; never type them).
+- The sentences the project states elsewhere are current:
+  `python evals/refresh_public_sentences.py` reports nothing stale
+  (`--write --as-of <date>` adopts the numbers; never type them).

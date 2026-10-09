@@ -4,6 +4,18 @@ All notable changes to SecondSignal are documented here.
 
 ## [Unreleased]
 
+### Added — 2026-10-07, the sentences that leave the repository
+
+- `evals/refresh_public_sentences.py` renders the five sentences on the
+  operator's LinkedIn profile that state the tree's numbers (headline, About,
+  the experience record sentence, the attached link's description, the Featured
+  card) from `evals/public-numbers.json` into `evals/public-sentences.md`, dated
+  with `--as-of`, and never writes unasked. `tests/test_public_sentences.py`
+  fails when that file disagrees with the snapshot, so the chain from pytest's
+  collection to the pasted sentence has no typed link (C-35, "What changed").
+  Nothing in the tree reaches LinkedIn; a person pastes from the file. Seven
+  tests.
+
 ### Added — 2026-10-07, the confessions ledger (C-33 to C-35)
 
 - Three entries approved by the operator on 7 October 2026, one at a time:

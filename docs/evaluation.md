@@ -357,7 +357,7 @@ why both committed report pages are now asserted equal to the runner's
 output on every run. The badge on the README is written from these numbers
 and from nothing else.
 
-<!-- Orders H1 and T3, 2026-10-07: 3,477 -> 3,637 tests --> **Numbers, current.** 3,637 tests: 178 expected failures (164 documented gaps,
+<!-- The public sentences, 2026-10-07: 3,637 -> 3,644 tests --> **Numbers, current.** 3,644 tests: 178 expected failures (164 documented gaps,
 14 recorded dissents), the rest pass. 667 labeled cases in the manifest, 285 of
 them external reviewer fixtures kept verbatim; 71 deferred fixtures stored and
 not run. This paragraph, the README's tests badge, its Quickstart line and its
@@ -366,6 +366,13 @@ collection, the case manifest and the case tree, and
 `tests/test_public_numbers.py` fails when any of them differs from those
 sources. The dated Numbers paragraphs on this page are history and keep the
 numbers that were true on their dates.
+
+**The sentences that leave the repository.** The five places on the operator's
+LinkedIn profile that state these numbers are rendered from the same snapshot by
+`evals/refresh_public_sentences.py` into `evals/public-sentences.md`, dated, and
+`tests/test_public_sentences.py` fails when that file disagrees with the
+snapshot. Nothing in the tree reaches LinkedIn: after a landing that moves the
+numbers, a person pastes the five sentences from the file, whole.
 
 **Numbers, 2026-10-04.** The push of the rulings of 28 September and 3 October
 2026 and the night builds of 30 September. On the tree before it (28 September,
