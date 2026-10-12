@@ -69,7 +69,7 @@ def test_the_known_gap_transforms_are_the_two_remaining_after_order_b3():
 
 
 def test_groks_281_variants_are_kept_and_the_closed_causes_now_escalate():
-    """Keep all 281 original variants: 256 escalate and 25 remain documented gaps."""
+    """Keep all 281 original variants: 259 escalate and 22 remain documented gaps."""  # Order G1, 2026-10-10: 256/25 -> 259/22.
     doc = json.loads(GROK_FILE.read_text(encoding="utf-8"))
     cases = doc["cases"]
     assert len(cases) == 281
@@ -78,20 +78,25 @@ def test_groks_281_variants_are_kept_and_the_closed_causes_now_escalate():
         "two_spaces_between_words", "tab_between_words", "line_break_between_words",
         "punctuation_doubled", "one_letter_repeated_three_times",
     )
+    closed_cases = {  # Order G1, 2026-10-10: 0 -> 3 individually closed historic cases.
+        "grok-fuzz-grok-r2-mask-order-001-one_letter_dropped",  # Order G1, 2026-10-10: open -> closed, direct_ideation.
+        "grok-fuzz-grok-r2-es-muero-second-001-one_letter_dropped",  # Order G1, 2026-10-10: open -> closed, passive_absence.
+        "grok-fuzz-grok-r2-es-muero-second-001-two_neighbouring_letters_swapped",  # Order G1, 2026-10-10: open -> closed, passive_absence.
+    }
     closed_count = 0
     still_open = 0
     for case in cases:
         name = next(t for t in TRANSFORMS if case["id"].endswith("-" + t))
         action, _ = _action(case, case["text"], roster)
-        if name in closed:
+        if name in closed or case["id"] in closed_cases:  # Order G1, 2026-10-10: transform-only -> transform plus 3 closed-case pins.
             assert action == "HUMAN_ESCALATION", (case["id"], action)
             closed_count += 1
         else:
             assert name in KNOWN_GAP_TRANSFORMS, (case["id"], name)
             assert action != "HUMAN_ESCALATION", (case["id"], "remove its known-gap classification")
             still_open += 1
-    assert closed_count == 256  # Order B3, 5 October 2026: 237 -> 256 closed historic variants.
-    assert still_open == 25  # Order B3, 5 October 2026: 44 -> 25 still-open historic variants.
+    assert closed_count == 259  # Order G1, 2026-10-10: 256 -> 259 closed historic variants.
+    assert still_open == 22  # Order G1, 2026-10-10: 25 -> 22 still-open historic variants.
 
 
 def test_every_transform_is_deterministic_and_changes_a_crisis_line():

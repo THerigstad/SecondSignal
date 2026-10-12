@@ -292,7 +292,7 @@ def test_explain_adds_exactly_one_line_after_signal_metadata(roster):
     case = _grief_case()
     baseline = route(case["text"], roster, session=make_session(case))
     # Captured from the supplied tree before any P1 source edit.
-    assert _digest(baseline.explain()) == "9b0c396b00725c85e322f40bf8901cb56951aa9f99e0a22fc292cf6a4e350a3f"
+    assert _digest(baseline.explain()) == "c1a4e375d46ea6c73d5179995cb403fbb9e65547a6c0bb71beeb5b843de29de5"  # Order G1, 2026-10-10, landed 2026-10-11 with the pack's line endings normalized: 9b0c396b00725c85e322f40bf8901cb56951aa9f99e0a22fc292cf6a4e350a3f -> c1a4e375d46ea6c73d5179995cb403fbb9e65547a6c0bb71beeb5b843de29de5 (explain pack-hash pin; only the patterns token differs).
     for metadata in (
         {}, {"confidence": {"domain:grief": 0.75}},
         {"distribution": {"domain:grief": {"yes": 0.75, "no": 0.25}}},
@@ -352,8 +352,8 @@ def test_harness_no_ask_keeps_the_supplied_turn_and_audit_bytes(roster):
     assert after == before and after.ask_acknowledgement is None
     assert explicit.audit_log.rows() == baseline.audit_log.rows()
     # Captured with this fixed clock and fake reply before any P1 source edit.
-    assert _digest(asdict(before)) == "390611804cd605e7719746087afdf50d66fdfb5062e84606f12771554b586130"
-    assert _digest(baseline.audit_log.rows()) == "1ebe5096cf44cc6f6a0ac57d75dde32fd337c4dfec8b7f3faefeaf70a39f7f37"
+    assert _digest(asdict(before)) == "7f0d82ce6afeeac44cfba748f439f3872f56c8081b6f60e4659b384552f5b4af"  # Order G1, 2026-10-10, landed 2026-10-11 with the pack's line endings normalized: 390611804cd605e7719746087afdf50d66fdfb5062e84606f12771554b586130 -> 7f0d82ce6afeeac44cfba748f439f3872f56c8081b6f60e4659b384552f5b4af (turn pack-hash pin; only the patterns token and the hashes derived from it differ).
+    assert _digest(baseline.audit_log.rows()) == "49dd6caab4880aae42641aa34de9f65d2c41a4a8d1a8e7e7608721066def6cd0"  # Order G1, 2026-10-10, landed 2026-10-11 with the pack's line endings normalized: 1ebe5096cf44cc6f6a0ac57d75dde32fd337c4dfec8b7f3faefeaf70a39f7f37 -> 49dd6caab4880aae42641aa34de9f65d2c41a4a8d1a8e7e7608721066def6cd0 (audit pack-hash pin; only the patterns token and the hashes derived from it differ).
 
 
 def test_trajectories_with_no_ask_keep_house_lines_text_release_and_audit(roster):

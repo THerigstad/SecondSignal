@@ -4,7 +4,7 @@
   "status": "unreviewed",
   "language": "en",
   "window": 4,
-  "note": "English idiom masks. A mask is a pre-filter, not a second crisis list: it marks a span as a known non-crisis construction so the matcher does not fire on it. Every window mask needs an object inside +/-window tokens; no object, no mask. Every mask carries a positive fixture (object present -> PROCEED) and a negative fixture (object absent -> HIT or seat-claim), enforced by tests/test_lexicon.py.",
+  "note": "English idiom masks. A mask is a pre-filter, not a second crisis list: it marks a span as a known non-crisis construction so the matcher does not fire on it. Every window mask needs an object inside +/-window tokens; no object, no mask. Every mask carries a positive fixture (object present -> PROCEED) and a negative fixture (object absent -> HIT or seat-claim), enforced by tests/test_lexicon.py. A regex mask marked yields_to_gate yields to protected gate hits; a false value keeps its exact-idiom exemption.",
   "negation": [
     "not",
     "don't",
@@ -29,155 +29,189 @@
   "regex_masks": [
     {
       "id": "labor_killing_me",
+      "yields_to_gate": false,
       "pattern": "\\bkilling (me|it|him|her|them|us|my \\w+|the \\w+)\\b"
     },
     {
       "id": "killed_it",
+      "yields_to_gate": false,
       "pattern": "\\bkilled it\\b"
     },
     {
       "id": "kill_it_time_lights",
+      "yields_to_gate": false,
       "pattern": "\\bkill (it|time|the (lights|mood|vibe|engine)|two birds)\\b"
     },
     {
       "id": "dying_to",
+      "yields_to_gate": false,
       "pattern": "\\bdying (to|of laughter|laughing|of embarrassment)\\b"
     },
     {
       "id": "die_laughing",
+      "yields_to_gate": false,
       "pattern": "\\bdie laughing\\b"
     },
     {
       "id": "died_laughing",
+      "yields_to_gate": false,
       "pattern": "\\bdied (laughing|of laughter)\\b"
     },
     {
       "id": "die_of_embarrassment",
+      "yields_to_gate": false,
       "pattern": "\\bdie of embarrassment\\b"
     },
     {
       "id": "to_die_for",
+      "yields_to_gate": false,
       "pattern": "\\bto die for\\b"
     },
     {
       "id": "dead_compound",
+      "yields_to_gate": true,
       "pattern": "\\bdead (tired|serious|end|ends|on|set|wrong|silent|quiet|last|centre|center|weight|zone)\\b"
     },
     {
       "id": "drop_dead",
+      "yields_to_gate": false,
       "pattern": "\\bdrop[- ]dead\\b"
     },
     {
       "id": "deadline_killswitch",
+      "yields_to_gate": false,
       "pattern": "\\b(dead|kill)(pan|lock|bolt|switch|beat|heat|wood|weight)\\b",
       "note": "Compounds that contain a stem. 'deadline' was removed from this list in round 2: word boundaries already keep it out of the stem patterns, and blanking it hid the career signal and the object the labor masks look for."
     },
     {
       "id": "device_died",
+      "yields_to_gate": true,
       "pattern": "\\b(my|the) (phone|battery|car|engine|laptop|computer|app|server|wifi|internet|plant|fish|screen|mic) (just |finally |again )?(died|is dead|dies|keeps dying)( again)?\\b"
     },
     {
       "id": "game_death",
+      "yields_to_gate": true,
       "pattern": "\\b(die|died|dying|dead|kill(ed)?|killing|unalived?) (in|on|at|during) (this|the|a|that|my|every) (boss fight|boss|game|level|raid|match|round|run|campaign|dungeon|pvp|mission)\\b"
     },
     {
       "id": "character_died",
+      "yields_to_gate": true,
       "pattern": "\\bmy (character|guy|hero|avatar|team|squad|party) (died|is dead|got killed|keeps dying)\\b"
     },
     {
       "id": "done_with_work",
+      "yields_to_gate": false,
       "pattern": "\\b(done|finished|through) with (the|this|that|my|these|those|it|him|her|them|work|school)\\b"
     },
     {
       "id": "give_up_on",
+      "yields_to_gate": false,
       "pattern": "\\bgive up (on|sugar|smoking|drinking|alcohol|caffeine|coffee|meat|dairy|gluten|carbs|weed|social media|(my|this|that|the) (job|seat|spot|place|turn|diet|habit|apartment|lease|car|search|hunt|game|deal|project|plan|idea|dream|hobby|fight for))\\b",
       "note": "Giving up on something, or giving up a named habit or object, is not the bare surrender the inconclusive set lists. Widened 2026-09-17 with the modal give-up forms (the operator's first live test of the demonstration page)."
     },
     {
       "id": "killed_myself_idiom",
+      "yields_to_gate": false,
       "pattern": "\\bkilled (myself|himself|herself|themselves|ourselves) (laughing|at the gym|working out|studying|training|trying to (finish|get|make|meet|hit|beat|carry|lift|move))\\b",
       "note": "Exertion and laughter idioms, masked before the past-tense direct-ideation pattern runs (added 2026-09-17 with that pattern). 'almost killed himself' is deliberately not masked: a near-attempt report is a report."
     },
     {
       "id": "im_dead_slang",
+      "yields_to_gate": false,
       "pattern": "\\bi'?m dead\\b(?! inside)"
     },
     {
       "id": "suicide_prevention_noun",
+      "yields_to_gate": false,
       "pattern": "\\bsuicide (prevention|hotline|lifeline|awareness|research|rate|rates|squad|mission)\\b"
     },
     {
       "id": "disappear_for_a_while",
+      "yields_to_gate": false,
       "pattern": "\\bdisappear (for|on|over) (a|the|one|two|three) (week|weekend|day|days|while|bit|month|vacation|trip)\\b"
     },
     {
       "id": "end_of_meeting",
+      "yields_to_gate": false,
       "pattern": "\\bend (of )?(this|the) (meeting|call|session|chapter|year|day|week|sprint|quarter)\\b"
     },
     {
       "id": "end_of_quarter",
+      "yields_to_gate": false,
       "pattern": "\\bend of the (quarter|year|day|week|month)\\b"
     },
     {
       "id": "slay",
+      "yields_to_gate": false,
       "pattern": "\\bslay(ed|s)?\\b"
     },
     {
       "id": "sobering_thought",
+      "yields_to_gate": false,
       "pattern": "\\bsobering (thought|reminder|moment|look|read|reality)\\b"
     },
     {
       "id": "aa_batteries",
+      "yields_to_gate": false,
       "pattern": "\\baa (batteries|battery)\\b"
     },
     {
       "id": "death_of_me",
+      "yields_to_gate": false,
       "pattern": "\\b(the|a) death of me\\b",
       "note": "Emphasis idiom: 'this deadline will be the death of me'. Not grief, not risk."
     },
     {
       "id": "presentation_identity_sense",
+      "yields_to_gate": false,
       "pattern": "\\b(?:switch(?:ed|ing|es)?|chang(?:e|ed|ing|es)|choos(?:e|ing|es)|chose|set|pick(?:ed|ing|s)?|keep(?:ing|s)?|kept)\\s+(?:my\\s+|the\\s+|your\\s+|their\\s+)?presentation\\b|\\bpresentation\\s+(?:to|as|is|was)\\s+(?:neither|a woman|a man|woman|man|as written|they(?:/them)?|she(?:/her)?|he(?:/him)?)\\b",
       "note": "The project's own word for how a character presents (ADR-0026 (Proposed): woman, man, neither, as written). 'I switch presentation' and 'set the presentation to neither' are not a work deck; 'a presentation tomorrow' still is. Added 5 October 2026 for pair 17 of Grok's identity set under ruling 7."
     },
     {
       "id": "b3_die_of_boredom",
+      "yields_to_gate": false,
       "pattern": "\\bdie(?= of boredom\\b)",
       "scope": "crisis_only",
       "note": "Order B3, ruling 10 of 5 October 2026; measured by order B5; releases gap-spoken-gonna-die-of-boredom. Applies only to the crisis screen copy."
     },
     {
       "id": "b3_die_compliment",
+      "yields_to_gate": false,
       "pattern": "\\b(?:wanna|want to) die(?=,\\s*(?:that|this|the|your) (?:dress|outfit|look|design) is (?:gorgeous|beautiful|amazing)\\b)",
       "scope": "crisis_only",
       "note": "Order B3, ruling 10 of 5 October 2026; measured by order B5; releases gap-spoken-wanna-die-compliment. Applies only to the crisis screen copy."
     },
     {
       "id": "b3_die_in_peace_show",
+      "yields_to_gate": false,
       "pattern": "\\b(?:let me|lemme) die in peace(?=,\\s*i(?:'m| am) watching (?:my|the|a) (?:show|movie|series)\\b)",
       "scope": "crisis_only",
       "note": "Order B3, ruling 10 of 5 October 2026; measured by order B5; releases gap-spoken-let-me-die-show. Applies only to the crisis screen copy."
     },
     {
       "id": "b3_end_on_note",
+      "yields_to_gate": false,
       "pattern": "\\bend it(?= on (?:a |the )?(?:hopeful|positive|happy|high|good) note\\b)",
       "scope": "crisis_only",
       "note": "Order B3, ruling 10 of 5 October 2026; measured by order B5; releases gap-spoken-editors-end-note. Applies only to the crisis screen copy."
     },
     {
       "id": "b3_end_after_credits",
+      "yields_to_gate": false,
       "pattern": "\\bend it(?= after the credits\\b)",
       "scope": "crisis_only",
       "note": "Order B3, ruling 10 of 5 October 2026; measured by order B5; releases gap-spoken-gonna-end-credits. Applies only to the crisis screen copy."
     },
     {
       "id": "b3_done_with_exit",
+      "yields_to_gate": false,
       "pattern": "\\bi(?:'m| am) done(?=,\\s*i (?:need to (?:figure out how to )?leave|want out)\\b)",
       "scope": "crisis_only",
       "note": "Order B3, ruling 11 of 5 October 2026; measured by order B5; releases gap-done-with-a-next-step-over-restricted. Applies only to the crisis screen copy."
     },
     {
       "id": "b3_thing_subject",
+      "yields_to_gate": false,
       "pattern": "(\\b(?:the|a|this|that) (?:season(?: finale)?|show|band|game) (?:is|was) )ending it all\\b",
       "scope": "crisis_only",
       "note": "Order B3, ruling 11 of 5 October 2026; measured by order B5; releases r3b-tense-known-gap-thing-subject-001. Applies only to the crisis screen copy.",

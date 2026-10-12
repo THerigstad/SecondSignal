@@ -105,7 +105,7 @@ def _write_pack(tmp_path: Path, body: dict) -> Path:
 
 def test_duplicate_id_fails_the_load(tmp_path) -> None:
     path = _write_pack(tmp_path, {
-        "regex_masks": [{"id": "dup", "pattern": "a"}],
+        "regex_masks": [{"id": "dup", "pattern": "a", "yields_to_gate": False}],  # Order G1, 2026-10-10: absent -> false schema pin.
         "hits": [{"id": "dup", "class": "c", "pattern": "b"}],
     })
     with pytest.raises(ValueError, match="duplicate id"):

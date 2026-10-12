@@ -557,6 +557,15 @@ INCONCLUSIVE_PATTERNS: tuple[re.Pattern[str], ...] = _compile((
     r"\b(fainted|blacked out|passed out) (from|because|after) (not eating|hunger|skipping meals|not sleeping)\b",
 ))
 
+# Order G1, 10 October 2026: proximity masks yield to the gate's hit classes.
+# Danger signals and present other-person weapon matches keep their words too.
+# Inconclusive patterns stay out because masks help resolve those ambiguous reads.
+MASK_PROTECTED_PATTERNS: tuple[re.Pattern[str], ...] = (
+    tuple(p for patterns in CRISIS_CLASSES.values() for p in patterns)
+    + tuple(p for patterns in DANGER_SIGNALS.values() for p in patterns)
+    + (_OTHER_PERSON_WEAPON_RE,)
+)
+
 # Framing that people use to route around a gate. Recorded as a reason; it
 # never changes the verdict in either direction (LC-9: framing does not waive).
 FRAMING_PATTERNS: tuple[re.Pattern[str], ...] = _compile((
@@ -1118,7 +1127,7 @@ def crisis_screen(text: str) -> CrisisScreen:
     # Order B3, 5 October 2026: only this screen reads the measured folds.
     # Routing and session monitors still read their existing unfolded copy.
     norm, folds = screen_fold(analysis.text)
-    masked, masked_spans = apply_masks(norm, crisis_only=True)
+    masked, masked_spans = apply_masks(norm, crisis_only=True, protect=MASK_PROTECTED_PATTERNS)
     evidence: list[tuple[str, str]] = []
     hit_spans: list[Span] = []
     negated = False

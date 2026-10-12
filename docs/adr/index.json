@@ -270,13 +270,14 @@
       "evidence": [
         "tests/test_normalize.py",
         "tests/test_lexicon.py",
+        "tests/test_g1_masks.py",
         "tests/test_crisis_gate.py::test_declared_language_never_exempts_english_text"
       ],
       "modules": [
         "src/secondsignal/normalize.py",
         "src/secondsignal/lexicon.py"
       ],
-      "notes": ""
+      "notes": "Order G1, 10 October 2026: proximity masks yield to gate and pack hits with protected-span receipts; exact idioms and inconclusive exclusions remain, and monitor input is unchanged."
     },
     {
       "number": "0019",

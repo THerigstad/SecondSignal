@@ -610,7 +610,7 @@ def test_t4_slow_host_terms_save_does_not_delay_a_crisis(app, monkeypatch):
     assert not worker.is_alive()
 
 
-@pytest.mark.parametrize("package,count,expected", [('src/secondsignal/', 21, '85e848a59368e91c3ac396d94484e4e97d3f46acbc54670f08d5ca0f8424f79b'), ('src/secondsignal_harness/', 12, '26e500f585c147a489018d1a722acaa9a5636e71e5cd683d519f1f7bda5ac7d2')])
+@pytest.mark.parametrize("package,count,expected", [('src/secondsignal/', 21, '183e15c9707de81abc1aaeefec40c5e8dca07c9e5303b1732730acc86fd50a64'), ('src/secondsignal_harness/', 12, '26e500f585c147a489018d1a722acaa9a5636e71e5cd683d519f1f7bda5ac7d2')])  # Order G1, 2026-10-10, landed 2026-10-11: the policy package moved on purpose (lexicon, gate constant and call, the two packs), 85e848a59368e91c3ac396d94484e4e97d3f46acbc54670f08d5ca0f8424f79b -> 183e15c9707de81abc1aaeefec40c5e8dca07c9e5303b1732730acc86fd50a64; the harness package stays byte-identical to landing 8.
 def test_t4_policy_and_harness_are_byte_identical(package, count, expected):
     """The complete source inventory and every byte in each protected package match the supplied tree."""
     import hashlib

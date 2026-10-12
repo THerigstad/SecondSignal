@@ -221,8 +221,12 @@ SAFE_OTHER_PERSON_WEAPON_CASES = [
 @pytest.mark.parametrize("text", CONTROLS)
 def test_ordinary_idiom_is_not_a_crisis(text):
     read, evidence = crisis_read(text)
-    assert read == "MISS", (text, evidence)
-    assert verdict(text).action is not Action.HUMAN_ESCALATION
+    expected = "HIT" if text == CONTROLS[14] else "MISS"  # Order G1, 2026-10-10: game positive MISS -> HIT.
+    assert read == expected, (text, evidence)
+    if expected == "HIT":
+        assert verdict(text).action is Action.HUMAN_ESCALATION  # Order G1, 2026-10-10: game positive PROCEED -> HUMAN_ESCALATION.
+    else:
+        assert verdict(text).action is not Action.HUMAN_ESCALATION
 
 
 @pytest.mark.parametrize(
@@ -230,7 +234,10 @@ def test_ordinary_idiom_is_not_a_crisis(text):
     [text for text in SPOKEN_SURFACE_CONTROLS if text not in KNOWN_SPOKEN_SURFACE_OVERRESTRICTIONS],
 )
 def test_innocent_spoken_surfaces_do_not_escalate(text):
-    assert verdict(text).action is not Action.HUMAN_ESCALATION
+    if text == SPOKEN_SURFACE_CONTROLS[13]:  # Order G1, 2026-10-10: spoken game positive PROCEED -> HUMAN_ESCALATION.
+        assert verdict(text).action is Action.HUMAN_ESCALATION
+    else:
+        assert verdict(text).action is not Action.HUMAN_ESCALATION
 
 
 @pytest.mark.parametrize("text", INTERNET_SLANG_DEATH_CONTROLS)

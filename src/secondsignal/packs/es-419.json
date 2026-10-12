@@ -4,7 +4,7 @@
   "status": "unreviewed",
   "language": "es",
   "window": 4,
-  "note": "Latin American Spanish crisis screen: native speech-act classes and native idiom masks, written as Spanish, not translated from the English list. Voseo forms (querés, tenés, podés) are listed alongside tuteo. Status stays unreviewed until two native reviewers from different countries sign; masks are reviewed with more suspicion than hits. Peninsular slang is not stuffed into this pack. The English card and four English lines changed on 8 and 10 September 2026 (A1, A2, A6, A7, A10 of the operator's rulings); the Spanish lines stand as written until a native speaker rewrites them, and three new lines (compound_opener, failure, post_separation) were written natively on 10 September and carry the same unreviewed status.",
+  "note": "Latin American Spanish crisis screen: native speech-act classes and native idiom masks, written as Spanish, not translated from the English list. Voseo forms (querés, tenés, podés) are listed alongside tuteo. Status stays unreviewed until two native reviewers from different countries sign; masks are reviewed with more suspicion than hits. Peninsular slang is not stuffed into this pack. The English card and four English lines changed on 8 and 10 September 2026 (A1, A2, A6, A7, A10 of the operator's rulings); the Spanish lines stand as written until a native speaker rewrites them, and three new lines (compound_opener, failure, post_separation) were written natively on 10 September and carry the same unreviewed status. A regex mask marked yields_to_gate yields to protected gate hits; a false value keeps its exact-idiom exemption.",
   "negation": [
     "no",
     "nunca",
@@ -23,30 +23,37 @@
   "regex_masks": [
     {
       "id": "muero_de_ganas",
+      "yields_to_gate": false,
       "pattern": "\\bme muero de (ganas|risa|calor|frío|frio|hambre|sueño|sueno|vergüenza|verguenza|amor|curiosidad|aburrimiento)\\b"
     },
     {
       "id": "muerto_de_sueno",
+      "yields_to_gate": false,
       "pattern": "\\b(estoy|estás|estas|está|esta|ando|andamos|estamos) (muert[oa]s?|muert[oa]) de (sueño|sueno|hambre|risa|cansancio|frío|frio|calor|miedo|vergüenza|verguenza)\\b"
     },
     {
       "id": "mato_el_show",
+      "yields_to_gate": false,
       "pattern": "\\b(mató|mato|la rompió|la rompio) (el show|en el escenario|el concierto)\\b"
     },
     {
       "id": "matar_el_tiempo",
+      "yields_to_gate": false,
       "pattern": "\\bmatar (el tiempo|la tarde|el rato)\\b"
     },
     {
       "id": "de_muerte_slang",
+      "yields_to_gate": false,
       "pattern": "\\b(está|esta|estaba|estuvo) de muerte\\b"
     },
     {
       "id": "morir_de_risa",
+      "yields_to_gate": false,
       "pattern": "\\bmorir(me|se|nos)? de (risa|ganas|vergüenza|verguenza)\\b"
     },
     {
       "id": "prevencion_suicidio",
+      "yields_to_gate": false,
       "pattern": "\\b(prevención|prevencion|tasa|tasas|riesgo|línea|linea|investigación|investigacion|intento|intentos) (del|de) suicidio\\b"
     }
   ],

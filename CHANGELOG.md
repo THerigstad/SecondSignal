@@ -10,6 +10,23 @@ All notable changes to SecondSignal are documented here.
 - The generator copies the script beside the ask and reset scripts, resolves the special open target `@lights` the way it resolves `@reset`, refuses any other target beginning `@` with the key named, and draws a plain bulb tile. The example TESTING list's reserved Lights check key becomes that open key; Flag this turn and Mic mute stay reserved.
 - Tests: the copied script against a running Table (nothing shown while unarmed; the roster, card and idle sequence once armed; the sitting, session and transcript untouched), the port rule and the silent exit for the third script, the special-target rule in the exports and the examples, and the refused misspelt target.
 
+### Fixed — 2026-10-10, order G1 (a proximity mask yields to the gate)
+
+- The lexicon protects unnegated caller and pack hit spans before proximity
+  masks run, requires explicit regex flags, and records protected attempts;
+  exact idioms retain their exemptions and `protect=None` retains old input.
+- The gate supplies its existing hit, danger and weapon patterns without
+  changing a class, card, exclusion, session monitor or digest algorithm.
+- An offline, id-only splice measurement and permanent guards cover the
+  bypasses, exact idioms, negation, Spanish hits, receipts and monitor input;
+  the replay separates 888 hash-only rows from one changed decision.
+- ADR-0018 is amended in place; the register, limitations, provenance and
+  generated public counts follow the measured tree and remaining exclusions.
+- Zero labelled expectations relabelled, zero reviewer cases re-dispositioned,
+  one manifest known gap closed and three historical fuzz variants closed;
+  two test control pins now receive the card. Historical fuzz data stays intact.
+- Landing note, 11 October 2026: the English pack had carried Windows line endings since 6 October; it is normalized to the tree's line endings at this landing, so the patterns hash moves for that reason as well as for the new flags, and every hash-derived pin was re-derived on the landed tree.
+
 ### Added — 2026-10-10, order T4 (Table kit four: the sitting, the persisted latch, the host-terms link, the declared ask from the deck)
 
 - A sitting ends on Reset, process exit or eight hours without an accepted turn; reloads keep it, and the computer receives one quiet-limit notice.

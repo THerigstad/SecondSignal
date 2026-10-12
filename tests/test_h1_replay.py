@@ -34,7 +34,7 @@ def replay():
             rows.append({"case": label, "turn": number, "released": turn.released,
                          "release_reason": turn.release_reason,
                          "policy_and_output_sha256": hashlib.sha256(material.encode()).hexdigest()})
-    return {"source": "main b4e819b labelled single cases with prior turns and trajectories",
+    return {"source": "SecondSignal-b017d82, order G1, 10 October 2026: labelled single cases with prior turns and trajectories",  # Order G1, 2026-10-10: main b4e819b -> SecondSignal-b017d82 + G1 source.
             "adapter": "FakeAdapter with existing PERSONA-TEXT-MARKER fixture",
             "cases": len(cases), "turns": len(rows),
             "released": sum(row["released"] for row in rows), "rows": rows}

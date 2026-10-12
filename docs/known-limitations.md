@@ -107,6 +107,41 @@ The Spanish pack remains unreviewed with native review in progress. Current
 holds still last only the turn; this order does not close persistent holds, the
 164 documented gaps or the fourteen recorded dissents.
 
+## A proximity mask yields to the gate — 10 October 2026, order G1
+
+Every proximity window and the four flagged English regex masks now yield
+to unnegated gate hit patterns, danger signals and pack hits, recording the
+attempt as a protected span. The gate explicitly enables protection; the
+session monitors keep their landing-8 input. The permanent guard is
+`tests/test_g1_masks.py::test_splice_guard_keeps_every_labelled_card_except_recorded_gate_exclusions`,
+and its exception list is the measured data, never an unlisted test waiver.
+
+The measurement in `evals/fuzz/measurements/splice_2026-10-10.json` records
+181 eligible cards before and 182 after, with these flip counts: suffix ` on my run` 71 → 11; suffix ` after my run` 16 → 1; suffix ` with the boss` 17 → 2; suffix ` at the plant` 12 → 1; suffix ` at my job` 2 → 2; suffix ` on the raid` 71 → 11; suffix ` at the deadline` 13 → 2; suffix ` in the app` 13 → 2; suffix ` on the server` 22 → 10; suffix ` in the tutorial` 16 → 1; suffix ` on the campaign` 71 → 11; suffix ` on this level` 71 → 11; suffix ` on my phone` 22 → 10; prefix `after my run, ` 12 → 1; prefix `at the plant, ` 9 → 0; prefix `boss fight done, ` 11 → 1; prefix `on my shift, ` 0 → 0.
+The raid baseline measured here is 71, not the prototype's 68. One manifest
+gap closes, leaving 163 documented gaps and fourteen recorded dissents;
+three additional historical fuzz variants close without changing their
+original archived fixture bytes. No labelled expectation is relabelled and
+no reviewer case is re-dispositioned.
+
+What remains open starts with the other-person weapon lane's occupational
+exclusion: its place words can excuse a threat at a workplace. The other
+remaining causes are the surrender-object exclusion, the jump-preposition
+exclusion, unprotected inconclusive jump reads resolved by the game window,
+the direct-ideation tail exclusion, the Spanish work idiom resolving an
+inconclusive read, and the existing three-token negation exception. The last
+can attach a preceding negation to a later class match. Some unspliced
+classes therefore disappear through their own exclusions; that is distinct
+from a mask erasing a still-applicable protected hit. No remaining measured
+flip does the latter. The classes, inconclusive patterns and exclusions,
+exact idioms and card wording remain unchanged.
+
+An exact-idiom regex may still blank a class match by design. The hand-reviewed
+exemption list is exactly the false `yields_to_gate` entries: `en:labor_killing_me`, `en:killed_it`, `en:kill_it_time_lights`, `en:dying_to`, `en:die_laughing`, `en:died_laughing`, `en:die_of_embarrassment`, `en:to_die_for`, `en:drop_dead`, `en:deadline_killswitch`, `en:done_with_work`, `en:give_up_on`, `en:killed_myself_idiom`, `en:im_dead_slang`, `en:suicide_prevention_noun`, `en:disappear_for_a_while`, `en:end_of_meeting`, `en:end_of_quarter`, `en:slay`, `en:sobering_thought`, `en:aa_batteries`, `en:death_of_me`, `en:presentation_identity_sense`, `en:b3_die_of_boredom`, `en:b3_die_compliment`, `en:b3_die_in_peace_show`, `en:b3_end_on_note`, `en:b3_end_after_credits`, `en:b3_done_with_exit`, `en:b3_thing_subject`, `es-419:muero_de_ganas`, `es-419:muerto_de_sueno`, `es-419:mato_el_show`, `es-419:matar_el_tiempo`, `es-419:de_muerte_slang`, `es-419:morir_de_risa`, `es-419:prevencion_suicidio`. No Spanish regex
+qualifies for the proximity flag; the Spanish window masks still yield when
+protection is enabled. Neither this rule nor the splice guard replaces
+clinical or native-language review.
+
 ## The measured closures of 5 October 2026 (order B3)
 
 The operator's rulings from the B1 and B5 measurements close

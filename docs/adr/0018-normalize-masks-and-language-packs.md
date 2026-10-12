@@ -106,3 +106,36 @@ language identification is not built; the unscreened heuristic is a function
 word list for Latin-script languages no pack covers plus a non-Latin script
 check. The Spanish pack has not been reviewed by a native speaker and says so
 on every verdict it touches.
+
+## Amended in place 10 October 2026, order G1
+
+A proximity mask yields to the gate. Every window mask and every regex mask
+whose pack marks `yields_to_gate: true` leaves a matching gate hit, danger
+signal, other-person weapon span or pack hit visible. The protected matches
+are found on the original normalized copy before any mask runs. A negation
+in the preceding three tokens retains the existing exception. A skipped
+masking attempt is recorded as a `protected` span with its mask id, offsets,
+pack and applicable domain; a mask still needs its object and clause context.
+
+Exact idioms marked false keep their measured exemption. No mask is added or
+removed, and no class, card, inconclusive pattern or exclusion changes.
+Inconclusive reads are not protected because masks help resolve them and
+those patterns carry their own exclusions. The field is mandatory and
+boolean on every regex entry. A missing or non-boolean field fails loading,
+with duplicate ids checked first.
+
+Under the operator's follow-up ruling, `protect=None` retains landing-8
+behavior completely; a tuple, including an empty tuple, enables caller and
+pack-hit protection. The gate supplies its hit patterns. Session monitors
+and extraction omit the parameter and keep their original bytes.
+
+The stored measurement is `evals/fuzz/measurements/splice_2026-10-10.json`:
+181 eligible single-message cards before, 182 after the known-gap closure.
+Unspliced misses are counted separately, and cases with prior turns are not
+single-message cases. Before/after flip counts are: suffix ` on my run` 71 → 11; suffix ` after my run` 16 → 1; suffix ` with the boss` 17 → 2; suffix ` at the plant` 12 → 1; suffix ` at my job` 2 → 2; suffix ` on the raid` 71 → 11; suffix ` at the deadline` 13 → 2; suffix ` in the app` 13 → 2; suffix ` on the server` 22 → 10; suffix ` in the tutorial` 16 → 1; suffix ` on the campaign` 71 → 11; suffix ` on this level` 71 → 11; suffix ` on my phone` 22 → 10; prefix `after my run, ` 12 → 1; prefix `at the plant, ` 9 → 0; prefix `boss fight done, ` 11 → 1; prefix `on my shift, ` 0 → 0.
+No remaining flip erases an unnegated protected hit. The remaining exclusions
+and maskable inconclusive reads are identified by case id and cause in the
+measurement; they remain outside this amendment. The measured raid baseline
+is 71 rather than the prototype's 68. `tests/test_g1_masks.py` guards the
+splices, explicit opt-in, exact idioms, negation, pack hits and span receipts.
+The decision remains Accepted and the implementation remains built.

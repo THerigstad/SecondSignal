@@ -32,6 +32,13 @@ Load-time contracts: a duplicate id, an empty stem list, or a window mask
 without objects fails the load. Every window mask must be exercised by a
 positive and a negative fixture; ``tests/test_lexicon.py`` enforces that.
 
+Order G1, 10 October 2026: proximity masks yield to protected gate and pack
+hit spans, and record each attempt they leave visible. Every window mask and
+each regex mask marked yields_to_gate follows this rule; no mask is added or
+removed. Exact idioms are unchanged. Inconclusive reads stay unprotected
+because masks help resolve them and their patterns carry their own exclusions.
+Protection is opt-in, so extraction and session monitors keep their input.
+
 All packs installed run on every turn. Declaring a language selects the
 house lines and resources; it never exempts any text from any screen.
 """
@@ -77,7 +84,7 @@ class Span:
     pattern_id: str
     start: int
     end: int
-    kind: str          # "mask" | "hit" | "inconclusive"
+    kind: str          # "mask" | "protected" | "hit" | "inconclusive"
     pack: str
     domain: str = "crisis"
 
@@ -109,6 +116,7 @@ class Pack:
     source_hash: str = ""
     crisis_only_masks: frozenset[str] = frozenset()
     mask_preserve_groups: dict[str, int] = field(default_factory=dict)
+    yields_to_gate: frozenset[str] = frozenset()
 
 
 def _compile(pattern: str) -> re.Pattern[str]:
@@ -126,11 +134,19 @@ def load_pack(path: str | Path) -> Pack:
             raise ValueError(f"pack {data.get('pack')!r}: duplicate id {entry_id!r} in {what}")
         ids.add(entry_id)
 
+    for kind in ("regex_masks", "window_masks", "hits", "inconclusive"):
+        for entry in data.get(kind, ()):
+            claim(entry["id"], kind)
+
     regex_masks = []
+    yields_to_gate = set()
     crisis_only_masks = set()
     mask_preserve_groups = {}
     for m in data.get("regex_masks", ()):
-        claim(m["id"], "regex_masks")
+        if not isinstance(m.get("yields_to_gate"), bool):
+            raise ValueError(f"mask {m['id']!r}: yields_to_gate must be a boolean")
+        if m["yields_to_gate"]:
+            yields_to_gate.add(m["id"])
         pattern = _compile(m["pattern"])
         regex_masks.append((m["id"], pattern))
         if m.get("scope") == "crisis_only":
@@ -143,7 +159,6 @@ def load_pack(path: str | Path) -> Pack:
 
     window_masks = []
     for m in data.get("window_masks", ()):
-        claim(m["id"], "window_masks")
         stems = frozenset(s.casefold() for s in m.get("stems", ()))
         objects = frozenset(o.casefold() for o in m.get("objects", ()))
         if not stems:
@@ -162,12 +177,10 @@ def load_pack(path: str | Path) -> Pack:
 
     hits = []
     for h in data.get("hits", ()):
-        claim(h["id"], "hits")
         hits.append((h["id"], h["class"], _compile(h["pattern"])))
 
     inconclusive = []
     for h in data.get("inconclusive", ()):
-        claim(h["id"], "inconclusive")
         inconclusive.append((h["id"], _compile(h["pattern"])))
 
     return Pack(
@@ -186,6 +199,7 @@ def load_pack(path: str | Path) -> Pack:
         source_hash=digest,
         crisis_only_masks=frozenset(crisis_only_masks),
         mask_preserve_groups=mask_preserve_groups,
+        yields_to_gate=frozenset(yields_to_gate),
     )
 
 
@@ -251,6 +265,27 @@ def _overlaps_desire(start: int, end: int, desire: list[tuple[int, int]]) -> boo
     return any(start < d_end and end > d_start for d_start, d_end in desire)
 
 
+def _protected_spans(
+    norm: str, packs: tuple[Pack, ...], protect: tuple[re.Pattern[str], ...] | None,
+) -> list[tuple[int, int]]:
+    """Collect unnegated hit matches on the original copy before any masking."""
+    if protect is None:
+        return []
+    negation = frozenset(word for pack in packs for word in pack.negation)
+    patterns = protect + tuple(pattern for pack in packs for _, _, pattern in pack.hits)
+    spans = []
+    for pattern in patterns:
+        for match in pattern.finditer(norm):
+            before = tokenize(norm[:match.start()])[-3:]
+            if not any(token in negation for token, _, _ in before):
+                spans.append((match.start(), match.end()))
+    return spans
+
+
+def _overlaps_protected(start: int, end: int, protected: list[tuple[int, int]]) -> bool:
+    return any(start < stop and end > begin for begin, stop in protected)
+
+
 def _same_clause(
     text: str,
     tokens: list[tuple[str, int, int]],
@@ -285,6 +320,7 @@ def _same_clause(
 
 def apply_masks(
     norm: str, packs: tuple[Pack, ...] | None = None, *, crisis_only: bool = False,
+    protect: tuple[re.Pattern[str], ...] | None = None,
 ) -> tuple[str, tuple[Span, ...]]:
     """Blank every masked span (same length, so offsets survive) and return
     the masked text with the spans, in the order they were applied.
@@ -292,8 +328,11 @@ def apply_masks(
     Order B3, ruling 7 of 5 October 2026: the new crisis-only masks are
     opt-in, so extraction and session monitors keep their existing input.
     A preserved prefix group retains the measured thing-subject context.
+    Order G1: None keeps the original input; a tuple enables caller and pack
+    hit protection, even when the tuple is empty.
     """
     packs = packs if packs is not None else tuple(PACKS.values())
+    protected = _protected_spans(norm, packs, protect)
     masked = norm
     spans: list[Span] = []
 
@@ -306,6 +345,9 @@ def apply_masks(
                     continue
                 group = pack.mask_preserve_groups.get(pattern_id)
                 start = m.end(group) if group is not None else m.start()
+                if pattern_id in pack.yields_to_gate and _overlaps_protected(start, m.end(), protected):
+                    spans.append(Span(masked[start:m.end()], pattern_id, start, m.end(), "protected", pack.id))
+                    continue
                 spans.append(Span(masked[start:m.end()], pattern_id, start, m.end(), "mask", pack.id))
                 masked = _blank(masked, start, m.end())
 
@@ -331,6 +373,9 @@ def apply_masks(
                         continue
                 # B4: first-person present desire is never masked by game/hobby idiom.
                 if _overlaps_desire(start, end, desire_spans):
+                    continue
+                if _overlaps_protected(start, end, protected):
+                    spans.append(Span(tok, mask.id, start, end, "protected", pack.id, mask.domain))
                     continue
                 spans.append(Span(tok, mask.id, start, end, "mask", pack.id, mask.domain))
                 masked = _blank(masked, start, end)
