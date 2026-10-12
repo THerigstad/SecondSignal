@@ -182,7 +182,7 @@ def _span_to_dict(span: Span) -> dict[str, object]:
 
 def _signals_to_dict(signals: RequestSignals) -> dict[str, object]:
     """Serialize the signal boundary, sorting its unordered collections."""
-    return {
+    result: dict[str, object] = {
         "regulation": signals.regulation,
         "domains": sorted(signals.domains),
         "modes": sorted(signals.modes),
@@ -192,6 +192,14 @@ def _signals_to_dict(signals: RequestSignals) -> dict[str, object]:
         },
         "turn_index": signals.turn_index,
     }
+
+    if signals.confidence:
+        result["confidence"] = dict(signals.confidence)
+    if signals.distribution:
+        result["distribution"] = {
+            feature: dict(options) for feature, options in signals.distribution.items()
+        }
+    return result
 
 
 def _safety_to_dict(verdict: SafetyVerdict) -> dict[str, object]:
@@ -336,6 +344,14 @@ class RoutingDecision:
         """Human-readable trace of why this decision was made."""
         lines: list[str] = []
         lines.append(f"regulation = {self.signals.regulation}")
+        if self.signals.confidence:
+            lines.append(f"confidence = {dict(self.signals.confidence)}")
+        if self.signals.distribution:
+            distribution = {
+                feature: dict(options)
+                for feature, options in self.signals.distribution.items()
+            }
+            lines.append(f"distribution = {distribution}")
         if self.signals.domains:
             lines.append(f"domains    = {', '.join(sorted(self.signals.domains))}")
         if self.signals.modes:

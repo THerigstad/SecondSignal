@@ -4,6 +4,22 @@ All notable changes to SecondSignal are documented here.
 
 ## [Unreleased]
 
+### Added — 2026-10-09, order J1 (the signal contract in three primitives, two reserved fields, ADR-0030)
+
+- `docs/signals-contract.md` writes the seam as yes-or-no, choice and
+  score, separates confidence from labels, and pins a labelled example.
+- `RequestSignals` gains immutable empty-default confidence and
+  distribution maps, conditionally reported by the two router reporting
+  functions; tests prove unchanged labelled decisions, safety and release.
+  The maps are `FrozenMap` copies (a dict that refuses change), so a record
+  still deep-copies, pickles and converts with `dataclasses.asdict` as every
+  record did before the fields existed; two tests hold that.
+- ADR-0030 (Proposed), `A probability is evidence, not authority`,
+  records future abstention and calibration rules with partial status.
+- The roadmap, limitations, architecture links, provenance and generated
+  public numbers and sentences follow the contract and its tests; no
+  probabilistic extractor, shadow run or promotion is claimed.
+
 ### Added — 2026-10-07, the sentences that leave the repository
 
 - `evals/refresh_public_sentences.py` renders the five sentences on the

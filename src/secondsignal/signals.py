@@ -27,13 +27,15 @@ default; the router's no-signal policy decides what happens next.
 from __future__ import annotations
 
 import re
+from collections.abc import Mapping
 from dataclasses import dataclass, field
+from typing import Any, NoReturn
 
 from .lexicon import PACKS, apply_masks, tokenize
 from .normalize import analyze
 
 __all__ = [
-    "RequestSignals", "extract", "DOMAIN_LEXICON", "MODE_LEXICON",
+    "RequestSignals", "FrozenMap", "extract", "DOMAIN_LEXICON", "MODE_LEXICON",
     "IDIOM_EXCLUSIONS", "mask_idioms", "SEAT_CLAIM_TERMS", "HOLD_DOMAINS",
     "THIRD_PERSON_SUBJECTS", "claim_person", "lone_fragment",
     "FRAGMENT_MAX_TOKENS", "FRAGMENT_SELF_TOKENS", "FRAGMENT_STRONG_DOMAINS",
@@ -470,6 +472,32 @@ DYSREGULATION_STEP = 0.18
 REGULATION_STEP = 0.08
 
 
+class FrozenMap(dict):  # type: ignore[type-arg]
+    """A dict that refuses every change after it is built.
+
+    `RequestSignals.confidence` and `RequestSignals.distribution` are stored
+    as these, so a frozen record stays frozen through every alias a caller
+    keeps, while the maps remain dicts for everything that reads them:
+    `json.dumps`, `copy.deepcopy`, `pickle` and `dataclasses.asdict` all
+    round-trip a record exactly as they did before the two fields existed.
+    (A `types.MappingProxyType` is read-only too, but cannot be copied or
+    pickled, which would have made the whole record uncopyable.) Building
+    one copies its argument, so the caller's dict can change afterwards
+    without reaching the record; insertion order is kept.
+    """
+
+    __slots__ = ()
+
+    def _refuse(self, *args: object, **kwargs: object) -> NoReturn:
+        raise TypeError(f"{type(self).__name__} is read-only")
+
+    __setitem__ = __delitem__ = __ior__ = _refuse
+    clear = pop = popitem = setdefault = update = _refuse
+
+    def __reduce__(self) -> tuple[type[FrozenMap], tuple[dict[Any, Any]]]:
+        return type(self), (dict(self),)
+
+
 @dataclass(frozen=True)
 class RequestSignals:
     """Structured features consumed by the policy layer.
@@ -481,6 +509,16 @@ class RequestSignals:
         evidence: Feature name -> the literal tokens that triggered it. Every
             routing decision can be traced back through this map.
         turn_index: Position in the session, used by session-level monitors.
+        confidence: Feature name -> certainty of its label, from 0.0 to 1.0;
+            empty means no probabilistic claim, as in the lexicon. Keys use
+            evidence names such as domain:<name>, mode:<name>, regulation.
+        distribution: Feature name -> option probabilities in supplied order;
+            empty for the lexicon. Both fields are stored as `FrozenMap`
+            copies (the nested option maps too), read-only and in insertion
+            order, and any mapping passed in is copied on construction. They
+            are reserved evidence, never policy inputs. Excluded from hashing
+            to preserve the existing hash behaviour; ordinary instances
+            already have unhashable dict evidence.
     """
 
     regulation: float
@@ -488,6 +526,16 @@ class RequestSignals:
     modes: frozenset[str] = frozenset()
     evidence: dict[str, tuple[str, ...]] = field(default_factory=dict)
     turn_index: int = 0
+    confidence: Mapping[str, float] = field(default_factory=FrozenMap, hash=False)
+    distribution: Mapping[str, Mapping[str, float]] = field(
+        default_factory=FrozenMap, hash=False,
+    )
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "confidence", FrozenMap(self.confidence))
+        object.__setattr__(self, "distribution", FrozenMap(
+            (feature, FrozenMap(options)) for feature, options in self.distribution.items()
+        ))
 
     @property
     def is_dysregulated(self) -> bool:

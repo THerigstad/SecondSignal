@@ -59,6 +59,10 @@ lands with its fixtures or not at all.
    corpora for the hard latch, and the family-relapse set for D3. The second
    labeller does not exist yet (`docs/known-limitations.md`), which is why
    this block is first: nothing behind it can honestly start.
+   Promotion on the lexicon-miss set also requires a measured improvement
+   over the lexicon without worsening the adult false-positive corpora,
+   and calibrated probabilities on those two-labeller sets (a signal marked
+   0.8 is right about 80 percent of the time).
 2. **The correction path after a careful-side inference.** Today the line
    answers once and a row is written; who reviews, when, and what the person
    is told about timing is undesigned because no staffed reviewer exists

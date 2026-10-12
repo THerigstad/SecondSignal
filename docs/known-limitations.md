@@ -13,6 +13,14 @@ with the rulings of 3 October on review rounds 3 and 3B (holds are per
 message today; the character write-ups are fixed; the survivor fixtures are
 ported).
 
+## Signal contract — 9 October 2026, order J1
+
+The confidence and distribution fields exist on `RequestSignals`, and
+nothing in the shipped extractor fills them; routing and safety logic read
+neither. No probabilistic extractor, shadow run or bake-off has been done,
+and the second labeller still does not exist. The future abstention rules
+are recorded in ADR-0030 (Proposed), not active policy.
+
 ## Harness kit — 7 October 2026, order H1
 
 The Table still carries its own copy of the reserved-voice guard; a later Table

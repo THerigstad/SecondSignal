@@ -8,6 +8,8 @@ text ─► normalize ─► masks (packs) ─► signals.extract ─► safety.
                                                               └─ HUMAN_ESCALATION ─► no persona selected
 ```
 
+The signal boundary is written down in [the signal contract](signals-contract.md).
+
 Each stage has one responsibility and a stable contract with the next.
 `normalize.py` runs first and always: NFKC, invisible and bidirectional
 characters stripped, a small hashed skeleton of look-alike letters, casefold.

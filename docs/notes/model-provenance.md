@@ -226,7 +226,7 @@ where it is measured.
   replay, and a cancellable lights check. Built and tested offline with
   FakeAdapter; policy and harness source files are byte-identical to the
   supplied tree.
-
+- **Order J1, the signal contract (Codex, OpenAI, the ChatGPT desktop app; model and tier not recorded).** 9 October 2026 on the supplied tree 5e85ec5: wrote the three-primitive signal contract, reserved immutable probability fields with conditional reporting, and tests of unchanged routing, safety, house lines and release. Registered ADR-0030 (Proposed) with future abstention and calibration rules, linked the contract and refreshed the roadmap note, limitations, changelog and public counts.
 
 ## Reviewers, with doorway and tier where recorded
 
