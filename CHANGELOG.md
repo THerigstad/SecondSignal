@@ -4,6 +4,14 @@ All notable changes to SecondSignal are documented here.
 
 ## [Unreleased]
 
+### Changed — 2026-10-11, the Spanish pack's review state, stated as it is
+
+- The README status table and the limitations page said the Spanish pack's
+  native review was in progress. It is pending: the review sheet of
+  10 September 2026 is ready and has not been handed out, by the operator's
+  choice to wait until the pack stops changing. The three sentences now say
+  so; no code, test or count changes.
+
 ### Added — 2026-10-11, the Stream Deck's Lights check key (the reserved key wired to the Table's own check)
 
 - `apps/stream_deck/lights_check.pyw` posts the Table's existing lights-check request and nothing else; the key never carries the lights key and never speaks to the lamps. The Table decides: unarmed lights or a crisis card on the floor show nothing, and a stopped Table makes the press silent.

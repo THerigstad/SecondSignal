@@ -134,8 +134,8 @@ Stop waiting cancels the view's wait, not an already-running vendor operation.
 Text previews come from the codexes; no real voice or vendor has been exercised.
 Keyboard order, labels and switch semantics are checked in the local browser
 tests, not claimed as a completed human assistive-technology or usability review.
-The Spanish pack remains unreviewed with native review in progress. At this
-Table order's landing, holds lasted only the turn; order P3 now carries them
+The Spanish pack remains unreviewed; its native review is pending, not under
+way. At this Table order's landing, holds lasted only the turn; order P3 now carries them
 for the sitting. The 164 documented gaps and fourteen recorded dissents
 keep their dispositions.
 
@@ -379,9 +379,10 @@ aliases are being measured, and the recorded recovery gaps remain open.
   This is the single largest credibility gap in the repository and no
   amount of automated review closes it.
 - The Spanish pack (es-419) was written natively but has not been reviewed
-  by a native speaker from a second country. Native review is in progress:
-  a review sheet was prepared on 10 September 2026 and two native reviewers
-  are being approached; the pack stays `unreviewed` on every verdict it
+  by a native speaker from a second country. Native review is pending, not
+  under way: a review sheet was prepared on 10 September 2026 and goes to two
+  native speakers once the pack stops changing; as of 11 October 2026 it has
+  not been handed out, and the pack stays `unreviewed` on every verdict it
   touches until their verdicts are entered. Its masks are more dangerous
   than its hits: a wrong mask hides a hit. The three house lines the pack
   gained on 10 September (the compound opener, the failure line, the
