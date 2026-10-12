@@ -34,14 +34,14 @@ def replay():
             rows.append({"case": label, "turn": number, "released": turn.released,
                          "release_reason": turn.release_reason,
                          "policy_and_output_sha256": hashlib.sha256(material.encode()).hexdigest()})
-    return {"source": "SecondSignal-b017d82, order G1, 10 October 2026: labelled single cases with prior turns and trajectories",  # Order G1, 2026-10-10: main b4e819b -> SecondSignal-b017d82 + G1 source.
+    return {"source": "SecondSignal-82521ba, orders G1 and P3, landed 11 October 2026: labelled single cases with prior turns and trajectories",  # Order G1, 2026-10-10: main b4e819b -> SecondSignal-b017d82 + G1 source; order P3, landed 2026-10-11 on landing 11: -> SecondSignal-82521ba, orders G1 and P3.
             "adapter": "FakeAdapter with existing PERSONA-TEXT-MARKER fixture",
             "cases": len(cases), "turns": len(rows),
             "released": sum(row["released"] for row in rows), "rows": rows}
 
 
 def test_h1_every_labelled_turn_keeps_its_policy_house_lines_and_release():
-    """All 889 turns keep identical decisions, house lines, output and release; 235 still release."""
+    """All 889 turns match the P3 decisions, house lines, output and release; 224 release."""  # Order P3, 2026-10-10: 235 -> 224 released rows
     expected = json.loads((ROOT / "tests/fixtures/h1/labelled_before.json").read_text(encoding="utf-8"))
     actual = replay()
     assert actual == expected

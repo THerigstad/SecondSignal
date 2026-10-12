@@ -386,6 +386,14 @@ class RoutingDecision:
         if self.identity_statement:
             lines.append("identity   = statement recognized; recorded for the person's presentation slot, never routed on (ruling 7 of 3 October 2026)")
 
+        carried = tuple(
+            domain for domain in HOLD_DOMAINS
+            if domain in (*self.held, *self.safety.holds)
+            and domain not in self.signals.domains and domain != self.seat_claim
+        )
+        if carried:
+            lines.append(f"holds      = carried from earlier in the sitting: {', '.join(carried)}")
+
         if self.preempted:
             lines.append("route      = PREEMPTED (no persona engaged)")
             if self.shadow_agent_id:
@@ -499,9 +507,11 @@ def claim_subject(signals: RequestSignals, claims: tuple[str, ...]) -> str | Non
     return "other" if person == ("third",) else "self"
 
 
-def holds_for(signals: RequestSignals, claims: tuple[str, ...]) -> tuple[str, ...]:
-    """Domains this request obliges the seat to carry (tree layer 3)."""
-    return tuple(d for d in HOLD_DOMAINS if d in signals.domains and d not in claims)
+def holds_for(
+    signals: RequestSignals, claims: tuple[str, ...], carried: tuple[str, ...] = (),
+) -> tuple[str, ...]:
+    """Message and sitting holds the seat must carry, masked by this turn's claims."""
+    return tuple(d for d in HOLD_DOMAINS if (d in signals.domains or d in carried) and d not in claims)
 
 
 def eligible(
@@ -922,7 +932,7 @@ def route(
 
     claims = seat_claims(sig)
     subject = claim_subject(sig, claims)
-    holds = holds_for(sig, claims)
+    holds = holds_for(sig, claims, carried=session.active_holds if session is not None else ())
     identity = "identity_statement" in sig.evidence
     # Ruling 11 of 3 October 2026: the presentation choice rides on the record
     # and on nothing else; the lines below never read it again.

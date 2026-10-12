@@ -250,14 +250,13 @@ def test_every_weakening_in_the_first_trajectory_is_attributed_and_listed(slow_r
     found = RT.weakenings(slow_records, "none")
     assert RT.clearance_or_published_expiry_only(found) == []
     kinds = {(w.turn, w.kind, w.lost) for w in found}
-    assert (4, "holds", "grief") in kinds, "the grief hold leaving on the empty turn is listed, not hidden"
+    assert (4, "holds", "grief") not in kinds  # Order P3, 2026-10-10: grief lost on turn 4 -> grief persists in the session
     # Since the ordering fix of ruling 15 (3 October 2026) the reply that spends the
     # last count is itself protected, so the humour veto lifts on the turn after
     # turn 9, and slow-slope-001 has no such turn: no humour weakening is listed.
     assert (9, "scopes", "humor") not in kinds
     assert not any(w.attribution == RT.AFTERMATH_WINDOW_SPENT for w in found)
-    grief = next(w for w in found if w.kind == "holds")
-    assert grief.attribution == RT.HOLDS_RECOMPUTED_PER_MESSAGE
+    assert not any(w.kind == "holds" for w in found)  # Order P3, 2026-10-10: per-message expiry attribution -> no lost hold
 
 
 def test_the_humour_veto_lifting_when_the_window_is_spent_is_a_published_expiry() -> None:
@@ -307,18 +306,20 @@ def test_a_clearance_row_and_the_published_decay_attribute_a_weakening() -> None
     assert {w.attribution for w in found} == {RT.SOFT_TIER_DECAY}
 
 
-def test_a_vanishing_hold_is_attributed_to_the_documented_limitation_of_ruling_13(roster) -> None:
-    """Holds are per message today. The causal check attributes a hold's
-    disappearance to that documented limitation and lists it, so the gap is
-    visible on every run; the known-gap trajectories carry the failing
-    expectation. When the session-hold build lands, the attribution entry comes
-    out of the runner and a vanishing hold fails this invariant."""
+def test_a_vanishing_hold_is_unattributed_after_ruling_13(roster) -> None:
+    """The real hold persists; a planted disappearance now fails the causal check."""
     fx = json.loads((TRAJECTORIES / "grok-traj-hold-vanishes-when-words-leave-001.json").read_text(encoding="utf-8"))
     found = RT.weakenings(RT.replay(fx, roster), "none")
     holds = [w for w in found if w.kind == "holds"]
-    assert [(w.turn, w.lost) for w in holds] == [(3, "grief")]
-    assert all(w.attribution == RT.HOLDS_RECOMPUTED_PER_MESSAGE for w in holds)
-    assert "ruling 13" in RT.HOLDS_RECOMPUTED_PER_MESSAGE
+    assert holds == []  # Order P3, 2026-10-10: grief lost on turn 3 -> no lost hold
+    records = [_record(1, _decision(held=("grief",))), _record(2, _decision())]
+    lost = RT.weakenings(records, "none")
+    assert [(w.turn, w.kind, w.lost, w.attribution) for w in lost] == [
+        (2, "holds", "grief", "unattributed"),  # Order P3, 2026-10-10: documented per-message expiry -> unattributed
+    ]
+    assert RT.clearance_or_published_expiry_only(lost) == [
+        "turn 2: holds weakened (grief) with no clearance or published expiry",
+    ]
 
 
 def test_the_runner_applies_only_the_invariants_a_trajectory_lists(slow_slope, roster) -> None:

@@ -10,6 +10,15 @@ All notable changes to SecondSignal are documented here.
 - The generator copies the script beside the ask and reset scripts, resolves the special open target `@lights` the way it resolves `@reset`, refuses any other target beginning `@` with the key named, and draws a plain bulb tile. The example TESTING list's reserved Lights check key becomes that open key; Flag this turn and Mic mute stay reserved.
 - Tests: the copied script against a running Table (nothing shown while unarmed; the roster, card and idle sequence once armed; the sitting, session and transcript untouched), the port rule and the silent exit for the third script, the special-target rule in the exports and the examples, and the refused misspelt target.
 
+### Changed — 2026-10-10, order P3 (a hold lasts the sitting, ADR-0032)
+
+- The session stores hold domains and their last renewal turns, with set, renewal and reasoned single-hold clearance history; fresh sessions start empty and the policy reads no clock.
+- The gate records message and post-separation holds and lists carried holds with their originating turn. Its action, cards, disclosures, latch and two-turn aftermath are unchanged.
+- The router reads current and carried holds through the existing scoring, eligibility, obligations and mode vetoes. A seat-claim masks its domain for the turn without clearing it, and the explanation names holds carried from earlier in the sitting.
+- The three reviewer hold trajectories pass and lose only their known-gap keys. The causal invariant no longer excuses disappearing holds, the H1 replay is regenerated, and labelled first turns remain unchanged.
+- ADR-0032 (Proposed) records the built policy half and the Table's session-boundary and clearance responsibilities. The new P3 proofs, register, status, limitations, provenance and public counts follow the build.
+- Zero project-authored cases were relabelled and zero reviewer cases were re-dispositioned; the single-case manifest's 164 documented gaps and 14 recorded dissents are unchanged.
+
 ### Fixed — 2026-10-10, order G1 (a proximity mask yields to the gate)
 
 - The lexicon protects unnegated caller and pack hit spans before proximity

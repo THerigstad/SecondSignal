@@ -76,7 +76,6 @@
       "no_seat_resolves_by_id_order"
     ]
   },
-  "known_gap": true,
   "gap_note": "Turn 3 fails on held: holds are recomputed per message today: a grief hold named on one turn is absent on the next turn that does not name the death, and the humour veto it carried goes with it. The session-hold build (a hold lasts the session, is renewed by mention, and ends only with the session or by an operator clearance) is the gap-closure push's work (ruling 13 of 3 October 2026).",
   "disputed": false,
   "contract_adjusted": true,

@@ -1,6 +1,6 @@
 {
  "note": "The headline numbers stated on the public pages, derived from the tree by evals/refresh_public_numbers.py: the test count from pytest's own collection, the dispositions from evals/case-manifest.json, the case and fixture counts from the files under evals/cases/. Regenerate with `python evals/refresh_public_numbers.py --write`. tests/test_public_numbers.py fails when this file, or any page written from it, no longer matches the tree.",
- "tests": 3765, "_tests_pin": "Order G1, 2026-10-10, landed 2026-10-11: 3,729 -> 3,765 tests",
+ "tests": 3791, "_tests_pin": "Order P3, 2026-10-10, landed 2026-10-11: 3,765 -> 3,791 tests",
  "expected_failures": 177,
  "documented_gaps": 163,
  "recorded_dissents": 14,

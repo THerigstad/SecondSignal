@@ -73,7 +73,7 @@ from .normalize import analyze, screen_fold
 from .preferences import STYLE_ASK_COOLDOWN_TURNS, STYLE_ASK_THRESHOLD, PreferenceEvent
 from .preferences import assess as assess_preference
 from .signals import DANGER_FRAME_EXCLUSION_RE as _DANGER_FRAME_EXCLUSION_RE
-from .signals import RequestSignals, post_separation_context
+from .signals import HOLD_DOMAINS, RequestSignals, post_separation_context
 
 __all__ = [
     "Action",
@@ -842,7 +842,11 @@ class SessionState:
     ``SOFT_LATCH_WINDOW_TURNS`` substantive turns, its caps decay on the same
     schedule for a declared adult and not at all for an unknown band, and a
     second weak hit makes it sticky. Only ``clear_latch`` -- an operator
-    call with a recorded reason -- clears anything; text cannot.
+    call with a recorded reason -- clears the latch; text cannot.
+
+    A hold set in a session stays until the session ends or an operator
+    clears it with a recorded reason. Message text renews a hold and never
+    clears it; the surface owns the session boundary, not a policy clock.
     """
 
     turn_count: int = 0
@@ -858,6 +862,8 @@ class SessionState:
     latch: str = "none"
     latch_reasons: list[str] = field(default_factory=list)
     latch_history: list[tuple[str, str, str, int]] = field(default_factory=list)
+    holds: dict[str, int] = field(default_factory=dict)
+    hold_history: list[tuple[str, str, str, int]] = field(default_factory=list)
     soft_visible_turns: int = 0
     soft_cap_turns: int = 0
     soft_weak_hits: int = 0
@@ -900,6 +906,27 @@ class SessionState:
         elif self.conservative_mode and self.latch == "none":
             # Backward-compatible constructor flag: treat as an operator-declared posture.
             self._set_latch("hard", "operator_declared")
+
+    # -- holds ---------------------------------------------------------------
+
+    def carry_hold(self, domain: str, *, source: str) -> None:
+        """Record the hold this message sets or renews; called by the gate."""
+        event = "renew" if domain in self.holds else "set"
+        self.holds[domain] = self.turn_count
+        self.hold_history.append((event, f"{domain}:{source}", "signal", self.turn_count))
+
+    def clear_hold(self, domain: str, reason: str, *, actor: str = "operator") -> None:
+        """Operator-only: clear one hold with a reason; message text has no path here."""
+        if not reason or not reason.strip():
+            raise ValueError("clearing a hold requires a recorded reason")
+        if domain not in self.holds:
+            return
+        del self.holds[domain]
+        self.hold_history.append(("clear", f"{domain}:{reason}", actor, self.turn_count))
+
+    @property
+    def active_holds(self) -> tuple[str, ...]:
+        return tuple(domain for domain in HOLD_DOMAINS if domain in self.holds)
 
     # -- latch ---------------------------------------------------------------
 
@@ -1573,6 +1600,18 @@ def evaluate(
             if session is not None:
                 session.post_separation_shown = True
 
+    # Order P3: store message detections, then report the sitting's holds.
+    # Keep message holds separate so the style monitor's verdict stays unchanged.
+    verdict_holds = tuple(holds)
+    if session is not None:
+        for domain in holds:
+            source = "post_separation" if domain == "abuse" and separation else "message"
+            session.carry_hold(domain, source=source)
+        verdict_holds = session.active_holds
+        for domain in verdict_holds:
+            if domain not in holds:
+                reasons.append(f"hold carried from turn {session.holds[domain]}: {domain}")
+
     # Aftermath (C3): for a bounded count of substantive turns after a card,
     # humour is off and the resource line stays within reach. Protection is
     # decided from the count as it stands before this reply; the spend is
@@ -1629,7 +1668,7 @@ def evaluate(
         integrity_event=bool(integrity),
         language_scope=language_scope,
         latch_reasons=tuple(latch_reasons),
-        holds=tuple(holds),
+        holds=verdict_holds,
         preference_result=preference_result,
         preference_key=preference_key,
         facilitation=bool(facilitation),

@@ -483,6 +483,32 @@
         "src/secondsignal/router.py"
       ],
       "notes": "Order P1, 10 October 2026: a control-declared ask is recorded and explained, with every labelled seat, score, verdict and session unchanged. The existing harness acknowledgement uses the approved house line. Landing fix the same day: a declared alias or case variant is recorded as the canonical id through the roster's resolver. Table control wiring belongs to the next Table order; the rule for when an ask may win the seat is open pending R2 and a separate P2 order. Under the standing rule of 7 September 2026, this record becomes canon only after a second model family has read it."
+    },
+    {
+      "number": "0032",
+      "file": "0032-a-hold-lasts-the-sitting.md",
+      "title": "A hold lasts the sitting",
+      "decision": "Proposed",
+      "implementation": "built",
+      "evidence": [
+        "tests/test_p3_holds.py::test_hold_survives_two_turns_without_subject_words",
+        "tests/test_p3_holds.py::test_mention_renews_the_turn_and_records_history",
+        "tests/test_p3_holds.py::test_message_text_cannot_clear_a_hold",
+        "tests/test_p3_holds.py::test_clearance_removes_exactly_one_hold_and_records_actor_reason",
+        "tests/test_p3_holds.py::test_recovery_claim_masks_this_turn_without_clearing_the_session",
+        "tests/test_p3_holds.py::test_carried_holds_change_only_the_gates_hold_list_and_carried_reasons",
+        "tests/test_p3_holds.py::test_crisis_card_and_two_turn_tail_are_unchanged",
+        "tests/test_p3_holds.py::test_every_labelled_first_turn_matches_the_supplied_tree",
+        "tests/test_p3_holds.py::test_the_three_hold_trajectories_pass",
+        "tests/test_p3_holds.py::test_h1_changes_are_confined_to_turns_with_prior_context",
+        "tests/test_h1_replay.py::test_h1_every_labelled_turn_keeps_its_policy_house_lines_and_release",
+        "tests/test_trajectory_runner.py::test_every_trajectory_runs_as_marked"
+      ],
+      "modules": [
+        "src/secondsignal/safety.py",
+        "src/secondsignal/router.py"
+      ],
+      "notes": "Order P3, 10 October 2026: holds last the sitting, renew on mention and end only with the session or an operator clearance with a recorded reason. A seat-claim masks its domain for one turn without clearing it. The gate's screening, cards and two-turn tail are unchanged; the policy reads no clock. The three reviewer hold trajectories pass, and first-turn labelled and H1 records remain unchanged. The Table owns Reset and the sitting clock; its clearance control belongs to the next Table order. Under the standing rule of 7 September 2026, this record becomes canon only after a second model family has read it."
     }
   ],
   "reserved": [

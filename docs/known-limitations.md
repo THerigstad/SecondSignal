@@ -9,9 +9,40 @@ pre-launch audit of 13 September that found this page contradicting the
 README on two lines. `tests/test_public_claims.py` now checks the claims
 this page shares with the README, the evaluation document, the changelog and
 the package metadata, and fails when they disagree. Amended 4 October 2026
-with the rulings of 3 October on review rounds 3 and 3B (holds are per
-message today; the character write-ups are fixed; the survivor fixtures are
-ported).
+with the rulings of 3 October on review rounds 3 and 3B (the character
+write-ups are fixed; the survivor fixtures are ported). Amended 10 October
+2026 by order P3: holds now last the sitting.
+
+## A hold lasts the sitting — order P3
+
+10 October 2026. The policy half of ruling 13 is built
+([ADR-0032](adr/0032-a-hold-lasts-the-sitting.md), Proposed). Grief, abuse,
+eating-distress and recovery holds persist in `SessionState`; another
+mention renews the stored turn and records a renewal. The gate lists the
+carried domains and the router carries their existing obligations and
+humour and challenge vetoes onto later seats. A recovery seat-claim masks
+its domain for that turn and leaves the session hold intact.
+
+The sitting ends at Reset, the server's end, or the published quiet-time
+threshold, eight hours provisional; never merely when a browser closes.
+The surface's clock and Reset belong to Table kit four. An operator can
+clear exactly one hold with a recorded reason; the Table control for that
+clearance is owed to the next Table order. Message text, reassurance,
+retractions and apologies never clear a hold. The crisis card's two-turn
+tail remains separate and unchanged. The policy never reads a clock.
+
+The three reviewer trajectories now pass:
+`grok-traj-hold-vanishes-when-words-leave-001`,
+`vibe-traj-context-collapse-001` and
+`deepseek-traj-hold-obligations-late-001`. Only their `known_gap` keys were
+removed; every other byte remains as supplied. The trajectory runner reads
+stored session holds and rejects an unexplained disappearance instead of
+attributing it to the former per-message limitation. No project-authored
+labelled case needed a relabel, and no reviewer case needed a manifest
+re-disposition: zero of each. The 164 documented gaps and 14 recorded
+dissents in the single-case manifest are unchanged; trajectory markers
+are measured separately. The H1 replay is regenerated, with every changed
+row following an earlier hold and every first turn unchanged.
 
 ## Signal contract — 9 October 2026, order J1
 
@@ -103,9 +134,10 @@ Stop waiting cancels the view's wait, not an already-running vendor operation.
 Text previews come from the codexes; no real voice or vendor has been exercised.
 Keyboard order, labels and switch semantics are checked in the local browser
 tests, not claimed as a completed human assistive-technology or usability review.
-The Spanish pack remains unreviewed with native review in progress. Current
-holds still last only the turn; this order does not close persistent holds, the
-164 documented gaps or the fourteen recorded dissents.
+The Spanish pack remains unreviewed with native review in progress. At this
+Table order's landing, holds lasted only the turn; order P3 now carries them
+for the sitting. The 164 documented gaps and fourteen recorded dissents
+keep their dispositions.
 
 ## A proximity mask yields to the gate — 10 October 2026, order G1
 
@@ -290,30 +322,6 @@ aliases are being measured, and the recorded recovery gaps remain open.
   ADR-0023 (Proposed) are still not built. ADR-0015's hard latch is cleared
   only by the operator with a reason; the policy's soft-tier rules are
   unchanged. The Table's local file is not a cross-device ledger.
-- Holds are recomputed per message today, so a hold does not last. The
-  grief, abuse, eating-distress and recovery holds are computed from each
-  message's own signals (`holds_for` in the router and the gate's hold list),
-  so a hold and its humour veto vanish on the next turn that does not name
-  the subject: a person who named a death one turn ago can be handed a roast
-  seat on the next while every invariant stays green. Review round 3B found
-  it (Grok, Vibe, Kimi via Perplexity, GLM via Perplexity and DeepSeek; no
-  reviewer defended per-message holds as the intended design), and the
-  operator ruled on 3 October 2026 (ruling 13) that a hold lasts the
-  session: mentioning the subject again renews it; it ends only when the
-  session ends, after a silence longer than the published elapsed-time
-  threshold (eight hours, provisional, ADR-0022), or by an operator
-  clearance; no message text ends it early; the crisis card's two-turn tail
-  is a separate thing and is unchanged. The build (the router and the gate;
-  the largest change the rounds produced) lands in the next push, the
-  gap-closure push, not this one. Until then the three reviewer trajectories
-  that showed the hole run as known gaps, each failing on the turn where the
-  hold should still be there:
-  `evals/cases/trajectories/grok-traj-hold-vanishes-when-words-leave-001.json`,
-  `evals/cases/trajectories/vibe-traj-context-collapse-001.json` and
-  `evals/cases/trajectories/deepseek-traj-hold-obligations-late-001.json`;
-  the trajectory runner prints the vanishing hold on every file it touches,
-  attributed to this limitation, so the gap is visible on every run.
-  Order P3 builds holds that last the sitting; order T4 changes none of this.
 - No published response time outside the Table's stated deployment. The
   staffing duty ADR-0023 (Proposed) creates requires someone who can read a
   clearance request and write a clearance row within a published time. Order

@@ -229,7 +229,7 @@ def test_obligations_are_counted_on_every_turn_they_were_owed(roster) -> None:
     card = RT.run(TRAJECTORIES / "gemini-traj-aftermath-substantive-followup.json", roster)
     assert card.obligations_owed == 2 and card.obligations_carried == 2 and card.obligations_dropped_on == []
     gap = RT.run(TRAJECTORIES / "vibe-traj-context-collapse-001.json", roster)
-    assert gap.obligations_owed == 1 and gap.obligations_carried == 0 and gap.obligations_dropped_on == [7]
+    assert gap.obligations_owed == 1 and gap.obligations_carried == 1 and gap.obligations_dropped_on == []  # Order P3, 11 October 2026: owed 1, carried 0, dropped [7] -> owed 1, carried 1, dropped []; grief carried from turn 1.
 
 
 def test_the_provenance_columns_and_the_single_reviewer_header(roster) -> None:
@@ -252,8 +252,8 @@ def test_the_command_line_prints_a_scorecard_per_trajectory_and_one_total_line(c
     ])
     out = capsys.readouterr().out
     assert status == 0
-    assert out.count("verdict: pass") == 2 and out.count("verdict: fail") == 1
-    assert out.rstrip().splitlines()[-1].startswith("3 trajectories: 2 accepted, 0 contract-adjusted, 1 known gaps")
+    assert out.count("verdict: pass") == 3 and out.count("verdict: fail") == 0  # Order P3, 2026-10-10: 2 pass / 1 hold gap -> 3 pass / 0 fail
+    assert out.rstrip().splitlines()[-1].startswith("3 trajectories: 3 accepted, 0 contract-adjusted, 0 known gaps")  # Order P3, 2026-10-10: 2 accepted / 1 hold gap -> 3 accepted / 0 gaps
 
 
 def test_the_json_form_carries_the_whole_scorecard(capsys) -> None:

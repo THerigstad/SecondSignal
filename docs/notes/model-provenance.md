@@ -230,6 +230,7 @@ where it is measured.
 - **Order P1, the declared ask (Codex, OpenAI, the ChatGPT desktop app; model and tier not recorded).** 10 October 2026 on the supplied tree 83c3b0e: recorded control-declared asks in routing decisions, passed them through the harness's existing approved acknowledgement and audit path, and proved unchanged policy and no-ask behaviour. Registered ADR-0031 (Proposed), kept the seating rule open for R2 and P2, and refreshed the status block, limitations, changelog and public counts. Landing fix by the project manager the same day: a declared alias or case variant is recorded as the canonical id, with a test.
 - **Order T4, Table kit four (Codex, OpenAI, the ChatGPT desktop app; model and tier not recorded).** 10 October 2026 on the supplied tree b017d82: built the sitting boundary, local latch persistence and operator clearance, compatible-host terms links and control-declared asks, while preserving the held-turn offer order. Added offline tests and helper repairs, verified policy and harness byte identity, and refreshed the Table guidance, limitations and public counts.
 - **Order G1, a proximity mask yields to the gate (Codex, OpenAI, the ChatGPT desktop app; model and tier not recorded).** 10 October 2026 on the supplied tree SecondSignal-b017d82: built opt-in protection for gate and pack hits, mandatory regex flags and protected-span receipts while retaining exact idioms and monitor input. Measured the fixed splices, closed one manifest gap and three historical fuzz variants, separated replay metadata changes from the one changed decision, and added permanent guards and the amended record.
+- **Order P3, a hold lasts the sitting (Codex, OpenAI, the ChatGPT desktop app; model and tier not recorded).** 10 October 2026 on the supplied tree SecondSignal-b017d82: built session hold persistence, renewal and reasoned single-hold clearance, with the gate and router carrying holds while preserving crisis screening and the two-turn tail. Closed the three reviewer hold trajectories, regenerated the measured H1 replay, added the P3 proofs and ADR-0032 (Proposed), and refreshed the register, pages and public counts.
 
 ## Reviewers, with doorway and tier where recorded
 
@@ -444,6 +445,15 @@ rewritten.
   app), is credited in the files and in the builders' section above. The
   commit:
   1. "Push D, landing 11: a proximity mask yields to the gate (order G1)".
+
+- **2026-10-11**, push D, landing 12: a hold lasts the sitting (order P3,
+  ADR-0032), one commit through the operator's browser session on GitHub's
+  upload page, authored by the operator, the model Claude Fable 5.1, Max, as
+  the operator's screen showed it (the operator's account), in the Claude
+  desktop app's Cowork mode; the builder, Codex (OpenAI; the ChatGPT desktop
+  app, on the operator's laptop), is credited in the files and in the
+  builders' section above. The commit:
+  1. "Push D, landing 12: a hold lasts the sitting (order P3)".
 
 ## What this note does not do
 

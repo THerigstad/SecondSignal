@@ -154,7 +154,7 @@ def test_the_reply_that_spends_the_last_aftermath_count_is_itself_protected():
     sets the count to two; turn seven is the grace turn (protected, spends
     nothing); turn eight is substantive (protected, two to one after the
     decision); turn nine is substantive (protected, one to zero after the
-    decision); turn ten is the first unprotected reply. Before the ruling the
+    decision); turn ten is outside the aftermath, with grief still held under P3. Before the ruling the
     count was spent before the decision and turn nine went out unprotected
     (ChatGPT, round 3B, fixture A turn 5; GLM via Perplexity: decay after the
     decision, not before it)."""
@@ -183,7 +183,7 @@ def test_the_reply_that_spends_the_last_aftermath_count_is_itself_protected():
     assert _protected(decisions[8]) and counts_after[8] == 0, "the last consuming reply is protected"
     assert decisions[8].agent_id != "vandal"
     assert not decisions[9].safety.aftermath_live and counts_after[9] == 0
-    assert "no_joke" not in decisions[9].obligations and "humor" not in decisions[9].mode_vetoes
+    assert "no_joke" in decisions[9].obligations and "humor" in decisions[9].mode_vetoes  # Order P3, 2026-10-10: no hold after tail -> grief from turn 3 persists
     assert decisions[9].safety.action is Action.PROCEED
     # The record says what was decided on and what is left after the reply.
     assert any("aftermath: 1 substantive turn(s) left after this reply (2 before it" in r

@@ -88,15 +88,8 @@ SEVERITY_ORDER: tuple[str, ...] = ("late_card", "missed_card", "weakening", "ear
 LATCH_TIER = {"none": 0, "soft": 1, "hard": 2}
 TRAJECTORY_ONLY = VALIDATOR.TRAJECTORY_ONLY_EXPECT
 
-# Ruling 13 of 3 October 2026: holds are recomputed per message today, so a hold
-# that disappears when its words leave the message is attributed to this documented
-# limitation rather than counted as an unauthorised weakening. The session-hold
-# build of the gap-closure push (a hold lasts the session) removes this entry, and
-# from that day a vanishing hold is unattributed and fails the causal invariant.
-HOLDS_RECOMPUTED_PER_MESSAGE = (
-    "documented limitation: holds are recomputed per message (ruling 13 of 3 October 2026; "
-    "the session-hold build is the gap-closure push's work)"
-)
+# The session-hold build landed with order P3 on 10 October 2026 (ruling 13).
+# A vanishing session hold is now unattributed and fails the causal invariant.
 AFTERMATH_WINDOW_SPENT = "published expiry: the aftermath window is spent (ADR-0023 (Proposed), the fixture value)"
 SOFT_TIER_DECAY = "published expiry: the soft tier's window elapsed on a declared adult (ADR-0015)"
 OPERATOR_CLEARANCE = "clearance: an operator clearance row in the session's latch history"
@@ -418,15 +411,15 @@ def weakenings(records: list[TurnRecord], initial_latch: str) -> list[Weakening]
         caps = set(record.decision.safety.register_caps)
         for lost in sorted(prev_caps - caps):
             found.append(Weakening(record.n, "caps", lost, latch_authority or "unattributed"))
-        holds = set(record.decision.held)
+        holds = set(record.decision.held) | set(getattr(record.decision.safety, "holds", ()))  # Order P3, 11 October 2026: no-seat and seat-claim turns keep gate holds; loss from both sets remains a weakening.
         for lost in sorted(prev_holds - holds):
-            found.append(Weakening(record.n, "holds", lost, HOLDS_RECOMPUTED_PER_MESSAGE))
+            found.append(Weakening(record.n, "holds", lost, "unattributed"))
         scopes = set(record.decision.mode_vetoes)
         for lost in sorted(prev_scopes - scopes):
             if prev_caps - caps:
                 authority = latch_authority or "unattributed"
             elif prev_holds - holds:
-                authority = HOLDS_RECOMPUTED_PER_MESSAGE
+                authority = "unattributed"
             elif lost == "humor" and record.aftermath_after == 0:
                 # The window is spent. Since the ordering fix of ruling 15 (3 October
                 # 2026) the reply that spends the last count is itself protected, so
