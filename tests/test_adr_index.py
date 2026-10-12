@@ -109,7 +109,7 @@ def parse_status_line(text: str) -> tuple[str, str] | None:
         if " — " not in body:
             return None
         decision, rest = body.split(" — ", 1)
-        implementation = re.split(r"[;(]", rest, 1)[0].strip()
+        implementation = re.split(r"[;(]", rest, maxsplit=1)[0].strip()
         return decision.strip(), implementation
     return None
 

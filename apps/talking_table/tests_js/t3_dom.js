@@ -114,7 +114,7 @@ async function page({phone = false, settings = {}, initial = null, saved = new M
     drop() { this.listeners.error({}); }
     close() { this.closed = true; }
   }
-  const sandbox = {document, console, URLSearchParams, EventSource, location: {search: '', pathname: '/'}, navigator: {},
+  const sandbox = {document, console, URL, URLSearchParams, EventSource, location: {search: '', pathname: '/'}, navigator: {},
     localStorage: {getItem: key => storage.get(key) ?? null, setItem: (key, value) => storage.set(key, value), removeItem: key => storage.delete(key)},
     fetch: async (url, options) => { calls.push({url, options}); let result;
       if (handlers.has(url)) result = await handlers.get(url)(options);

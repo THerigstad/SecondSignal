@@ -9,6 +9,8 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 
+# The generator fills this explicit control declaration for each character.
+CHARACTER = ""
 # These are the supplied roster's display names, not routing instructions.
 NAMES = {
     "vandal": "Vandal", "willow": "Willow", "cody": "Cody", "seren": "Seren",
@@ -18,7 +20,7 @@ NAMES = {
 
 def main(argv=None):
     arguments = list(sys.argv[1:] if argv is None else argv)
-    character = arguments[0] if arguments else Path(__file__).stem.removeprefix("ask_")
+    character = arguments[0] if arguments else (CHARACTER or Path(__file__).stem.removeprefix("ask_"))
     name = NAMES.get(character.casefold())
     if name is None or len(arguments) > 2:
         return 2
@@ -29,7 +31,8 @@ def main(argv=None):
             return 2
         request = urllib.request.Request(
             f"http://127.0.0.1:{port}/api/turn",
-            data=json.dumps({"text": f"Could I talk to {name}?"}).encode("utf-8"),
+            data=json.dumps({"text": f"Could I talk to {name}?", "action": "ask",
+                             "target": character.casefold()}).encode("utf-8"),
             headers={"Content-Type": "application/json"}, method="POST")
         # Local asks must remain local even on a machine with an HTTP proxy.
         opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))

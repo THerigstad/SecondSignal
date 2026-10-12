@@ -289,3 +289,82 @@ test('T3 paused POST before a full stream snapshot keeps server chronological or
   assert.equal(rows.length, 2); assert.match(rows[0].textContent, /Earlier reply/);
   assert.match(rows[1].textContent, /Latest reply/); assert.equal(rows[1].classList.contains('current-turn'), true);
 });
+
+test('T4 host terms follow the selected host and submit only its explicit value', async () => {
+  const p = await page({initial: sitting(1), settings: {adapter: 'compatible',
+    url: 'https://first.example/chat', host_terms: {'first.example': 'https://first.example/terms'}}});
+  const field = p.ids.get('host-terms');
+  assert.equal(p.ids.get('compatible-fields').hidden, false);
+  assert.equal(field.value, 'https://first.example/terms');
+  assert.equal(field.getAttribute('maxlength'), '300');
+  p.config.honesty.operator_token_available = true;
+  await p.ids.get('save-presentation').click();
+  await p.ids.get('vendor-url').fire('change');
+  assert.equal(field.disabled, false);
+  p.ids.get('vendor-url').value = 'https://second.example/chat';
+  await p.ids.get('vendor-url').fire('change');
+  assert.equal(field.value, '');
+  field.value = 'http://second.example/terms';
+  await p.ids.get('settings-form').fire('submit');
+  const posted = () => JSON.parse(p.calls.filter(call => call.url === '/api/settings').at(-1).options.body);
+  assert.deepEqual(posted().host_terms, {'second.example': 'http://second.example/terms'});
+  field.value = '';
+  await p.ids.get('settings-form').fire('submit');
+  assert.deepEqual(posted().host_terms, {'second.example': ''});
+  p.ids.get('adapter').value = 'fake';
+  await p.ids.get('adapter').fire('change');
+  assert.equal(p.ids.get('compatible-fields').hidden, true);
+  await p.ids.get('settings-form').fire('submit');
+  assert.equal(Object.hasOwn(posted(), 'host_terms'), false);
+});
+
+test('T4 host terms need the computer scope and the available operator token', async () => {
+  const settings = {adapter: 'compatible', url: 'https://fixture.example/chat'};
+  const local = await page({initial: sitting(1), settings});
+  assert.equal(local.ids.get('host-terms').disabled, true);
+  local.ids.get('host-terms').value = 'https://fixture.example/terms';
+  await local.ids.get('settings-form').fire('submit');
+  const payload = JSON.parse(local.calls.filter(call => call.url === '/api/settings').at(-1).options.body);
+  assert.equal(Object.hasOwn(payload, 'host_terms'), false);
+  const paired = await page({initial: sitting(1), settings, local: false});
+  paired.config.honesty.operator_token_available = true;
+  await paired.ids.get('vendor-url').fire('change');
+  assert.equal(paired.ids.get('host-terms').disabled, true);
+  assert.equal(paired.ids.get('model-settings').disabled, true);
+  await paired.ids.get('settings-form').fire('submit');
+  assert.equal(paired.calls.filter(call => call.url === '/api/settings').length, 0);
+});
+
+test('T4 an operator HTTP terms link reaches the existing terms dialog', async () => {
+  const p = await page({initial: sitting(1)});
+  const terms = {title: 'Fixture host', summary: 'Fixture summary supplied by the server.',
+    vendor: 'compatible:fixture.example', revision: 'fixture', attestation: 'Fixture attestation.',
+    url: 'http://fixture.example/terms', url_source: 'operator'};
+  p.handlers.set('/api/turn', () => ({error: 'Read terms', terms_required: true, terms}));
+  await p.send('ordinary draft');
+  assert.equal(p.ids.get('terms-dialog').open, true);
+  assert.equal(p.ids.get('terms-authority').hidden, false);
+  assert.equal(p.ids.get('terms-authority').href, terms.url);
+  assert.equal(p.ids.get('terms-summary').textContent, terms.summary);
+});
+
+test('T4 sitting notices appear once on the computer and stay behind the crisis card', async () => {
+  const notices = {sitting_notice: 'Quiet-limit fixture notice.', latch_carried: true,
+    latch_carried_notice: 'Carried-latch fixture notice.'};
+  const initial = sitting(1, notices), p = await page({initial}), box = p.ids.get('sitting-notices');
+  assert.equal(box.hidden, false);
+  assert.deepEqual(box.children.map(node => node.textContent), [notices.sitting_notice, notices.latch_carried_notice]);
+  p.streams[0].emit(sitting(2, notices)); p.streams[0].emit(sitting(3));
+  assert.equal(box.children.length, 2);
+  p.streams[0].emit(card(4));
+  assert.equal(box.hidden, true);
+  assert.equal(p.ids.get('crisis').hidden, false);
+  assert.match(p.ids.get('crisis').textContent, /What you just wrote/);
+  p.streams[0].emit(sitting(5, {session_id: 'two'}));
+  assert.equal(box.hidden, true); assert.equal(box.children.length, 0);
+  const paired = await page({initial, local: false});
+  assert.equal(paired.ids.get('sitting-notices').hidden, true);
+  assert.equal(paired.ids.get('sitting-notices').children.length, 0);
+  const phone = await page({initial, phone: true});
+  assert.equal(phone.ids.has('sitting-notices'), false);
+});

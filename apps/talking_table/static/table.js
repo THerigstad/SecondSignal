@@ -49,7 +49,7 @@
     submissions: new Map(), paused: false, queued: [], lowDemand: false, showTable: false, lastCardRevision: -1, serverSession: null,
     surface: {}, sprint: createSprint(), sprintTimer: null, biographyPersona: null,
     serverVersion: -1, displayed: new Set(), stream: null, streamUp: false, queuedSnapshot: null,
-    limitationsSeen: null, networkResolve: null, pendingTerms: null,
+    limitationsSeen: null, networkResolve: null, pendingTerms: null, sittingNotices: new Map(),
     operatorCircle: null, modeRevision: -1, modePolling: false, circleDirty: false};
   const familyLabels = {fake: "Pretend model · free", gemini: "Gemini", openai: "OpenAI", anthropic: "Anthropic", xai: "xAI", compatible: "Compatible host"};
 
@@ -74,7 +74,17 @@
     state.serverVersion = snapshot.session_version;
     state.config.state = snapshot;
     adoptSession(snapshot, request);
-    if (changed) clearRemoteView();
+    if (changed) { clearRemoteView(); state.sittingNotices.clear(); }
+    if ($("sitting-notices")) {
+      if (state.config.local) {
+        if (snapshot.sitting_notice) state.sittingNotices.set("quiet", snapshot.sitting_notice);
+        if (snapshot.latch_carried && snapshot.latch_carried_notice) {
+          state.sittingNotices.set("latch", snapshot.latch_carried_notice);
+        }
+      }
+      $("sitting-notices").replaceChildren(...[...state.sittingNotices.values()].map(line => el("p", line)));
+      $("sitting-notices").hidden = !state.config.local || snapshot.state === "card" || !state.sittingNotices.size;
+    }
     if (snapshot.view_settings) {
       const changedSettings = JSON.stringify(snapshot.view_settings) !== JSON.stringify(state.sharedSettings);
       Object.assign(state.config.settings, snapshot.view_settings);
@@ -179,7 +189,7 @@
     $("terms-summary").textContent = terms.summary;
     $("terms-attestation-label").textContent = terms.attestation;
     $("terms-authority").hidden = !terms.url;
-    if (terms.url && /^https:\/\//.test(terms.url)) $("terms-authority").href = terms.url;
+    if (terms.url && /^https?:\/\//.test(terms.url)) $("terms-authority").href = terms.url;
     $("terms-accepted").checked = false; $("terms-attested").checked = false;
     $("terms-status").textContent = "";
     if (!$("message").value) $("message").value = input;
@@ -466,6 +476,15 @@
     });
   }
 
+  function termsHost() {
+    try { return new URL($("vendor-url").value).hostname; }
+    catch (_) { return ""; }
+  }
+  function hostTermsField() {
+    if (!$("host-terms")) return;
+    $("host-terms").value = state.config?.settings.host_terms?.[termsHost()] || "";
+    $("host-terms").disabled = !state.config?.local || !state.config?.honesty?.operator_token_available;
+  }
   function modelFields() {
     const adapter = $("adapter").value;
     $("gemini-note").hidden = adapter !== "gemini";
@@ -529,6 +548,7 @@
       $("phone-urls").append(link);
     });
     modelFields();
+    hostTermsField();
     drawTable();
     refreshPresentationNames();
     if (state.biographyPersona && $("biography-dialog").open) showBiography(state.biographyPersona);
@@ -1159,10 +1179,14 @@
   $("settings-dialog").addEventListener("close", () => { $("api-key").value = ""; $("voice-key").value = ""; $("lights-key").value = ""; });
   $("operator-circle").addEventListener("change", () => { state.circleDirty = true; });
   $("adapter").addEventListener("change", () => { modelFields(); if ($("adapter").value === "fake") $("model").value = "fake-1"; else if ($("model").value === "fake-1") $("model").value = ""; });
+  $("vendor-url").addEventListener("change", hostTermsField);
   $("settings-form").addEventListener("submit", async event => {
     event.preventDefault();
     if (!state.config.local) return;
     const data = {adapter: $("adapter").value, model: $("model").value, url: $("vendor-url").value, remember: $("remember").checked, operator_circle: $("operator-circle").checked, locale: $("locale").value};
+    if (data.adapter === "compatible" && !$("host-terms").disabled && termsHost()) {
+      data.host_terms = {[termsHost()]: $("host-terms").value};
+    }
     data.house_name = $("house-name").value;
     data.declared_preferences = styleValues();
     data.humour_grief = $("humour-grief").checked;

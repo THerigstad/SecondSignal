@@ -672,8 +672,12 @@ def _browser() -> str | None:
         found = shutil.which(name)
         if found:
             return found
+    local = os.environ.get("LOCALAPPDATA")
+    local_chrome = [str(Path(local) / "Google/Chrome/Application/chrome.exe")] if local else []
     for path in ("/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
                  r"C:\Program Files\Google\Chrome\Application\chrome.exe",
+                 r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe",
+                 *local_chrome,
                  r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"):
         if Path(path).is_file():
             return path

@@ -289,7 +289,7 @@ def test_script_arguments_override_environment_and_default_to_8765(monkeypatch):
     monkeypatch.setenv("SECONDSIGNAL_TABLE_PORT", "43210")
     assert ask(["vAnDaL", "43211"]) == 0
     assert requests[-1].full_url == "http://127.0.0.1:43211/api/turn"
-    assert json.loads(requests[-1].data) == {"text": "Could I talk to Vandal?"}
+    assert json.loads(requests[-1].data) == {"text": "Could I talk to Vandal?", "action": "ask", "target": "vandal"}  # Order T4, 2026-10-10: {text} -> {text, action, target}.
     assert ask(["Willow"]) == 0
     assert requests[-1].full_url == "http://127.0.0.1:43210/api/turn"
     assert reset(["43212"]) == 0

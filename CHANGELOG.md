@@ -4,6 +4,15 @@ All notable changes to SecondSignal are documented here.
 
 ## [Unreleased]
 
+### Added — 2026-10-10, order T4 (Table kit four: the sitting, the persisted latch, the host-terms link, the declared ask from the deck)
+
+- A sitting ends on Reset, process exit or eight hours without an accepted turn; reloads keep it, and the computer receives one quiet-limit notice.
+- The Table atomically saves the policy latch on this computer, restores it at startup and carries memory across sittings, with a staffed operator clearance, correction evidence disclosure and a fail-closed fault notice.
+- The operator can supply an unverified HTTP or HTTPS terms link for a compatible host; the existing host confirmation stays valid.
+- A regression test pins the unchanged held-turn offer order: hand-back, assist, then a second view only in a free slot.
+- Deck keys and Table controls pass their declared asks to the harness; the record, acknowledgement, audit, receipt and replay retain the declaration.
+- Browser discovery and the ADR parser receive the two helper repairs; documentation, public counts and offline Python and JavaScript checks cover the completed kit.
+
 ### Added — 2026-10-10, order P1 (the declared ask on the record, ADR-0031)
 
 - A keyword-only declared ask on `route`, validated against the roster and recorded on all eight decision paths, with conditional serialization and an exact explanation line; no policy decision changes. Landing fix of the same day: a known alias or case variant is recorded as the canonical id through the roster's own resolver, with a test, so a record never carries two spellings of one character.

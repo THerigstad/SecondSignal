@@ -55,19 +55,38 @@ The policy record now carries a declared ask from a control the surface
 owns, and the existing harness line fires when the released seat differs
 from that ask. The ask changes nothing about the seat, verdict, holds,
 latch or caps. The Table's own keys and buttons are wired to the parameter
-by the next Table order. The rule for when an ask may win the seat remains
+by order T4. The rule for when an ask may win the seat remains
 open, with its three candidates named in ADR-0031 (Proposed).
+
+## Table kit four — 10 October 2026, order T4
+
+A Table sitting ends on Reset, server-process shutdown, or eight hours without
+an accepted turn; closing or reloading a browser does not end it. The quiet
+boundary is checked on the next request and does not expire an empty sitting.
+The Table now keeps its careful-side latch on this computer in `latch.json`,
+cleared only by the operator with a reason. It reads that file once at startup,
+before requests; Reset and quiet expiry carry the policy's in-memory latch fields
+into the new sitting with a restore row. The running state wins a disagreement
+with the file, and the operator page names it. The history preserves the policy's
+short matched correction fragments, such as a stated age, because those are the
+evidence the operator reads before clearing; the file never holds a message or
+transcript. The operator with the local operator token is the staffed exit, with
+the operator's presence at the Table stated as the response time and no remote
+clearance. This is the first deployment in the tree to state that field. A second
+device is still a second device, and the policy ledger remains unbuilt. Holds
+still last the message until order P3. A compatible host's terms link is supplied
+by the operator and is unverified. The deck's keys and the Table's buttons now
+declare the ask; typed names remain text. The policy and harness packages are
+unchanged, and none of these additions holds up a crisis card.
 
 ## Table kit two — 6 October 2026, order T2
 
-The named-ask acknowledgement cannot activate on the supplied policy record:
-its ask describes domain and mode fit, and it carries no asked-character
-identity or named-ask reason kind. The harness omits the line when that evidence
-is absent; typed names never become an inferred ask. The hand-back offer works
-for an explicit character-request control in this sitting only; remembering an
-arbitrary typed named ask remains open until the record supplies its identity.
-Whether a room or a draft tag should influence seating also remains a policy
-ruling; today neither can. All seven profiles explicitly carry handoffs, so the
+Kit two originally lacked the policy's asked-character field. P1 supplied the
+field and T4 wires the declared controls to it; the harness still omits the
+acknowledgement when that evidence is absent. Typed names never become an
+inferred ask. The hand-back offer works for an explicit character-request
+control in this sitting only. The operator ruled on 9 October that rooms and
+draft tags never weigh on the seat; neither changes the policy's decision. All seven profiles explicitly carry handoffs, so the
 biographies need no inferred destinations. The extras were exercised with
 FakeAdapter and local checks only; no live model or voice behavior, completed
 human accessibility review, persistent holds, recorded dissent or documented
@@ -219,27 +238,23 @@ aliases are being measured, and the recorded recovery gaps remain open.
   monitor, no narrators. The security layer is specified as four objects on
   four clocks behind the gate, their dependency (ADR-0019, ADR-0022,
   ADR-0023, all Proposed; amended 10 September with review round 2's
-  findings); only the gate exists. Nothing labels where a session fact came
-  from, nothing keeps an append-only record of restrictions, and nothing
-  persists a restriction past the session. The README's status block,
+  findings); only the gate exists. The policy layer labels no session fact's origin
+  and keeps no append-only record of restrictions or persistent restriction
+  state. The Table's local latch file does not build those policy objects. The README's status block,
   generated from the register, names each record. The eighteen round-2
   fixtures for these objects are filed verbatim under
   `evals/cases/deferred/` and are not run.
-- No persistence of a safety restriction across sessions, which contradicts
-  a promise the tree makes. ADR-0015 says a strong signal sets a hard latch
-  that does not expire; that is true only inside one in-memory session, and
-  the latch dies three ways the documents once described as one: a second
-  device, a process restart, and the elapsed-time session boundary (review
-  round 2, Grok). The soft posture's sticky memory dies with it, so an
-  undeclared band gets a non-sticky posture every session (Kimi). Nothing
-  tells a person their latch died by process death, and they may read that
-  as cleared (Grok). ADR-0023 makes persistence an explicit part of the
-  ledger; until it is built, "does not expire" means "does not expire while
-  the process runs", and the careful-side line the person reads ("this
-  thread is on the careful side for now") may not promise more than one
-  conversation. Whether that line should say "for the rest of this
-  conversation" until persistence exists is Kimi's dissent 5.1 and is the
-  operator's copy decision, open.
+- No persistence of a safety restriction across sessions in the policy layer
+  itself. The Table closes the process-restart and sitting-boundary cases on
+  one computer in order T4: its file carries the policy's own latch fields,
+  and Reset or eight quiet hours carries the running fields into the new
+  session. The computer page shows a carry-over notice once beside the gate's
+  own careful-side line, so a restart is not presented as a clearance. A
+  second device is still a second device. The policy's own `SessionState`
+  remains in memory, and the policy-level ledger and interlock specified by
+  ADR-0023 (Proposed) are still not built. ADR-0015's hard latch is cleared
+  only by the operator with a reason; the policy's soft-tier rules are
+  unchanged. The Table's local file is not a cross-device ledger.
 - Holds are recomputed per message today, so a hold does not last. The
   grief, abuse, eating-distress and recovery holds are computed from each
   message's own signals (`holds_for` in the router and the gate's hold list),
@@ -263,19 +278,23 @@ aliases are being measured, and the recorded recovery gaps remain open.
   `evals/cases/trajectories/deepseek-traj-hold-obligations-late-001.json`;
   the trajectory runner prints the vanishing hold on every file it touches,
   attributed to this limitation, so the gap is visible on every run.
-- No published response time. The staffing duty ADR-0023 creates (someone
-  who can read a clearance request and write a clearance row) has no number
-  anywhere in the repository, so it is a duty without a clock. The number
-  is a capability-manifest field with no default: a deployment that cannot
-  state it may not persist a hard latch, because a restriction with no
-  staffed exit is worse than a restriction that ends with the session
-  (review round 2, all nine families; Nemotron and DeepSeek on the
-  manifest).
-- The correction path after a careful-side inference is undesigned past
-  its first step. "I'm 30, that was a joke" now gets the line once and a
-  row on the latch history; nothing moves, as ruled. What happens next, who
-  reviews the correction, when, and what the person is told about timing,
-  does not exist, because no staffed reviewer exists. The operator's own
+  Order P3 builds holds that last the sitting; order T4 changes none of this.
+- No published response time outside the Table's stated deployment. The
+  staffing duty ADR-0023 (Proposed) creates requires someone who can read a
+  clearance request and write a clearance row within a published time. Order
+  T4 is the first deployment in the tree to state the field: the operator
+  with the local operator token clears the Table's latch with a reason, the
+  response time is the operator's presence at the Table, and no remote
+  clearance exists. The general capability manifest still has no default;
+  another deployment that cannot state its staffed exit and response time
+  may not persist a hard latch (review round 2, all nine families; Nemotron
+  and DeepSeek on the manifest).
+- Outside this local Table, the correction path after a careful-side
+  inference is undesigned past its first step. "I'm 30, that was a joke"
+  gets the line once and a row on the latch history; nothing moves, as
+  ruled. T3 and T4 provide the Table's local operator review and stated
+  response time. Other deployments still lack a staffed reviewer, a
+  review process and a stated clearance time. The operator's own
   reading on 10 September: "it says 'ok', shrugs, and moves on, without a
   clear direction; that will need more work". Open, on the roadmap after
   the danger lane.

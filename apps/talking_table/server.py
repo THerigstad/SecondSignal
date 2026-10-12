@@ -40,7 +40,7 @@ from secondsignal_harness.lines import HARNESS_LINES_EN, ROOM_LINES
 from secondsignal_harness.prompt import LANGUAGE_STYLES, STYLE_VALUES, applied_preferences
 from secondsignal_harness.table_extras import asked_agent, eligible_agents
 
-from .t3 import COMPUTER_PATHS, TOKEN_NOTE, TableFeatures
+from .t3 import COMPUTER_PATHS, T4_LINES, TOKEN_NOTE, TableFeatures
 from .table_kit import decision_receipt, presentation_samples, resources
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -58,6 +58,8 @@ COOKIE = "ss_table_pair"
 MAX_BODY = 65536
 MAX_REPLY = 3500
 MODEL_TIMEOUT = 15.0
+# ADR-0022 (Proposed), provisional boundary; operator ruling of 9 October 2026.
+SITTING_QUIET_LIMIT_SECONDS = 8 * 60 * 60
 # No reply is lost to a limit (Night Builds Review of 30 September 2026, required
 # fix 2 on Codex job 2). The longest reply the Table can release is MAX_REPLY
 # characters of character text plus every attached house line, under 5,600
@@ -208,6 +210,14 @@ def _card_decision(record):
         "explain": explanation,
         "presentation_note": "Character-routing details are omitted from this card record.",
     }
+
+
+def _declared_receipt(row, names):
+    receipt = decision_receipt(row, names)
+    record = row.get("decision") or {}
+    if row.get("action") != "HUMAN_ESCALATION" and record.get("asked_agent_id") is not None:
+        receipt["asked_agent_id"] = record["asked_agent_id"]
+    return receipt
 
 
 class _Cancelled(Exception):
@@ -386,7 +396,12 @@ class _TurnJob:
 
     def run(self):
         try:
-            self.result = self.harness.speak(self.text)
+            if (isinstance(self.action, str)
+                    and self.action in {"ask", "handback", "assist", "second_view"}
+                    and isinstance(self.target, str) and self.target in self.app.roster):
+                self.result = self.harness.speak(self.text, asked=self.target)
+            else:
+                self.result = self.harness.speak(self.text)
         except _Cancelled:
             pass
         except Exception:
@@ -489,7 +504,7 @@ class _TableAudit:
             job.harness.presentation.get(persona, "as_written"),
             job.harness.chosen_names.get(persona))[0]
             for persona, profile in app.roster.items()}
-        receipt = decision_receipt(safe, names)
+        receipt = _declared_receipt(safe, names)
         if not gate:
             receipt["at"] = safe.get("at", time.time())
             receipt = app._redact(receipt)
@@ -529,6 +544,8 @@ class TableApp(TableFeatures):
         self.jobs = set()
         self.session_id = secrets.token_hex(12)
         self.revision = 0
+        self.last_turn_at = None
+        self.sitting_notice = None
         self.object_text = ""
         self.object_notice = None
         self.deferred_ask = None
@@ -548,7 +565,7 @@ class TableApp(TableFeatures):
                          "voice_slots": {}, "locale": "",
                          "declared_preferences": {}, "humour_grief": False,
                          "language_style": "match", "house_name": "", "room": "",
-                         "presentation_overrides": {}}
+                         "presentation_overrides": {}, "host_terms": {}}
         self.key = ""
         self.voice_key = ""
         self.lights_key = ""
@@ -572,11 +589,13 @@ class TableApp(TableFeatures):
         self._samples = presentation_samples(self.roster, self.harness.codexes, PRESENTATIONS)
         self.state = self._idle_state()
         self._init_features()
+        self._init_latch()
 
     def _idle_state(self):
         return {"seated": None, "assist": None, "state": "idle",
                 "presentation": self.settings["presentation"], "turn_count": 0,
                 "session_id": self.session_id, "revision": self.revision,
+                "last_turn_at": self.last_turn_at,
                 **self._extras_state(),
                 **self._mode_state()}
 
@@ -787,7 +806,7 @@ class TableApp(TableFeatures):
         names = {persona: profile.name_for(
             job.harness.presentation.get(persona, "as_written"),
             job.harness.chosen_names.get(persona))[0] for persona, profile in self.roster.items()}
-        receipt = decision_receipt({
+        receipt = _declared_receipt({
             "decision": job.record, "action": job.record["safety"]["action"],
             "turn_index": job.harness.session.turn_count, "adapter_calls": job.model_calls,
             "release_reason": "superseded", "released": False,
@@ -897,7 +916,7 @@ class TableApp(TableFeatures):
         except Exception:
             LOG.warning("Declared presentation settings could not be read; using defaults.")
 
-    def _validate_settings(self, proposed):
+    def _validate_settings(self, proposed, *, token_ready=None):
         if not isinstance(proposed, dict):
             raise InputError("Settings must be an object.")
         result = copy.deepcopy(self.settings)
@@ -950,7 +969,7 @@ class TableApp(TableFeatures):
                 if not isinstance(proposed[name], bool):
                     raise InputError("A switch must be on or off.")
                 result[name] = proposed[name]
-        if result["operator_circle"] and not self.operator_token_available():
+        if result["operator_circle"] and not (self.operator_token_available() if token_ready is None else token_ready):
             raise InputError(TOKEN_NOTE)
         if "lights_key" in proposed and (not isinstance(proposed["lights_key"], str)
                                           or len(proposed["lights_key"]) > 4096):
@@ -966,6 +985,33 @@ class TableApp(TableFeatures):
             if (parsed.scheme != "https" or not parsed.hostname or parsed.username
                     or parsed.password or parsed.query or parsed.fragment):
                 raise InputError("Use the vendor's HTTPS chat-completions address without credentials or a query.")
+        if "host_terms" in proposed:
+            entries = proposed["host_terms"]
+            if not isinstance(entries, dict):
+                raise InputError("Terms pages must name a host and one URL.")
+            for host, value in entries.items():
+                if not isinstance(host, str) or not host or len(host) > 253:
+                    raise InputError("Terms pages must name a host and one URL.")
+                try:
+                    parsed_host = urllib.parse.urlsplit("//" + host)
+                    if (parsed_host.hostname != host.lower() or parsed_host.netloc != host
+                            or parsed_host.port is not None or parsed_host.path
+                            or parsed_host.query or parsed_host.fragment
+                            or parsed_host.username is not None or parsed_host.password is not None
+                            or any(char.isspace() for char in host)):
+                        raise ValueError()
+                    value = self._one_line(value, 300, "Terms page")
+                    if value:
+                        parsed_link = urllib.parse.urlsplit(value)
+                        if (parsed_link.scheme not in {"http", "https"} or not parsed_link.hostname
+                                or parsed_link.username is not None or parsed_link.password is not None):
+                            raise ValueError()
+                except ValueError:
+                    raise InputError("Use one HTTP or HTTPS terms URL without a username or password.") from None
+                if value:
+                    result["host_terms"][host.lower()] = value
+                else:
+                    result["host_terms"].pop(host.lower(), None)
         chosen = proposed.get("chosen_names", result["chosen_names"])
         if not isinstance(chosen, dict) or any(
             key not in self.roster or value not in [pair[0] for pair in self.roster[key].plate]
@@ -1018,7 +1064,7 @@ class TableApp(TableFeatures):
             return status, raw
         return call
 
-    def _build_harness(self):
+    def _build_harness(self, *, reuse_audit=False):
         if self.factory:
             return self.factory()
         setting = self.settings
@@ -1027,8 +1073,11 @@ class TableApp(TableFeatures):
         if setting["adapter"] != "fake":
             adapter.key_variable = KEY_SLOT
             adapter._transport = self._transport(self.key, adapter.url)
+        # Sitting/settings transitions reuse the open sink so they never scan
+        # the log before a card. An explicit build retains its original reopen.
+        audit = self.harness.audit_log if reuse_audit else AuditLog(self.audit_path)
         return Harness(self.roster, adapter, CodexStore(ROOT / "docs" / "codex"),
-                       audit_log=AuditLog(self.audit_path),
+                       audit_log=audit,
                        locale=setting["locale"] or None,
                        presentation={name: self._presentation_for(name) for name in self.roster},
                        chosen_names=setting["chosen_names"],
@@ -1047,6 +1096,8 @@ class TableApp(TableFeatures):
             settings["voice_key_set"] = bool(self.voice_key)
             settings["lights_key_set"] = bool(self.lights_key)
             settings["voice_ready"] = self._voice_ready() or self._preview_ready()
+            if not local:
+                settings.pop("host_terms", None)
             return {
                 "settings": settings,
                 "roster": [{"id": p.id, "plate": p.plate, "one_line": p.one_line,
@@ -1064,6 +1115,8 @@ class TableApp(TableFeatures):
                     f"{self.preferences_path} under Remember, separately from credentials. "
                     f"Presentation and name choices are also remembered in {self.preferences_path} "
                     f"under Remember. Conversation state and pairing stay in memory. "
+                    f"latch.json keeps the policy latch fields, including correction evidence, "
+                    f"across sittings and restarts on this computer; the operator clears it with a reason. "
                     f"Remembered settings and independently encrypted model, voice and lights keys are kept in "
                     f"{self.settings_path} only for the corresponding remember switches. "
                     f"New session clears unremembered keys and keeps existing audit logs. "
@@ -1087,91 +1140,99 @@ class TableApp(TableFeatures):
             }
 
     def update_settings(self, proposed):
-        with self.terms_lock, self.lock:
-            settings = self._validate_settings(proposed)
-            candidate = proposed.get("key", "")
-            if not isinstance(candidate, str) or len(candidate) > 4096:
-                raise InputError("The key must be text.")
-            voice_candidate = proposed.get("voice_key", "")
-            if not isinstance(voice_candidate, str) or len(voice_candidate) > 4096:
-                raise InputError("The voice key must be text.")
-            lights_candidate = proposed.get("lights_key", "")
-            changed_host = (settings["adapter"], settings["url"]) != (
-                self.settings["adapter"], self.settings["url"])
-            key = candidate.strip() or ("" if changed_host else self.key)
-            if proposed.get("clear_key") is True:
-                key = ""
-            voice_key = voice_candidate.strip() or self.voice_key
-            if proposed.get("clear_voice_key") is True:
-                voice_key = ""
-            lights_key = lights_candidate.strip() or self.lights_key
-            if proposed.get("clear_lights_key") is True:
-                lights_key = ""
-            if self._contains_key(settings, (key, voice_key, lights_key, candidate.strip(),
-                                            voice_candidate.strip(), lights_candidate.strip())):
-                raise InputError("Put the key only in the key field.")
-            # Complete the durable write before adopting the new settings.
-            settings_payload = None
-            if settings["remember"] or settings["voice_remember"] or settings["lights_remember"]:
-                # Presentation and style belong in their separate local file,
-                # never beside any encrypted credential blob.
-                saved = {"settings": {k: copy.deepcopy(v) for k, v in settings.items()
-                                      if k not in ("presentation", "chosen_names", "declared_preferences",
-                                                   "humour_grief", "language_style", *REMEMBERED_EXTRAS)}}
-                for secret, flag, blob_name in ((key, "remember", "key_blob"),
-                                                (voice_key, "voice_remember", "voice_key_blob"),
-                                                (lights_key, "lights_remember", "lights_key_blob")):
-                    if settings[flag] and secret:
-                        try:
-                            saved[blob_name] = base64.b64encode(
-                                _secret_blob(secret.encode("utf-8"))).decode("ascii")
-                        except Exception:
-                            raise InputError("The computer could not protect or unlock the saved key.") from None
-                if not settings["remember"]:
-                    saved["settings"].update(adapter="fake", model="fake-1", url="",
-                                             operator_circle=False)
-                if not settings["voice_remember"]:
-                    saved["settings"].update(voice_enabled=False, voice_slots={
-                        persona: {presentation: "" for presentation in sorted(PRESENTATIONS)}
-                        for persona in self.roster})
-                if not settings["lights_remember"]:
-                    saved["settings"]["lights_enabled"] = False
-                settings_payload = json.dumps(saved, ensure_ascii=False)
-            preferences_payload = None
-            if settings["remember"]:
-                preference_payload = {key: settings[key] for key in (
-                    "declared_preferences", "humour_grief", "language_style",
-                    "presentation", "chosen_names")}
-                # Preserve the T1 file shape when every T2 control is unset.
-                preference_payload.update({key: settings[key] for key in REMEMBERED_EXTRAS
-                                           if settings[key]})
-                preferences_payload = json.dumps(preference_payload)
-            terms_payload = json.dumps(self.confirmations) if settings["remember"] and self.confirmations else None
+        token_ready = self.operator_token_available()
+        with self.terms_lock:
+            with self.lock:
+                settings = self._validate_settings(proposed, token_ready=token_ready)
+                if (settings["host_terms"] != self.settings["host_terms"]
+                        and not token_ready):
+                    raise InputError("Saving a host terms page needs the operator's token on this computer.")
+                candidate = proposed.get("key", "")
+                if not isinstance(candidate, str) or len(candidate) > 4096:
+                    raise InputError("The key must be text.")
+                voice_candidate = proposed.get("voice_key", "")
+                if not isinstance(voice_candidate, str) or len(voice_candidate) > 4096:
+                    raise InputError("The voice key must be text.")
+                lights_candidate = proposed.get("lights_key", "")
+                changed_host = (settings["adapter"], settings["url"]) != (
+                    self.settings["adapter"], self.settings["url"])
+                key = candidate.strip() or ("" if changed_host else self.key)
+                if proposed.get("clear_key") is True:
+                    key = ""
+                voice_key = voice_candidate.strip() or self.voice_key
+                if proposed.get("clear_voice_key") is True:
+                    voice_key = ""
+                lights_key = lights_candidate.strip() or self.lights_key
+                if proposed.get("clear_lights_key") is True:
+                    lights_key = ""
+                if self._contains_key(settings, (key, voice_key, lights_key, candidate.strip(),
+                                                voice_candidate.strip(), lights_candidate.strip())):
+                    raise InputError("Put the key only in the key field.")
+                # Complete the durable write before adopting the new settings.
+                settings_payload = None
+                if settings["remember"] or settings["voice_remember"] or settings["lights_remember"]:
+                    # Presentation and style belong in their separate local file,
+                    # never beside any encrypted credential blob.
+                    saved = {"settings": {k: copy.deepcopy(v) for k, v in settings.items()
+                                          if k not in ("presentation", "chosen_names", "declared_preferences",
+                                                       "humour_grief", "language_style", *REMEMBERED_EXTRAS)}}
+                    for secret, flag, blob_name in ((key, "remember", "key_blob"),
+                                                    (voice_key, "voice_remember", "voice_key_blob"),
+                                                    (lights_key, "lights_remember", "lights_key_blob")):
+                        if settings[flag] and secret:
+                            try:
+                                saved[blob_name] = base64.b64encode(
+                                    _secret_blob(secret.encode("utf-8"))).decode("ascii")
+                            except Exception:
+                                raise InputError("The computer could not protect or unlock the saved key.") from None
+                    if not settings["remember"]:
+                        saved["settings"].update(adapter="fake", model="fake-1", url="",
+                                                 operator_circle=False)
+                    if not settings["voice_remember"]:
+                        saved["settings"].update(voice_enabled=False, voice_slots={
+                            persona: {presentation: "" for presentation in sorted(PRESENTATIONS)}
+                            for persona in self.roster})
+                    if not settings["lights_remember"]:
+                        saved["settings"]["lights_enabled"] = False
+                    settings_payload = json.dumps(saved, ensure_ascii=False)
+                preferences_payload = None
+                if settings["remember"]:
+                    preference_payload = {key: settings[key] for key in (
+                        "declared_preferences", "humour_grief", "language_style",
+                        "presentation", "chosen_names")}
+                    # Preserve the T1 file shape when every T2 control is unset.
+                    preference_payload.update({key: settings[key] for key in REMEMBERED_EXTRAS
+                                               if settings[key]})
+                    preferences_payload = json.dumps(preference_payload)
+                terms_payload = json.dumps(self.confirmations) if settings["remember"] and self.confirmations else None
+            # Settings and consent writes share their own lock. A slow disk
+            # must not hold the sitting lock while a card is ready to leave.
             self._persist_settings(settings_payload, preferences_payload, terms_payload)
-            self.settings = settings
-            self.key = key
-            self.voice_key = voice_key
-            self.lights_key = lights_key
-            self._remember_key(key)
-            self._remember_key(voice_key)
-            self._remember_key(lights_key)
-            self._cancel_jobs()
-            # Settings must never clear the policy latch or the conversation.
-            previous = self.harness
-            self.harness = self._build_harness()
-            self.harness.session = previous.session
-            # The country applies to the conversation in progress; the session
-            # itself (latch, aftermath, holds) is never reset by a setting.
-            self.harness.session.locale = settings["locale"] or None
-            self.harness.transcript = previous.transcript
-            self.harness.turns = previous.turns
-            self.mode_revision += 1
-            self.state["presentation"] = settings["presentation"]
-            if self.state["state"] != "card":
-                self.state.update(self._extras_state())
-            self.state.update(self._mode_state())
-            self.pending_turn = None
-            self._publish()
+            with self.lock:
+                self.settings = settings
+                self.key = key
+                self.voice_key = voice_key
+                self.lights_key = lights_key
+                self._remember_key(key)
+                self._remember_key(voice_key)
+                self._remember_key(lights_key)
+                self._cancel_jobs()
+                # Settings must never clear the policy latch or the conversation.
+                previous = self.harness
+                self.harness = self._build_harness(reuse_audit=True)
+                self.harness.session = previous.session
+                # The country applies to the conversation in progress; the session
+                # itself (latch, aftermath, holds) is never reset by a setting.
+                self.harness.session.locale = settings["locale"] or None
+                self.harness.transcript = previous.transcript
+                self.harness.turns = previous.turns
+                self.mode_revision += 1
+                self.state["presentation"] = settings["presentation"]
+                if self.state["state"] != "card":
+                    self.state.update(self._extras_state())
+                self.state.update(self._mode_state())
+                self.pending_turn = None
+                self._publish()
             return self.config()
 
     def _persist_settings(self, settings_payload, preferences_payload, terms_payload=None):
@@ -1202,33 +1263,56 @@ class TableApp(TableFeatures):
             for path, _ in updates:
                 path.with_suffix(".tmp").unlink(missing_ok=True)
 
+    def _start_sitting(self, harness=None, *, quiet=False):
+        """The common in-memory boundary; caller owns the sitting lock."""
+        carry = self._latch_fields() if self._latch_owned and harness is None else None
+        self._cancel_jobs()
+        self.session_id = secrets.token_hex(12)
+        self.revision = 0
+        self.last_turn_at = None
+        self.sitting_notice = T4_LINES["sitting_ended"] if quiet else None
+        if not self.settings["remember"]:
+            self.key = ""
+        if not self.settings["voice_remember"]:
+            self.voice_key = ""
+        if not self.settings["lights_remember"]:
+            self.lights_key = ""
+        self.settings["presentation"] = "as_written"
+        self.settings["chosen_names"] = {}
+        self.settings["presentation_overrides"] = {}
+        self.object_text, self.object_notice = "", None
+        self.deferred_ask = None
+        self._handback_ready = False
+        self._last_record = None
+        self._last_released = False
+        self._last_revision = 0
+        self.pages.clear()
+        self.harness = harness if harness is not None else self._build_harness(reuse_audit=True)
+        self._latch_owned = harness is None
+        self.latch_carried = False
+        if carry and (carry["latch"] != "none" or carry["latch_reasons"]):
+            self._apply_latch_fields(carry, carried=True)
+        if harness is not None:
+            self._latch_requires_token = False
+        self.mode_revision += 1
+        self.state = self._idle_state()
+        self._reset_features()
+        self.lights.submit(None, "idle")
+        return self._queue_latch()
+
+    def end_quiet_sitting(self):
+        with self.lock:
+            if (self.harness.session.turn_count and self.last_turn_at is not None
+                    and time.time() - self.last_turn_at >= SITTING_QUIET_LIMIT_SECONDS):
+                # No file access, terms lookup, token check or config build is
+                # on this request boundary. A card can enter the new sitting now.
+                self._start_sitting(quiet=True)
+
     def reset(self, harness: Harness | None = None):
         with self.lock:
-            self._cancel_jobs()
-            self.session_id = secrets.token_hex(12)
-            self.revision = 0
-            if not self.settings["remember"]:
-                self.key = ""
-            if not self.settings["voice_remember"]:
-                self.voice_key = ""
-            if not self.settings["lights_remember"]:
-                self.lights_key = ""
-            self.settings["presentation"] = "as_written"
-            self.settings["chosen_names"] = {}
-            self.settings["presentation_overrides"] = {}
-            self.object_text, self.object_notice = "", None
-            self.deferred_ask = None
-            self._handback_ready = False
-            self._last_record = None
-            self._last_released = False
-            self._last_revision = 0
-            self.pages.clear()
-            self.harness = harness if harness is not None else self._build_harness()
-            self.mode_revision += 1
-            self.state = self._idle_state()
-            self._reset_features()
-            self.lights.submit(None, "idle")
-            return self.config()
+            persisted = self._start_sitting(harness)
+        persisted.wait()
+        return self.config()
 
     def _control_error(self, text, action, target, source_revision, source_session):
         if action is None and target is None and source_revision is None and source_session is None:
@@ -1237,7 +1321,9 @@ class TableApp(TableFeatures):
                 or not isinstance(target, str) or target not in self.roster):
             return HARNESS_LINES_EN["t2_control_unavailable"]
         if action == "ask":
-            expected = f"Could I talk to {self._name_for(target)}?"
+            # The deck's shipped display name stays valid across presentation changes.
+            expected = {f"Could I talk to {self._name_for(target)}?",
+                        f"Could I talk to {self.roster[target].display_name}?"}
         else:
             fields = self._extras_state()
             choices = (fields["second_opinions"] if action == "second_view" else
@@ -1250,20 +1336,23 @@ class TableApp(TableFeatures):
             match = next((choice for choice in choices if choice and choice["persona"] == target), None)
             if match is None or self.state["state"] == "card":
                 return HARNESS_LINES_EN["t2_control_unavailable"]
-            expected = match["text"]
-        return None if text == expected else HARNESS_LINES_EN["t2_control_unchanged"]
+            expected = {match["text"]}
+        return None if text in expected else HARNESS_LINES_EN["t2_control_unchanged"]
 
     def turn(self, text, *, tag="", action=None, target=None,
              source_revision=None, source_session=None):
         # Transport/type limits are needed to obtain text. Content checks happen
         # only AFTER the unchanged harness has run the policy gate on that text.
+        self.end_quiet_sitting()
         if not isinstance(text, str):
             raise InputError("Write a message of 1 to 16000 characters.")
         with self.lock:
             tag_valid = isinstance(tag, str) and tag in DRAFT_TAGS
             # Bad metadata never prevents the raw message's crisis gate.
             control_error = self._control_error(text, action, target, source_revision, source_session)
-            job = _TurnJob(self, text, tag=tag if tag_valid else "", action=action, target=target)
+            job = _TurnJob(self, text, tag=tag if tag_valid else "",
+                           action=action if control_error is None else None,
+                           target=target if control_error is None else None)
             threading.Thread(target=job.run, daemon=True, name="table-turn").start()
             job.ready.wait()
             if job.error:
@@ -1299,6 +1388,9 @@ class TableApp(TableFeatures):
             # Preserve identity for settings/session consumers. Completion must
             # never copy an old session back over a newer crisis latch.
             self.harness.session.__dict__.update(copy.deepcopy(job.harness.session.__dict__))
+            self.last_turn_at = time.time()
+            self.state["last_turn_at"] = self.last_turn_at
+            persisted = self._queue_latch()
             self.harness.transcript.append({"role": "user", "content": self._redact(text)})
             self.state["turn_count"] = self.harness.session.turn_count
             self.state["revision"] = self.revision
@@ -1312,6 +1404,9 @@ class TableApp(TableFeatures):
                 return self._finish_job(job)
         job.admitted.set()
         job.done.wait()
+        # Ordinary callers receive durability before completion; the gate above
+        # never waits for this event or the independent file writer.
+        persisted.wait()
         with self.lock:
             return self._finish_job(job)
 
@@ -1333,11 +1428,14 @@ class TableApp(TableFeatures):
         assist = None if gate else turn.decision.get("assist_agent_id")
         state = "card" if gate else "seated" if persona else "idle"
         public_decision = _card_decision(turn.decision) if gate else turn.decision
-        receipt = job.receipt or decision_receipt({
+        receipt = job.receipt or _declared_receipt({
             "action": turn.action, "decision": public_decision,
             "release_reason": turn.release_reason}, {})
         if not gate:
+            # These controls already consumed an offer; P1's recorded ask
+            # must not create a new deferred ask where T2 did not create one.
             declared = (job.target if job.action in {"ask", "assist"} else
+                        None if job.action in {"handback", "second_view"} else
                         asked_agent(turn.decision, self.roster))
             if declared and declared != persona:
                 self.deferred_ask = declared
@@ -1355,6 +1453,7 @@ class TableApp(TableFeatures):
                       "presentation": self.settings["presentation"],
                       "turn_count": self.harness.session.turn_count,
                       "session_id": self.session_id, "revision": job.revision,
+                      "last_turn_at": self.last_turn_at,
                       "receipt": receipt, "card": turn.text if gate else None,
                       "card_revision": job.revision if gate else None,
                       "decision": public_decision if gate else None,
@@ -1585,6 +1684,9 @@ class TableApp(TableFeatures):
             self._publish()
             self._cancel_jobs()
         self.set_network(False)
+        if self._latch_thread.is_alive():
+            self._latch_pending.put_nowait(None)
+            self._latch_pending.join()
         self.lights.close()
 
 
@@ -1677,6 +1779,13 @@ class Handler(BaseHTTPRequestHandler):
                 pass
             finally:
                 self.connection.settimeout(75)
+        if isinstance(payload, dict):
+            snapshot = payload.get("state") if isinstance(payload.get("state"), dict) else payload
+            if "turn_count" in snapshot and "session_id" in snapshot:
+                app = self.server.app
+                with app.lock:
+                    if snapshot["session_id"] == app.session_id:
+                        snapshot.update(app._sitting_notices(self._scope() == "computer"))
         body = json.dumps(payload, ensure_ascii=False).encode("utf-8") if isinstance(payload, dict) else payload
         self.send_response(status)
         self.send_header("Content-Type", content_type)
@@ -1766,7 +1875,7 @@ class Handler(BaseHTTPRequestHandler):
                         # itself reconnects and receives the current snapshot.
                         reconnect = True
                         break
-                    snapshot = app.sitting() if version != app.session_version else None
+                    snapshot = app.sitting(computer=self._scope() == "computer") if version != app.session_version else None
                 if snapshot is not None:
                     version = snapshot["session_version"]
                     data = json.dumps(snapshot, ensure_ascii=False)
@@ -1783,6 +1892,7 @@ class Handler(BaseHTTPRequestHandler):
         self.close_connection = True
 
     def do_GET(self):
+        self.server.app.end_quiet_sitting()
         path = urllib.parse.urlsplit(self.path).path
         if not self._authorize(path):
             return
@@ -1796,7 +1906,10 @@ class Handler(BaseHTTPRequestHandler):
         elif path in ("/api/operator/state", "/api/replay", "/api/receipts/week", "/api/receipts/export"):
             try:
                 if path == "/api/operator/state":
-                    value = app.correction_state()
+                    token_ready = app.operator_token_available()
+                    with app.lock:
+                        app.token_ready = token_ready
+                        value = app.correction_state()
                 elif path == "/api/replay":
                     query = urllib.parse.parse_qs(urllib.parse.urlsplit(self.path).query)
                     value = app.logged_decision(query.get("row_id", [None])[0])
@@ -1850,6 +1963,7 @@ class Handler(BaseHTTPRequestHandler):
             self._send(404, {"error": "File not found."})
 
     def do_POST(self):
+        self.server.app.end_quiet_sitting()
         path = urllib.parse.urlsplit(self.path).path
         if not self._authorize(path):
             return
@@ -1914,6 +2028,7 @@ class Handler(BaseHTTPRequestHandler):
             self._send(500, {"error": "This request ran into a problem. Please try again."})
 
     def do_OPTIONS(self):
+        self.server.app.end_quiet_sitting()
         self._send(403, {"error": "Cross-site access is not enabled."})
 
 

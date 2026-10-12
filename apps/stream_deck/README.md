@@ -56,8 +56,10 @@ of each profile and check the app's profile names before removing an old copy.
 
 Keep DECK OUTPUT in place: the ask and New session keys open scripts stored
 there. The ask keys need the Talking Table running. Start the Table first;
-its existing launcher opens the browser. Ask keys send an ordinary message
-such as `Could I talk to Vandal?`; the Table decides who sits. New session
+its existing launcher opens the browser. Ask keys send a declared control:
+`{"text": "Could I talk to Vandal?", "action": "ask", "target": "vandal"}`.
+Each generated script carries its character id. The policy records the ask and
+still decides who sits; typing the same words without a control stays ordinary text. New session
 uses the Table's existing reset action. The scripts need a working Windows
 Python `.pyw` association to open without a console window. The Table launcher
 explains how to install Python if it cannot find it.

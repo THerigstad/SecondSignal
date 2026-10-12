@@ -439,7 +439,8 @@ def _write_fetch_files(key_paths: list[Path], out: Path) -> None:
         "STREAM DECK OUTPUT\n\n"
         "Double-click each of the three .streamDeckProfile files to import it.\n"
         "Keep this folder in place: ask and reset keys open the scripts here.\n"
-        "The ask keys need the Talking Table running.\n\n"
+        "The ask keys need the Talking Table running.\n"
+        "Each generated ask script declares its character with action ask and target id, alongside the message.\n\n"
         "OFFLINE BUILD AND REAL WEBSITE ICONS\n"
         "The supplied build uses original website tiles and local program icons.\n"
         "Personal artwork and reserved.png still take priority.\n"
@@ -475,8 +476,10 @@ def generate_profiles(
     icons.reset_cache()
     for name in ("ask.pyw", "reset.pyw"):
         shutil.copyfile(Path(__file__).with_name(name), out / name)
+    ask_template = Path(__file__).with_name("ask.pyw").read_text(encoding="utf-8")
     for character in characters.keys() - {"idle"}:
-        shutil.copyfile(Path(__file__).with_name("ask.pyw"), out / f"ask_{character}.pyw")
+        script = ask_template.replace('CHARACTER = ""', f"CHARACTER = {character!r}", 1)
+        (out / f"ask_{character}.pyw").write_text(script, encoding="utf-8")
     report = {"profiles": [], "keys": [], "offline": offline}
     for profile in profiles:
         local_registry = dict(registry)

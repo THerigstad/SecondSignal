@@ -5,7 +5,9 @@ from __future__ import annotations
 import copy
 import hashlib
 import json
+import math
 import os
+import queue
 import re
 import secrets
 import threading
@@ -17,6 +19,7 @@ from urllib.parse import urlsplit
 
 from secondsignal import __version__
 from secondsignal.profiles import roster_hash
+from secondsignal.safety import SessionState
 from secondsignal_harness import AuditLog
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -31,6 +34,25 @@ REVIEW_NOTE = (
     "The review looks at the turn, not at you."
 )
 ATTESTATION = "This key is not used to train the vendor's models, as far as I know."
+# draft for the operator, 10 October 2026. Each sentence is defined only here.
+T4_LINES = {
+    "sitting_ended": "Eight quiet hours passed, so that sitting ended and a new one has begun.",
+    "latch_carried": "This Table is still on the careful side from an earlier sitting on this computer. The operator can clear that with a reason.",
+}
+LATCH_FIELDS = ("latch", "latch_reasons", "latch_history", "soft_weak_hits", "soft_sticky",
+                "soft_visible_turns", "soft_cap_turns", "conservative_mode")
+LATCH_UNREADABLE = (
+    "latch_file_unreadable: latch.json could not be read or parsed. "
+    "The operator must review and clear this hard latch with a reason."
+)
+LATCH_MEMORY_WINS = (
+    "latch.json differed from the running Table's saved state. "
+    "The in-memory policy latch was kept and saved again."
+)
+LATCH_WRITE_FAILED = (
+    "latch.json could not be saved. The in-memory policy latch remains authoritative; "
+    "restart persistence could not be confirmed."
+)
 FLAGS = ("this was read wrong", "this missed me")
 COMPUTER_PATHS = (
     "/api/settings", "/api/object", "/api/network", "/api/presentation/", "/api/operator/",
@@ -60,6 +82,12 @@ def limitations(root=ROOT, prototype="A prototype for the operator and adults th
         "Operator-circle mode can release an otherwise passing, normal-risk reply when only "
         "the unlocked cultural check is inconclusive, with the operator reviewing afterward. "
         "The crisis gate and the other checks still apply.",
+        "Careful-side latches set at this Table are kept on this computer until the operator "
+        "clears them with a reason; closing the window or pressing Reset does not clear them.",
+        "The operator at this Table is the one who can clear a latch, with the operator token; "
+        "the response time is the operator's presence at the Table, and no remote clearance exists.",
+        "latch.json may hold the short matched words of a correction, such as a stated age, "
+        "because that is the evidence the operator reads before clearing; it never holds a message.",
     ]}
 
 
@@ -110,6 +138,173 @@ class TableFeatures:
                 pass
         self.state["session_version"] = self.session_version
 
+
+    def _latch_fields(self, session=None):
+        session = self.harness.session if session is None else session
+        fields = {name: copy.deepcopy(getattr(session, name)) for name in LATCH_FIELDS}
+        fields["latch_history"] = [list(row) for row in fields["latch_history"]]
+        return fields
+
+    def _apply_latch_fields(self, fields, *, carried=False):
+        session = self.harness.session
+        for name in LATCH_FIELDS:
+            value = copy.deepcopy(fields[name])
+            if name == "latch_history":
+                value = [tuple(row) for row in value]
+            setattr(session, name, value)
+        session.hard_line_shown = False
+        if carried and (session.latch != "none" or session.latch_reasons):
+            session.latch_history.append(
+                ("restore", session.latch + ":" + ",".join(session.latch_reasons), "table", 0))
+            self.latch_carried = True
+
+    def _latch_signature(self):
+        try:
+            stat = self.latch_path.stat()
+            return stat.st_mtime_ns, stat.st_size
+        except FileNotFoundError:
+            return None
+
+    @staticmethod
+    def _checked_latch(document):
+        if not isinstance(document, dict) or set(document) != set(LATCH_FIELDS) | {
+                "saved_at", "saved_in_sitting", "table_version"}:
+            raise ValueError("latch fields")
+        fields = {key: document[key] for key in LATCH_FIELDS}
+        if (fields["latch"] not in ("none", "soft", "hard")
+                or not isinstance(fields["latch_reasons"], list)
+                or not all(isinstance(reason, str) for reason in fields["latch_reasons"])
+                or not isinstance(fields["latch_history"], list)
+                or not all(isinstance(row, list) and len(row) == 4
+                           and all(isinstance(item, str) for item in row[:3])
+                           and type(row[3]) is int and row[3] >= 0
+                           for row in fields["latch_history"])
+                or any(type(fields[key]) is not bool for key in
+                       ("soft_sticky", "conservative_mode"))
+                or any(type(fields[key]) is not int or fields[key] < 0 for key in
+                       ("soft_weak_hits", "soft_visible_turns", "soft_cap_turns"))
+                or type(document["saved_at"]) not in (int, float)
+                or not math.isfinite(document["saved_at"])
+                or not isinstance(document["saved_in_sitting"], str)
+                or not isinstance(document["table_version"], str)):
+            raise ValueError("latch values")
+        json.dumps(document, ensure_ascii=False).encode("utf-8")
+        return fields
+
+    def _init_latch(self):
+        # Order T4, operator amendment of 10 October 2026: the only content
+        # read is here, before requests. In-process sitting starts use memory.
+        self.latch_path = self.data_dir / "latch.json"
+        self.latch_notice = None
+        self.latch_carried = False
+        self._latch_owned = True
+        self._latch_requires_token = False
+        self._latch_saved = None
+        self._latch_stamp = None
+        self._latch_pending = queue.Queue()
+        fields = None
+        try:
+            try:
+                raw = self.latch_path.read_text(encoding="utf-8")
+            except FileNotFoundError:
+                raw = None
+            if raw is not None:
+                fields = self._checked_latch(json.loads(raw))
+                self._latch_saved = copy.deepcopy(fields)
+        except (OSError, ValueError, TypeError, UnicodeError, OverflowError, RecursionError):
+            fields = self._latch_fields(SessionState())
+            fields.update(latch="hard", latch_reasons=["latch_file_unreadable"],
+                          conservative_mode=True)
+            self.latch_notice = LATCH_UNREADABLE
+        if fields is not None:
+            self._apply_latch_fields(fields, carried=True)
+            self._latch_requires_token = self.latch_carried
+            if "latch_file_unreadable" in fields["latch_reasons"]:
+                self.latch_notice = LATCH_UNREADABLE
+            # Startup writes happen before requests. A write failure never
+            # discards a valid policy history or pretends its file was unreadable.
+            try:
+                self._latch_stamp = self._latch_signature()
+                self._save_latch(self._latch_payload())
+            except (OSError, ValueError, TypeError, UnicodeError, OverflowError):
+                self.latch_notice = ((self.latch_notice + " ") if self.latch_notice else "") + LATCH_WRITE_FAILED
+        self._latch_thread = threading.Thread(target=self._latch_writer, daemon=True,
+                                              name="table-latch")
+        self._latch_thread.start()
+
+    def _latch_payload(self):
+        return {**self._latch_fields(), "saved_at": time.time(),
+                "saved_in_sitting": self.session_id, "table_version": __version__}
+
+    def _save_latch(self, payload):
+        # Only the single writer (or pre-request construction) calls this.
+        # Compare policy fields, not timestamps: unchanged turns do not rewrite.
+        fields = {key: payload[key] for key in LATCH_FIELDS}
+        stamp = self._latch_signature()
+        mismatch = stamp != self._latch_stamp
+        if fields["latch"] == "none" and not fields["latch_reasons"]:
+            self.latch_path.unlink(missing_ok=True)
+            self._latch_saved = self._latch_stamp = None
+        elif fields != self._latch_saved or mismatch:
+            temporary = self.latch_path.with_suffix(".tmp")
+            try:
+                temporary.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
+                temporary.replace(self.latch_path)
+            finally:
+                temporary.unlink(missing_ok=True)
+            self._latch_saved = copy.deepcopy(fields)
+            self._latch_stamp = self._latch_signature()
+        return mismatch
+
+    def _latch_writer(self):
+        while True:
+            item = self._latch_pending.get()
+            try:
+                if item is None:
+                    return
+                payload, completed = item
+                notice = None
+                try:
+                    if self._save_latch(payload):
+                        notice = LATCH_MEMORY_WINS
+                except (OSError, ValueError, TypeError, UnicodeError, OverflowError):
+                    notice = LATCH_WRITE_FAILED
+                    completed.failed = True
+                if notice:
+                    with self.lock:
+                        self.latch_notice = notice
+                        self._publish()
+            finally:
+                if item is not None:
+                    item[1].set()
+                self._latch_pending.task_done()
+
+    def _queue_latch(self):
+        # Caller owns the sitting lock. The queue operation never waits on I/O.
+        completed = threading.Event()
+        completed.failed = False
+        if not self._latch_owned:
+            # Explicit Harness injection transfers session ownership to the
+            # caller. HTTP Reset and quiet expiry always use Table-owned sessions.
+            completed.set()
+            return completed
+        if self.harness.session.latch != "none" or self.harness.session.latch_reasons:
+            self._latch_requires_token = True
+        self._latch_pending.put_nowait((self._latch_payload(), completed))
+        return completed
+
+    def _sitting_notices(self, computer=False):
+        notices = {"last_turn_at": self.last_turn_at, "latch_carried": False,
+                   "sitting_notice": None, "latch_carried_notice": None}
+        if computer:
+            notices["sitting_notice"] = self.sitting_notice
+            notices["latch_carried"] = self.latch_carried
+            notices["latch_carried_notice"] = T4_LINES["latch_carried"] if self.latch_carried else None
+            self.sitting_notice = None
+            self.latch_carried = False
+        return notices
+
+
     def operator_token_available(self):
         try:
             value = (self.data_dir / "operator.token").read_text(encoding="ascii").strip()
@@ -123,7 +318,7 @@ class TableFeatures:
         self.state["session_version"] = self.session_version
         self.events.notify_all()
 
-    def sitting(self):
+    def sitting(self, computer=False):
         with self.lock:
             snapshot = copy.deepcopy(self.state)
             snapshot["session_version"] = self.session_version
@@ -138,6 +333,7 @@ class TableFeatures:
                     "adapter", "model", "presentation", "chosen_names", "house_name", "room",
                     "presentation_overrides", "remember")}
             snapshot["turns"] = copy.deepcopy(turns)
+            snapshot.update(self._sitting_notices(computer))
             return snapshot if self.state["state"] == "card" else self._redact(snapshot)
 
     def _posted(self, job):
@@ -174,7 +370,15 @@ class TableFeatures:
         entry = dict(self.vendor_terms[family])
         vendor = family
         if family == "compatible":
-            vendor += ":" + (urlsplit(self.settings["url"]).hostname or "")
+            host = urlsplit(self.settings["url"]).hostname or ""
+            vendor += ":" + host
+            entry["url_source"] = "none"
+            if link := self.settings["host_terms"].get(host):
+                entry["url"] = link
+                entry["url_source"] = "operator"
+                entry["summary"] += (
+                    " This link was supplied by the operator and has not been verified by the Table."
+                )
         revision = self.terms_revision
         return {**entry, "family": family, "vendor": vendor, "revision": revision,
                 "attestation": ATTESTATION,
@@ -223,7 +427,7 @@ class TableFeatures:
             "session_lines": [
                 "This conversation ends when the table's server window closes. "
                 "Reloading or closing this page leaves the shared sitting on the computer "
-                "until New session or server shutdown.",
+                "until New session, server shutdown, or eight hours without an accepted turn.",
                 "audit.jsonl keeps submitted messages, accepted model output including "
                 "audit-withheld replies, decisions and operator correction records.",
                 "receipts.jsonl keeps non-crisis decisions without message text, raw stems or crisis patterns.",
@@ -256,7 +460,10 @@ class TableFeatures:
         with self.lock:
             session = self.harness.session
             return {"session_id": self.session_id, "session_version": self.session_version,
-                    "latch": session.latch, "reasons": list(session.latch_reasons), "note": REVIEW_NOTE}
+                    "latch": session.latch, "reasons": list(session.latch_reasons), "note": REVIEW_NOTE,
+                    "latch_notice": self.latch_notice,
+                    "operator_token_available": self.token_ready,
+                    "clear_requires_token": self._latch_requires_token}
 
     def _correction_row(self, row):
         with self.audit_lock:
@@ -266,8 +473,12 @@ class TableFeatures:
         reason = self._one_line(payload.get("reason"), 500, "Review reason")
         if not reason or self._has_key(reason):
             raise self.input_error("Give a review reason without a key.")
+        token_ready = self.operator_token_available()
         with self.correction_lock:
             with self.lock:
+                self.token_ready = token_ready
+                if self._latch_requires_token and not token_ready:
+                    raise self.input_error("Clearing this latch needs the operator's token on this computer.")
                 before = self.correction_state()
                 if (payload.get("session_id") != self.session_id
                         or payload.get("session_version") != self.session_version):
@@ -280,6 +491,9 @@ class TableFeatures:
                 if applied:
                     self._cancel_jobs()
                     self.harness.session.clear_latch(reason, actor="operator")
+                    self.latch_carried = False
+                    self.latch_notice = None
+                    persisted = self._queue_latch()
                     self.pending_turn = None
                     self.state.update(self._mode_state())
                     self._publish()
@@ -290,6 +504,9 @@ class TableFeatures:
                                   "request_row_id": request_id, "applied": applied, "after": after})
             if not applied:
                 raise self.input_error("The sitting changed during review; nothing was cleared.")
+            persisted.wait()
+            if persisted.failed:
+                raise self.input_error("The latch was cleared in memory, but its file could not be removed.")
             return after
 
     def logged_decision(self, row_id):

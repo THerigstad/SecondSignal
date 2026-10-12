@@ -58,7 +58,12 @@
       sitting = await api("/api/operator/state");
       $("latch-state").textContent = "Current latch: " + sitting.latch + ". " + sitting.reasons.join("; ");
       $("review-note").textContent = sitting.note;
-      $("clear-latch").disabled = sitting.latch === "none";
+      if ($("latch-file-notice")) {
+        $("latch-file-notice").textContent = sitting.latch_notice || "";
+        $("latch-file-notice").hidden = !sitting.latch_notice;
+      }
+      $("clear-latch").disabled = sitting.latch === "none" ||
+        (sitting.clear_requires_token && !sitting.operator_token_available);
     } catch (error) { $("operator-status").textContent = error.message; }
   }
   if ($("correction-form")) {

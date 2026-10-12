@@ -130,17 +130,16 @@ modes, contraindications and the handoffs explicitly recorded in that profile.
 These words come from the loaded profile, never a model. Both name forms remain
 on the plate; the panel uses the active presentation's name.
 
-The ask acknowledgement has a strict evidence boundary: it attaches before a
-seated reply only if the returned record identifies the asked character and a
-different seated character. Its reason comes from the record alone. The supplied
-policy has no named-character-ask field, so ordinary message text cannot produce
-this line today; the missing field is recorded in the limitations and build log.
-Explicit character-request controls can save a deferred ask for this sitting.
-On a later turn, **Want {Asked} back now?** appears only when that character is
-eligible and has not been seated; its plate has a quiet saved mark. Tapping it
-sends **Could I talk to {Asked}?** through the ordinary pipeline. The offer clears
-on tap, when the character sits, or on **New session**. A typed name is never
-silently converted into this declared control state.
+The ask acknowledgement attaches before a seated reply only when the policy's
+record names the asked character and a different seated character. Its reason
+comes from that record alone. The Stream Deck's ask keys and the Table and phone
+buttons declare which character was asked for; an ordinary typed message never
+does. A declared ask changes no seat, verdict, hold, latch or cap. Explicit
+character-request controls can save a deferred ask for this sitting. On a later
+turn, **Want {Asked} back now?** appears only when that character is eligible and
+has not been seated; its plate has a quiet saved mark. Tapping it sends
+**Could I talk to {Asked}?** as another declared control through the ordinary
+pipeline. The offer clears on tap, when the character sits, or on **New session**.
 
 **What do you call your table?** accepts one plain-text line of at most forty
 characters. It is the idle and phone-page heading and is remembered only under
@@ -175,8 +174,11 @@ saveable page containing only that released character text, its presentation
 name as byline and the house footer “Written with a seated companion, not a
 professional.” The server reads the released turn; the browser never posts the
 reply text back. Up to three **What would {Name} add?** controls are drawn from
-other eligible candidates on that turn. Held turns reserve their two optional controls for the review labels below;
-hand-back, assist and second-view controls are suppressed on those turns. Earlier replies retain their own
+other eligible candidates on that turn. The server's held-turn offers keep their
+existing two-slot order: a due hand-back first, then an assist, with a second view
+only in a free slot. The page continues to reserve its two optional controls on
+held turns for the review labels below and suppresses these offer shortcuts.
+Earlier replies retain their own
 eligibility and presentation names. They submit exactly those words as a
 new turn, labelled **a second view**, with one policy-selected voice per reply.
 
@@ -224,12 +226,15 @@ Select the correct vendor and enter that vendor's model identifier and key.
 For **Other compatible host**, enter the vendor's own compatible endpoint. Keys
 are sent only to the selected vendor address. The page never displays a saved key.
 
-**New session** clears the conversation on screen and resets the policy session.
-It also clears a key that was not remembered; the selected model can stay the
-same, so enter its key again when needed. It does not erase existing audit
-records. Changing settings preserves the policy session and its safety latch.
-Closing the server clears in-memory session state. Conversations are not restored
-when the server starts again.
+**New session** ends the sitting and clears the conversation on screen. A sitting
+also ends when the server process stops or eight hours pass without an accepted
+turn. The next request starts a new sitting after that quiet limit; an empty
+sitting does not expire. Closing or reloading a browser does not end the sitting.
+A new sitting clears an unremembered key; the selected model can stay the same,
+so enter its key again when needed. Existing audit records stay saved, but they
+do not restore a conversation after a restart. The careful-side latch carries
+into the new sitting and survives a server restart on this computer; **New
+session** does not clear it. Changing settings preserves the sitting and latch.
 
 ## Storage and keys
 
@@ -250,6 +255,25 @@ the harness can store them. Known credentials in free-text fields are redacted;
 crisis records omit character-routing details. Fixed policy cards and schema
 constants remain verbatim. Superseded pending replies are not appended after
 cancellation. Anyone with access to that folder can read those audit records.
+
+`latch.json` in the same folder keeps the policy's latch level, reasons and
+history, the soft-latch counters and sticky flag, and conservative mode, with the
+save time, sitting id and Table version. It contains no transcript or key. It may
+hold the short matched words of a correction, such as a stated age, because that
+is the evidence the operator reads before clearing; it never holds a message.
+The Table reads this file once at startup, before it accepts requests. **New
+session** and the eight-hour boundary carry the running latch into a fresh
+session in memory and add a restore row; they never reread the file. Changed
+fields are saved by replacing the file atomically. If the file changes while the
+Table is running, the running latch wins and the operator page names the
+disagreement. A file that cannot be read or parsed at startup restores a hard
+careful-side latch with the reason `latch_file_unreadable` and an operator notice.
+The operator uses the local operator token and gives a reason to clear it;
+clearance removes the file. The operator's presence at the Table is the stated
+response time, and there is no remote clearance. The computer page shows the
+carry-over notice once beside the policy's own line. Latch storage never holds
+up a crisis card. This file belongs to this computer; another device has its own
+state. The policy's existing soft-tier rules are unchanged.
 
 Keys stay in memory unless **remember on this computer** is selected. On Windows,
 remembered settings are written to `settings.json` in that same folder, with the
@@ -357,11 +381,13 @@ version in each browser; Settings reopens it. The version acknowledgment uses
 browser local storage and holds no conversation or credential.
 
 The composer explains the shared sitting before a message is sent. Closing the
-**server window** ends that sitting; closing or reloading a browser page leaves
-it available to the other paired screens until **New session** or server shutdown.
-The audit is durable, but it does not restore a sitting after a server restart.
-No transcript-storage switch is added. A turn or New session on any paired screen
-changes the same sitting on all screens.
+**server window** ends that sitting; closing or reloading a browser leaves it
+available to paired screens until **New session**, server shutdown, or eight
+hours without an accepted turn. A request after the quiet limit starts the new
+sitting before it is handled. The audit is durable but does not restore a
+conversation after restart; the latch alone carries across sittings on this
+computer. A turn or New session on any paired screen changes the same sitting
+on all screens. No transcript-storage switch is added.
 
 Each change has one increasing server session version. `/api/events` sends full
 current snapshots. Each stream closes after one second, even during activity;
@@ -383,8 +409,14 @@ Before the first seated send to each live vendor, the Table displays the fixed
 summary in `vendor_terms.json` and requires both summary confirmation and:
 “This key is not used to train the vendor's models, as far as I know.” The summaries
 are PM drafts, name each vendor's own terms page as the authority, and do not
-verify account settings. Compatible hosts have separate confirmations by host;
-their own terms page must be checked because no universal terms URL exists.
+verify account settings. Compatible hosts have separate confirmations by host.
+For **Other compatible host**, the operator may enter **Terms page for this host
+(optional; you supply it, the Table does not check it)** in Settings on the
+computer. The operator token is required. Use one HTTP or HTTPS address of at
+most 300 characters, without a username or password; leave it empty to remove
+that host's link. Remember saves it with the other settings. The summary marks
+the link as supplied by the operator and unverified by the Table. Changing the
+link does not repeat a confirmation already given for that host and revision.
 The pretend model needs no confirmation, and a crisis card never consults this
 gate. Rejected consent leaves the policy session unchanged. `terms.json` stores
 only vendor/revision acknowledgments when Remember is on; otherwise acknowledgment
@@ -422,7 +454,8 @@ policy state. The project manager can turn queue items into fixtures by hand.
 A slow queue write cannot delay a card or put old content back over it.
 
 **Review a careful-side read** opens `/operator.html` on the computer. The operator
-reads the latch, enters a reason and invokes the existing
+reads the latch, uses the local operator token, enters
+a reason and invokes the existing
 `clear_latch(reason, actor="operator")`. A durable request row precedes the clear;
 a distinct result row records either completion or a superseded review. A changed
 sitting rejects an old review. Message text gains no way to clear the latch.
@@ -453,8 +486,8 @@ The check adds no conversation, receipt, audit row or session-version change.
 The complete durable data-folder inventory is `audit.jsonl` (messages, accepted
 output, decisions and operator correction records), `receipts.jsonl` (sanitized
 non-crisis decision receipts), `review_queue.jsonl` (explicitly flagged snapshots),
+`latch.json` (policy latch fields and correction evidence across sittings),
 `settings.json` (remembered settings with encrypted credentials), `preferences.json`
 (remembered presentation/style choices), `terms.json` (remembered vendor consent),
-and the locally generated `operator.token`. Temporary `.tmp` files exist only
-while staging settings writes. No new surface stores an API key. The separate
+and the locally generated `operator.token`. Temporary `.tmp` files stage atomic settings and latch writes. No new surface stores an API key. The separate
 voice and lights remember switches retain their existing behavior.
