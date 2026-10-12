@@ -227,6 +227,7 @@ where it is measured.
   FakeAdapter; policy and harness source files are byte-identical to the
   supplied tree.
 - **Order J1, the signal contract (Codex, OpenAI, the ChatGPT desktop app; model and tier not recorded).** 9 October 2026 on the supplied tree 5e85ec5: wrote the three-primitive signal contract, reserved immutable probability fields with conditional reporting, and tests of unchanged routing, safety, house lines and release. Registered ADR-0030 (Proposed) with future abstention and calibration rules, linked the contract and refreshed the roadmap note, limitations, changelog and public counts.
+- **Order P1, the declared ask (Codex, OpenAI, the ChatGPT desktop app; model and tier not recorded).** 10 October 2026 on the supplied tree 83c3b0e: recorded control-declared asks in routing decisions, passed them through the harness's existing approved acknowledgement and audit path, and proved unchanged policy and no-ask behaviour. Registered ADR-0031 (Proposed), kept the seating rule open for R2 and P2, and refreshed the status block, limitations, changelog and public counts. Landing fix by the project manager the same day: a declared alias or case variant is recorded as the canonical id, with a test.
 
 ## Reviewers, with doorway and tier where recorded
 

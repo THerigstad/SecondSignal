@@ -175,8 +175,8 @@ class Harness:
 
     # -------------------------------------------------------------------- speak
 
-    def speak(self, text: str) -> Turn:
-        decision = route(text, self.roster, session=self.session)
+    def speak(self, text: str, *, asked: str | None = None) -> Turn:
+        decision = route(text, self.roster, session=self.session, asked=asked)
         record: dict[str, Any] = decision.to_dict()
         raw_safety = record.get("safety")
         safety: dict[str, Any] = dict(raw_safety) if isinstance(raw_safety, dict) else {}

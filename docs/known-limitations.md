@@ -49,6 +49,15 @@ row. Receipt export uses the browser's save/download behavior. These Table
 surfaces close no documented policy gap or recorded dissent, and add no
 transcript-storage switch.
 
+## The declared ask — 10 October 2026, order P1
+
+The policy record now carries a declared ask from a control the surface
+owns, and the existing harness line fires when the released seat differs
+from that ask. The ask changes nothing about the seat, verdict, holds,
+latch or caps. The Table's own keys and buttons are wired to the parameter
+by the next Table order. The rule for when an ask may win the seat remains
+open, with its three candidates named in ADR-0031 (Proposed).
+
 ## Table kit two — 6 October 2026, order T2
 
 The named-ask acknowledgement cannot activate on the supplied policy record:

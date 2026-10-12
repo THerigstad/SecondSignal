@@ -9,24 +9,24 @@ the profile, whole. Nothing here reaches LinkedIn by itself. "Two external
 review rounds" counts the rounds with a published results page, not every
 round the project has run.
 
-As of: 9 October 2026
+As of: 10 October 2026
 
 ## 1. Headline
 
-I build AI systems that help people get through hard things · Creator of SecondSignal (public on GitHub: 3,658 tests, two external review rounds) · AI systems design, persona architecture, evaluation.
+I build AI systems that help people get through hard things · Creator of SecondSignal (public on GitHub: 3,671 tests, two external review rounds) · AI systems design, persona architecture, evaluation.
 
 ## 2. About, the paragraph that begins "Public since"
 
-Public since 10 September 2026: github.com/THerigstad/SecondSignal. Architecture, decision records, review rounds, 3,658 tests, and an invitation: try to get a crisis sentence past the gate and file the transcript. I'd rather it break there than fail with a human on the other end.
+Public since 10 September 2026: github.com/THerigstad/SecondSignal. Architecture, decision records, review rounds, 3,671 tests, and an invitation: try to get a crisis sentence past the gate and file the transcript. I'd rather it break there than fail with a human on the other end.
 
 ## 3. Experience, SecondSignal, the paragraph that begins "On the record"
 
-On the record as of 9 October 2026: 3,658 tests (3,480 passing, 164 documented gaps, 14 recorded dissents, all named); 667 evaluation cases, 285 of them fixtures returned by outside reviewers and kept byte for byte; two external review rounds across nine model families, with every disagreement logged with its reasoning rather than settled by head count; a machine-checked register of every design decision; a fail-closed crisis gate over normalized text in English and Spanish; and a public failures ledger that records every model wipeout, cheat and miscount the project has caught, my own included. Released under MIT for the code and CC BY-NC-ND 4.0 for the characters.
+On the record as of 10 October 2026: 3,671 tests (3,493 passing, 164 documented gaps, 14 recorded dissents, all named); 667 evaluation cases, 285 of them fixtures returned by outside reviewers and kept byte for byte; two external review rounds across nine model families, with every disagreement logged with its reasoning rather than settled by head count; a machine-checked register of every design decision; a fail-closed crisis gate over normalized text in English and Spanish; and a public failures ledger that records every model wipeout, cheat and miscount the project has caught, my own included. Released under MIT for the code and CC BY-NC-ND 4.0 for the characters.
 
 ## 4. Experience, SecondSignal, the description of the attached GitHub link
 
-The repository: routing, the fail-closed crisis gate, 3,658 tests, two external review rounds kept verbatim, every design decision on a machine-checked register, and the failures ledger.
+The repository: routing, the fail-closed crisis gate, 3,671 tests, two external review rounds kept verbatim, every design decision on a machine-checked register, and the failures ledger.
 
 ## 5. Featured, the repository card's description
 
-The policy layer of a seven-voice companion system, public: routing, a fail-closed crisis gate, 3,658 tests, two external review rounds kept verbatim, every design decision on a machine-checked register, and a failures ledger. Try to break it and file the transcript.
+The policy layer of a seven-voice companion system, public: routing, a fail-closed crisis gate, 3,671 tests, two external review rounds kept verbatim, every design decision on a machine-checked register, and a failures ledger. Try to break it and file the transcript.

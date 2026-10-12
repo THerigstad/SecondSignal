@@ -6,7 +6,8 @@ decision record. The remaining fixed copy belongs to the surface: the ask when n
 seated (ADR-0011 leaves the wording to the surface), the honesty sentence
 every prompt carries, and the line printed on a session's first turn when
 operator-circle mode is on, and the Table's declared controls. The operator's
-words are marked; the other new Table sentences are drafts for the operator.
+words are marked; the Table sentences of order T2 were approved by the
+operator on 9 October 2026.
 Like every house line they are never paraphrased by a persona.
 """
 
@@ -42,7 +43,7 @@ HARNESS_LINES_EN: dict[str, str] = {
         "strangers."
     ),
     # Order T2, 6 October 2026. Operator's words; the reason clauses below
-    # are PM drafts kept in one place for the operator to replace.
+    # were approved by the operator on 9 October 2026 (copy all yes).
     "ask_acknowledgement": (
         "You asked for {Asked}. {Seated} is taking this one, because {reason}. "
         "{Asked} hasn't gone anywhere."

@@ -4,6 +4,13 @@ All notable changes to SecondSignal are documented here.
 
 ## [Unreleased]
 
+### Added — 2026-10-10, order P1 (the declared ask on the record, ADR-0031)
+
+- A keyword-only declared ask on `route`, validated against the roster and recorded on all eight decision paths, with conditional serialization and an exact explanation line; no policy decision changes. Landing fix of the same day: a known alias or case variant is recorded as the canonical id through the roster's own resolver, with a test, so a record never carries two spellings of one character.
+- The harness passes the declaration through to its existing acknowledgement and audit path; comments now record the operator's approval of the T2 copy, with every house line unchanged.
+- Tests prove unchanged labelled decisions and sessions for all seven asks, boundary validation, static restrictions, exact serialization and explanation, real harness acknowledgement, unchanged no-ask audit bytes and trajectories.
+- ADR-0031 (Proposed) records the declaration rules and the open P2 seating question; the register, limitations, provenance and generated public counts follow the built tree.
+
 ### Added — 2026-10-09, order J1 (the signal contract in three primitives, two reserved fields, ADR-0030)
 
 - `docs/signals-contract.md` writes the seam as yes-or-no, choice and

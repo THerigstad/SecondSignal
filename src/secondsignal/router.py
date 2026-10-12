@@ -293,6 +293,10 @@ class RoutingDecision:
     identity_statement: bool = False
     # The session's presentation choice, copied onto the record (ruling 11).
     presentation: PresentationFacts = PresentationFacts()
+    # Who the person asked for, by declared control only (ADR-0031 (Proposed));
+    # None when nobody was asked. Recorded and explained; it moves no seat,
+    # verdict, hold, latch or cap.
+    asked_agent_id: str | None = None
 
     @property
     def preempted(self) -> bool:
@@ -316,7 +320,7 @@ class RoutingDecision:
         Enums use their names, unordered signal sets are sorted, and every
         mapping key is a string.
         """
-        return {
+        result: dict[str, object] = {
             "schema_version": 1,
             "agent_id": self.agent_id,
             "signals": _signals_to_dict(self.signals),
@@ -337,8 +341,11 @@ class RoutingDecision:
             "house_ask": self.house_ask,
             "identity_statement": self.identity_statement,
             "presentation": _presentation_to_dict(self.presentation),
-            "explain": self.explain(),
         }
+        if self.asked_agent_id is not None:
+            result["asked_agent_id"] = self.asked_agent_id
+        result["explain"] = self.explain()
+        return result
 
     def explain(self) -> str:
         """Human-readable trace of why this decision was made."""
@@ -352,6 +359,11 @@ class RoutingDecision:
                 for feature, options in self.signals.distribution.items()
             }
             lines.append(f"distribution = {distribution}")
+        if self.asked_agent_id is not None:
+            lines.append(
+                f"asked      = {self.asked_agent_id} "
+                "(declared by a control; recorded, not routed on)"
+            )
         if self.signals.domains:
             lines.append(f"domains    = {', '.join(sorted(self.signals.domains))}")
         if self.signals.modes:
@@ -858,6 +870,7 @@ def route(
     *,
     session: SessionState | None = None,
     signals: RequestSignals | None = None,
+    asked: str | None = None,
 ) -> RoutingDecision:
     """Select an agent for one turn of input.
 
@@ -870,6 +883,10 @@ def route(
         signals: Optional pre-extracted signals, allowing a different signal
             extractor (a classifier, an embedding model) to be substituted
             without touching the policy layer.
+        asked: A declared ask: the id of the character the person asked for,
+            declared by a control the surface owns (a deck key, a phone button),
+            never read from the message text. Recorded on the decision; read by
+            nothing that chooses a seat. None when nobody was asked.
 
     Returns:
         A `RoutingDecision`. When the safety layer escalates, `outcome` is
@@ -880,6 +897,15 @@ def route(
     """
     if not roster:
         raise ValueError("roster is empty; load profiles before routing")
+    if asked is not None and asked not in roster:
+        raise ValueError(f"asked names no character in the roster: {asked!r}")
+    if asked is not None:
+        # A known alias or case variant is recorded as the canonical id, through
+        # the roster's own resolver when it has one; the record never carries two
+        # spellings of one character (landing fix, 10 October 2026).
+        resolve = getattr(roster, "resolve", None)
+        if callable(resolve):
+            asked = resolve(asked)
 
     if session is not None:
         session.observe(text)
@@ -945,6 +971,7 @@ def route(
             mode_vetoes=tuple(sorted(vetoes)),
             identity_statement=identity,
             presentation=facts,
+            asked_agent_id=asked,
         )
 
     if sig.is_empty:
@@ -977,6 +1004,7 @@ def route(
                 mode_vetoes=tuple(sorted(vetoes)),
                 identity_statement=identity,
                 presentation=facts,
+                asked_agent_id=asked,
             )
         if streak >= NO_SIGNAL_SEAT_AFTER_TURNS and stabilizer is not None:
             # The third vague message in a row (ruling 5 of 3 October 2026):
@@ -999,6 +1027,7 @@ def route(
                 mode_vetoes=tuple(sorted(vetoes)),
                 identity_statement=identity,
                 presentation=facts,
+                asked_agent_id=asked,
             )
         if streak >= 2:
             # The second vague message in a row (ruling 5 of 3 October 2026):
@@ -1017,6 +1046,7 @@ def route(
                 mode_vetoes=tuple(sorted(vetoes)),
                 identity_statement=identity,
                 presentation=facts,
+                asked_agent_id=asked,
                 house_ask="second",
             )
         return RoutingDecision(
@@ -1030,6 +1060,7 @@ def route(
             mode_vetoes=tuple(sorted(vetoes)),
             identity_statement=identity,
             presentation=facts,
+            asked_agent_id=asked,
             house_ask="first",
         )
 
@@ -1052,6 +1083,7 @@ def route(
             house_ask="first",
             identity_statement=identity,
             presentation=facts,
+            asked_agent_id=asked,
         )
     if holds:
         # The reason names what the seat owes, so a reader of the log never
@@ -1083,6 +1115,7 @@ def route(
             mode_vetoes=tuple(sorted(vetoes)),
             identity_statement=identity,
             presentation=facts,
+            asked_agent_id=asked,
         )
 
     profile = roster[selected.agent_id]
@@ -1116,4 +1149,5 @@ def route(
         mode_vetoes=tuple(sorted(vetoes)),
         identity_statement=identity,
         presentation=facts,
+        asked_agent_id=asked,
     )

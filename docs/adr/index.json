@@ -456,6 +456,32 @@
         "src/secondsignal/signals.py"
       ],
       "notes": "Order J1, 9 October 2026: the two reserved fields and proofs that routing and safety logic never read them are built; the two reporting functions expose non-empty metadata only. No probabilistic extractor exists, so the abstention table has nothing to act on yet. The second labeller, shadow run, bake-off, calibration and independent review are not done. Under the standing rule of 7 September 2026, a record written for the operator by the project's own assistants becomes canon only after a second model family has read it."
+    },
+    {
+      "number": "0031",
+      "file": "0031-a-declared-ask-is-a-fact-on-the-record.md",
+      "title": "A declared ask is a fact on the record",
+      "decision": "Proposed",
+      "implementation": "built",
+      "evidence": [
+        "tests/test_p1_declared_ask.py::test_every_labelled_turn_defaults_to_no_declared_ask",
+        "tests/test_p1_declared_ask.py::test_every_labelled_turn_keeps_policy_and_session_for_all_seven_asks",
+        "tests/test_p1_declared_ask.py::test_unknown_ask_is_refused_before_session_observation",
+        "tests/test_p1_declared_ask.py::test_router_and_gate_only_allow_declared_ask_recording_and_reporting",
+        "tests/test_p1_declared_ask.py::test_ast_guard_rejects_policy_signature_and_forwarding_mutations",
+        "tests/test_p1_declared_ask.py::test_serializer_pins_both_key_lists_and_keeps_schema_one",
+        "tests/test_p1_declared_ask.py::test_explain_adds_exactly_one_line_after_signal_metadata",
+        "tests/test_p1_declared_ask.py::test_harness_declared_ask_uses_the_approved_grief_acknowledgement",
+        "tests/test_p1_declared_ask.py::test_harness_same_seat_ask_has_no_acknowledgement",
+        "tests/test_p1_declared_ask.py::test_harness_no_ask_keeps_the_supplied_turn_and_audit_bytes",
+        "tests/test_p1_declared_ask.py::test_trajectories_with_no_ask_keep_house_lines_text_release_and_audit",
+        "tests/test_p1_declared_ask.py::test_alias_and_case_variants_are_recorded_as_the_canonical_id",
+        "tests/test_p1_declared_ask.py::test_a_typed_character_request_never_declares_an_ask"
+      ],
+      "modules": [
+        "src/secondsignal/router.py"
+      ],
+      "notes": "Order P1, 10 October 2026: a control-declared ask is recorded and explained, with every labelled seat, score, verdict and session unchanged. The existing harness acknowledgement uses the approved house line. Landing fix the same day: a declared alias or case variant is recorded as the canonical id through the roster's resolver. Table control wiring belongs to the next Table order; the rule for when an ask may win the seat is open pending R2 and a separate P2 order. Under the standing rule of 7 September 2026, this record becomes canon only after a second model family has read it."
     }
   ],
   "reserved": [

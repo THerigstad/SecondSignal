@@ -67,7 +67,7 @@ def test_decision_dict_explicitly_covers_every_stored_field(roster) -> None:
     decision = route("this deadline is killing me; help me plan the launch", roster)
     payload = cast(dict[str, Any], decision.to_dict())
 
-    assert {field.name for field in dataclasses.fields(decision)} <= payload.keys()
+    assert {field.name for field in dataclasses.fields(decision)} - {"asked_agent_id"} <= payload.keys()  # Order P1, 2026-10-10: all fields -> required fields; asked_agent_id is conditional.
     assert {field.name for field in dataclasses.fields(decision.signals)} - {"confidence", "distribution"} <= payload["signals"].keys()  # Order J1, 2026-10-09: all fields -> required fields; the two new keys are conditional.
     assert {field.name for field in dataclasses.fields(decision.safety)} <= payload["safety"].keys()
     assert {field.name for field in dataclasses.fields(decision.ranked[0])} <= payload["ranked"][0].keys()

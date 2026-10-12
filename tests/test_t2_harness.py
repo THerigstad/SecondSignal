@@ -226,7 +226,7 @@ def test_t2_harness_attaches_a_supplied_record_acknowledgement_before_the_reply(
     """The dormant attachment path audits the house acknowledgement before the released persona."""
     original = harness_module.route
 
-    def explicit_record(text, roster_, *, session):
+    def explicit_record(text, roster_, *, session, asked=None):  # Order P1, 2026-10-10: test double without asked -> asked=None.
         record = original(text, roster_, session=session).to_dict()
         record["asked_agent_id"] = next(pid for pid in roster if pid != record["agent_id"])
         return SimpleNamespace(to_dict=lambda: record)
