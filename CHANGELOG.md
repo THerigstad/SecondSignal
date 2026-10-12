@@ -4,6 +4,12 @@ All notable changes to SecondSignal are documented here.
 
 ## [Unreleased]
 
+### Added — 2026-10-11, the Stream Deck's Lights check key (the reserved key wired to the Table's own check)
+
+- `apps/stream_deck/lights_check.pyw` posts the Table's existing lights-check request and nothing else; the key never carries the lights key and never speaks to the lamps. The Table decides: unarmed lights or a crisis card on the floor show nothing, and a stopped Table makes the press silent.
+- The generator copies the script beside the ask and reset scripts, resolves the special open target `@lights` the way it resolves `@reset`, refuses any other target beginning `@` with the key named, and draws a plain bulb tile. The example TESTING list's reserved Lights check key becomes that open key; Flag this turn and Mic mute stay reserved.
+- Tests: the copied script against a running Table (nothing shown while unarmed; the roster, card and idle sequence once armed; the sitting, session and transcript untouched), the port rule and the silent exit for the third script, the special-target rule in the exports and the examples, and the refused misspelt target.
+
 ### Added — 2026-10-10, order T4 (Table kit four: the sitting, the persisted latch, the host-terms link, the declared ask from the deck)
 
 - A sitting ends on Reset, process exit or eight hours without an accepted turn; reloads keep it, and the computer receives one quiet-limit notice.

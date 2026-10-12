@@ -54,8 +54,8 @@ to TESTING is on its More page. Folder pages receive a Back key at the top
 left automatically. When replacing a previous import, keep one active copy
 of each profile and check the app's profile names before removing an old copy.
 
-Keep DECK OUTPUT in place: the ask and New session keys open scripts stored
-there. The ask keys need the Talking Table running. Start the Table first;
+Keep DECK OUTPUT in place: the ask, New session and Lights check keys open
+scripts stored there. The ask keys need the Talking Table running. Start the Table first;
 its existing launcher opens the browser. Ask keys send a declared control:
 `{"text": "Could I talk to Vandal?", "action": "ask", "target": "vandal"}`.
 Each generated script carries its character id. The policy records the ask and
@@ -64,11 +64,19 @@ uses the Table's existing reset action. The scripts need a working Windows
 Python `.pyw` association to open without a console window. The Table launcher
 explains how to install Python if it cannot find it.
 
+Lights check asks the running Table to run its own lights check, the same
+one the Table's settings page offers: each character's colour in turn, then
+the card colour, then idle. The key never carries the lights key and never
+speaks to the lamps; the Table decides whether it can show anything. When the
+lights are off or not set up, or while the crisis card holds the floor, the
+press does nothing and the Table's settings page says why.
+
 The Table address defaults to port 8765. For another port, set
 `SECONDSIGNAL_TABLE_PORT` before opening Stream Deck, and update the Table page
 address in the list. The standalone ask script also accepts a character name
-and then a port; reset accepts a port. A stopped Table makes either script exit
-quietly. A key does not start or change the model, voice, or room lights.
+and then a port; reset and lights check accept a port. A stopped Table makes
+any of the three scripts exit quietly. A key does not start or change the
+model, the voice or the room lights' settings.
 
 STOP types `Stop. Hold.` and Enter into the window that has focus. It's in
 types the operator's approved standing request and Enter into that window.
@@ -85,8 +93,10 @@ Key kinds are `website`, `open`, `text`, `hotkey`, `folder`, `switch`, `ask`,
 `reserved`, and `empty`. A key has an `id`, `title`, `position`, and `kind`.
 Its `target` is an address, local path, fixed text, shortcut such as
 `Windows+H`, page ID, or profile ID as appropriate. Ask keys use `character`.
-Text keys use `enter: true` when Enter should follow. New session uses the
-special open target `@reset`. Leave position `[0, 0]` out of sub-page lists;
+Text keys use `enter: true` when Enter should follow. Two open keys have
+special targets instead of paths: New session uses `@reset` and Lights check
+uses `@lights`; each opens the matching script copied into the output folder,
+and any other target beginning `@` is refused with the key named. Leave position `[0, 0]` out of sub-page lists;
 the generator adds Back. `home` identifies the first page.
 
 The three generated profiles use stable UUIDs so their switch keys agree.
@@ -131,5 +141,6 @@ and a lone SVG is preserved as SVG with that limitation recorded.
 
 No light control, smart-light plugin, or credential belongs in a key list or
 on this deck. The room lights remain the Table's, and their key stays only
-in the Table's encrypted settings. Keep account information and personal
+in the Table's encrypted settings; the Lights check key only asks the Table
+to run the check it already owns. Keep account information and personal
 paths in the operator's copies, never in this folder's examples or README.

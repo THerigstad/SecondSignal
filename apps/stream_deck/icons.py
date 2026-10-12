@@ -200,6 +200,11 @@ def _glyph(canvas: _Canvas, key: dict, colour=WHITE):
         canvas.circle((72, 56), 23, "none", colour, 4)
         canvas.line([(72, 41), (72, 71)], colour)
         canvas.line([(57, 56), (87, 56)], colour)
+    elif "lights" in name:
+        # A plain bulb outline: a circle, a short neck and the base.
+        canvas.circle((72, 50), 20, "none", colour, 4)
+        canvas.line([(63, 68), (63, 78), (81, 78), (81, 68)], colour, 4)
+        canvas.line([(66, 85), (78, 85)], colour, 4)
     elif "start" in name and "table" in name:
         canvas.polygon([(61, 32), (61, 80), (94, 56)], colour)
     elif kind == "switch":
@@ -495,7 +500,7 @@ def render_icon(
     elif ("start" in key_id and "table" in key_id) or title == "start the table":
         style = "start"
     utility = style != "utility" or kind not in {"website", "open"} or any(
-        token in key_id for token in ("ground", "plan", "current_push", "new_session", "reset")
+        token in key_id for token in ("ground", "plan", "current_push", "new_session", "reset", "lights")
     )
     if not utility:
         external_kind = "website" if kind == "website" else "program"

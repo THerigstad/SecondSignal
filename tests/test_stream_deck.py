@@ -9,6 +9,7 @@ import re
 import runpy
 import sys
 import threading
+import time
 import urllib.error
 import urllib.request
 import uuid
@@ -78,9 +79,10 @@ def test_example_list_validates_with_its_companions(profile_id):
     {"position": [0, 3]}, {"kind": "ask", "character": "not_a_character"},
     {"kind": "folder", "target": "missing_page"},
     {"kind": "switch", "target": "missing_profile"},
+    {"kind": "open", "target": "@light"},  # Landing 10, 2026-10-11: a misspelt special target is refused, not a dead key.
 ])
 def test_bad_list_names_the_bad_key(change):
-    """Unknown kinds, out-of-grid keys and broken references identify their key."""
+    """Unknown kinds, out-of-grid keys, broken references and misspelt special targets identify their key."""
     profiles = copy.deepcopy(example_profiles())
     key = profiles[0]["pages"][0]["keys"][0]
     key.update(change)
@@ -183,10 +185,12 @@ def test_export_text_hotkeys_and_inert_keys_keep_exact_settings(generated):
                     expected_profile = next(item for item in profiles if item["id"] == key["target"])
                     assert action["UUID"] == PREFIX + "profile.rotate"
                     assert settings == {"DeviceUUID": "", "ProfileUUID": expected_profile["uuid"].upper()}
-                if key["kind"] == "ask" or key.get("target") == "@reset":
+                special = make_profile.SPECIAL_OPEN_TARGETS  # Landing 10, 2026-10-11: @reset and @lights share one rule.
+                if key["kind"] == "ask" or key.get("target") in special:
                     assert action["UUID"] == PREFIX + "system.open"
-                    filename = "reset.pyw" if key.get("target") == "@reset" else f"ask_{key['character']}.pyw"
+                    filename = special.get(key.get("target"), f"ask_{key.get('character')}.pyw")
                     assert settings == {"path": '"' + str(destination / filename) + '"'}
+                    assert (destination / filename).is_file()
 
 
 def test_png_and_svg_icons_are_144_pixels_and_stop_is_white(generated):
@@ -232,7 +236,7 @@ def test_examples_and_readme_have_no_machine_paths_or_credentials():
             document = json.loads(text)
             for page in document["pages"]:
                 for key in page["keys"]:
-                    if key["kind"] in {"open", "website"} and key.get("target") != "@reset":
+                    if key["kind"] in {"open", "website"} and key.get("target") not in make_profile.SPECIAL_OPEN_TARGETS:  # Landing 10, 2026-10-11: @reset and @lights.
                         assert key["target"].startswith("PLACEHOLDER:")
 
 
@@ -295,9 +299,15 @@ def test_script_arguments_override_environment_and_default_to_8765(monkeypatch):
     assert reset(["43212"]) == 0
     assert requests[-1].full_url == "http://127.0.0.1:43212/api/session/reset"
     assert requests[-1].data == b"{}"
+    lights = runpy.run_path(str(DECK / "lights_check.pyw"))["main"]  # Landing 10, 2026-10-11: the third script follows the same port rule.
+    assert lights(["43213"]) == 0
+    assert requests[-1].full_url == "http://127.0.0.1:43213/api/lights/check"
+    assert requests[-1].data == b"{}" and requests[-1].get_method() == "POST"
+    assert requests[-1].get_header("Content-type") == "application/json"
+    assert lights(["1", "2"]) == 2 and lights(["70000"]) == 2
     monkeypatch.delenv("SECONDSIGNAL_TABLE_PORT")
-    assert ask(["Ellis"]) == 0 and reset([]) == 0
-    assert all(":8765/" in request.full_url for request in requests[-2:])
+    assert ask(["Ellis"]) == 0 and reset([]) == 0 and lights([]) == 0
+    assert all(":8765/" in request.full_url for request in requests[-3:])
 
 
 def test_scripts_exit_quietly_when_table_is_absent(monkeypatch, capsys):
@@ -308,8 +318,57 @@ def test_scripts_exit_quietly_when_table_is_absent(monkeypatch, capsys):
     monkeypatch.setattr(urllib.request.OpenerDirector, "open", unavailable)
     assert runpy.run_path(str(DECK / "ask.pyw"))["main"](["Vandal"]) == 0
     assert runpy.run_path(str(DECK / "reset.pyw"))["main"]([]) == 0
+    assert runpy.run_path(str(DECK / "lights_check.pyw"))["main"]([]) == 0  # Landing 10, 2026-10-11.
     captured = capsys.readouterr()
     assert captured.out == captured.err == ""
+
+
+def test_lights_check_key_asks_the_running_table_which_decides(generated, tmp_path, monkeypatch):
+    """The copied script posts the Table's own lights-check request; unarmed lights show nothing,
+    armed lights run the Table's sequence, and the key never carries or sends a lights key."""
+    from apps.talking_table import lights
+
+    _, destination, _ = generated
+    script = destination / "lights_check.pyw"
+    assert script.is_file()
+    text = script.read_text(encoding="utf-8")
+    assert "/api/lights/check" in text and "lights_key" not in text and "set_scene" not in text
+    app = server.TableApp(data_dir=tmp_path / "table-data")
+    listener = server.make_server(app, port=0)
+    worker = threading.Thread(target=listener.serve_forever, daemon=True)
+    worker.start()
+    monkeypatch.setenv("SECONDSIGNAL_TABLE_PORT", str(listener.server_address[1]))
+    scenes = []
+    monkeypatch.setattr(lights, "set_scene", lambda persona, state, **kwargs: scenes.append((persona, state)))
+    check = app.lights.check
+    monkeypatch.setattr(app.lights, "check", lambda personas: check(personas, interval=0.01))
+
+    def press():
+        monkeypatch.setattr(sys, "argv", [str(script)])
+        with pytest.raises(SystemExit) as result:
+            runpy.run_path(str(script), run_name="__main__")
+        assert result.value.code == 0
+
+    try:
+        press()  # Lights off and no key: the Table shows nothing and the press is silent.
+        app.lights.pending.join()
+        assert scenes == []
+        app.update_settings({"lights_enabled": True, "lights_key": "test-only-lamps"})
+        app.lights.pending.join()
+        scenes.clear()
+        before = (app.sitting(), copy.deepcopy(app.harness.session.__dict__), app.state["turn_count"])
+        press()
+        deadline = time.monotonic() + 3
+        while (not scenes or scenes[-1] != (None, "idle")) and time.monotonic() < deadline:
+            time.sleep(0.01)
+        assert scenes == [(persona, "seated") for persona in app.roster] + [(None, "card"), (None, "idle")]
+        assert before == (app.sitting(), app.harness.session.__dict__, app.state["turn_count"])
+        assert app.harness.transcript == []
+    finally:
+        listener.shutdown()
+        listener.server_close()
+        worker.join(timeout=3)
+        app.close()
 
 
 def test_offline_icons_use_fallbacks_without_network(tmp_path, monkeypatch):

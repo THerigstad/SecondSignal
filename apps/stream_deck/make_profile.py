@@ -23,6 +23,10 @@ from pathlib import Path
 from urllib.parse import urlsplit
 
 KINDS = {"website", "open", "text", "hotkey", "folder", "switch", "ask", "reserved", "empty"}
+# An open key whose target is one of these names opens the matching script
+# copied into the output folder: a request to the running Table, never a
+# path from the operator's machine inside a list.
+SPECIAL_OPEN_TARGETS = {"@reset": "reset.pyw", "@lights": "lights_check.pyw"}
 ID_PATTERN = re.compile(r"[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}\Z")
 ROOT = Path(__file__).resolve().parents[2]
 EMPTY_HOTKEY = {
@@ -253,6 +257,9 @@ def validate_profiles(profiles: list[dict]) -> None:
                     _fail(key_label, "target must not be empty; use PLACEHOLDER: for unknown targets")
                 if kind == "open" and any(c in target for c in ('"', '\r', '\n')):
                     _fail(key_label, "open target must be a plain path without embedded quotes")
+                if kind == "open" and target.startswith("@") and target not in SPECIAL_OPEN_TARGETS:
+                    _fail(key_label, "unknown special open target; use "
+                          + " or ".join(sorted(SPECIAL_OPEN_TARGETS)))
                 if kind == "text" and type(key.get("enter", False)) is not bool:
                     _fail(key_label, "enter must be true or false")
         active = set()
@@ -438,9 +445,10 @@ def _write_fetch_files(key_paths: list[Path], out: Path) -> None:
     (out / "README.txt").write_text(
         "STREAM DECK OUTPUT\n\n"
         "Double-click each of the three .streamDeckProfile files to import it.\n"
-        "Keep this folder in place: ask and reset keys open the scripts here.\n"
+        "Keep this folder in place: ask, New session and Lights check keys open the scripts here.\n"
         "The ask keys need the Talking Table running.\n"
-        "Each generated ask script declares its character with action ask and target id, alongside the message.\n\n"
+        "Each generated ask script declares its character with action ask and target id, alongside the message.\n"
+        "Lights check asks the running Table to run its own lights check; the Table decides whether it can.\n\n"
         "OFFLINE BUILD AND REAL WEBSITE ICONS\n"
         "The supplied build uses original website tiles and local program icons.\n"
         "Personal artwork and reserved.png still take priority.\n"
@@ -474,7 +482,7 @@ def generate_profiles(
     characters = character_data()
     registry = {profile["id"]: _uuid(profile["uuid"], profile["id"]) for profile in profiles}
     icons.reset_cache()
-    for name in ("ask.pyw", "reset.pyw"):
+    for name in ("ask.pyw", "reset.pyw", "lights_check.pyw"):
         shutil.copyfile(Path(__file__).with_name(name), out / name)
     ask_template = Path(__file__).with_name("ask.pyw").read_text(encoding="utf-8")
     for character in characters.keys() - {"idle"}:
@@ -529,8 +537,8 @@ def generate_profiles(
                         character = key.get("character", target)
                         key.update(characters[character])
                         key["target"] = str(out / f"ask_{character}.pyw")
-                    elif key["kind"] == "open" and target == "@reset":
-                        key["target"] = str(out / "reset.pyw")
+                    elif key["kind"] == "open" and target in SPECIAL_OPEN_TARGETS:
+                        key["target"] = str(out / SPECIAL_OPEN_TARGETS[target])
                     if key["id"] == "start_table":
                         key["color"] = characters["idle"]["color"]
                     row = {"profile": profile["id"], "page": page["id"], "id": key["id"],

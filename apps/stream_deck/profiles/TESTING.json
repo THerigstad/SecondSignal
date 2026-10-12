@@ -301,7 +301,8 @@
         {
           "id": "lights_check",
           "title": "Lights check",
-          "kind": "reserved",
+          "kind": "open",
+          "target": "@lights",
           "position": [
             4,
             2

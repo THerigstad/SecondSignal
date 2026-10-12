@@ -420,6 +420,21 @@ rewritten.
   lapse is recorded here rather than back-dated. The commit:
   1. "The sentences that leave the repository, and the commit ledger brought current (7 October 2026)".
 
+- **2026-10-09 to 2026-10-11**, push D, landings 7 to 10: the signal contract
+  (order J1), the declared ask on the record (order P1), Table kit four
+  (order T4) and the Stream Deck's Lights check key, landed as one commit
+  each through the operator's browser session on GitHub's upload page,
+  authored by the operator, the model Claude Fable 5.1, Max, as the
+  operator's screen showed it (the operator's account), in the Claude
+  desktop app's Cowork mode; the builder of the three orders, Codex (OpenAI;
+  the ChatGPT desktop app), is credited in the files and in the builders'
+  section above, and the fourth landing was built by the project manager.
+  These four rows were added with the fourth landing. The commits, in order:
+  1. "Push D, landing 7: the signal contract (order J1)".
+  2. "Push D, landing 8: the declared ask on the record (order P1)".
+  3. "Push D, landing 9: Table kit four (order T4)".
+  4. "Push D, landing 10: the Stream Deck's Lights check key".
+
 ## What this note does not do
 
 It does not rank the families and it does not count agreements. Where two
