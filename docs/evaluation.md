@@ -357,8 +357,8 @@ why both committed report pages are now asserted equal to the runner's
 output on every run. The badge on the README is written from these numbers
 and from nothing else.
 
-<!-- Order P3, 2026-10-10, landed 2026-10-11: 3,765 -> 3,791 tests --> **Numbers, current.** 3,791 tests: 177 expected failures (163 documented gaps,
-14 recorded dissents), the rest pass. 667 labeled cases in the manifest, 285 of
+<!-- Order P3, 2026-10-10, landed 2026-10-11: 3,765 -> 3,791 tests --> <!-- Follow-on to order P2V1, 13 October 2026: tests 3,824 -> 3,846, expected failures 179 -> 185, gaps 164 -> 168, dissents 15 -> 17, cases 671 -> 682, external fixtures 289 -> 300. --> **Numbers, current.** 3,846 tests: 185 expected failures (168 documented gaps,
+17 recorded dissents), the rest pass. 682 labeled cases in the manifest, 300 of
 them external reviewer fixtures kept verbatim; 71 deferred fixtures stored and
 not run. This paragraph, the README's tests badge, its Quickstart line and its
 Status table are written by `evals/refresh_public_numbers.py` from pytest's

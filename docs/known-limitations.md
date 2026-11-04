@@ -80,6 +80,33 @@ row. Receipt export uses the browser's save/download behavior. These Table
 surfaces close no documented policy gap or recorded dissent, and add no
 transcript-storage switch.
 
+## The ask wins the seat, and veto kinds, 13 October 2026, order P2V1
+
+A control-declared ask now wins when the character is eligible and carries
+an extracted domain or live mode, or when there is nothing to route
+(ADR-0034 (Proposed)). Fully empty asked turns examine only the asked
+character; no-ask vague-message behavior and all session observation stay
+unchanged. Every contraindication now names its safety or fit kind, and
+neither kind can be overridden (ADR-0033 (Proposed)). The card, latch, caps,
+holds and seat claims still outrank the ask.
+
+The Table's explanation text still uses pre-P2 wording until its own order.
+Preferences beyond the single ask, favourites and teams do not exist as
+seat controls yet; the permanent veto proof covers the ask today and must
+take those controls when they arrive. Proposed reply lines in the research
+remain source metadata, not verified generated speech.
+
+Four exact, literal-text fixtures were ported: two Kimi cases pass, one
+Nemotron case is a strict grief-veto dissent and the other is a documented
+lexicon gap. Ten requested exact IDs were absent: ask-safety-003,
+askseat-001, askseat-002, VETO-001, VETO-002, ask-override-001,
+ask-anchor-001, ask-notopic-005, ask-eligibility-004, ask-competence-002.
+Longer prefixed IDs exist in the supplied returns but were not substituted.
+DeepSeek's r2d-veto-001 and r2d-veto-003 have declared facts and expectations
+only, no literal message text; the first also lacks a prior turn to set its
+grief hold. Both remain unported, with the dissent retained in ADR-0033
+(Proposed) and the exact source blocks in the build log.
+
 ## The declared ask — 10 October 2026, order P1
 
 The policy record now carries a declared ask from a control the surface

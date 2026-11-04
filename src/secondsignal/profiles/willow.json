@@ -23,6 +23,10 @@
     "challenge",
     "humor"
   ],
+  "veto_kinds": {
+    "challenge": "fit",
+    "humor": "fit"
+  },
   "handoffs": {
     "somatic_distress": "cody",
     "neurodivergence": "ellis",

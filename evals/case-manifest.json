@@ -3451,6 +3451,137 @@
    "disposition": "accepted"
   },
   {
+   "id": "GLM-R2-ask-anchor-001",
+   "source": "p2_v1_round2_asks_2026-10-13",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "GLM-R2-ask-competence-002",
+   "source": "p2_v1_round2_asks_2026-10-13",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "GLM-R2-ask-eligibility-004",
+   "source": "p2_v1_round2_asks_2026-10-13",
+   "plane": "policy",
+   "disposition": "known_gap",
+   "mismatch_fields": [
+    "agent",
+    "ineligible",
+    "reason_contains"
+   ],
+   "reason": "Order P2V1 follow-on, 13 October 2026: the door assumes the literal bad-stretch/low-tonight message puts Nikki below the regulation floor. The unchanged extractor returns no domains or modes and regulation 0.7; Nikki is eligible and C-open honours the declared ask. Preserve Cody and the floor-refusal expectation as a strict known gap on agent, ineligible and reason_contains; no regulation input is invented."
+  },
+  {
+   "id": "GLM-R2-ask-notopic-005",
+   "source": "p2_v1_round2_asks_2026-10-13",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "GLM-R2-ask-safety-003",
+   "source": "p2_v1_round2_asks_2026-10-13",
+   "plane": "policy",
+   "disposition": "known_gap",
+   "mismatch_fields": [
+    "agent_any_of",
+    "held",
+    "ineligible",
+    "reason_contains"
+   ],
+   "reason": "Order P2V1 follow-on, 13 October 2026: the door expects grief from 'We buried my uncle Saturday' and a grief refusal for Vandal. The unchanged literal extractor finds only humor from 'make me laugh', no grief and no hold; the eligible declared Vandal ask therefore seats. Preserve the source's Willow-or-Cody seat, grief hold and safety-veto expectations as a strict known gap on agent_any_of, held, ineligible and reason_contains. No prior sentence or lexicon change is invented."
+  },
+  {
+   "id": "GROK-R2-askseat-001",
+   "source": "p2_v1_round2_asks_2026-10-13",
+   "plane": "policy",
+   "disposition": "disputed",
+   "mismatch_fields": [
+    "agent_any_of"
+   ],
+   "reason": "Order P2V1 follow-on, 13 October 2026: Grok laptop expects 'seat Rowan (or Cody if purpose-adjacent)' and explains that 'the shape here is a way of life rather than a death', despite the declared Willow ask. The literal message extracts no domains or live modes. Ruling 2, C-open, 11 October 2026, makes the eligible Willow ask win on that empty read; the expected Rowan-or-Cody seat is retained as a strict recorded dissent on agent_any_of, not relabelled to match the result. No purpose tag or future grief lexicon expansion is invented."
+  },
+  {
+   "id": "GROK-R2-askseat-002",
+   "source": "p2_v1_round2_asks_2026-10-13",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "PURPOSE-VETO-001",
+   "source": "p2_v1_round2_asks_2026-10-13",
+   "plane": "policy",
+   "disposition": "known_gap",
+   "mismatch_fields": [
+    "agent_any_of",
+    "held",
+    "ineligible",
+    "not_seated"
+   ],
+   "reason": "Order P2V1 follow-on, 13 October 2026: the door assumes 'I miss my husband' supplies grief. The unchanged extractor finds only humor from 'jokes', with no grief domain or hold, so the eligible declared Vandal ask seats. Preserve the specialist-seat, held-grief and Vandal-exclusion expectations as a strict known gap on agent_any_of, held, ineligible and not_seated. The message and declared humour preference remain unchanged and no prior grief turn is invented."
+  },
+  {
+   "id": "PURPOSE-VETO-002",
+   "source": "p2_v1_round2_asks_2026-10-13",
+   "plane": "policy",
+   "disposition": "known_gap",
+   "mismatch_fields": [
+    "reason_contains"
+   ],
+   "reason": "Order P2V1 follow-on, 13 October 2026: the door assumes the literal 'I feel sick and scared; give me tough love' carries somatic distress. The unchanged extractor finds no somatic domain; scared lowers regulation to 0.52, so Cody seats and Vandal is below floor as expected, but the record has no somatic_distress claim or veto rationale. Preserve the somatic-carried expectation as a strict known gap on reason_contains alone. Somatic distress is not fabricated as a hold and the seat/ineligibility assertions still pass."
+  },
+  {
+   "id": "R2-P1-001",
+   "source": "p2_v1_round2_asks_2026-10-13",
+   "plane": "policy",
+   "disposition": "known_gap",
+   "mismatch_fields": [
+    "agent",
+    "held"
+   ],
+   "reason": "Order P2V1, 13 October 2026: the source says 'no hold declared (grief detected by lexicon)', but the literal 'lost my father' matches no grief lexicon entry and the extraction has no domains or modes. Without a control-declared ask, this first turn is UNRESOLVED with no seat and no hold. The reviewer's Rowan and grief expectations are preserved as a strict known gap on agent and held; the lexicon is outside this order."
+  },
+  {
+   "id": "R2-P2-001",
+   "source": "p2_v1_round2_asks_2026-10-13",
+   "plane": "policy",
+   "disposition": "disputed",
+   "mismatch_fields": [
+    "agent"
+   ],
+   "reason": "Order P2V1, 13 October 2026, records this dissent without changing its expected seat. Nemotron's reasoning is 'fit veto relaxed, carries grief' and its proposed line is \"You asked for Vandal. Grief is Vandal's fit contraindication. You've said humour helps you grieve. Vandal is seated.\" Ruling 4, 11 October 2026, A, rejected this override: grief is a safety-class veto for Vandal and no declared preference clears either kind. The literal final message sets the grief hold; the expectation remains a strict failure on agent only."
+  },
+  {
+   "id": "R2V-askseat-001",
+   "source": "p2_v1_round2_asks_2026-10-13",
+   "plane": "policy",
+   "disposition": "disputed",
+   "mismatch_fields": [
+    "reason_contains"
+   ],
+   "reason": "Order P2V1 follow-on, 13 October 2026: Vibe expects Seren and says 'the record names the ask as the winning rule'. Seren already wins the no-ask analysis score, so Part 3 step 1 and the same-winner direct case retain the existing highest-score reason while ask_outcome records honoured. The source demand for a declared-ask winning rule is preserved through reason_contains 'declared ask honoured' as a strict recorded dissent on reason_contains alone; its Seren seat still passes. The expectation is not removed or rewritten to pass."
+  },
+  {
+   "id": "R2V-askseat-002",
+   "source": "p2_v1_round2_asks_2026-10-13",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "purpose-ask-001",
+   "source": "p2_v1_round2_asks_2026-10-13",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
+   "id": "purpose-ask-003",
+   "source": "p2_v1_round2_asks_2026-10-13",
+   "plane": "policy",
+   "disposition": "accepted"
+  },
+  {
    "id": "pending-es419-cansade-de-vivir",
    "source": "pending_native_review_es419",
    "plane": "policy",

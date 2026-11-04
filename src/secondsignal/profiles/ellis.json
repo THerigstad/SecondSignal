@@ -25,6 +25,9 @@
   "contraindications": [
     "somatic_distress"
   ],
+  "veto_kinds": {
+    "somatic_distress": "safety"
+  },
   "handoffs": {
     "somatic_distress": "cody",
     "grief": "willow",

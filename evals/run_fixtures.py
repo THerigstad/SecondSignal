@@ -259,7 +259,7 @@ def run_case(case: CaseData, roster: Roster) -> tuple[RoutingDecision, SessionSt
     text = case.get("text")
     if not isinstance(text, str):
         raise ValueError(f"{case.get('id', '<unknown>')}: text must be a string")
-    return route(text, roster, session=session), session
+    return route(text, roster, session=session, asked=case.get("asked")), session  # Order P2V1, 13 October 2026: final-turn ask absent -> declared case ask.
 
 
 def _decision_trace(decision: RoutingDecision) -> str:

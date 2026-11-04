@@ -24,6 +24,10 @@
     "somatic_distress",
     "addiction_recovery"
   ],
+  "veto_kinds": {
+    "somatic_distress": "safety",
+    "addiction_recovery": "safety"
+  },
   "handoffs": {
     "somatic_distress": "cody",
     "grief": "willow",

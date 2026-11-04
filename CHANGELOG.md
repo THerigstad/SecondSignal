@@ -4,6 +4,17 @@ All notable changes to SecondSignal are documented here.
 
 ## [Unreleased]
 
+### Added — 2026-10-13, order P2V1 (the ask wins inside competence, ADR-0034; every veto has a kind, ADR-0033)
+
+- A control-declared ask wins over score when eligible and carrying an extracted domain or live mode, or when nothing remains to route. An eligible ask resolves an exhaustive tie. The card, latch, holds, floors, caps and seat claims still outrank it; every refusal names the rule. Aliases remain canonical and message text declares no ask.
+- Fully empty asked turns examine and record only the requested candidate; an honoured ask takes the normal seat and clears the house question. The no-ask vague-message rules and complete session observation stay unchanged. `ask_outcome` is an additive optional JSON key; schema version remains 1.
+- All seven profiles gain immutable, validated veto kinds: eight safety entries, two fit entries, and two empty maps. No ask clears either kind. Three permanent proofs cover the case corpus, pure lexicon floors under all seven asks, same-sitting carried holds and malformed profile data.
+- Four exact literal-text fixtures are ported: Kimi's purpose-ask-001 and purpose-ask-003 pass; Nemotron's R2-P1-001 records an extraction gap and R2-P2-001 records the rejected grief-veto override as a strict dissent. Ten requested exact IDs are absent; DeepSeek's two textless fixtures remain unported and quoted in the build log. Its dissent and Grok laptop's fit-veto override remain in ADR-0033 (Proposed).
+- The original 667 cases and 747 turns retain their no-ask seat, shadow, assist, outcome and obligations. Synthetic asks move 2,276 of 4,669 final case/ask pairs; 2,606 of 5,229 pairs when prior turns are included. The original H1 release behavior also stays fixed.
+- State pins follow the new rationale and profile hashes: the P1 explanation/turn/audit digests, P3 aggregates (667 to 671 cases), H1 replay (889 to 893 turns; 224 to 225 releases from one new case), optional JSON field pin, generated round-1 report, CLI sample, Table declared-ask expectations and policy source digest. Mandatory schema fields were added only to the three authorized original test payloads; their safety/error assertions stay intact.
+- Public counts are regenerated: 3,791 to 3,824 tests; 177 to 179 expected failures (164 documented gaps and 15 recorded dissents); 667 to 671 cases; 285 to 289 external fixtures; 71 deferred fixtures unchanged. Both fixture runners forward declared asks only on the final turn.
+- ADR-0034 (Proposed) amends ADR-0031 without rewriting it. The register, generated status, limitations and public numbers follow the build. The Table's explanation wording awaits its own order; preferences beyond one ask, favourites and teams remain unbuilt.
+
 ### Changed — 2026-10-11, the Spanish pack's review state, stated as it is
 
 - The README status table and the limitations page said the Spanish pack's

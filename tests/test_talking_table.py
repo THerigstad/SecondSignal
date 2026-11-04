@@ -468,8 +468,8 @@ def test_grok_round4_scheme_whitespace_controls_are_released(app, payload):
 # named below), Grok's 30 vague openers (ruling 5), ChatGPT's assist pin (ruling 8)
 # and the four reviewer fixtures Codex asked for joined the labelled suite.
 # Recomputed at integration, 4 October.
-CASES_PIN = 667  # 552 at f350424; B7 of 5 October 2026 ported 115 of Grok's cases (65 identity, 50 neurodivergent)
-TURNS_PIN = 747      # 632 + the 115 single-turn cases of B7
+CASES_PIN = 682  # Follow-on to order P2V1, 13 October 2026: 671 -> 682 (eleven additional verbatim fixtures).
+TURNS_PIN = 762  # Follow-on to order P2V1, 13 October 2026: 751 -> 762 (eleven additional single-turn fixtures).
 LABELLED_PIN = 340   # 325 + B7's 15 wrapped crisis lines (5 identity, 10 neurodivergent)
 ACTUAL_PIN = 191  # Order G1, 2026-10-10: 190 -> 191.
 GAPS_PIN = 148  # Order G1, 2026-10-10: 149 -> 148.
@@ -1236,7 +1236,7 @@ def test_sigils_runs_against_real_table_and_card_screenshot_is_white(app, tmp_pa
     if not BROWSER:
         pytest.skip("headless Chrome/Chromium is absent; real Table sigils screenshot cannot run")
     expected = Harness(app.roster, FakeAdapter(), CodexStore(ROOT / "docs" / "codex"),
-                       audit_log=AuditLog()).speak("Could I talk to Vandal?")
+                       audit_log=AuditLog()).speak("Could I talk to Vandal?", asked="vandal")  # Order P2V1, 2026-10-13: no-ask expected turn -> the same declared Vandal control as the sigils UI.
     expected_state = ("card" if expected.action == "HUMAN_ESCALATION" else
                       "seated" if expected.agent_id else "idle")
     with live(app) as listener:

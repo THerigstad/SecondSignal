@@ -18,7 +18,6 @@ from test_talking_table import live, request
 from apps.talking_table import server, t3
 from secondsignal.safety import SessionState
 from secondsignal_harness import FakeAdapter
-from secondsignal_harness.lines import HARNESS_LINES_EN
 from secondsignal_harness.table_extras import eligible_agents
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -176,19 +175,19 @@ def prime_vague(app):
 
 
 def test_t4_deck_declared_ask_reaches_state_audit_receipt_and_replay(app):
-    """A deck-style control records its ask and the approved acknowledgement when another chair sits."""
+    """An eligible deck ask seats on an empty turn and records its honoured outcome without an acknowledgement."""
     text = prime_vague(app)
     with live(app) as listener:
         status, result, _ = request(listener, "/api/turn",
                                      {"text": text, "action": "ask", "target": "vandal"})
-        assert status == 200 and result["persona"] != "vandal"
+        assert status == 200 and result["persona"] == "vandal"  # Order P2V1, 2026-10-13: another chair -> declared Vandal seat on the empty turn.
         assert result["decision"]["asked_agent_id"] == "vandal"
         line = result["ask_acknowledgement"]
-        assert line and HARNESS_LINES_EN["ask_acknowledgement"].split("{Asked}")[0] in line
+        assert line is None and result["decision"]["ask_outcome"] == "honoured"  # Order P2V1, 2026-10-13: different-seat acknowledgement -> honoured ask without acknowledgement.
         state = request(listener, "/api/state")[1]
         assert state["turns"][-1]["ask_acknowledgement"] == line
         row = app.harness.audit_log.read(result["audit_row_id"])
-        assert row["decision"] == result["decision"] and row["composed"].startswith(line)
+        assert row["decision"] == result["decision"] and row["composed"] == app.harness.turns[-1].text  # Order P2V1, 2026-10-13: acknowledgement prefix -> exact composed honoured-seat turn.
         assert result["receipt"]["asked_agent_id"] == "vandal"
         replay = request(listener, "/api/replay?row_id=" + result["receipt"]["row_id"])[1]
         assert replay["record"]["asked_agent_id"] == "vandal"
@@ -207,7 +206,7 @@ def test_t4_plain_same_text_never_declares_an_ask(app):
 
 
 def test_t4_handback_declares_ask_without_redeferring_it(app):
-    """A hand-back records the offered target and explains a different seat while consuming the offer."""
+    """A hand-back records and seats its eligible offered target while consuming the offer."""
     operator(app)
     app.deferred_ask = "willow"
     result = app.turn(PROMPT)
@@ -216,7 +215,8 @@ def test_t4_handback_declares_ask_without_redeferring_it(app):
     app.harness.session.empty_streak = 2
     returned = app.turn(offer["text"], action="handback", target=offer["persona"])
     assert returned["decision"]["asked_agent_id"] == "willow"
-    assert returned["persona"] != "willow" and returned["ask_acknowledgement"]
+    assert returned["persona"] == "willow" and returned["ask_acknowledgement"] is None  # Order P2V1, 2026-10-13: different seat with acknowledgement -> declared Willow seated without acknowledgement.
+    assert returned["decision"]["ask_outcome"] == "honoured"
     assert app.deferred_ask is None and returned["handback"] is None
 
 
@@ -229,7 +229,8 @@ def test_t4_phone_ask_uses_the_same_declared_control(app):
                                 {"text": text, "action": "ask", "target": "vandal"},
                                 headers={"Cookie": f"{server.COOKIE}={token}"})
     assert status == 200 and result["decision"]["asked_agent_id"] == "vandal"
-    assert result["ask_acknowledgement"]
+    assert result["ask_acknowledgement"] is None and result["persona"] == "vandal"  # Order P2V1, 2026-10-13: different-seat acknowledgement -> declared Vandal seated without acknowledgement.
+    assert result["decision"]["ask_outcome"] == "honoured"
 
 
 def test_t4_generated_scripts_embed_and_post_each_persona(generated, monkeypatch):  # noqa: F811
@@ -610,7 +611,7 @@ def test_t4_slow_host_terms_save_does_not_delay_a_crisis(app, monkeypatch):
     assert not worker.is_alive()
 
 
-@pytest.mark.parametrize("package,count,expected", [('src/secondsignal/', 21, '8a547d819b4f48260e01f7c353f271ce2335733348a696198929b7f6ab0cde87'), ('src/secondsignal_harness/', 12, '26e500f585c147a489018d1a722acaa9a5636e71e5cd683d519f1f7bda5ac7d2')])  # Order G1, 2026-10-10, landed 2026-10-11: the policy package moved on purpose (lexicon, gate constant and call, the two packs), 85e848a59368e91c3ac396d94484e4e97d3f46acbc54670f08d5ca0f8424f79b -> 183e15c9707de81abc1aaeefec40c5e8dca07c9e5303b1732730acc86fd50a64; order P3, landed 2026-10-11: the policy package moved again on purpose (router and gate carry the sitting's holds), 183e15c9707de81abc1aaeefec40c5e8dca07c9e5303b1732730acc86fd50a64 -> 8a547d819b4f48260e01f7c353f271ce2335733348a696198929b7f6ab0cde87; the harness package stays byte-identical to landing 8.
+@pytest.mark.parametrize("package,count,expected", [('src/secondsignal/', 21, '6622cf335f4e29810814d0092de6cbd04acb0de36ef47cd61a9800da87db015d'), ('src/secondsignal_harness/', 12, '26e500f585c147a489018d1a722acaa9a5636e71e5cd683d519f1f7bda5ac7d2')])  # Order G1, 2026-10-10, landed 2026-10-11: the policy package moved on purpose (lexicon, gate constant and call, the two packs), 85e848a59368e91c3ac396d94484e4e97d3f46acbc54670f08d5ca0f8424f79b -> 183e15c9707de81abc1aaeefec40c5e8dca07c9e5303b1732730acc86fd50a64; order P3, landed 2026-10-11: the policy package moved again on purpose (router and gate carry the sitting's holds), 183e15c9707de81abc1aaeefec40c5e8dca07c9e5303b1732730acc86fd50a64 -> 8a547d819b4f48260e01f7c353f271ce2335733348a696198929b7f6ab0cde87; order P2V1, 2026-10-13: veto kinds and eligible asks, 8a547d819b4f48260e01f7c353f271ce2335733348a696198929b7f6ab0cde87 -> 6622cf335f4e29810814d0092de6cbd04acb0de36ef47cd61a9800da87db015d; the harness package stays byte-identical to landing 8.
 def test_t4_policy_and_harness_are_byte_identical(package, count, expected):
     """The complete source inventory and every byte in each protected package match the supplied tree."""
     import hashlib

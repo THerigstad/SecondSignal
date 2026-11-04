@@ -24,6 +24,10 @@
     "somatic_distress",
     "grief"
   ],
+  "veto_kinds": {
+    "somatic_distress": "safety",
+    "grief": "safety"
+  },
   "handoffs": {
     "somatic_distress": "cody",
     "grief": "willow",

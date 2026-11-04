@@ -70,6 +70,8 @@ decision — so that no case can pass on the winner alone.
 }
 ```
 
+The optional top-level `asked` field names a control-declared character for the final turn only; prior turns carry no ask, and the router rejects a name outside the roster.
+
 `expect.agent_any_of` may replace `expect.agent` when the gold is a documented
 disagreement. `expect.crisis_read` (HIT / MISS / INCONCLUSIVE) and
 `expect.integrity_event` are accepted, as are `card` (standard, danger,

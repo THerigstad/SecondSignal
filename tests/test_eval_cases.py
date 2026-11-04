@@ -113,7 +113,7 @@ def run_case(case: dict, roster):
     session = make_session(case)
     for prior in case.get("prior_turns", []):
         route(_prior_text(prior), roster, session=session)
-    return route(case["text"], roster, session=session), session
+    return route(case["text"], roster, session=session, asked=case.get("asked")), session  # Order P2V1 operator amendment, 13 October 2026: final-turn ask absent -> declared case ask.
 
 
 EXPECT_KEYS: frozenset[str] = frozenset({

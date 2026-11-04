@@ -241,6 +241,7 @@ def test_narrowing_the_stabilizers_floor_fails_to_load(tmp_path):
 def test_contraindicating_the_stabilizer_fails_to_load(tmp_path):
     def edit(data):
         data["contraindications"] = ["humor"]
+        data["veto_kinds"] = {"humor": "fit"}  # Order P2V1, 2026-10-13: missing kind -> humor fit; safety assertion unchanged.
     with pytest.raises(ValueError, match="no stabilizer"):
         load_roster(_roster_edit(tmp_path, "cody", edit))
 

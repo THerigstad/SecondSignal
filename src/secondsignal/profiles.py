@@ -6,14 +6,14 @@ agent is competent at, what affective range it is safe within, what it must
 
 Keeping this as data rather than prose has three consequences that matter:
 
-1. Profiles are diffable. A change to an agent's contraindications shows up in
-   version control as a reviewable line, not as a paragraph edit buried in a
-   prompt.
+1. Profiles are diffable. A change to an agent's contraindications or veto
+   kinds shows up in version control as a reviewable line, not as a paragraph
+   edit buried in a prompt.
 2. Profiles are testable. `tests/test_profiles.py` asserts invariants across
    the whole roster (e.g. every handoff target resolves to a real agent).
 3. Profiles are portable. The same roster drives any underlying model.
 
-Two invariants are enforced at load time rather than left to tests, because a
+Three invariants are enforced at load time rather than left to tests, because a
 roster that violates them must not be able to start (ADR-0012):
 
 * every handoff target resolves to a loaded agent;
@@ -21,7 +21,10 @@ roster that violates them must not be able to start (ADR-0012):
   reaches 0.0 and who carries no contraindications, so that there is always
   someone the router may hand any caller to. A wide window alone does not
   qualify -- an agent who vetoes humor cannot be the floor for a caller who
-  asked for humor.
+  asked for humor;
+* every contraindication has exactly one kind, safety or fit. Safety vetoes
+  name hold domains or somatic distress, and those domains cannot be labelled
+  fit. A mode or another domain can be fit only (ADR-0033 (Proposed)).
 
 Every profile is hashed when loaded, and the roster hash travels with each
 routing decision, so a replayed trace can be matched to the exact profiles
@@ -40,9 +43,12 @@ from __future__ import annotations
 
 import hashlib
 import json
+from collections.abc import Mapping
 from dataclasses import dataclass, field, replace
 from pathlib import Path
 from typing import Any
+
+from .signals import HOLD_DOMAINS, FrozenMap
 
 __all__ = [
     "AgentProfile",
@@ -60,6 +66,32 @@ __all__ = [
 ]
 
 DEFAULT_PROFILE_DIR = Path(__file__).resolve().parent / "profiles"
+_SAFETY_VETO_DOMAINS = frozenset((*HOLD_DOMAINS, "somatic_distress"))
+_UNDECLARED_VETO_KINDS: Mapping[str, str] = FrozenMap()
+
+
+def _validate_veto_kinds(
+    agent_id: str, contraindications: frozenset[str], veto_kinds: Mapping[str, str],
+) -> None:
+    """The kind is a data contract, never permission to clear a veto."""
+    if set(veto_kinds) != contraindications:
+        raise ValueError(
+            f"agent {agent_id!r} veto_kinds keys must exactly match contraindications"
+        )
+    for tag, kind in veto_kinds.items():
+        if kind not in ("safety", "fit"):
+            raise ValueError(
+                f"agent {agent_id!r} veto_kinds for {tag!r} must be 'safety' or 'fit'"
+            )
+        if kind == "safety" and tag not in _SAFETY_VETO_DOMAINS:
+            raise ValueError(
+                f"agent {agent_id!r} safety veto {tag!r} must name a hold domain "
+                "or somatic_distress"
+            )
+        if tag in _SAFETY_VETO_DOMAINS and kind != "safety":
+            raise ValueError(
+                f"agent {agent_id!r} veto {tag!r} must be safety, never fit"
+            )
 
 
 @dataclass(frozen=True)
@@ -81,6 +113,9 @@ class AgentProfile:
         contraindications: Domain or mode tags that veto this agent outright,
             regardless of score. This is the field that encodes "never route
             here," and it is the reason the roster is auditable.
+        veto_kinds: Immutable contraindication -> "safety" or "fit" mapping.
+            Every hold-domain or somatic-distress veto is safety; every other
+            veto is fit. Neither kind can be cleared by a preference or ask.
         handoffs: condition -> agent id. Conditions are free-form tags emitted
             by the router when it detects that an active agent has reached the
             edge of its window.
@@ -117,6 +152,7 @@ class AgentProfile:
     modes: frozenset[str] = frozenset()
     regulation_window: tuple[float, float] = (0.0, 1.0)
     contraindications: frozenset[str] = frozenset()
+    veto_kinds: Mapping[str, str] = field(default_factory=lambda: _UNDECLARED_VETO_KINDS)
     handoffs: dict[str, str] = field(default_factory=dict)
     serves: tuple[str, ...] = ()
     risks: tuple[str, ...] = ()
@@ -125,6 +161,21 @@ class AgentProfile:
     short_name: str = ""
     presentation: dict[str, str] = field(default_factory=dict)
     source_hash: str = ""
+
+    def __post_init__(self) -> None:
+        # In-memory contracts predate this field; omitted kinds receive the
+        # same conservative classification as the shipped data. JSON loading
+        # requires the field whenever contraindications is declared, and
+        # explicit mappings are strict (operator amendment, 13 October 2026).
+        kinds = (
+            {tag: "safety" if tag in _SAFETY_VETO_DOMAINS else "fit"
+             for tag in self.contraindications}
+            if self.veto_kinds is _UNDECLARED_VETO_KINDS else dict(self.veto_kinds)
+        )
+        _validate_veto_kinds(self.id, self.contraindications, kinds)
+        # Use the existing immutable map so copying a profile or harness,
+        # pickling and dataclasses.asdict keep their established contract.
+        object.__setattr__(self, "veto_kinds", FrozenMap(kinds))
 
     @property
     def names(self) -> tuple[str, ...]:
@@ -186,6 +237,9 @@ class AgentProfile:
 
 
 def _profile_from_dict(data: dict, source_hash: str = "") -> AgentProfile:
+    kinds = data.get("veto_kinds", {} if "contraindications" not in data else None)
+    if not isinstance(kinds, dict):
+        raise ValueError(f"agent {data['id']!r} must declare veto_kinds as an object, even when empty")
     window = data.get("regulation_window", [0.0, 1.0])
     return AgentProfile(
         id=data["id"],
@@ -195,6 +249,7 @@ def _profile_from_dict(data: dict, source_hash: str = "") -> AgentProfile:
         modes=frozenset(data.get("modes", ())),
         regulation_window=(float(window[0]), float(window[1])),
         contraindications=frozenset(data.get("contraindications", ())),
+        veto_kinds=kinds,
         handoffs=dict(data.get("handoffs", {})),
         serves=tuple(data.get("serves", ())),
         risks=tuple(data.get("risks", ())),
@@ -358,6 +413,7 @@ def validate_roster(roster: dict[str, AgentProfile]) -> None:
         raise ValueError("roster is empty")
     seen: dict[str, str] = {}
     for profile in roster.values():
+        _validate_veto_kinds(profile.id, profile.contraindications, profile.veto_kinds)
         for name in profile.names:
             if name in seen and seen[name] != profile.id:
                 raise ValueError(
@@ -386,7 +442,8 @@ def load_roster(directory: str | Path | None = None) -> dict[str, AgentProfile]:
     Raises:
         ValueError: if two profiles declare the same id, if any handoff target
             does not resolve to a loaded agent, or if the roster has no
-            stabilizer. Failing loudly at load time is preferred over
+            stabilizer, or a veto kind violates the safety boundary. Failing
+            loudly at load time is preferred over
             discovering a dangling handoff -- or a missing floor -- mid-session.
     """
     directory = Path(directory or DEFAULT_PROFILE_DIR)

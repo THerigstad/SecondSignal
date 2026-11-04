@@ -102,6 +102,7 @@ def test_duplicate_ids_are_rejected(tmp_path):
         "id": "duplicate",
         "display_name": "A",
         "one_line": "x",
+        "veto_kinds": {},  # Order P2V1, 2026-10-13: omitted -> empty kinds (operator amendment).
     }
     (tmp_path / "a.json").write_text(json.dumps(payload), encoding="utf-8")
     (tmp_path / "b.json").write_text(json.dumps(payload), encoding="utf-8")
@@ -114,6 +115,7 @@ def test_dangling_handoff_is_rejected(tmp_path):
         "id": "solo",
         "display_name": "Solo",
         "one_line": "x",
+        "veto_kinds": {},  # Order P2V1, 2026-10-13: omitted -> empty kinds (operator amendment).
         "handoffs": {"grief": "nobody"},
     }
     (tmp_path / "solo.json").write_text(json.dumps(payload), encoding="utf-8")

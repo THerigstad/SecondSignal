@@ -1,6 +1,7 @@
 # ADR-0031: A declared ask is a fact on the record
 
 - **Status:** Proposed — built; the declared ask is recorded and explained without changing policy; the rule for letting an ask win the seat remains open; under the standing rule of 7 September 2026, a record written for the operator by the project's own assistants becomes canon only after a second model family has read it
+- **Amended by:** ADR-0034 (Proposed), 13 October 2026: a declared ask wins inside competence; the declaration remains a control fact.
 - **Date:** 2026-10-10
 - **Evidence:** `tests/test_p1_declared_ask.py` (all labelled cases and prior turns, all seven asks, unchanged decisions and sessions, boundary validation, static guards with negative cases, serialization, exact explanation, the real harness acknowledgement and audit, typed-name non-inference, and unchanged trajectories); `tests/test_h1_replay.py::test_h1_every_labelled_turn_keeps_its_policy_house_lines_and_release` (the unchanged historical replay); the deck test and the operator's ruling of 9 October 2026, built by order P1
 - **Depends on:** ADR-0011 (no-signal routing is a policy), ADR-0016 (seat versus hold), ADR-0025 (Proposed) (the assist from the hold and an affinity that can trade seats), ADR-0029 (Proposed) (the voice is a harness behind the policy layer), ADR-0030 (Proposed) (a probability is evidence, not authority)

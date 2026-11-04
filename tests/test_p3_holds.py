@@ -185,8 +185,8 @@ def test_every_labelled_first_turn_matches_the_supplied_tree(roster):
         if isinstance(text, dict):
             text = text["text"]
         records[case["id"]] = route(text, roster, session=make_session(case)).to_dict()
-    assert len(records) == 667
-    assert _digest(records) == "cfab4065d5c59ebb6c686f25886d92d0f15870b08e225a98b16600c9eec254f3"  # Order P3, landed 2026-10-11 on landing 11 (82521ba): 7e9489e9a050c103a891a501a0ba317f90c553dce566051c74c7353839a6cc26 (the supplied tree b017d82) -> cfab4065d5c59ebb6c686f25886d92d0f15870b08e225a98b16600c9eec254f3, the same aggregate landing 11 produces without P3, so P3 changes no first turn on this chain.
+    assert len(records) == 682  # Follow-on to order P2V1, 13 October 2026: 671 -> 682; eleven additional verbatim fixture ports.
+    assert _digest(records) == "b58a4b5db51655a0196a0576d643b45e4b40ecd37358c6a2a2631cf2bb30131c"  # Follow-on to order P2V1, 13 October 2026: 1d4989de8750c53e1cf461519ea2e9700f77b5a4f39581204a3c69a22261b81b -> b58a4b5db51655a0196a0576d643b45e4b40ecd37358c6a2a2631cf2bb30131c; eleven added cases, existing decisions unchanged.
 
 
 @pytest.mark.parametrize("name", THREE)
@@ -199,7 +199,7 @@ def test_the_three_hold_trajectories_pass(name, roster):
 def test_h1_changes_are_confined_to_turns_with_prior_context():
     actual = replay()
     first = [row for row in actual["rows"] if row["turn"] == 1]
-    assert _digest(first) == "74dc7f2e6069bb6b550c985e6be460f5c92ace785df50ca45d9788131b2ce9aa"  # Order P3, landed 2026-10-11 on landing 11 (82521ba): 7b9cd263f5762fbc6d146c85026c37f8d1b620fce4fce681441b80d316e05065 (the supplied tree b017d82) -> 74dc7f2e6069bb6b550c985e6be460f5c92ace785df50ca45d9788131b2ce9aa, the same digest landing 11 produces without P3.
+    assert _digest(first) == "24db78f941440177cbd5c17de8f5b7184a8594177847eed15fd74004ffe7e03b"  # Follow-on to order P2V1, 13 October 2026: 0562e21304d8159086657188da98bbf00cfb688223f11a10ab934b0c9a74f8f8 -> 24db78f941440177cbd5c17de8f5b7184a8594177847eed15fd74004ffe7e03b; eleven added first turns, all prior H1 rows unchanged.
 
 
 def test_no_seat_keeps_the_session_hold(roster):

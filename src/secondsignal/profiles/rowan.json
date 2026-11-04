@@ -20,6 +20,7 @@
     1.0
   ],
   "contraindications": [],
+  "veto_kinds": {},
   "handoffs": {
     "somatic_distress": "cody",
     "analysis": "seren",

@@ -23,7 +23,8 @@ The decision tree, top to bottom (ADR-0016):
    eating distress and recovery status are carried, not necessarily spoken
    to first. ``held`` and ``obligations`` travel on the decision so the
    generation layer knows what it owes and a harness can check that it paid.
-4. Ask fit -> the score (domain, mode, regulation).
+4. A declared ask wins inside eligibility and competence (ADR-0034 (Proposed));
+   otherwise ask fit -> the score (domain, mode, regulation).
 5. Dysregulation -> the stabilizer is preferred and challenge is penalized.
 6. Declared affinities -> the advisory assist, and only that: a voice
    preference sources the assist and never breaks a seat tie (``_select``
@@ -294,9 +295,10 @@ class RoutingDecision:
     # The session's presentation choice, copied onto the record (ruling 11).
     presentation: PresentationFacts = PresentationFacts()
     # Who the person asked for, by declared control only (ADR-0031 (Proposed));
-    # None when nobody was asked. Recorded and explained; it moves no seat,
-    # verdict, hold, latch or cap.
+    # None when nobody was asked. It may move the seat inside competence,
+    # but never a verdict, hold, latch, cap or veto (ADR-0034 (Proposed)).
     asked_agent_id: str | None = None
+    ask_outcome: str | None = None
 
     @property
     def preempted(self) -> bool:
@@ -344,6 +346,7 @@ class RoutingDecision:
         }
         if self.asked_agent_id is not None:
             result["asked_agent_id"] = self.asked_agent_id
+            result["ask_outcome"] = self.ask_outcome
         result["explain"] = self.explain()
         return result
 
@@ -360,9 +363,15 @@ class RoutingDecision:
             }
             lines.append(f"distribution = {distribution}")
         if self.asked_agent_id is not None:
+            if self.ask_outcome == "honoured":
+                outcome = "honoured"
+            else:
+                marker = f"; asked {self.asked_agent_id} not seated: "
+                refusal = self.reason.split(marker, 1)[-1]
+                refusal = refusal.split("; hold on ", 1)[0]
+                outcome = f"not seated: {refusal}"
             lines.append(
-                f"asked      = {self.asked_agent_id} "
-                "(declared by a control; recorded, not routed on)"
+                f"asked      = {self.asked_agent_id} (declared by a control; {outcome})"
             )
         if self.signals.domains:
             lines.append(f"domains    = {', '.join(sorted(self.signals.domains))}")
@@ -540,7 +549,8 @@ def eligible(
     blocked = (signals.domains | signals.modes | frozenset(holds)) & profile.contraindications
     if blocked:
         held_block = frozenset(holds) & profile.contraindications
-        why = f"contraindicated for: {', '.join(sorted(blocked))}"
+        labelled = (f"{tag} ({profile.veto_kinds[tag]})" for tag in sorted(blocked))
+        why = f"contraindicated for: {', '.join(labelled)}"
         if held_block:
             why += f" (cannot honor hold: {', '.join(sorted(held_block))})"
         return "vetoed", (why,)
@@ -770,6 +780,60 @@ def _select(
     )
 
 
+
+def _honour_ask(
+    asked: str | None,
+    scored: list[ScoredAgent],
+    roster: dict[str, AgentProfile],
+    signals: RequestSignals,
+    claims: tuple[str, ...],
+    holds: tuple[str, ...],
+    vetoes: frozenset[str],
+) -> tuple[ScoredAgent | None, str]:
+    """The sole declared-choice rule, inside eligibility and competence.
+
+    On an empty extract only the declared candidate is examined for the record;
+    no score is invented. With no declaration the existing empty record remains
+    untouched (operator amendment, 13 October 2026; ADR-0034 (Proposed)).
+    """
+    if asked is None:
+        if signals.is_empty:
+            scored[:] = sorted(
+                (score_agent(p, signals, holds=holds, claims=claims, mode_vetoes=vetoes) for p in roster.values()),
+                key=lambda s: (-s.score, s.agent_id),
+            )
+        return None, ""
+    profile = roster[asked]
+    if signals.is_empty:
+        status, rationale = eligible(
+            profile, signals, holds=holds, claims=claims, mode_vetoes=vetoes,
+        )
+        candidate = ScoredAgent(
+            agent_id=profile.id, score=0.0, rationale=rationale,
+            vetoed=status == "vetoed", status=status,
+        )
+        scored[:] = [candidate]
+    else:
+        candidate = next(item for item in scored if item.agent_id == profile.id)
+    if candidate.status != "scored":
+        return None, (
+            f"; asked {profile.id} not seated: {candidate.status}: "
+            + "; ".join(candidate.rationale)
+        )
+    live_modes = signals.modes - vetoes
+    carried = (signals.domains & profile.domains) | (live_modes & profile.modes)
+    if not signals.domains and not live_modes:
+        basis = "nothing to route"
+    elif carried:
+        basis = f"carries {sorted(carried)[0]}"
+    else:
+        return None, (
+            f"; asked {profile.id} not seated: does not carry "
+            + ", ".join(sorted(signals.domains | live_modes))
+        )
+    return candidate, f"declared ask honoured: {profile.id} (eligible; {basis})"
+
+
 def _obligations(
     holds: tuple[str, ...],
     roster: dict[str, AgentProfile],
@@ -895,8 +959,8 @@ def route(
             without touching the policy layer.
         asked: A declared ask: the id of the character the person asked for,
             declared by a control the surface owns (a deck key, a phone button),
-            never read from the message text. Recorded on the decision; read by
-            nothing that chooses a seat. None when nobody was asked.
+            never read from the message text. Honoured when eligible and carrying
+            the topic, or when there is nothing to route. None when nobody was asked.
 
     Returns:
         A `RoutingDecision`. When the safety layer escalates, `outcome` is
@@ -909,7 +973,9 @@ def route(
         raise ValueError("roster is empty; load profiles before routing")
     if asked is not None and asked not in roster:
         raise ValueError(f"asked names no character in the roster: {asked!r}")
+    ask_outcome = None
     if asked is not None:
+        ask_outcome = "not_seated"
         # A known alias or case variant is recorded as the canonical id, through
         # the roster's own resolver when it has one; the record never carries two
         # spellings of one character (landing fix, 10 October 2026).
@@ -958,7 +1024,7 @@ def route(
     scored = sorted(
         (score_agent(p, sig, holds=holds, claims=claims, mode_vetoes=vetoes) for p in roster.values()),
         key=lambda s: (-s.score, s.agent_id),
-    )
+    ) if not sig.is_empty else []
 
     if verdict.action is Action.HUMAN_ESCALATION:
         # Compute the shadow seat for the record; never seat it.
@@ -982,9 +1048,22 @@ def route(
             identity_statement=identity,
             presentation=facts,
             asked_agent_id=asked,
+            ask_outcome=ask_outcome,
         )
 
-    if sig.is_empty:
+    selected, rule = _select(scored, roster, sig, claims, holds, vetoes)
+    requested, ask_rule = _honour_ask(asked, scored, roster, sig, claims, holds, vetoes)
+    if requested is not None:
+        ask_outcome = "honoured"
+        if selected is None and EXHAUSTIVE_TIE in rule:
+            rule = f"declared ask honoured: {requested.agent_id} (resolved an exhaustive tie)"
+        elif selected is None or requested.agent_id != selected.agent_id:
+            rule = ask_rule
+        selected = requested
+    else:
+        rule += ask_rule
+
+    if sig.is_empty and requested is None:
         streak = session.empty_streak if session is not None else 1
         # The lone-fragment rider (ruling 5 of 3 October 2026): the extractor
         # dropped a weak reading and said so; the reason carries it.
@@ -1006,7 +1085,7 @@ def route(
                 reason=(
                     f"no routable topic, but the safety verdict ({verdict.action.name}) "
                     f"carries a required disclosure; stabilizer={stabilizer} by role (ADR-0011)"
-                    + fragment_note
+                    + fragment_note + ask_rule
                 ),
                 roster_hash=rhash,
                 held=holds,
@@ -1015,6 +1094,7 @@ def route(
                 identity_statement=identity,
                 presentation=facts,
                 asked_agent_id=asked,
+                ask_outcome=ask_outcome,
             )
         if streak >= NO_SIGNAL_SEAT_AFTER_TURNS and stabilizer is not None:
             # The third vague message in a row (ruling 5 of 3 October 2026):
@@ -1028,7 +1108,7 @@ def route(
                 reason=(
                     f"no routable signal {streak} turns in a row; stabilizer={stabilizer} by role, "
                     f"with a question attached, not a plan (empty turn {streak} of a session; "
-                    "ADR-0011; ruling 5 of 3 October 2026)" + fragment_note
+                    "ADR-0011; ruling 5 of 3 October 2026)" + fragment_note + ask_rule
                 ),
                 roster_hash=rhash,
                 held=holds,
@@ -1038,6 +1118,7 @@ def route(
                 identity_statement=identity,
                 presentation=facts,
                 asked_agent_id=asked,
+                ask_outcome=ask_outcome,
             )
         if streak >= 2:
             # The second vague message in a row (ruling 5 of 3 October 2026):
@@ -1050,13 +1131,14 @@ def route(
                 outcome=Outcome.UNRESOLVED,
                 reason=(
                     "no routable signal twice in a row; nobody seated; the house asks a second, "
-                    "different question (ADR-0011; ruling 5 of 3 October 2026)" + fragment_note
+                    "different question (ADR-0011; ruling 5 of 3 October 2026)" + fragment_note + ask_rule
                 ),
                 roster_hash=rhash,
                 mode_vetoes=tuple(sorted(vetoes)),
                 identity_statement=identity,
                 presentation=facts,
                 asked_agent_id=asked,
+                ask_outcome=ask_outcome,
                 house_ask="second",
             )
         return RoutingDecision(
@@ -1065,16 +1147,16 @@ def route(
             safety=verdict,
             ranked=tuple(scored),
             outcome=Outcome.UNRESOLVED,
-            reason="no routable signal; nobody seated; ask for one more sentence (ADR-0011)" + fragment_note,
+            reason="no routable signal; nobody seated; ask for one more sentence (ADR-0011)" + fragment_note + ask_rule,
             roster_hash=rhash,
             mode_vetoes=tuple(sorted(vetoes)),
             identity_statement=identity,
             presentation=facts,
             asked_agent_id=asked,
+            ask_outcome=ask_outcome,
             house_ask="first",
         )
 
-    selected, rule = _select(scored, roster, sig, claims, holds, vetoes)
     if selected is None and EXHAUSTIVE_TIE in rule:
         # Ruling 17 of 3 October 2026: an exhaustive tie seats nobody. The
         # no-seat outcome, with the tie named in the reason (ADR-0013).
@@ -1094,6 +1176,7 @@ def route(
             identity_statement=identity,
             presentation=facts,
             asked_agent_id=asked,
+            ask_outcome=ask_outcome,
         )
     if holds:
         # The reason names what the seat owes, so a reader of the log never
@@ -1116,7 +1199,7 @@ def route(
             safety=verdict,
             ranked=tuple(scored),
             outcome=Outcome.ROUTED,
-            reason=f"no eligible agent; fallback to the stabilizer role ({fallback})",
+            reason=f"no eligible agent; fallback to the stabilizer role ({fallback})" + ask_rule,
             roster_hash=rhash,
             seat_claim=claims[0] if claims else None,
             claim_subject=subject,
@@ -1126,6 +1209,7 @@ def route(
             identity_statement=identity,
             presentation=facts,
             asked_agent_id=asked,
+            ask_outcome=ask_outcome,
         )
 
     profile = roster[selected.agent_id]
@@ -1160,4 +1244,5 @@ def route(
         identity_statement=identity,
         presentation=facts,
         asked_agent_id=asked,
+        ask_outcome=ask_outcome,
     )

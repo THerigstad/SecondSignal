@@ -228,14 +228,14 @@ def test_t2_malformed_control_metadata_never_preempts_labelled_crisis(app, metad
 
 
 def test_t2_handback_is_declared_session_state_not_message_inference(app):
-    """Only explicit ask controls defer a chair; raw message text never creates that memory."""
+    """Only explicit controls declare an ask; an eligible empty-turn ask seats without deferral."""
     text = f"Could I talk to {app._name_for('vandal')}?"
     app.turn(text)
     assert app.deferred_ask is None
     app.reset()
     result = app.turn(text, action="ask", target="vandal")
-    assert result["persona"] != "vandal"
-    assert app.deferred_ask == result["deferred_ask"] == "vandal"
+    assert result["persona"] == "vandal" and result["decision"]["ask_outcome"] == "honoured"  # Order P2V1, 2026-10-13: Vandal not seated -> eligible empty-turn Vandal ask honoured.
+    assert app.deferred_ask is result["deferred_ask"] is None  # Order P2V1, 2026-10-13: deferred Vandal -> no deferral after the declared seat is taken.
     assert result["handback"] is None
     assert "deferred_ask" not in app.audit_path.read_text(encoding="utf-8")
     assert "deferred_ask" not in app.receipt_path.read_text(encoding="utf-8")
