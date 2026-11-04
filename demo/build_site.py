@@ -12,7 +12,8 @@ number can.
 
 Copied into the site, at the same relative paths as in the repository:
 
-* ``src/secondsignal/`` (every ``.py``, and the ``packs`` and ``profiles`` JSON)
+* ``src/secondsignal/`` (every ``.py``, the ``.json`` and ``.txt`` data files the gate
+  reads at import, and the ``packs`` and ``profiles`` JSON)
 * ``evals/__init__.py``, ``evals/run_fixtures.py``, ``evals/case-manifest.json``
 * ``evals/cases/`` (every JSON document, the deferred ones included, because the
   case test checks that deferred planes are not run)
@@ -44,6 +45,8 @@ PAGE = ROOT / "demo" / "index.html"
 # The files the interpreter needs, in the order they are written.
 RUNTIME_GLOBS: tuple[str, ...] = (
     "src/secondsignal/*.py",
+    "src/secondsignal/*.json",
+    "src/secondsignal/*.txt",
     "src/secondsignal/packs/*.json",
     "src/secondsignal/profiles/*.json",
     "evals/__init__.py",

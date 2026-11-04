@@ -4,6 +4,11 @@ All notable changes to SecondSignal are documented here.
 
 ## [Unreleased]
 
+### Fixed — 2026-11-04, the demo site ships the gate's data files (landing 18)
+
+- Order G2B5B (landing 16) added four data files that `src/secondsignal/normalize.py` reads at import: `corrected_confusables.json`, `reviewed_skeleton_remainder.json`, `crisis_words.txt` and `everyday_words.txt`. `demo/build_site.py` copied only the package's `.py` files and the packs and profiles JSON, so a deployed demo would have failed to import the gate in the visitor's browser. The project manager found it on 4 November 2026 while checking a demo-pages deploy that had timed out, before any deploy carried the broken site; the live demo was still landing 15's.
+- The builder now copies the package's root `.json` and `.txt` data files. The existing demo-site test now also imports the gate and the router from the manifest's files alone, in a clean interpreter, so a data file left off the list fails CI before it can fail the page. The public test count does not move.
+
 ### Added — 2026-11-04, the house sigils (landing 17)
 
 - Twelve sigils under `docs/assets/` (`sigil-the-house.png` and the eleven `sigil-*.png` beside it): one each for the house, the seven characters, the Security Division and its three characters, drawn on 1 November 2026 by five image models from one brief (Gemini, ChatGPT, Grok, Qwen and Vibe) and chosen by the operator by eye. Ten are committed byte for byte; the house's and Ellis's faint grey backgrounds were lifted to pure white at the operator's word, the drawings unchanged. Each is recorded in `docs/assets/generation-prompts.json` with its hash, its model, the brief verbatim, the one steering line, the attempts that were not chosen and its alt text.

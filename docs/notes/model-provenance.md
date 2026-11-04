@@ -489,6 +489,13 @@ rewritten.
   3. "Push E, landing 16: the gate's second broom (order G2B5B)".
   4. "Push E, landing 17: the house sigils".
 
+- **2026-11-04** (night), push F, landing 18: the demo site ships the gate's
+  data files, one commit through the operator's browser session on GitHub's
+  upload page, authored by the operator, the model Claude Opus 5.5, as the
+  operator's screen showed it (the operator's account), in the Claude
+  desktop app's Cowork mode; written by the project manager. The commit:
+  1. "Push F, landing 18: the demo site ships the gate's data files".
+
 ## What this note does not do
 
 It does not rank the families and it does not count agreements. Where two
