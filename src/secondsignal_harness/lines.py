@@ -27,8 +27,7 @@ HARNESS_LINES_EN: dict[str, str] = {
     # replacing the build's draft.
     "ask_second": (
         "Asking a different way, to get you the best response: is this about "
-        "something that happened, something you could use a hand with, or how "
-        "you're feeling today?"
+        "something that happened, or how you're feeling today?"
     ),
     # In every prompt, after the decision record's block. Rule 11.
     "honesty": (

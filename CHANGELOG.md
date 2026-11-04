@@ -4,6 +4,34 @@ All notable changes to SecondSignal are documented here.
 
 ## [Unreleased]
 
+### Added — 2026-11-04, order T5R (landing 15; the Table's two notices and the second ask)
+
+- Replaced the two Table notices with the operator's exact words and added the project manager's Spanish lines, selected from the policy session's declared language. `T4_LINES_ES_REVIEW` states that the Spanish is not yet reviewed by a native speaker.
+- Changed four person-visible Table strings from sitting/sittings to conversation/conversations: the confirmation error, the reload/close explanation, the paired-screen explanation, and the persistence explanation.
+- Cut `ask_second` to two options under house-line rule 3 and ported Grok's ask-second and resource-lines fixtures unchanged into `tests/fixtures/break57/`. The imported option-count test passes without a routing expected failure. The verified resource lines keep the catalog's wording even where it offers more than two doors, because resource facts are never paraphrased; Grok's fixture is kept as recorded dissent, not applied.
+- Moved the harness digest, replay source and ten replay output hashes, then regenerated the public pages from 3,846 to 3,869 collected tests; 185 expected failures, 168 documented gaps, 17 recorded dissents, 682 cases, 300 external fixtures and 71 deferred fixtures stay fixed. Replay remains 704 cases, 904 turns and 231 releases. Every moved pin is listed below with its old and new values.
+
+| File and pin | Old value | New value |
+| --- | --- | --- |
+| `tests/test_h1_replay.py and tests/fixtures/h1/labelled_before.json` — replay source | `SecondSignal-20de102, order P2V1, 13 October 2026: labelled single cases with prior turns and trajectories` | `SecondSignal-20de102-P2V1, order T5R (landing 15), 2026-11-04: labelled single cases with prior turns and trajectories` |
+| `tests/fixtures/h1/labelled_before.json` — trajectories/chatgpt-traj-r3b-twenty-turn-terminal-guard.json::chatgpt-traj-r3b-twenty-turn-terminal-guard, turn 8 | `c28fcb7a78619ba9cf52c579e9b79845143811637d7694adb664c262dc92a454` | `3878994ed9c449f7f3cf21f78fd905f50d4e1dc420fb6a9d2a4226cd4c63a811` |
+| `tests/fixtures/h1/labelled_before.json` — trajectories/chatgpt-traj-r3b-twenty-turn-terminal-guard.json::chatgpt-traj-r3b-twenty-turn-terminal-guard, turn 11 | `216f1287eef263e21918067b2cd5bafe1b8853ce81e06c0a932d971d51c01e4a` | `173325e3901653675eaa3d3581fc92b440105e5079a4baeaf89f96c245f7abab` |
+| `tests/fixtures/h1/labelled_before.json` — trajectories/chatgpt-traj-r3b-twenty-turn-terminal-guard.json::chatgpt-traj-r3b-twenty-turn-terminal-guard, turn 19 | `efba9dde60a8e8be5a8339f7f06e201c0a5de51943e96eabad2329ac764a1e22` | `3c80a6acf14cb1127dc7ef30920a68dcb2145b123edf5fa126635d632b1cff2c` |
+| `tests/fixtures/h1/labelled_before.json` — trajectories/grok-traj-vague-slope-001.json::grok-traj-vague-slope-001, turn 2 | `fe0f4e621bfdf44a60a679a67a9671cf76e7e0f479011951ee9c36211f4b4764` | `f60beb4c35ded2f3ad76497d698e8deb55466ed71b4f849b3ea6f1690373bb9e` |
+| `tests/fixtures/h1/labelled_before.json` — trajectories/grok-traj-vague-slope-002.json::grok-traj-vague-slope-002, turn 2 | `fe0f4e621bfdf44a60a679a67a9671cf76e7e0f479011951ee9c36211f4b4764` | `f60beb4c35ded2f3ad76497d698e8deb55466ed71b4f849b3ea6f1690373bb9e` |
+| `tests/fixtures/h1/labelled_before.json` — trajectories/grok-traj-vague-slope-003.json::grok-traj-vague-slope-003, turn 2 | `fe0f4e621bfdf44a60a679a67a9671cf76e7e0f479011951ee9c36211f4b4764` | `f60beb4c35ded2f3ad76497d698e8deb55466ed71b4f849b3ea6f1690373bb9e` |
+| `tests/fixtures/h1/labelled_before.json` — trajectories/grok-traj-vague-slope-004.json::grok-traj-vague-slope-004, turn 2 | `fe0f4e621bfdf44a60a679a67a9671cf76e7e0f479011951ee9c36211f4b4764` | `f60beb4c35ded2f3ad76497d698e8deb55466ed71b4f849b3ea6f1690373bb9e` |
+| `tests/fixtures/h1/labelled_before.json` — trajectories/grok-traj-vague-slope-005.json::grok-traj-vague-slope-005, turn 2 | `fe0f4e621bfdf44a60a679a67a9671cf76e7e0f479011951ee9c36211f4b4764` | `f60beb4c35ded2f3ad76497d698e8deb55466ed71b4f849b3ea6f1690373bb9e` |
+| `tests/fixtures/h1/labelled_before.json` — trajectories/vibe-traj-context-collapse-001.json::vibe-traj-context-collapse-001, turn 3 | `d75f9bfb8d8d4ea2dc69af2e8e6487dcb1d217d1ad24cb2285d9d717be16e011` | `39908df682971d2edc94430a6f51bef9f048d1c75b2f81960703e027e3f5d83e` |
+| `tests/fixtures/h1/labelled_before.json` — trajectories/vibe-traj-refusal-decay-001.json::vibe-traj-refusal-decay-001, turn 7 | `465b187b4fd99677a341aa4bc56000f3579203ad191dd6e082a812bb33cf2519` | `f4b57f7061266d39bf72f9e5354d1a1f91c90df7dcc5e955840e8a44bda07c5a` |
+| `tests/test_t4_table.py` — harness package SHA-256 | `26e500f585c147a489018d1a722acaa9a5636e71e5cd683d519f1f7bda5ac7d2` | `b2ce48c01108041377fb9696f628018e210e035b2906ddf7c4baee7f25c627ea` |
+| `README.md` — public test count | `3846` | `3869` |
+| `docs/evaluation.md` — public test count | `3846` | `3869` |
+| `evals/public-numbers.json` — public test count | `3846` | `3869` |
+| `evals/public-sentences.md` — public test count | `3846` | `3869` |
+| `evals/public-sentences.md` — public passing count (collection minus expected failures) | `3661` | `3684` |
+| `evals/public-sentences.md` — as-of date | `13 October 2026` | `4 November 2026` |
+
 ### Added — 2026-10-13, order P2V1 (the ask wins inside competence, ADR-0034; every veto has a kind, ADR-0033)
 
 - A control-declared ask wins over score when eligible and carrying an extracted domain or live mode, or when nothing remains to route. An eligible ask resolves an exhaustive tie. The card, latch, holds, floors, caps and seat claims still outrank it; every refusal names the rule. Aliases remain canonical and message text declares no ask.

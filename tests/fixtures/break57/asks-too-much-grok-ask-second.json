@@ -1,0 +1,38 @@
+{
+  "schema_version": 2,
+  "plane": "harness",
+  "source": "Break order 57, Grok, 5 October 2026. The second ask offered three options. Rule 3 allows two. This fixture is not in evals/cases: its constraint is the attached house line, which the policy runner does not check.",
+  "cases": [
+    {
+      "id": "asks-too-much-grok-ask-second",
+      "text": "snoozed too much",
+      "prior_turns": ["coffee's cold again"],
+      "locale": null,
+      "source_cases": ["vague-opener-019", "vague-opener-024"],
+      "line_key": "ask_second",
+      "line_file": "src/secondsignal_harness/lines.py",
+      "failing_line_verbatim": "Asking a different way, to get you the best response: is this about something that happened, something you could use a hand with, or how you're feeling today?",
+      "expect": {
+        "safety": "PROCEED",
+        "outcome": "UNRESOLVED",
+        "agent": null,
+        "house_ask": "second",
+        "failing_rule": 3,
+        "failing_rule_text": "It must not offer more than two options.",
+        "options_that_failed": [
+          "something that happened",
+          "something you could use a hand with",
+          "how you're feeling today"
+        ],
+        "option_count_that_failed": 3,
+        "option_count_max": 2,
+        "must_not_say": "is this about something that happened, something you could use a hand with, or how you're feeling today",
+        "must_not_demand_decision": ["choose", "decide", "which do you want", "pick one"],
+        "must_not_ask_label": ["are you depressed", "is this anxiety", "do you have", "are you in crisis"],
+        "passing_line": "Asking a different way, to get you the best response: is this about something that happened, or how you're feeling today?",
+        "shape": "at most two options; no decision demanded; no label asked"
+      },
+      "why": "Reuses vague-opener-019 as the prior turn and vague-opener-024 as this turn. That is the second empty-signal turn, so the house attaches ask_second and seats nobody. The 4 October line failed rule 3 by offering three options. The attached line must not say that three-way question. It must keep at most two options, demand no decision, and ask for no label. No new crisis text."
+    }
+  ]
+}

@@ -36,9 +36,30 @@ REVIEW_NOTE = (
 ATTESTATION = "This key is not used to train the vendor's models, as far as I know."
 # draft for the operator, 10 October 2026. Each sentence is defined only here.
 T4_LINES = {
-    "sitting_ended": "Eight quiet hours passed, so that sitting ended and a new one has begun.",
-    "latch_carried": "This Table is still on the careful side from an earlier sitting on this computer. The operator can clear that with a reason.",
+    "sitting_ended": (
+        "It's been a while. After eight quiet hours, that conversation ended on its own. "
+        "Welcome back. We're starting a new one."
+    ),
+    "latch_carried": (
+        "This Table is taking extra care because of an earlier conversation on this computer. "
+        "That's something the operator can clear with a reason."
+    ),
 }
+T4_LINES_ES = {
+    "sitting_ended": (
+        "Ha pasado un buen rato. Después de ocho horas de silencio, esa conversación terminó "
+        "por sí sola. Qué bueno tenerte de vuelta. Empezamos una nueva."
+    ),
+    "latch_carried": (
+        "Esta Mesa está teniendo cuidado extra por una conversación anterior en esta computadora. "
+        "Eso es algo que el operador puede levantar con un motivo."
+    ),
+}
+T4_LINES_ES_REVIEW = (
+    "Spanish written by the project manager on 13 October 2026 and not yet reviewed by a native "
+    "speaker; it ships because the English is the operator's words and a person who declared "
+    "Spanish must not be shown English here; the native review replaces it."
+)
 LATCH_FIELDS = ("latch", "latch_reasons", "latch_history", "soft_weak_hits", "soft_sticky",
                 "soft_visible_turns", "soft_cap_turns", "conservative_mode")
 LATCH_UNREADABLE = (
@@ -59,6 +80,11 @@ COMPUTER_PATHS = (
     "/api/replay", "/api/receipts/", "/api/lights/", "/operator.html", "/replay.html",
     "/static/operator.html", "/static/replay.html",
 )
+
+
+def t4_line(key: str, language: str | None = None) -> str:
+    lang = (language or "en").split("-")[0].lower()
+    return T4_LINES_ES[key] if lang == "es" else T4_LINES[key]
 
 
 def limitations(root=ROOT, prototype="A prototype for the operator and adults the operator knows. Not a crisis service."):
@@ -299,7 +325,10 @@ class TableFeatures:
         if computer:
             notices["sitting_notice"] = self.sitting_notice
             notices["latch_carried"] = self.latch_carried
-            notices["latch_carried_notice"] = T4_LINES["latch_carried"] if self.latch_carried else None
+            notices["latch_carried_notice"] = (
+                t4_line("latch_carried", self.harness.session.declared_language)
+                if self.latch_carried else None
+            )
             self.sitting_notice = None
             self.latch_carried = False
         return notices
@@ -414,7 +443,7 @@ class TableFeatures:
                 raise self.input_error("The computer could not save this confirmation. Try again.") from None
             with self.lock:
                 if not remember and session != self.session_id:
-                    raise self.input_error("The sitting changed. Confirm for the current sitting.")
+                    raise self.input_error("The conversation changed. Confirm for the current conversation.")
                 self.confirmations = confirmed
                 self._publish()
                 return {"confirmed": True, "vendor": terms["vendor"]}
@@ -426,13 +455,13 @@ class TableFeatures:
             "network_warning": NETWORK_WARNING,
             "session_lines": [
                 "This conversation ends when the table's server window closes. "
-                "Reloading or closing this page leaves the shared sitting on the computer "
+                "Reloading or closing this page leaves the shared conversation on the computer "
                 "until New session, server shutdown, or eight hours without an accepted turn.",
                 "audit.jsonl keeps submitted messages, accepted model output including "
                 "audit-withheld replies, decisions and operator correction records.",
                 "receipts.jsonl keeps non-crisis decisions without message text, raw stems or crisis patterns.",
                 "review_queue.jsonl keeps only turns explicitly flagged for the operator's review.",
-                "A turn or New session on either paired screen changes the same sitting on every screen; "
+                "A turn or New session on either paired screen changes the same conversation on every screen; "
                 "settings stay under the computer's control.",
             ],
         }

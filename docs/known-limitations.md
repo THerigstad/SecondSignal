@@ -684,3 +684,13 @@ invented in its place.
 ## Vocabulary research merge — 6 October 2026, order R1M
 
 The seven-return merge cannot settle the off-topic Grok, grok.com, Expert return, which supplies zero vocabulary terms; the 11 uncited entries (gender field; identity theft; who am I kidding?; I don't know myself; everyone's a little ADHD; I have OCD; that's my OCD; we're all on the spectrum; alcohol-free beer; anniversary chip; anniversary coin); or the recorded conflicts for a sensitive term for gender_identity (withheld 021), agender, crossdresser, gender diverse, passing, deadname, demand avoidance, neurodiverse, PDA, sensory sensitivity, task paralysis, Early recovery, lapse, MAT, slip, sober, sobriety. Perplexity with GPT-6 Sol Thinking has three restarted passes and no copied web addresses; the two Grok Thinking threads repeat and truncate material, and the Grok 4.7 consolidation admits unopened definitions or primary sources. No citation was fetched or verified. The requested narrow recovery-alias collision test is unavailable because the supplied pack and loader have no recovery-alias feature; a control occurrence does not substitute for that result. The candidate data and measurement under evals/vocabulary/ preserve these limits and leave every policy decision and existing lexicon unchanged.
+
+## The Table's two notices and the second ask — 2026-11-04, order T5R (landing 15)
+
+The Table's two notices are the operator's words. Their Spanish lines were written by the project manager and are not yet reviewed by a native speaker. The review state ships beside the notices in `T4_LINES_ES_REVIEW`:
+
+> Spanish written by the project manager on 13 October 2026 and not yet reviewed by a native speaker; it ships because the English is the operator's words and a person who declared Spanish must not be shown English here; the native review replaces it.
+
+The second ask now offers two options under rule 3 of the house lines: something that happened, or how the person is feeling today. Grok's resource-lines fixture from break order 57 is kept under `tests/fixtures/break57/` as recorded dissent and is not applied. The verified resource lines keep the catalog's wording even where it offers more than two doors, because resource facts are never paraphrased; Grok's fixture is kept as recorded dissent, not applied.
+
+No control on the Table sets a person's declared language yet, so the Table shows these notices, like every house line, in English until one exists. That control, and whether a declared language carries into a new conversation (the builder's question of 4 November), are filed with order T6.

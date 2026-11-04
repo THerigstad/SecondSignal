@@ -34,7 +34,7 @@ def replay():
             rows.append({"case": label, "turn": number, "released": turn.released,
                          "release_reason": turn.release_reason,
                          "policy_and_output_sha256": hashlib.sha256(material.encode()).hexdigest()})
-    return {"source": "SecondSignal-20de102, order P2V1, 13 October 2026: labelled single cases with prior turns and trajectories",  # Order P2V1, 2026-10-13: 82521ba G1/P3 -> 20de102 P2V1; kinds and roster hashes, no changed old releases.
+    return {"source": "SecondSignal-20de102-P2V1, order T5R (landing 15), 2026-11-04: labelled single cases with prior turns and trajectories",  # Order P2V1, 2026-10-13: 82521ba G1/P3 -> 20de102 P2V1; kinds and roster hashes, no changed old releases. Order T5R, 2026-11-04: source 'SecondSignal-20de102, order P2V1, 13 October 2026: labelled single cases with prior turns and trajectories' -> 'SecondSignal-20de102-P2V1, order T5R (landing 15), 2026-11-04: labelled single cases with prior turns and trajectories'; second-ask replay hashes regenerated.
             "adapter": "FakeAdapter with existing PERSONA-TEXT-MARKER fixture",
             "cases": len(cases), "turns": len(rows),
             "released": sum(row["released"] for row in rows), "rows": rows}

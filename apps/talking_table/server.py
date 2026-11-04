@@ -40,7 +40,7 @@ from secondsignal_harness.lines import HARNESS_LINES_EN, ROOM_LINES
 from secondsignal_harness.prompt import LANGUAGE_STYLES, STYLE_VALUES, applied_preferences
 from secondsignal_harness.table_extras import asked_agent, eligible_agents
 
-from .t3 import COMPUTER_PATHS, T4_LINES, TOKEN_NOTE, TableFeatures
+from .t3 import COMPUTER_PATHS, TOKEN_NOTE, TableFeatures, t4_line
 from .table_kit import decision_receipt, presentation_samples, resources
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -1116,7 +1116,7 @@ class TableApp(TableFeatures):
                     f"Presentation and name choices are also remembered in {self.preferences_path} "
                     f"under Remember. Conversation state and pairing stay in memory. "
                     f"latch.json keeps the policy latch fields, including correction evidence, "
-                    f"across sittings and restarts on this computer; the operator clears it with a reason. "
+                    f"across conversations and restarts on this computer; the operator clears it with a reason. "
                     f"Remembered settings and independently encrypted model, voice and lights keys are kept in "
                     f"{self.settings_path} only for the corresponding remember switches. "
                     f"New session clears unremembered keys and keeps existing audit logs. "
@@ -1263,6 +1263,9 @@ class TableApp(TableFeatures):
             for path, _ in updates:
                 path.with_suffix(".tmp").unlink(missing_ok=True)
 
+    def _declared_language(self) -> str | None:
+        return self.harness.session.declared_language
+
     def _start_sitting(self, harness=None, *, quiet=False):
         """The common in-memory boundary; caller owns the sitting lock."""
         carry = self._latch_fields() if self._latch_owned and harness is None else None
@@ -1270,7 +1273,7 @@ class TableApp(TableFeatures):
         self.session_id = secrets.token_hex(12)
         self.revision = 0
         self.last_turn_at = None
-        self.sitting_notice = T4_LINES["sitting_ended"] if quiet else None
+        self.sitting_notice = t4_line("sitting_ended", self._declared_language()) if quiet else None
         if not self.settings["remember"]:
             self.key = ""
         if not self.settings["voice_remember"]:
