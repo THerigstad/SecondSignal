@@ -231,6 +231,9 @@ where it is measured.
 - **Order T4, Table kit four (Codex, OpenAI, the ChatGPT desktop app; model and tier not recorded).** 10 October 2026 on the supplied tree b017d82: built the sitting boundary, local latch persistence and operator clearance, compatible-host terms links and control-declared asks, while preserving the held-turn offer order. Added offline tests and helper repairs, verified policy and harness byte identity, and refreshed the Table guidance, limitations and public counts.
 - **Order G1, a proximity mask yields to the gate (Codex, OpenAI, the ChatGPT desktop app; model and tier not recorded).** 10 October 2026 on the supplied tree SecondSignal-b017d82: built opt-in protection for gate and pack hits, mandatory regex flags and protected-span receipts while retaining exact idioms and monitor input. Measured the fixed splices, closed one manifest gap and three historical fuzz variants, separated replay metadata changes from the one changed decision, and added permanent guards and the amended record.
 - **Order P3, a hold lasts the sitting (Codex, OpenAI, the ChatGPT desktop app; model and tier not recorded).** 10 October 2026 on the supplied tree SecondSignal-b017d82: built session hold persistence, renewal and reasoned single-hold clearance, with the gate and router carrying holds while preserving crisis screening and the two-turn tail. Closed the three reviewer hold trajectories, regenerated the measured H1 replay, added the P3 proofs and ADR-0032 (Proposed), and refreshed the register, pages and public counts.
+- **Order P2V1, the ask wins inside competence and every veto has a kind (Codex, OpenAI, the ChatGPT desktop app; model and tier not recorded).** 13 October 2026 on the supplied tree SecondSignal-20de102: a control-declared ask wins the seat inside the agent's competence, while the card, latch, holds, floors, caps and seat claims still outrank it and every refusal names its rule; all seven profiles gained immutable veto kinds, safety or fit, that no ask clears; four literal-text fixtures were ported, one kept as a strict dissent; registered ADR-0033 and ADR-0034 (Proposed) and refreshed the pins, register and public counts.
+- **Order T5R, the Table's two notices and the second ask (Codex, OpenAI, the ChatGPT desktop app on the operator's PC; model and tier not recorded).** 4 November 2026 on the supplied tree SecondSignal-20de102-P2V1: put the operator's exact words on the Table's two notices, with the project manager's Spanish beside them marked not yet reviewed by a native speaker; changed four person-visible Table strings to say conversation; cut the second ask to two options; ported Grok's two break-57 fixtures unchanged, one passing and one kept as a recorded dissent; and refreshed the pins, replay and public counts.
+- **Order G2B5B, the gate's second broom (Codex, OpenAI, the ChatGPT desktop app on the operator's PC; model and tier not recorded).** 4 November 2026 on the supplied tree SecondSignal-20de102-P2V1: built B5b's five parts (the guarded one-letter screen with its shipped guard and vocabulary data, the corrected 1,225-source look-alike table, the measured wider folds, the nine stutter variants replayed for good, and the finite routing-extraction aliases) and G2's weapon-owner rule, measured before and after; 119 documented gaps now pass, every historical and current card is kept and no control gains a card. Orders T5R and G2B5B were built from the same tree and merged by the project manager the same day.
 
 ## Reviewers, with doorway and tier where recorded
 
@@ -462,6 +465,29 @@ rewritten.
   operator's account), in the Claude desktop app's Cowork mode; written by
   the project manager. The commit:
   1. "Push D, landing 13: the Spanish pack's review state, stated as it is".
+
+- **2026-11-04**, push E, landings 14 to 17: the ask wins inside competence
+  and every veto has a kind (order P2V1), the Table's two notices and the
+  second ask (order T5R), the gate's second broom (order G2B5B, with the
+  project manager's merge of the two orders and the documented gap found
+  at grading), and the house sigils, one commit each, all authored by the
+  operator, the model Claude Opus 5.5, as the operator's screen showed it
+  (the operator's account), in the Claude desktop app's Cowork mode.
+  Landings 14 and 15 landed through the operator's browser session on
+  GitHub's upload page. That page refused landing 16 as too large (it
+  carries 43 MB of measurement receipts, one file of 13 MB), so landings 16
+  and 17 were pushed with Git from the operator's PC by Codex (OpenAI; the
+  ChatGPT desktop app, order GP1), from a bundle the project manager built
+  and checked against the tested trees; nothing in them changed on the way.
+  The builder of the three orders, Codex, is credited in the files and in
+  the builders' section above, and the twelve sigils were drawn by five
+  image models, each credited in `docs/assets/generation-prompts.json`, and
+  folded in by the project manager. This row was added with the fourth
+  commit. The commits, in order:
+  1. "Push E, landing 14: the ask wins inside competence, and every veto has a kind (order P2V1)".
+  2. "Push E, landing 15: the Table's two notices and the second ask (order T5R)".
+  3. "Push E, landing 16: the gate's second broom (order G2B5B)".
+  4. "Push E, landing 17: the house sigils".
 
 ## What this note does not do
 

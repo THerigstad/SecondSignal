@@ -4,6 +4,11 @@ All notable changes to SecondSignal are documented here.
 
 ## [Unreleased]
 
+### Added — 2026-11-04, the house sigils (landing 17)
+
+- Twelve sigils under `docs/assets/` (`sigil-the-house.png` and the eleven `sigil-*.png` beside it): one each for the house, the seven characters, the Security Division and its three characters, drawn on 1 November 2026 by five image models from one brief (Gemini, ChatGPT, Grok, Qwen and Vibe) and chosen by the operator by eye. Ten are committed byte for byte; the house's and Ellis's faint grey backgrounds were lifted to pure white at the operator's word, the drawings unchanged. Each is recorded in `docs/assets/generation-prompts.json` with its hash, its model, the brief verbatim, the one steering line, the attempts that were not chosen and its alt text.
+- The README shows them beside the characters, in "Agent profiles are data"; `LICENSE-CONTENT` names them among the pictures under CC BY-NC-ND 4.0. The picture test checks each file against its record: twelve checks, 3,956 → 3,968 tests. The typo guard's everyday-word list, which is built from the README and the docs, was regenerated after these pages: 35 plain words added (arch, cairn, footbridge, ribbon and the like), none of them a one-letter typo of a crisis word or a crisis word itself; the policy package pin moved with it. Order B6 freezes the guard's sources.
+
 ### Added — 2026-11-04, order G2B5B (landing 16; the gate's second broom)
 
 - B5b part 1: install the guarded one-letter screen read with shipped guard/vocabulary data and regeneration tests. The before candidate restores 44/68 missed variants and 2/8 gaps; the same 44 now card as plain inputs, with 24 still missed and rain still released.

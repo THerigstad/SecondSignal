@@ -64,6 +64,24 @@ the reason it was looked at.
   uploads under one megabyte and the PNG is over it; the JPEG is the same
   picture re-encoded and is not committed, so the committed PNG remains the
   record of what was composed.
+- **The twelve sigils**, `sigil-the-house.png` and the eleven `sigil-*.png`
+  files beside it. One plain mark each for the house, the seven characters,
+  the Security Division and its three characters, all in the same hand: one
+  thick, even black line on white, with no text inside any of them. On
+  1 November 2026 five image models each drew all twelve on one sheet from
+  the same written brief, pasted word for word into each: Gemini, ChatGPT,
+  Grok, Qwen and Vibe. The operator then chose every sigil by eye, one tile
+  per character from the five sheets. The house and Ellis were drawn by
+  Vibe; Nikki and Cody by Qwen; Seren by Gemini; Rowan by Grok; Willow, the
+  Security Division, Orrin, Aya and J.R. by ChatGPT; and Vandal by
+  ChatGPT's first run, which stalled after its top four tiles and was kept
+  as data. The brief is in the prompts file verbatim, with each tile's own
+  line beside its file; the five sheets and the tiles that were not chosen
+  are in the operator's archive and are not committed. Ten files are
+  committed byte for byte; the house's and Ellis's had a faint grey box
+  behind the drawing, lifted to pure white at the operator's word with the
+  drawing unchanged, and the prompts file records both hashes. Used in the
+  README, beside the characters.
 
 ## Palette
 
