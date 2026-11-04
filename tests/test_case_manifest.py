@@ -24,6 +24,7 @@ from pathlib import Path
 import pytest
 from test_eval_cases import CASES, EXPECT_KEYS, field_failures, run_case
 
+from evals.run_fixtures import case_disposition
 from secondsignal import load_roster
 
 MANIFEST_PATH = Path(__file__).resolve().parents[1] / "evals" / "case-manifest.json"
@@ -76,16 +77,61 @@ def test_every_disposition_is_a_known_one() -> None:
     assert not unknown, unknown
 
 
-def test_the_manifest_disposition_matches_the_case_file() -> None:
-    drifted = {
-        case["id"]: (BY_ID[case["id"]]["disposition"], _disposition(case))
-        for _, case in CASES
-        if case["id"] in BY_ID and BY_ID[case["id"]]["disposition"] != _disposition(case)
-    }
-    assert not drifted, (
-        f"disposition changed without updating the manifest: {drifted}. "
-        "Marking a case as a gap, or un-marking one, is a decision with a reason."
+def test_the_manifest_disposition_matches_the_case_file(roster) -> None:
+    drifted = {}
+    closures = []
+    for label, case in CASES:
+        entry = BY_ID.get(case["id"])
+        if entry is None:
+            continue  # The inventory test separately requires every case to have an entry.
+        try:
+            current = case_disposition(case, entry, source=label.split("::")[0])
+        except ValueError as error:
+            drifted[case["id"]] = str(error)
+            continue
+        if current != _disposition(case):
+            closures.append(case)
+    assert not drifted, (  # G2B5B Part 7: strict raw-flag equality -> equality or the exact recorded known_gap-to-accepted override, with every closure replayed below.
+        f"disposition changed without an authorized manifest closure: {drifted}. "
+        "Reviewer flags remain historical; only the recorded G2B5B acceptance overrides them."
     )
+    for case in closures:
+        decision, session = run_case(case, roster)
+        bad = field_failures(case, decision, session)
+        assert not bad, f"Accepted manifest closure {case['id']} fails original expectations: {bad}"
+
+
+def test_a_manifest_closure_requires_its_order_date_reason_and_non_dissent_source() -> None:
+    case = {"id": "manifest-closure-probe", "known_gap": True, "gap_note": "Original recorded gap.", "expect": {"safety": "HUMAN_ESCALATION"}}
+    entry = {
+        "id": case["id"], "source": "closure-probe", "disposition": "accepted",
+        "previous_disposition": "known_gap", "accepted_by_order": "G2B5B",
+        "accepted_on": "2026-11-04", "reason": case["gap_note"],
+        "acceptance_reason": "Measured G2B5B closure of every asserted field.",  # G2B5B Part 7: combined reason -> unchanged source reason and separately required acceptance evidence.
+        "previous_mismatch_fields": ["safety"],
+    }
+    assert case_disposition(case, entry, source="closure-probe") == "accepted"
+    for key in ("previous_disposition", "accepted_by_order", "accepted_on", "reason", "acceptance_reason", "previous_mismatch_fields"):
+        incomplete = {name: value for name, value in entry.items() if name != key}
+        with pytest.raises(ValueError):
+            case_disposition(case, incomplete, source="closure-probe")
+        with pytest.raises(ValueError):
+            case_disposition(case, {**entry, key: ""}, source="closure-probe")
+    for updates in ({"reason": case["gap_note"] + " Altered."}, {"acceptance_reason": "   "},
+                    {"previous_mismatch_fields": ["agent"]}, {"previous_mismatch_fields": []},
+                    {"previous_mismatch_fields": [1]}, {"mismatch_fields": ["safety"]}):
+        with pytest.raises(ValueError):
+            case_disposition(case, {**entry, **updates}, source="closure-probe")
+    with pytest.raises(ValueError):
+        case_disposition({**case, "disputed": True}, entry, source="closure-probe")
+    with pytest.raises(ValueError):
+        case_disposition({**case, "known_gap": False, "disputed": True}, entry, source="closure-probe")
+    with pytest.raises(ValueError):
+        case_disposition(case, {**entry, "id": "another-case"}, source="closure-probe")
+    with pytest.raises(ValueError):
+        case_disposition(case, entry, source="another-source")
+    with pytest.raises(ValueError):
+        case_disposition({**case, "known_gap": False}, entry, source="closure-probe")
 
 
 def test_the_manifest_plane_matches_the_case_file() -> None:
@@ -164,8 +210,8 @@ def test_an_unrelated_regression_inside_a_gap_fails_instead_of_xfailing(roster) 
     """
     gap = next(
         case for _, case in CASES
-        if _disposition(case) in ("known_gap", "disputed")
-        and case["id"] in BY_ID
+        if case["id"] in BY_ID
+        and case_disposition(case, BY_ID[case["id"]]) in ("known_gap", "disputed")  # G2B5B Part 7: historical raw markers -> actual remaining expected failures.
         and "agent" not in BY_ID[case["id"]].get("mismatch_fields", [])
     )
     decision, session = run_case(gap, roster)
@@ -191,8 +237,8 @@ def test_the_same_regression_would_have_been_invisible_before(roster) -> None:
     """
     gap = next(
         case for _, case in CASES
-        if _disposition(case) in ("known_gap", "disputed")
-        and case["id"] in BY_ID
+        if case["id"] in BY_ID
+        and case_disposition(case, BY_ID[case["id"]]) in ("known_gap", "disputed")  # G2B5B Part 7: historical raw markers -> actual remaining expected failures.
         and BY_ID[case["id"]].get("mismatch_fields")
         and "agent" not in BY_ID[case["id"]]["mismatch_fields"]
     )

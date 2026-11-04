@@ -128,17 +128,67 @@ def fixture_files(root: Path = ROOT) -> list[Path]:
     return files
 
 
-def _strings_authored_by_the_project(value: object, external: bool) -> list[str]:
-    """Every string in a JSON document except the reviewer's own fields."""
+def _verified_copied_reviewer_controls(document: dict, root: Path) -> tuple[set[int], list[str]]:
+    """Quote only exact reviewer-field copies tied to an external source case.
+
+    The before capture is immutable evidence. Its copied control dictionaries
+    retain source and id, so their reviewer words can keep the same quotation
+    treatment as the originals without exempting any generated project prose.
+    """
+    controls = document.get("controls")
+    if not isinstance(controls, dict):
+        return set(), ["before-cohort capture has no control dictionary"]
+    quoted: set[int] = set()
+    problems: list[str] = []
+    case_root = (root / "evals/cases").resolve()
+    sources: dict[str, dict] = {}
+    for group in controls.values():
+        if not isinstance(group, list):
+            problems.append("before-cohort control group is not a list")
+            continue
+        for case in group:
+            if not isinstance(case, dict) or not isinstance(case.get("source"), str):
+                continue
+            source = case["source"]
+            source_path = (case_root / (source + ".json")).resolve()
+            if not source_path.is_relative_to(case_root) or not source_path.is_file():
+                continue
+            if source not in sources:
+                sources[source] = json.loads(source_path.read_text(encoding="utf-8"))
+            original_document = sources[source]
+            if original_document.get("external") is not True:
+                continue
+            matches = [row for row in original_document.get("cases", [])
+                       if isinstance(row, dict) and row.get("id") == case.get("id")]
+            if len(matches) != 1:
+                problems.append(f"copied reviewer control {source}::{case.get('id')} has no unique source case")
+                continue
+            original = matches[0]
+            altered = sorted(key for key in REVIEWER_FIELDS if key in case
+                             and (key not in original or case[key] != original[key]))
+            if altered:
+                problems.append(
+                    f"copied reviewer control {source}::{case.get('id')} differs from its source: {altered}"
+                )
+                continue
+            quoted.add(id(case))
+    return quoted, problems
+
+
+def _strings_authored_by_the_project(
+    value: object, external: bool, verified_copies: set[int] | None = None,
+) -> list[str]:
+    """Every project string; only original or source-verified reviewer fields are quoted."""
     out: list[str] = []
     if isinstance(value, dict):
+        quoted = external or (verified_copies is not None and id(value) in verified_copies)
         for key, item in value.items():
-            if external and key in REVIEWER_FIELDS:
+            if quoted and key in REVIEWER_FIELDS:  # G2B5B Part 7: unmarked copied reviewer citations -> exact source/id-verified quotations; project fields remain checked.
                 continue
-            out.extend(_strings_authored_by_the_project(item, external))
+            out.extend(_strings_authored_by_the_project(item, external, verified_copies))
     elif isinstance(value, list):
         for item in value:
-            out.extend(_strings_authored_by_the_project(item, external))
+            out.extend(_strings_authored_by_the_project(item, external, verified_copies))
     elif isinstance(value, str):
         out.append(value)
     return out
@@ -313,7 +363,15 @@ def check_fixture_citations(root: Path = ROOT) -> list[str]:
             problems.append(f"{file.relative_to(root)}: not JSON ({exc})")
             continue
         external = isinstance(document, dict) and document.get("external") is True
-        for text in _strings_authored_by_the_project(document, external):
+        verified_copies: set[int] = set()
+        if file.relative_to(root).as_posix() == "evals/gap_triage/measurements/second_broom_before_cohorts_2026-11-04.json":
+            if not isinstance(document, dict) or external:
+                problems.append(f"{file.relative_to(root)}: before-cohort capture must retain project-authored metadata")
+                external = False
+            else:
+                verified_copies, copy_problems = _verified_copied_reviewer_controls(document, root)
+                problems.extend(f"{file.relative_to(root)}: {problem}" for problem in copy_problems)
+        for text in _strings_authored_by_the_project(document, external, verified_copies):
             for line in text.splitlines():
                 problems.extend(_citation_problems(line, str(file.relative_to(root)), records))
     return sorted(set(problems))

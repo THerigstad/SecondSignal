@@ -185,8 +185,8 @@ def test_every_labelled_first_turn_matches_the_supplied_tree(roster):
         if isinstance(text, dict):
             text = text["text"]
         records[case["id"]] = route(text, roster, session=make_session(case)).to_dict()
-    assert len(records) == 682  # Follow-on to order P2V1, 13 October 2026: 671 -> 682; eleven additional verbatim fixture ports.
-    assert _digest(records) == "b58a4b5db51655a0196a0576d643b45e4b40ecd37358c6a2a2631cf2bb30131c"  # Follow-on to order P2V1, 13 October 2026: 1d4989de8750c53e1cf461519ea2e9700f77b5a4f39581204a3c69a22261b81b -> b58a4b5db51655a0196a0576d643b45e4b40ecd37358c6a2a2631cf2bb30131c; eleven added cases, existing decisions unchanged.
+    assert len(records) == 693  # Follow-on to order P2V1, 13 October 2026: 671 -> 682; eleven additional verbatim fixture ports.; Order G2B5B Parts 2-6, 2026-11-04: 682 -> 692 (measured current gate and added G2 fixtures).; landing 16 at grading, 2026-11-04: one documented gap added, grading-t0-die-001: 692 -> 693.
+    assert _digest(records) == "666a2122aecb838c791dc3ea2a6094f29e62e72abc277df032687319ba2adc6c"  # Follow-on to order P2V1, 13 October 2026: 1d4989de8750c53e1cf461519ea2e9700f77b5a4f39581204a3c69a22261b81b -> b58a4b5db51655a0196a0576d643b45e4b40ecd37358c6a2a2631cf2bb30131c; eleven added cases, existing decisions unchanged.; Order G2B5B Parts 2-6, 2026-11-04: b58a4b5db51655a0196a0576d643b45e4b40ecd37358c6a2a2631cf2bb30131c -> b989541e4e5f395a3629bbbbd983f2cf1cffa13ee8431e4d76f37b749da4e5cc (measured current gate and added G2 fixtures).; Order G2B5B Parts 2-6, 2026-11-04: b989541e4e5f395a3629bbbbd983f2cf1cffa13ee8431e4d76f37b749da4e5cc -> 09fba2e4749df0bebef9741520254e07a7019f17b7469e18083dd8a16ae2ee4b (measured current gate and added G2 fixtures).; landing 16 at grading, 2026-11-04: one documented gap added, grading-t0-die-001: 09fba2e4749df0bebef9741520254e07a7019f17b7469e18083dd8a16ae2ee4b -> 666a2122aecb838c791dc3ea2a6094f29e62e72abc277df032687319ba2adc6c.
 
 
 @pytest.mark.parametrize("name", THREE)
@@ -199,7 +199,7 @@ def test_the_three_hold_trajectories_pass(name, roster):
 def test_h1_changes_are_confined_to_turns_with_prior_context():
     actual = replay()
     first = [row for row in actual["rows"] if row["turn"] == 1]
-    assert _digest(first) == "24db78f941440177cbd5c17de8f5b7184a8594177847eed15fd74004ffe7e03b"  # Follow-on to order P2V1, 13 October 2026: 0562e21304d8159086657188da98bbf00cfb688223f11a10ab934b0c9a74f8f8 -> 24db78f941440177cbd5c17de8f5b7184a8594177847eed15fd74004ffe7e03b; eleven added first turns, all prior H1 rows unchanged.
+    assert _digest(first) == "7f1b1328fbad0f76cb569bb87befae5847a791b1a2394024489a173e2da336a8"  # Follow-on to order P2V1, 13 October 2026: 0562e21304d8159086657188da98bbf00cfb688223f11a10ab934b0c9a74f8f8 -> 24db78f941440177cbd5c17de8f5b7184a8594177847eed15fd74004ffe7e03b; eleven added first turns, all prior H1 rows unchanged.; Order G2B5B Parts 2-6, 2026-11-04: 24db78f941440177cbd5c17de8f5b7184a8594177847eed15fd74004ffe7e03b -> bee1178da5e0bef98fe4133f1c9a79b095bb4b82db1ad22d4d932f53e38b1667 (measured current gate and added G2 fixtures).; Order G2B5B Parts 2-6, 2026-11-04: bee1178da5e0bef98fe4133f1c9a79b095bb4b82db1ad22d4d932f53e38b1667 -> 935017f4f2588688601523efc9565cb7b43d264e681486a294053094907956fa (measured current gate and added G2 fixtures).; landing 16 at grading, 2026-11-04: one documented gap added, grading-t0-die-001: 935017f4f2588688601523efc9565cb7b43d264e681486a294053094907956fa -> 7f1b1328fbad0f76cb569bb87befae5847a791b1a2394024489a173e2da336a8.
 
 
 def test_no_seat_keeps_the_session_hold(roster):

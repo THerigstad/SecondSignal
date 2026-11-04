@@ -394,7 +394,7 @@ def test_explain_adds_exactly_one_line_after_signal_metadata(roster):
     case = _grief_case()
     baseline = route(case["text"], roster, session=make_session(case))
     # Captured from the supplied tree before any P1 source edit.
-    assert _digest(baseline.explain()) == "2e70de4c5abe2f4d129f166834f057b2a7da81f407700436ea6ff7e7d9b38c84"  # Order P2V1, 2026-10-13: c1a4e375d46ea6c73d5179995cb403fbb9e65547a6c0bb71beeb5b843de29de5 -> 2e70de4c5abe2f4d129f166834f057b2a7da81f407700436ea6ff7e7d9b38c84 (veto-kind rationale and profile source hashes).
+    assert _digest(baseline.explain()) == "54e9fe8fbd4ccc90239cad6ad7d6cab546e726659b990158bed96df39c8185f8"  # Order P2V1, 2026-10-13: c1a4e375d46ea6c73d5179995cb403fbb9e65547a6c0bb71beeb5b843de29de5 -> 2e70de4c5abe2f4d129f166834f057b2a7da81f407700436ea6ff7e7d9b38c84 (veto-kind rationale and profile source hashes).; Order G2B5B Part 6, 2026-11-04: 2e70de4c5abe2f4d129f166834f057b2a7da81f407700436ea6ff7e7d9b38c84 -> 54e9fe8fbd4ccc90239cad6ad7d6cab546e726659b990158bed96df39c8185f8 (danger/weapon patterns hash extension).
     for metadata in (
         {}, {"confidence": {"domain:grief": 0.75}},
         {"distribution": {"domain:grief": {"yes": 0.75, "no": 0.25}}},
@@ -456,8 +456,8 @@ def test_harness_no_ask_keeps_the_supplied_turn_and_audit_bytes(roster):
     assert after == before and after.ask_acknowledgement is None
     assert explicit.audit_log.rows() == baseline.audit_log.rows()
     # Captured with this fixed clock and fake reply before any P1 source edit.
-    assert _digest(asdict(before)) == "930d0f30c6c91075424c5d3d7f57240e93c1e01a9f67ab040b67fbeab5c7f682"  # Order P2V1, 2026-10-13: 7f0d82ce6afeeac44cfba748f439f3872f56c8081b6f60e4659b384552f5b4af -> 930d0f30c6c91075424c5d3d7f57240e93c1e01a9f67ab040b67fbeab5c7f682 (veto-kind rationale and profile source hashes).
-    assert _digest(baseline.audit_log.rows()) == "6b61a48e53731660a7c8262d9b41f9c718b2c56822eb4c7538f217e1837ac882"  # Order P2V1, 2026-10-13: 49dd6caab4880aae42641aa34de9f65d2c41a4a8d1a8e7e7608721066def6cd0 -> 6b61a48e53731660a7c8262d9b41f9c718b2c56822eb4c7538f217e1837ac882 (veto-kind rationale and profile source hashes).
+    assert _digest(asdict(before)) == "a70a1e4f57244be0e4062606c9f8a856323cb1a3ce698e7154a6da865bae9371"  # Order P2V1, 2026-10-13: 7f0d82ce6afeeac44cfba748f439f3872f56c8081b6f60e4659b384552f5b4af -> 930d0f30c6c91075424c5d3d7f57240e93c1e01a9f67ab040b67fbeab5c7f682 (veto-kind rationale and profile source hashes).; Order G2B5B Part 6, 2026-11-04: 930d0f30c6c91075424c5d3d7f57240e93c1e01a9f67ab040b67fbeab5c7f682 -> a70a1e4f57244be0e4062606c9f8a856323cb1a3ce698e7154a6da865bae9371 (danger/weapon patterns hash extension).
+    assert _digest(baseline.audit_log.rows()) == "226ee1157d44c10fb87b86cf4785c1a7e0a61d4b0fb6c343b8e2458aef977e56"  # Order P2V1, 2026-10-13: 49dd6caab4880aae42641aa34de9f65d2c41a4a8d1a8e7e7608721066def6cd0 -> 6b61a48e53731660a7c8262d9b41f9c718b2c56822eb4c7538f217e1837ac882 (veto-kind rationale and profile source hashes).; Order G2B5B Part 6, 2026-11-04: 6b61a48e53731660a7c8262d9b41f9c718b2c56822eb4c7538f217e1837ac882 -> 226ee1157d44c10fb87b86cf4785c1a7e0a61d4b0fb6c343b8e2458aef977e56 (danger/weapon patterns hash extension).
 
 
 def test_trajectories_with_no_ask_keep_house_lines_text_release_and_audit(roster):

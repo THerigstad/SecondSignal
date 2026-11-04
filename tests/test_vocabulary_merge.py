@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import copy
+import hashlib
 import json
 import os
 import subprocess
@@ -187,7 +188,27 @@ def test_measurement_cli_runs_on_complete_file_and_writes_report(measured, vocab
 def test_measurement_matches_saved_report_without_source_writes(measured):
     report, _ = measured
     assert report["source_files_unchanged"]
-    assert report == json.loads(measure.OUTPUT.read_text(encoding="utf-8"))
+    historical = measure.OUTPUT.read_bytes()
+    assert hashlib.sha256(historical).hexdigest() == "6289e2e4408d999ae43d60c4f3383d0cf4bdedb411813856b0628343bac192f2"  # Order G2B5B Parts 2/4/6: original October report bytes retained.
+    expected = json.loads(historical)
+    assert expected["control_counts"]["policy_proceed"] == 260
+    expected["control_counts"]["policy_proceed"] = 264  # Order G2B5B Part 6: 260 -> 264; four new PROCEED fixtures.
+    by_term = {row["term"]: row for row in expected["candidates"]}
+    nt = next(variant for variant in by_term["neurotypical"]["variant_screens"]
+              if variant["form"] == "NT")
+    al_anon = by_term["Al-Anon"]
+    for screen in (nt["alone"], *nt["carriers"],
+                   al_anon["term_alone"], *al_anon["neutral_carriers"]):
+        assert screen["folds"] == []
+        screen["folds"] = ["guarded_one_letter"]  # Order G2B5B Part 2: [] -> ["guarded_one_letter"] for exactly eight NT/Al-Anon screen receipts.
+    spectrum = by_term["we're all on the spectrum"]
+    assert len(spectrum["variant_screens"]) == 1
+    variant = spectrum["variant_screens"][0]
+    for screen in (spectrum["term_alone"], *spectrum["neutral_carriers"],
+                   variant["alone"], *variant["carriers"]):
+        assert screen["folds"] == []
+        screen["folds"] = ["wider_quotes"]  # Order G2B5B Part 4: [] -> ["wider_quotes"] for exactly eight spectrum screen receipts.
+    assert report == expected  # Order G2B5B Parts 2/4/6: October report -> exact 17 measured receipt/count migrations; every other field retains full equality.
 
 
 def test_output_under_src_is_refused_before_a_write():
@@ -203,7 +224,7 @@ def test_controls_include_all_b3_b5b_corpora_and_whole_phrase_boundaries():
     counts = {name: sum(c["group"] == name for c in controls) for name in (
         "literal_three_lists", "policy_proceed", "digit_tokens", "recovery_everyday", "non_latin",
     )}
-    assert counts == {"literal_three_lists": 43, "policy_proceed": 260,
+    assert counts == {"literal_three_lists": 43, "policy_proceed": 264,  # Order G2B5B Part 6: 260 -> 264; four new PROCEED fixtures.
                       "digit_tokens": 40, "recovery_everyday": 8, "non_latin": 30}
     assert not measure.phrase_pattern("trans").search("transferring")
     assert measure.phrase_pattern("non-binary").search("non binary")

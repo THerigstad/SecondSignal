@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 from dataclasses import replace
 from unittest.mock import patch
@@ -26,9 +27,14 @@ from secondsignal.lexicon import PACKS, apply_masks, load_pack
 from secondsignal.normalize import normalize
 from secondsignal.safety import MASK_PROTECTED_PATTERNS, crisis_screen
 
+HISTORICAL_MEASUREMENT = MEASUREMENT
+MEASUREMENT = HISTORICAL_MEASUREMENT.with_name("splice_second_broom_2026-11-04.json")  # G2B5B, 2026-11-04: splice_2026-10-10.json SHA-256 fa060fe5a88b3833212025bbaa4be6cb0b197c11ad2aa16c39b8b36f89e81774 -> splice_second_broom_2026-11-04.json SHA-256 0f40d3c3388fec69f1f5066cbcce366eb86a17b102d04e229b5795a094dd1168; original receipt retained byte-for-byte.
+
 
 def test_splice_guard_keeps_every_labelled_card_except_recorded_gate_exclusions():
     """Every current single-message card survives each splice unless the data names its exclusion."""
+    assert hashlib.sha256(HISTORICAL_MEASUREMENT.read_bytes()).hexdigest() == "fa060fe5a88b3833212025bbaa4be6cb0b197c11ad2aa16c39b8b36f89e81774"
+    assert hashlib.sha256(MEASUREMENT.read_bytes()).hexdigest() == "0f40d3c3388fec69f1f5066cbcce366eb86a17b102d04e229b5795a094dd1168"
     data = json.loads(MEASUREMENT.read_text(encoding="utf-8"))
     exceptions = {(r["id"], r["position"], r["phrase"]) for r in data["gate_exclusions"]}
     assert all(r["reason"] != "unclassified_exclusion" and not r["hit_erasing_mask_ids"]

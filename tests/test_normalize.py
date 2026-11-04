@@ -25,6 +25,7 @@ from secondsignal.normalize import (
     analyze,
     is_mixed_script_token,
     normalize,
+    screen_confusables,
     skeleton_hash,
 )
 from secondsignal.safety import crisis_screen, evaluate
@@ -127,7 +128,7 @@ def test_skeleton_maps_only_to_plain_latin_letters() -> None:
     for source, target in SKELETON.items():
         assert len(source) == 1
         assert target.isascii() and target.isalpha(), (source, target)
-        assert unicodedata.normalize("NFKC", source) == source, f"{source!r} is already folded by NFKC; the skeleton entry is dead"
+        assert screen_confusables(source) == target, (source, target)  # G2B5B part 3: old NFKC(source)==source (reviewed-only) -> every full-table source effective before NFKC.
 
 
 def test_skeleton_never_touches_digits_or_punctuation() -> None:

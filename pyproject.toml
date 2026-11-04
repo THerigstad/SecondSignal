@@ -35,7 +35,7 @@ secondsignal = "secondsignal.cli:main"
 where = ["src"]
 
 [tool.setuptools.package-data]
-secondsignal = ["packs/*.json", "profiles/*.json"]
+secondsignal = ["packs/*.json", "profiles/*.json", "*.txt", "*.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

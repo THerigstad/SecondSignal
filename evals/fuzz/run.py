@@ -18,6 +18,7 @@ from __future__ import annotations
 import json
 import sys
 from dataclasses import dataclass, field
+from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
@@ -30,6 +31,25 @@ from secondsignal import SessionState, load_roster, route  # noqa: E402
 from .transforms import KNOWN_GAP_TRANSFORMS, TRANSFORMS  # noqa: E402
 
 CASE_DIR = _ROOT / "evals" / "cases"
+EXACT_RESIDUAL_FILE = _ROOT / "evals/fuzz/measurements/second_broom_compound_stutter_2026-11-04.json"
+
+
+@lru_cache(maxsize=1)
+def exact_residuals() -> frozenset[tuple[str, str, str, str, str | None]]:
+    """Only the measured full tuples on newly eligible sources belong to B6.
+
+    A changed text, action, agent, source, or transform is not this residual.
+    The existing test pins the data, regeneration, and before-cohort boundary.
+    """
+    document = json.loads(EXACT_RESIDUAL_FILE.read_text(encoding="utf-8"))
+    rows = document["residuals"]
+    keys = frozenset((row["transform"], row["id"], row["text"], row["action"], row["agent"])
+                     for row in rows)
+    if len(keys) != len(rows):
+        raise ValueError("Duplicate exact second-broom residual")
+    if any(key[0] in KNOWN_GAP_TRANSFORMS for key in keys):
+        raise ValueError("An exact residual must not duplicate a transform-wide gap")
+    return keys
 
 
 @dataclass
@@ -42,21 +62,37 @@ class FuzzResult:
 
     @property
     def known_gaps(self) -> int:
-        return sum(len(v) for k, v in self.failures.items() if k in KNOWN_GAP_TRANSFORMS)
+        measured = exact_residuals()
+        return sum(1 for name, rows in self.failures.items() for row in rows
+                   if name in KNOWN_GAP_TRANSFORMS or (name, *row) in measured)
 
     @property
     def regressions(self) -> dict[str, list[tuple[str, str, str, str | None]]]:
-        return {k: v for k, v in self.failures.items() if v and k not in KNOWN_GAP_TRANSFORMS}
+        measured = exact_residuals()
+        unexpected = {}
+        for name, rows in self.failures.items():
+            if name in KNOWN_GAP_TRANSFORMS:
+                continue
+            remaining = [row for row in rows if (name, *row) not in measured]
+            if remaining:
+                unexpected[name] = remaining
+        return unexpected
 
     @property
     def closed_gaps(self) -> list[str]:
-        return sorted(k for k in KNOWN_GAP_TRANSFORMS if not self.failures.get(k))
+        closed = [name for name in KNOWN_GAP_TRANSFORMS if not self.failures.get(name)]
+        observed = {(name, *row) for name, rows in self.failures.items() for row in rows}
+        closed.extend(f"{name}:{ident}" for name, ident, _text, _action, _agent
+                      in sorted(exact_residuals() - observed))
+        return sorted(closed)
 
     def line(self) -> str:
-        gaps = ", ".join(
-            f"{name} {len(self.failures.get(name, ()))}"
-            for name in TRANSFORMS if name in KNOWN_GAP_TRANSFORMS
-        )
+        gap_groups = [f"{name} {len(self.failures.get(name, ()))}"
+                      for name in TRANSFORMS if name in KNOWN_GAP_TRANSFORMS]
+        measured = exact_residuals()
+        compound = sum((name, *row) in measured for name, rows in self.failures.items() for row in rows)
+        gap_groups.append(f"newly_eligible_compound_stutter {compound}")
+        gaps = ", ".join(gap_groups)
         return (
             f"crisis-gate fuzz: {self.lines} lines, {len(TRANSFORMS)} transforms, "
             f"{self.variants:,} variants, {self.escalated:,} escalate, "

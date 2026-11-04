@@ -34,14 +34,14 @@ def replay():
             rows.append({"case": label, "turn": number, "released": turn.released,
                          "release_reason": turn.release_reason,
                          "policy_and_output_sha256": hashlib.sha256(material.encode()).hexdigest()})
-    return {"source": "SecondSignal-20de102-P2V1, order T5R (landing 15), 2026-11-04: labelled single cases with prior turns and trajectories",  # Order P2V1, 2026-10-13: 82521ba G1/P3 -> 20de102 P2V1; kinds and roster hashes, no changed old releases. Order T5R, 2026-11-04: source 'SecondSignal-20de102, order P2V1, 13 October 2026: labelled single cases with prior turns and trajectories' -> 'SecondSignal-20de102-P2V1, order T5R (landing 15), 2026-11-04: labelled single cases with prior turns and trajectories'; second-ask replay hashes regenerated.
+    return {"source": "SecondSignal-20de102-P2V1, orders T5R and G2B5B (landings 15 and 16), 2026-11-04: labelled single cases with prior turns and trajectories",  # Order P2V1, 2026-10-13: 82521ba G1/P3 -> 20de102 P2V1; kinds and roster hashes, no changed old releases. Order T5R, 2026-11-04: source 'SecondSignal-20de102, order P2V1, 13 October 2026: labelled single cases with prior turns and trajectories' -> 'SecondSignal-20de102-P2V1, order T5R (landing 15), 2026-11-04: labelled single cases with prior turns and trajectories'; second-ask replay hashes regenerated.; landings 15 and 16 merged, 2026-11-04: the source names both orders, the rows are replayed once on the merged tree
             "adapter": "FakeAdapter with existing PERSONA-TEXT-MARKER fixture",
             "cases": len(cases), "turns": len(rows),
             "released": sum(row["released"] for row in rows), "rows": rows}
 
 
 def test_h1_every_labelled_turn_keeps_its_policy_house_lines_and_release():
-    """All 904 turns match the recorded decisions, house lines, output and release; 231 release."""  # Follow-on to order P2V1, 13 October 2026: 693 cases/893 turns/225 releases -> 704 cases/904 turns/231 releases; all 893 prior rows unchanged.
-    expected = json.loads((ROOT / "tests/fixtures/h1/labelled_before.json").read_text(encoding="utf-8"))
+    """All 914 turns match the recorded decisions, house lines, output and release; 231 release."""  # Follow-on to order P2V1, 13 October 2026: 693 cases/893 turns/225 releases -> 704 cases/904 turns/231 releases; all 893 prior rows unchanged.; Order G2B5B Parts 2-6, 2026-11-04: cases/turns/releases (704, 904, 231) -> (714, 914, 231).
+    expected = json.loads((ROOT / "tests/fixtures/h1/labelled_before.json").read_text(encoding="utf-8"))  # Order G2B5B Parts 2-6, 2026-11-04: replay fixture SHA-256 1c5704c3e753497baacceb60826dac191a4d9b6f6952cc4dd709b5702fa0e47e -> 5616390f8767a8960501748d84c9e6c0e6db0b55ce1bb02e456f1a93172f4b00 (exact current replay).; Order G2B5B Parts 2-6, 2026-11-04: replay fixture SHA-256 5616390f8767a8960501748d84c9e6c0e6db0b55ce1bb02e456f1a93172f4b00 -> 14942cba42b36e50d610c4d8b061c27d9c882597e57698f15953d049bb47b55b (exact current replay).
     actual = replay()
     assert actual == expected

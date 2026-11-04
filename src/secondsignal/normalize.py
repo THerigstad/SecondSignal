@@ -11,13 +11,12 @@ Four steps, in this order, every time:
    Latin letters. ``di<ZWSP>e`` must reach the lexicon as ``die``. The
    Latin-only context rule avoids corrupting scripts where these characters
    carry meaning. Nothing here emulates the bidi algorithm.
-3. **Skeleton** -- a small, reviewed map of look-alike letters (Cyrillic,
-   Greek, a few Latin variants) onto the Latin letters that occur in the
-   stems the lexicons match. NFKC does *not* do this: a Cyrillic ``і``
-   (U+0456) inside ``die`` survives NFKC untouched and walked straight
-   through the crisis gate before this module existed. The map is
-   deliberately not the full Unicode confusables table, which flags ordinary
-   non-Latin text; it is the handful of letters that spell our stems.
+3. **Skeleton** -- the corrected full confusables table, with the reviewed
+   mappings retained. The 5 October measurement found zero new cards on the
+   43 literal, 160 historical, 260 policy and 30 non-Latin controls, replacing
+   the old reason to keep only a small hand-written map. The crisis screen
+   also applies this table before NFKC, as the measured candidate did, so
+   compatibility normalization cannot erase a measured source distinction.
 4. ``casefold`` -- default casefold, never a Turkish locale.
 
 The map is hashed (``skeleton_hash``) and exported, so a reviewer can pin
@@ -35,10 +34,13 @@ from __future__ import annotations
 
 import hashlib
 import itertools
+import json
 import re
 import unicodedata
 from dataclasses import dataclass
 from functools import lru_cache
+from itertools import pairwise
+from pathlib import Path
 
 __all__ = [
     "normalize",
@@ -62,48 +64,19 @@ STRIP_CODEPOINTS: frozenset[int] = frozenset(
     | set(range(0x2066, 0x206A))   # LRI, RLI, FSI, PDI
 )
 
-# Look-alike letters -> the Latin letter they impersonate. Only letters that
-# appear in the hit and mask stems of the shipped packs are worth mapping;
-# a wider map buys false mixed-script flags on real names, not safety.
-# Uppercase forms are listed because the skeleton runs before casefold.
-SKELETON: dict[str, str] = {
-    # Cyrillic lowercase
-    "а": "a", "в": "b", "е": "e", "і": "i", "о": "o", "р": "p",
-    "с": "c", "у": "y", "х": "x", "ѕ": "s", "ј": "j",
-    "м": "m", "н": "h", "т": "t",
-    "һ": "h", "ԁ": "d", "ԛ": "q", "ԝ": "w", "ӏ": "l",
-    "г": "r", "к": "k",
-    # Cyrillic uppercase
-    "А": "A", "В": "B", "С": "C", "Е": "E", "Н": "H",
-    "К": "K", "М": "M", "О": "O", "Р": "P", "Т": "T",
-    "Х": "X", "І": "I", "Ј": "J", "Ѕ": "S", "У": "Y",
-    # Greek lowercase
-    "ο": "o", "ι": "i", "ν": "v", "ρ": "p", "κ": "k",
-    "υ": "u", "α": "a",
-    # Greek lowercase, added 4 October 2026 (ruling 3 of 3 October): an
-    # epsilon inside a crisis word ("diε") dropped 60 of 82 crisis lines from
-    # the card to the resource line, because the lowercase set above had no
-    # epsilon. These are the remaining lowercase letters whose glyphs read as
-    # Latin letters that occur in the stems.
-    "ε": "e", "τ": "t", "χ": "x", "γ": "y", "ω": "w", "η": "n",
-    "β": "b", "μ": "u", "ϳ": "j",
-    # Greek uppercase
-    "Α": "A", "Β": "B", "Ε": "E", "Ζ": "Z", "Η": "H",
-    "Ι": "I", "Κ": "K", "Μ": "M", "Ν": "N", "Ο": "O",
-    "Ρ": "P", "Τ": "T", "Υ": "Y", "Χ": "X",
-    # Cyrillic, re-checked 4 October 2026 while the table was open (ruling 3):
-    # the lowercase izhitsa, omega and reversed ze, and the uppercase forms of
-    # letters whose lowercase was already mapped, were missing.
-    "ѵ": "v", "ѡ": "w", "ԑ": "e",
-    "Ѵ": "V", "Ѡ": "W", "Ԑ": "E", "Ԁ": "D", "Ԛ": "Q", "Ԝ": "W", "Һ": "H", "Ӏ": "I",
-    # Latin variants that NFKC leaves alone
-    "ı": "i",   # dotless i
-    "ɡ": "g",   # script g
-    "ɑ": "a",   # latin alpha
-    "ᴀ": "a", "ᴇ": "e", "ᴏ": "o",  # small capitals
+# Order G2B5B, part 3: the candidate map is shipped; evals is never imported.
+SKELETON: dict[str, str] = json.loads(
+    Path(__file__).with_name("corrected_confusables.json").read_text(encoding="utf-8")
+)
+# The experiment applied its full map before the existing reviewed normalizer.
+# Preserve the 21 reviewed sources absent from that candidate, including epsilon.
+_REVIEWED_SKELETON_REMAINDER: dict[str, str] = json.loads(
+    Path(__file__).with_name("reviewed_skeleton_remainder.json").read_text(encoding="utf-8")
+)
+_SKELETON_TABLE = {
+    ord(k): v for k, v in {**_REVIEWED_SKELETON_REMAINDER, **SKELETON}.items()
 }
-
-_SKELETON_TABLE = {ord(k): v for k, v in SKELETON.items()}
+_SCREEN_SKELETON_TABLE = {ord(k): v for k, v in SKELETON.items()}
 _QUOTE_TABLE = {0x2019: "'", 0x2018: "'", 0x201C: '"', 0x201D: '"'}
 _CONTRACTION_RE = re.compile(r"\b(?:wanna|gonna|gotta|imma|i'ma|lemme|dunno|morirme)\b")
 _TOKEN_RE = re.compile(r"\S+")
@@ -344,7 +317,207 @@ def _screen_doubled_vowel(text: str) -> str:
     return re.sub(r"(?<!\w)[a-z]+(?!\w)", fold, text)
 
 
-def screen_fold(text: str) -> tuple[str, tuple[str, ...]]:
+# Order G2B5B, part 2: measured corpus guard and crisis vocabulary, shipped as data.
+_SECOND_BROOM_VOCABULARY = frozenset(
+    Path(__file__).with_name("crisis_words.txt").read_text(encoding="utf-8").splitlines()
+)
+_EVERYDAY_WORDS = frozenset(
+    Path(__file__).with_name("everyday_words.txt").read_text(encoding="utf-8").splitlines()
+)
+_ONE_LETTER_WORD = re.compile(r"[^\W\d_]+")
+
+
+@lru_cache(maxsize=1)
+def _one_letter_targets() -> dict[str, tuple[str, ...]]:
+    targets: dict[str, set[str]] = {}
+    for word in _SECOND_BROOM_VOCABULARY:
+        for index in range(len(word)):
+            targets.setdefault(word[:index] + word[index + 1:], set()).add(word)
+        for index in range(len(word) - 1):
+            if word[index] != word[index + 1]:
+                variant = word[:index] + word[index + 1] + word[index] + word[index + 2:]
+                targets.setdefault(variant, set()).add(word)
+    return {token: tuple(sorted(choices)) for token, choices in targets.items()}
+
+
+def screen_confusables(text: str) -> str:
+    """Apply the measured full correction before NFKC on the screen copy."""
+    return text.translate(_SCREEN_SKELETON_TABLE)
+
+
+def guarded_one_letter(text: str) -> str:
+    """The measured non-unique lexical-first matcher, on the screen copy only."""
+    def replace(match: re.Match[str]) -> str:
+        token = match.group().casefold()
+        if token in _EVERYDAY_WORDS or token in _SECOND_BROOM_VOCABULARY:
+            return match.group()
+        choices = _one_letter_targets().get(token, ())
+        return choices[0] if choices else match.group()
+    return _ONE_LETTER_WORD.sub(replace, text)
+
+
+# Order G2B5B, parts 3 and 4: exact wider_all candidate folds, in its order.
+WIDER_QUOTES = frozenset("\"'\u2018\u2019\u201c\u201d")
+WIDER_PLAIN_TOKEN = re.compile(r"(?<!\w)[a-z]+(?!\w)", re.IGNORECASE)
+WIDER_FRAGMENT = re.compile(r"(?<![^\W_])[a-zA-Z]+(?![^\W_])")
+
+
+def wider_join_punctuation(text: str, *, quotes: bool) -> str:
+    """Join alphabetic fragments only if their complete joined run is a word.
+
+    Quote folding admits only quotes/apostrophes. Symbol folding admits Unicode
+    punctuation and symbols except quotes, spaces, and the narrow separator
+    set; those last partial boundaries belong to the partial-split candidate.
+    The runs cannot contain digits, and a symbol never substitutes for a letter.
+    """
+    def admitted(char: str) -> bool:
+        if quotes:
+            return char in WIDER_QUOTES
+        return (
+            char not in WIDER_QUOTES
+            and char not in " ._-"
+            and unicodedata.category(char)[0] in "PS"
+        )
+
+    # A maximal connected run includes all its letter pieces: a vocabulary
+    # substring inside a larger punctuated token does not qualify on its own.
+    output: list[str] = []
+    cursor = 0
+    while cursor < len(text):
+        if not text[cursor].isascii() or not text[cursor].isalpha():
+            output.append(text[cursor])
+            cursor += 1
+            continue
+        start = cursor
+        while cursor < len(text) and text[cursor].isascii() and text[cursor].isalpha():
+            cursor += 1
+        letters = text[start:cursor]
+        has_separator = False
+        while cursor < len(text):
+            end = cursor
+            while end < len(text) and admitted(text[end]):
+                end += 1
+            if end == cursor or end == len(text) or not (
+                text[end].isascii() and text[end].isalpha()
+            ):
+                break
+            next_end = end
+            while next_end < len(text) and text[next_end].isascii() and text[next_end].isalpha():
+                next_end += 1
+            letters += text[end:next_end]
+            cursor = next_end
+            has_separator = True
+        bounded = (
+            (start == 0 or not (text[start - 1].isalnum() or text[start - 1] == "_"))
+            and (cursor == len(text) or not (text[cursor].isalnum() or text[cursor] == "_"))
+        )
+        output.append(
+            letters.lower()
+            if bounded and has_separator and letters.lower() in _SECOND_BROOM_VOCABULARY
+            else text[start:cursor]
+        )
+    return "".join(output)
+
+
+def wider_quotes(text: str) -> str:
+    return wider_join_punctuation(text, quotes=True)
+
+
+def wider_symbols(text: str) -> str:
+    return wider_join_punctuation(text, quotes=False)
+
+
+def wider_split_words(
+    text: str, separators: frozenset[str], *, allow_interior_marks: bool = False
+) -> str:
+    """Join two or three fragments with an exact unique vocabulary target.
+
+    At least one fragment must have <=2 letters, and at least one >1: complete
+    runs of single letters are owned by the narrow fold. Longest admissible
+    fragment span wins; scans resume after it. No arbitrary sentence-wide
+    whitespace deletion or fuzzy spelling repair is performed.
+    """
+    def allowed_gap(gap: str) -> bool:
+        if not gap:
+            return False
+        if all(char in separators for char in gap):
+            return True
+        # Existing normalize() already removes these categories between Latin
+        # letters. A space created by the filler removal prevented that context
+        # check; test precisely this combination as a vocabulary-gated partial
+        # split, never stripping marks from arbitrary other-script text.
+        return (
+            allow_interior_marks
+            and any(char in separators for char in gap)
+            and all(
+                char in separators or unicodedata.category(char) in {"Cf", "Mn", "Me"}
+                for char in gap
+            )
+        )
+
+    words = list(WIDER_FRAGMENT.finditer(text))
+    output: list[str] = []
+    cursor = 0
+    index = 0
+    while index < len(words):
+        first = words[index]
+        selected = None
+        for count in (3, 2):
+            pieces = words[index:index + count]
+            if len(pieces) != count:
+                continue
+            lengths = [len(part.group()) for part in pieces]
+            if min(lengths) > 2 or max(lengths) == 1:
+                continue
+            between = [text[left.end():right.start()] for left, right in pairwise(pieces)]
+            if not all(allowed_gap(gap) for gap in between):
+                continue
+            joined = "".join(part.group() for part in pieces).lower()
+            if joined in _SECOND_BROOM_VOCABULARY:
+                selected = (count, pieces[-1].end(), joined)
+                break
+        if selected is None:
+            index += 1
+            continue
+        count, end, joined = selected
+        output.extend((text[cursor:first.start()], joined))
+        cursor = end
+        index += count
+    output.append(text[cursor:])
+    return "".join(output)
+
+
+def wider_whitespace(text: str) -> str:
+    """Spacing has already erased tab/newline provenance; ordinary space too."""
+    return wider_split_words(text, frozenset(" \t\r\n"))
+
+
+def wider_partial(text: str) -> str:
+    return wider_split_words(text, frozenset(" ._-\t\r\n"), allow_interior_marks=True)
+
+
+def wider_doubled(text: str) -> str:
+    """Delete exactly one duplicated letter, with one unique vocabulary word."""
+    def replace(match: re.Match[str]) -> str:
+        token = match.group().lower()
+        if token in _SECOND_BROOM_VOCABULARY:
+            return match.group()
+        targets = {
+            token[:repeat.start()] + token[repeat.start() + 1:]
+            for repeat in re.finditer(r"([a-z])\1", token)
+        } & _SECOND_BROOM_VOCABULARY
+        return next(iter(targets)) if len(targets) == 1 else match.group()
+    return WIDER_PLAIN_TOKEN.sub(replace, text)
+
+
+def wider_all(text: str) -> str:
+    for fold in (wider_quotes, wider_symbols, wider_partial, wider_doubled):
+        text = fold(text)
+    return text
+
+
+
+def screen_fold(text: str, *, wider: bool = True) -> tuple[str, tuple[str, ...]]:
     """The measured B3 folds and the names of those that changed this copy.
 
     The caller supplies its existing Unicode-normalized analysis. Routing and
@@ -361,7 +534,13 @@ def screen_fold(text: str) -> tuple[str, tuple[str, ...]]:
         ("separators", _screen_separators),
         ("lookalikes", _screen_lookalikes),
         ("doubled_vowel", _screen_doubled_vowel),
+        ("wider_quotes", wider_quotes),
+        ("wider_inserted_symbols", wider_symbols),
+        ("wider_partial_splits", wider_partial),
+        ("wider_doubled_letters", wider_doubled),
     ):
+        if not wider and name.startswith("wider_"):
+            continue
         folded = fold(text)
         if folded != text:
             changed.append(name)
@@ -371,7 +550,7 @@ def screen_fold(text: str) -> tuple[str, tuple[str, ...]]:
 
 def skeleton_hash() -> str:
     """First 12 hex digits of the SHA-256 of the skeleton map, for the record."""
-    material = "|".join(f"{k}:{v}" for k, v in sorted(SKELETON.items()))
+    material = "|".join(f"{k}:{v}" for k, v in sorted({**_REVIEWED_SKELETON_REMAINDER, **SKELETON}.items()))
     return hashlib.sha256(material.encode("utf-8")).hexdigest()[:12]
 
 

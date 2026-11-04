@@ -528,21 +528,21 @@ def _run_report(case_ids, control_limit, variant_line_limit, source_limit):
             "narrowed_recovery_routing_experiment", "recovery_community_vocabulary",
             narrowed_recovery_aliases, "routing"),
     }
-    obfuscated = [c for c in gaps if causes[c["id"]] == "crisis_word_obfuscation"]
+    obfuscated = [c for c in gaps if causes.get(c["id"]) == "crisis_word_obfuscation"]
     narrow_rows = [observe(c, roster, registry["narrow_reference"]) for c in obfuscated]
     narrow_recovered_ids = {r["id"] for r in narrow_rows if not r["mismatch_fields"]}
     residual_cases = [c for c in obfuscated if c["id"] not in narrow_recovered_ids]
     results = {}
     for name, candidate in registry.items():
         if name.startswith("guarded_one_letter"):
-            relevant = [c for c in gaps if causes[c["id"]] in
+            relevant = [c for c in gaps if causes.get(c["id"]) in
                         {"b1_one_letter_dropped", "b1_two_neighbouring_letters_swapped"}]
         elif name == "corrected_confusables":
             relevant = gaps  # Manifest reductions must be observed, not inferred from fuzz counts.
         elif name.startswith("wider_"):
             relevant = residual_cases
         else:
-            relevant = [c for c in gaps if causes[c["id"]] == candidate.cause]
+            relevant = [c for c in gaps if causes.get(c["id"]) == candidate.cause]
         result = gap_report(relevant, roster, candidate, baseline)
         result["scope"] = candidate.scope
         result["controls"] = {
@@ -693,6 +693,7 @@ def _run_report(case_ids, control_limit, variant_line_limit, source_limit):
                                   "current_crisis_lines": len(all_lines),
                                   "added_b7_wrapper_ids": sorted(added_ids),
                                   "historical_selection": "Exclude B7 source_case/port_note wrappers to reproduce B1 86 and 56,909; retain all 260 current PROCEED controls plus separate historical160."},
+        "untriaged_gap_ids": sorted(c["id"] for c in gaps if c["id"] not in causes),
         "gap_baseline": [compact_row(r) for r in baseline.values()],
         "candidates": results, "narrow_recovered_ids": sorted(narrow_recovered_ids),
         "wider_measurement_denominator": len(residual_cases),
@@ -713,7 +714,7 @@ def main(argv=None):
     args = parser.parse_args(argv)
     report = run_report(args.case_id, args.control_limit, args.variant_line_limit, args.source_limit)
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
     for name, result in report["candidates"].items():
         print(result["line"])
         print(result["plain_sentence"])

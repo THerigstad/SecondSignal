@@ -4,6 +4,8 @@ import importlib.util
 import json
 from pathlib import Path
 
+import pytest
+
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -32,7 +34,19 @@ def test_manifest_refresh_keeps_every_reason_complete():
         assert row["reason"] == notes[(row["source"], row["id"])]
 
 
-def test_checked_in_manifest_matches_full_reason_refresh():
+def test_checked_in_manifest_matches_full_reason_refresh(monkeypatch):
     module = _generator()
     document = json.loads(module.MANIFEST_PATH.read_text(encoding="utf-8"))
     assert document == module.build()
+    closures = [row for row in document["cases"] if row.get("accepted_by_order") == "G2B5B"]
+    assert len(closures) == 119  # G2B5B Part 7: raw-flag refresh discarded closures -> retain all 119 measured manifest-only acceptances.
+    closure_id = closures[0]["id"]
+    original = module.runner.field_failures
+
+    def injected_regression(case, decision, session):
+        bad = original(case, decision, session)
+        return {**bad, "safety": "injected regression"} if case["id"] == closure_id else bad
+
+    monkeypatch.setattr(module.runner, "field_failures", injected_regression)
+    with pytest.raises(ValueError, match=f"Accepted manifest closure {closure_id} fails original expectations"):
+        module.build()

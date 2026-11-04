@@ -468,11 +468,11 @@ def test_grok_round4_scheme_whitespace_controls_are_released(app, payload):
 # named below), Grok's 30 vague openers (ruling 5), ChatGPT's assist pin (ruling 8)
 # and the four reviewer fixtures Codex asked for joined the labelled suite.
 # Recomputed at integration, 4 October.
-CASES_PIN = 682  # Follow-on to order P2V1, 13 October 2026: 671 -> 682 (eleven additional verbatim fixtures).
-TURNS_PIN = 762  # Follow-on to order P2V1, 13 October 2026: 751 -> 762 (eleven additional single-turn fixtures).
-LABELLED_PIN = 340   # 325 + B7's 15 wrapped crisis lines (5 identity, 10 neurodivergent)
-ACTUAL_PIN = 191  # Order G1, 2026-10-10: 190 -> 191.
-GAPS_PIN = 148  # Order G1, 2026-10-10: 149 -> 148.
+CASES_PIN = 693  # Follow-on to order P2V1, 13 October 2026: 671 -> 682 (eleven additional verbatim fixtures).; Order G2B5B Parts 2-6, 2026-11-04: 682 -> 692 (same direct-Harness replay counters). landing 16 at grading, 2026-11-04: one documented gap added, grading-t0-die-001: 692 -> 693.
+TURNS_PIN = 773  # Follow-on to order P2V1, 13 October 2026: 751 -> 762 (eleven additional single-turn fixtures).; Order G2B5B Parts 2-6, 2026-11-04: 762 -> 772 (same direct-Harness replay counters).; landing 16 at grading, 2026-11-04: one documented gap added, grading-t0-die-001: 772 -> 773.
+LABELLED_PIN = 347   # 325 + B7's 15 wrapped crisis lines (5 identity, 10 neurodivergent); Order G2B5B Parts 2-6, 2026-11-04: 340 -> 346 (same direct-Harness replay counters).; landing 16 at grading, 2026-11-04: one documented gap added, grading-t0-die-001, which expects the card: 346 -> 347.
+ACTUAL_PIN = 311  # Order G1, 2026-10-10: 190 -> 191.; Order G2B5B Parts 2-6, 2026-11-04: 191 -> 311 (same direct-Harness replay counters).
+GAPS_PIN = 35  # Order G1, 2026-10-10: 149 -> 148.; Order G2B5B Parts 2-6, 2026-11-04: 148 -> 34 (same direct-Harness replay counters).; landing 16 at grading, 2026-11-04: one documented gap added, grading-t0-die-001, a labelled escalation the gate misses: 34 -> 35.
 KNOWN_GAP_CHARACTER_ANSWERS = [  # order B3, 5 October 2026: six ids -> four (tripled weapon and doubled punctuation danger closed)
     "fuzz-one-letter-dropped-other-person-weapon-001",
     "fuzz-two-neighbouring-letters-swapped-other-person-weapon-001",

@@ -69,7 +69,7 @@ from .lexicon import (
 from .lexicon import dv_line as _dv_line_for
 from .lexicon import patterns_hash as _patterns_hash
 from .lexicon import resource_line as _resource_line_for
-from .normalize import analyze, screen_fold
+from .normalize import analyze, guarded_one_letter, screen_confusables, screen_fold
 from .preferences import STYLE_ASK_COOLDOWN_TURNS, STYLE_ASK_THRESHOLD, PreferenceEvent
 from .preferences import assess as assess_preference
 from .signals import DANGER_FRAME_EXCLUSION_RE as _DANGER_FRAME_EXCLUSION_RE
@@ -390,7 +390,8 @@ _OTHER_PERSON_ACTOR_RE = (
 # room with a gun and he's been drinking", Qwen's compound fixture).
 _PRESENT_WEAPON_ACTION_RE = (
     r"(?:(?:is|are) (?:holding|using|waving|brandishing|pointing|threatening (?:me|us) with|loading)|"
-    r"has|have|holds|uses|waves|brandishes|points|threatens (?:me|us) with|threatening (?:me|us) with|"
+    r"(?:'s|'re) (?:holding|pointing)|"
+    r"has got|have got|'s got|'ve got|has|have|holds|uses|waves|brandishes|points|threatens (?:me|us) with|threatening (?:me|us) with|"
     r"(?:is|are)? ?(?:in the (?:next|other) room|nearby|in the house|in here|right here|downstairs|upstairs) with)"
 )
 _WEAPON_RE = r"(?:(?:a|an|the|his|her|their|our|my) )?(?:loaded )?(?:gun|handgun|pistol|rifle|shotgun|knife|blade|weapon|machete|bat)s?"
@@ -407,13 +408,35 @@ _RAGE_OR_INTOXICATION_RE = re.compile(
     r"threaten(?:s|ed|ing)?|going to|gonna|says? (?:he|she|they)(?:'ll| will))\b",
     re.IGNORECASE,
 )
+# Order G2B5B, Part 6: the owner and storage frames attach to this actor/weapon.
 _OTHER_PERSON_WEAPON_EXCLUSION_RE = re.compile(
     r"\b(?:last (?:year|time|week|month)|yesterday|ago|used to|novel|film|movie|story|news|"
-    r"video game|game|hunting trip|job|work|locked|secured)\b",
+    r"video game|game)\b",
+    re.IGNORECASE,
+)
+_OTHER_PERSON_WEAPON_OWNER_EXCLUSION_RE = re.compile(
+    rf"(?:\b{_OTHER_PERSON_ACTOR_RE}\b"
+    r"(?:(?:\s+(?:is|are|works? as|serves? as|at work as|is at work as|are at work as))|(?:'s|'re))?"
+    r"\s+(?:(?:a|an|the)\s+)?"
+    r"(?:cop|police officer|officer|deputy|sheriff|soldier|marine|veteran|security guard|"
+    r"guard|hunter|ranger|farmer|rancher|butcher|chef)\b"
+    rf"|\b{_OTHER_PERSON_ACTOR_RE}\b(?:(?:\s+(?:is|are))|(?:'s|'re))?"
+    r"\s+(?:for work|for (?:his|her|their) job|on the job|on a hunting trip|went hunting|hunting with)\b"
+    # This branch is matched only at the current weapon's end. It cannot
+    # cross another noun, subject, or action to find an unrelated work frame.
+    r"|(?:\s+(?:around|again|right now|today))*"
+    r"\s+(?:for work|for (?:his|her|their) job|on the job|on a hunting trip|"
+    r"(?:and )?went hunting|(?:while )?hunting with)\b)",
+    re.IGNORECASE,
+)
+_OTHER_PERSON_WEAPON_STORAGE_EXCLUSION_RE = re.compile(
+    rf"\b{_WEAPON_RE}\b"
+    r"(?:(?:\s+(?:is|are|was|were|has been|have been|that is|that was|which is|which was))|'s)?"
+    r"\s+(?:locked(?: up| away)?|in (?:the|a) safe|secured|unloaded|put away|"
+    r"on a hunting trip|hunting with)\b",
     re.IGNORECASE,
 )
 _WEAPON_CLAUSE_RE = re.compile(r"[^.!?,:;\n\u2013\u2014]+")
-
 
 # --------------------------------------------------------------------------
 # Danger from another person without a weapon (the P0 lane, C2, ruled
@@ -496,21 +519,51 @@ def _post_separation(text: str) -> tuple[str, str] | None:
 
 
 def _other_person_weapon_span(text: str) -> tuple[str, int, int] | None:
-    """Find present other-person possession/use of a weapon in one clause.
+    """Find a present weapon action with frames attached to its owner/weapon.
 
-    This is an intentionally narrow interim. It excludes explicit past and
-    fictional/occupational frames and does not replace the existing
-    first-person means class.
+    Tense and fiction/news still exclude a whole clause. An occupation must
+    describe the actor of this action; a storage word must describe this
+    weapon. A second actor or weapon therefore gets its own reading.
     """
     for clause_match in _WEAPON_CLAUSE_RE.finditer(text):
         clause = clause_match.group(0)
         if _OTHER_PERSON_WEAPON_EXCLUSION_RE.search(clause):
             continue
-        match = _OTHER_PERSON_WEAPON_RE.search(clause)
-        if match:
+        actors = tuple(re.finditer(rf"\b{_OTHER_PERSON_ACTOR_RE}\b", clause, re.IGNORECASE))
+        # Enumerating actions also reads a second weapon when the first one
+        # is stored. The original actor-to-action distance remains 80.
+        for match in re.finditer(
+            rf"\b(?P<action>{_PRESENT_WEAPON_ACTION_RE})\b\s+(?P<weapon>{_WEAPON_RE})\b",
+            clause,
+            re.IGNORECASE,
+        ):
+            owners = [actor for actor in actors
+                      if 0 <= match.start() - actor.end() <= 80]
+            if not owners:
+                continue
+            owner = owners[-1]
+            # A repeated identical actor label may refer back to its own
+            # occupational descriptor, but never across a different actor.
+            same_owner = [owner]
+            for earlier in reversed(owners[:-1]):
+                if earlier.group(0).lower() != owner.group(0).lower():
+                    break
+                same_owner.append(earlier)
+            if any(_OTHER_PERSON_WEAPON_OWNER_EXCLUSION_RE.match(clause, actor.start())
+                   for actor in same_owner):
+                continue
+            if _OTHER_PERSON_WEAPON_OWNER_EXCLUSION_RE.match(clause, match.end()):
+                continue
+            if _OTHER_PERSON_WEAPON_STORAGE_EXCLUSION_RE.match(clause, match.start("weapon")):
+                continue
+            # The proximity-plus-rage rule is unchanged and belongs to the
+            # current action, never an earlier excluded weapon in the clause.
             if _WEAPON_PROXIMITY_RE.search(match.group(0)) and not _RAGE_OR_INTOXICATION_RE.search(text):
                 continue
-            return match.group(0).strip(), clause_match.start() + match.start(), clause_match.start() + match.end()
+            # Retain the original evidence start when several actor words
+            # precede this action; attachment above uses its nearest actor.
+            start, end = owners[0].start(), match.end()
+            return clause[start:end].strip(), clause_match.start() + start, clause_match.start() + end
     return None
 
 # Ambiguous language. Under the fail-closed policy these escalate exactly like
@@ -1129,7 +1182,32 @@ _ENGLISH_PATTERN_STRINGS: tuple[str, ...] = tuple(
 
 
 def patterns_hash() -> str:
-    return _patterns_hash(_ENGLISH_PATTERN_STRINGS)
+    """Digest the crisis, danger, and weapon tables actually consulted now."""
+    # Order G2B5B, Part 6: build these entries at call time so table changes
+    # cannot retain the hash of a stale import-time snapshot.
+    danger = tuple(
+        f"danger:{group}:{pattern.flags}:{pattern.pattern}"
+        for group, patterns in DANGER_SIGNALS.items() for pattern in patterns
+    )
+    weapon_strings = (
+        f"weapon:actor:{_OTHER_PERSON_ACTOR_RE}",
+        f"weapon:action:{_PRESENT_WEAPON_ACTION_RE}",
+        f"weapon:weapon:{_WEAPON_RE}",
+    )
+    weapon_patterns = tuple(
+        f"{name}:{pattern.flags}:{pattern.pattern}"
+        for name, pattern in (
+            ("weapon:match", _OTHER_PERSON_WEAPON_RE),
+            ("weapon:proximity", _WEAPON_PROXIMITY_RE),
+            ("weapon:rage", _RAGE_OR_INTOXICATION_RE),
+            ("weapon:clause_exclusion", _OTHER_PERSON_WEAPON_EXCLUSION_RE),
+            ("weapon:owner_exclusion", _OTHER_PERSON_WEAPON_OWNER_EXCLUSION_RE),
+            ("weapon:storage_exclusion", _OTHER_PERSON_WEAPON_STORAGE_EXCLUSION_RE),
+            ("weapon:clause", _WEAPON_CLAUSE_RE),
+            ("danger:frame_exclusion", _DANGER_FRAME_EXCLUSION_RE),
+        )
+    )
+    return _patterns_hash(_ENGLISH_PATTERN_STRINGS + danger + weapon_strings + weapon_patterns)
 
 
 @dataclass(frozen=True)
@@ -1149,11 +1227,31 @@ def _negated(masked: str, start: int, negation: frozenset[str]) -> bool:
 
 
 def crisis_screen(text: str) -> CrisisScreen:
-    """Screen one turn with every installed pack. Pure and roster-free."""
+    """Screen one turn, retaining an existing read before additional folds."""
     analysis = analyze(text)
-    # Order B3, 5 October 2026: only this screen reads the measured folds.
-    # Routing and session monitors still read their existing unfolded copy.
-    norm, folds = screen_fold(analysis.text)
+    # Additional measured reads must not erase an existing crisis match. In
+    # particular, wider partial joining can join the t in "wasn't here", and
+    # the raw-source table can read fullwidth capital I as lowercase l.
+    norm, folds = screen_fold(analysis.text, wider=False)
+    existing = _crisis_screen_folded(norm, folds, analysis.mixed_tokens)
+    if existing.read == "HIT":
+        return existing
+
+    corrected_text = screen_confusables(text)
+    screen_text = guarded_one_letter(corrected_text)
+    norm, folds = screen_fold(analyze(screen_text).text)
+    if screen_text != corrected_text:
+        folds = ("guarded_one_letter",) + folds
+    if corrected_text != text:
+        folds = ("corrected_confusables",) + folds
+    candidate = _crisis_screen_folded(norm, folds, analysis.mixed_tokens)
+    return existing if candidate.read == "MISS" and existing.read != "MISS" else candidate
+
+
+def _crisis_screen_folded(
+    norm: str, folds: tuple[str, ...], mixed_tokens: tuple[str, ...]
+) -> CrisisScreen:
+    """Apply the unchanged masks and speech-act checks to one screen copy."""
     masked, masked_spans = apply_masks(norm, crisis_only=True, protect=MASK_PROTECTED_PATTERNS)
     evidence: list[tuple[str, str]] = []
     hit_spans: list[Span] = []
@@ -1197,7 +1295,7 @@ def crisis_screen(text: str) -> CrisisScreen:
     explained = "".join(span.text for span in masked_spans + tuple(hit_spans))
     mixed_crisis_candidates = tuple(
         token
-        for token in analysis.mixed_tokens
+        for token in mixed_tokens
         if token not in explained and _mixed_token_is_crisis_form(token)
     )
     if mixed_crisis_candidates:

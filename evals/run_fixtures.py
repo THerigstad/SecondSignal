@@ -424,15 +424,69 @@ def check_case(
     return tuple(failures)
 
 
-def classify_case(case: CaseData) -> Status:
-    """Apply mutually exclusive precedence: gap, dispute, adjustment, pass."""
+def case_disposition(
+    case: CaseData, manifest_entry: CaseData | None = None, *, source: str | None = None,
+) -> str:
+    """Read historical flags, allowing only the recorded G2B5B closure.
+
+    The source fixture remains verbatim. An accepted override is effective
+    only for a known gap, never a dissent, and requires the order, date,
+    previous disposition, original reason and separate acceptance reason together.
+    Every accepted case still
+    executes all its original expectation checks without an xfail allowance.
+    """
     if case.get("known_gap"):
-        return "known gap"
-    if case.get("disputed"):
-        return "disputed"
-    if case.get("contract_adjusted"):
-        return "contract-adjusted"
-    return "pass as written"
+        original = "known_gap"
+    elif case.get("disputed"):
+        original = "disputed"
+    elif case.get("contract_adjusted"):
+        original = "contract_adjusted"
+    else:
+        original = "accepted"
+    if manifest_entry is None:
+        return original
+    if manifest_entry.get("id") != case.get("id"):
+        raise ValueError("Manifest entry belongs to a different case")
+    if source is not None and manifest_entry.get("source") != source:
+        raise ValueError(f"Manifest source differs for {case['id']}")
+    disposition = manifest_entry.get("disposition")
+    closure_keys = ("previous_disposition", "accepted_by_order", "accepted_on", "acceptance_reason", "previous_mismatch_fields")
+    if disposition == original and not any(key in manifest_entry for key in closure_keys):
+        return original
+    permitted_closure = (
+        original == "known_gap"
+        and not case.get("disputed")
+        and disposition == "accepted"
+        and manifest_entry.get("previous_disposition") == "known_gap"
+        and manifest_entry.get("accepted_by_order") == "G2B5B"
+        and manifest_entry.get("accepted_on") == "2026-11-04"
+        and isinstance(manifest_entry.get("reason"), str)
+        and bool(manifest_entry["reason"].strip())
+        and manifest_entry["reason"] == (case.get("gap_note") or case.get("dispute_note") or case.get("why", ""))  # G2B5B Part 7: appended acceptance prose -> verbatim original reviewer reason plus separate acceptance_reason.
+        and isinstance(manifest_entry.get("acceptance_reason"), str)
+        and bool(manifest_entry["acceptance_reason"].strip())
+        and isinstance(manifest_entry.get("previous_mismatch_fields"), list)
+        and bool(manifest_entry["previous_mismatch_fields"])
+        and all(isinstance(field, str) for field in manifest_entry["previous_mismatch_fields"])
+        and set(manifest_entry["previous_mismatch_fields"]) <= set(case.get("expect", {})) | {"id_order"}
+        and "mismatch_fields" not in manifest_entry
+    )
+    if not permitted_closure:
+        raise ValueError(
+            f"Unapproved disposition drift for {case['id']}: {original} -> {disposition}"
+        )
+    return "accepted"
+
+
+def classify_case(
+    case: CaseData, manifest_entry: CaseData | None = None, *, source: str | None = None,
+) -> Status:
+    """Classify historical flags or an explicitly authorized manifest closure."""
+    statuses: dict[str, Status] = {
+        "known_gap": "known gap", "disputed": "disputed",
+        "contract_adjusted": "contract-adjusted", "accepted": "pass as written",
+    }
+    return statuses[case_disposition(case, manifest_entry, source=source)]  # G2B5B Part 7: raw fixture flags -> validated manifest closure for the actual source.
 
 
 def _observed_fields(
@@ -542,11 +596,20 @@ def run_fixtures(
     selected = discover_fixtures(case_dir, report=report)
     active_roster = load_roster() if roster is None else roster
     results: list[FixtureResult] = []
+    actual_case_dir = CASE_DIR.resolve()
+    manifest_entries: dict[str, CaseData] = {}
+    if any(fixture.source_path.resolve().is_relative_to(actual_case_dir) for fixture in selected):
+        manifest = json.loads((PROJECT_ROOT / "evals/case-manifest.json").read_text(encoding="utf-8"))
+        manifest_entries = {entry["id"]: entry for entry in manifest["cases"]}
 
     for fixture in selected:
         decision, session = run_case(fixture.case, active_roster)
         failures = check_case(fixture.case, decision, session)
-        status = classify_case(fixture.case)
+        entry, source = None, None
+        if fixture.source_path.resolve().is_relative_to(actual_case_dir):
+            source = fixture.source_path.resolve().relative_to(actual_case_dir).with_suffix("").as_posix()
+            entry = manifest_entries[fixture.case_id]
+        status = classify_case(fixture.case, entry, source=source)  # G2B5B Part 7: raw flags -> validated current disposition for actual repository fixtures only.
         current_expectation = fixture.case.get("expect")
         original_expectation = fixture.case.get("original_expect")
         uses_original = isinstance(original_expectation, dict)

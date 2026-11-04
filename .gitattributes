@@ -1,0 +1,12 @@
+* text=auto eol=lf
+evals/b3_closure_report.json -text
+evals/cases/identity_pairs_grok_2026-09-30.json -text
+evals/cases/neurodivergent_grok_2026-09-30.json -text
+evals/fuzz/measurements/crisis_vocabulary_2026-10-04.json -text
+evals/fuzz/measurements/spacing_2026-10-04.json -text
+evals/fuzz/measurements/targets_the_crisis_labels_2026-10-04.json -text
+evals/gap_triage/measurements/rest_2026-10-05.json -text
+evals/gap_triage/measurements/verification_2026-10-05.json -text
+evals/gap_triage/triage_2026-10-05.json -text
+evals/gate_cost/measurements/gate_cost_2026-10-05.json -text
+evals/near_tie/measurements/near_tie_2026-10-05.json -text

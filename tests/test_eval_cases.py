@@ -59,6 +59,7 @@ from pathlib import Path
 
 import pytest
 
+from evals.run_fixtures import case_disposition
 from secondsignal import Action, Outcome, SessionState, load_roster, route
 from secondsignal.profiles import canonicalize_expectation
 
@@ -260,7 +261,8 @@ MANIFEST = {
 def test_eval_case(label: str, case: dict, roster) -> None:
     decision, session = run_case(case, roster)
     bad = field_failures(case, decision, session)
-    expected_to_fail = case.get("known_gap") or case.get("disputed")
+    disposition = case_disposition(case, MANIFEST[case["id"]], source=label.split("::")[0])
+    expected_to_fail = disposition in {"known_gap", "disputed"}  # G2B5B Part 7: raw known_gap/disputed flags -> validated manifest disposition; accepted closures assert every field.
 
     if not expected_to_fail:
         if bad:
@@ -268,7 +270,7 @@ def test_eval_case(label: str, case: dict, roster) -> None:
             raise AssertionError(f"{field}: {message}")
         return
 
-    kind = "known gap" if case.get("known_gap") else "disputed"
+    kind = "known gap" if disposition == "known_gap" else "disputed"  # G2B5B Part 7: historical fixture flag -> current manifest disposition.
     approved = set(MANIFEST.get(case["id"], {}).get("mismatch_fields", []))
     unapproved = {f: m for f, m in bad.items() if f not in approved}
     if unapproved:
@@ -287,7 +289,7 @@ def test_eval_case(label: str, case: dict, roster) -> None:
         pytest.xfail(f"{kind} on {sorted(bad)}: {note}")
     pytest.fail(
         f"{label} is marked {kind} but now passes; "
-        "remove the marker so the record stays honest"
+        "update the manifest disposition so the record stays honest"  # G2B5B Part 7: remove fixture marker -> record closure in manifest without rewriting reviewer text.
     )
 
 

@@ -52,24 +52,35 @@ def disposition(case: dict) -> str:
 
 def build() -> dict:
     roster = load_roster()
+    current = json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))
+    recorded = {entry["id"]: entry for entry in current["cases"]}
     entries = []
+    closure_keys = ("previous_disposition", "accepted_by_order", "accepted_on", "acceptance_reason", "previous_mismatch_fields")
     for label, case in runner.CASES:
         source, case_id = label.split("::", 1)
+        previous = recorded.get(case_id, {})
+        has_closure = any(key in previous for key in closure_keys)
+        current_disposition = runner.case_disposition(case, previous, source=source) if has_closure else disposition(case)  # G2B5B Part 7: rebuild historical known_gap flags -> preserve only validated manifest closures and replay their original assertions.
         entry = {
             "id": case_id,
             "source": source,
             "plane": case.get("plane", "policy"),
-            "disposition": disposition(case),
+            "disposition": current_disposition,
         }
-        if entry["disposition"] in ("known_gap", "disputed"):
+        reason = case.get("gap_note") or case.get("dispute_note") or case.get("why", "")
+        if has_closure:
+            decision, session = runner.run_case(case, roster)
+            bad = runner.field_failures(case, decision, session)
+            if bad:
+                raise ValueError(f"Accepted manifest closure {case_id} fails original expectations: {bad}")
+            entry["reason"] = reason
+            entry.update({key: previous[key] for key in closure_keys})
+        elif entry["disposition"] in ("known_gap", "disputed"):
             decision, session = runner.run_case(case, roster)
             entry["mismatch_fields"] = sorted(runner.field_failures(case, decision, session))
-            entry["reason"] = (
-                case.get("gap_note") or case.get("dispute_note") or case.get("why", "")
-            )
+            entry["reason"] = reason
         entries.append(entry)
     entries.sort(key=lambda e: (e["source"], e["id"]))
-    current = json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))
     return {**current, "cases": entries}
 
 
@@ -107,7 +118,7 @@ def main() -> int:
         print("manifest is current; nothing to adopt")
         return 0
     if args.write:
-        MANIFEST_PATH.write_text(json.dumps(proposed, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+        MANIFEST_PATH.write_text(json.dumps(proposed, ensure_ascii=False, indent=1) + "\n", encoding="utf-8", newline="\n")
         print("\nwritten. Commit the diff with the reason each change is correct.")
     else:
         print("\nnot written. Re-run with --write once every line above is intended.")

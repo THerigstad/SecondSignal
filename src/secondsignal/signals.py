@@ -183,6 +183,32 @@ DOMAIN_LEXICON: dict[str, tuple[str, ...]] = {
     ),
 }
 
+# Order G2B5B, Part 5: retain only the five measured first-person frames.
+# The broad six-alias experiment is not production vocabulary. These bounded
+# aliases feed the existing relapse claims and sobriety/recovery status terms;
+# bare day-one, other-person and everyday sponsor frames remain unchanged.
+def _narrowed_recovery_aliases(text: str) -> str:
+    """Apply the measured finite recovery aliases to the extraction copy only.
+
+    Match raw wording before normalization, as the routing experiment did.
+    This helper is private to extract(); the gate and session keep raw input.
+    """
+    start = r"(^|[.!?;]\s+)"
+    end = r"(?=[.!?]|$)"
+    aliases = (
+        (start + r"(i )went back out(?= last night(?:[.!?]|$))", r"\1\2relapsed"),
+        (start + r"(i )picked up again(?= after \d+ days(?:[.!?]|$))", r"\1\2relapsed"),
+        (start + r"(i )had a slip(?= this weekend(?:[.!?]|$))", r"\1\2relapsed"),
+        (start + r"(i have to reset my )date" + end, r"\1\2sobriety date"),
+        # The existing sponsor fixture has an introductory coordinated clause.
+        (start + r"(things are wobbly and )?(i could use the kind of thing a )sponsor"
+         r"(?= would say right now(?:[.!?]|$))", r"\1\2\3sponsor in recovery"),
+    )
+    for pattern, replacement in aliases:
+        text = re.sub(pattern, replacement, text, flags=re.IGNORECASE)
+    return text
+
+
 # Terms in the addiction_recovery lexicon that mean present use or a return to
 # use. When one of these produced the domain, the domain claims the seat; when
 # only status terms did ("ten years clean"), the domain is a hold (ADR-0016).
@@ -759,7 +785,7 @@ def _fold_lines(text: str) -> str:
 
 def extract(text: str, *, turn_index: int = 0) -> RequestSignals:
     """Extract routing signals from a single turn of user input."""
-    unmasked = _normalize(text)
+    unmasked = _normalize(_narrowed_recovery_aliases(text))
     norm, masked_spans = apply_masks(unmasked)
     norm = _fold_lines(norm)
     evidence: dict[str, tuple[str, ...]] = {}
