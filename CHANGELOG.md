@@ -4,6 +4,15 @@ All notable changes to SecondSignal are documented here.
 
 ## [Unreleased]
 
+### Added — 2026-11-04, order OR1 (landing 20; the calibration measurement instrument, ADR-0036)
+
+- `evals/or1/` is a measurement-only instrument. For each labelled case it would ask several decision models the same fixed questions and record, side by side, the case's labels, the lexicon's own verdict and each model's probability. It then computes calibration: the Brier score, ten-bin calibration curves, expected calibration error, the six EACL set measures, Cohen's kappa and Gwet's AC1. Nothing it produces reaches a decision until ADR-0030's abstention table is adopted, and no function averages or votes across models (ADR-0009).
+- It is built and proven on a scripted fake client only. The real client raises `NotConfigured`, the five-model panel is marked unverified, no vendor is called and no key is read. A real run sends each case's text to the third-party models it names; the cases are synthetic.
+- The questions are data (`evals/or1/data/questions.json`): the presence of each hold domain, one choice over the tree's thirteen domains, a crisis read, and three probes (ongoing risk, intent to act, and the most severe risk). The intent question is marked first for clinician review. The lexicon pass (`evals/or1_lexicon.py`) reads the signal extractor and crisis screen without loading the router.
+- Nothing is invented. Of 6,237 case-question pairs, 128 carry a label today (the cases' `crisis_read`): 10 are model-authored, 118 are of unconfirmed authorship, and none is called human. A corpus-level record (`evals/or1/data/corpus-provenance.json`) covers all 65 case files as synthetic; no case file was edited.
+- Built by Codex (OpenAI, the ChatGPT desktop app on the operator's PC) in two attempts. The first stopped, correctly, at its baseline gate on Windows' path-length limit, which the order's short-layout rule then avoided. Landing fix by the project manager: the fake run's outputs (33 MB) are not committed; `evals/or1/results/` is listed in `.gitignore`, and the run's command rebuilds them.
+- Public numbers: 4,165 to 4,205 tests; 67 expected failures (50 documented gaps, 17 recorded dissents).
+
 ### Added — 2026-11-04, order HM2 (landing 19; the harness specification, ADR-0035)
 
 - The harness now describes itself in the portable format proposed by Gertler, Novelli and Floridi ("Towards Portable Specification of the Agent Harness", Digital Ethics Center, Yale University). `src/secondsignal_harness/spec.py` emits a machine-readable specification: the model pairing, with the requested and host-reported identities kept separate; the eight components in fixed order, each with a status, evidence, and a reason wherever a component is partial or not implemented; and five records (release, declared changeable, run start, material change events, run end). No persona and no model call can change anything; the operator's runtime controls are listed with their authorisation.

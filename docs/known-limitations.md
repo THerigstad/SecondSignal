@@ -13,6 +13,25 @@ with the rulings of 3 October on review rounds 3 and 3B (the character
 write-ups are fixed; the survivor fixtures are ported). Amended 10 October
 2026 by order P3: holds now last the sitting.
 
+## Calibration measurement — 4 November 2026
+
+The instrument in ADR-0036 (Proposed) has been proved with a scripted fake
+client only. Every model panel entry is unverified, and the real client
+raises an error before reading a key or making a call. Most questions are
+unlabelled until the two human labellers finish; agreement between those
+labellers cannot be measured yet. Model-authored fixture labels remain
+model-authored, and authorship that is not settled remains unconfirmed.
+
+A real run sends each case's text to the third-party decision models named
+in that run. The cases are synthetic public fixtures written for testing,
+and no person's message is ever sent. The fake run sends nothing. Unknown
+source files are excluded by the corpus provenance record. Results with
+an explicit absent specification hash are labelled not-reproducible.
+
+Each model is measured separately, with labelled counts; disagreement is
+preserved. No average or vote across models controls a decision, gate, latch,
+hold or seat. The future abstention table is not adopted by this measurement.
+
 ## Harness records — 4 November 2026
 
 The material change log is tamper-evident, not tamper-proof. Each event binds

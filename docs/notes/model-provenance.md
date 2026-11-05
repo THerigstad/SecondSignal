@@ -235,6 +235,7 @@ where it is measured.
 - **Order T5R, the Table's two notices and the second ask (Codex, OpenAI, the ChatGPT desktop app on the operator's PC; model and tier not recorded).** 4 November 2026 on the supplied tree SecondSignal-20de102-P2V1: put the operator's exact words on the Table's two notices, with the project manager's Spanish beside them marked not yet reviewed by a native speaker; changed four person-visible Table strings to say conversation; cut the second ask to two options; ported Grok's two break-57 fixtures unchanged, one passing and one kept as a recorded dissent; and refreshed the pins, replay and public counts.
 - **Order G2B5B, the gate's second broom (Codex, OpenAI, the ChatGPT desktop app on the operator's PC; model and tier not recorded).** 4 November 2026 on the supplied tree SecondSignal-20de102-P2V1: built B5b's five parts (the guarded one-letter screen with its shipped guard and vocabulary data, the corrected 1,225-source look-alike table, the measured wider folds, the nine stutter variants replayed for good, and the finite routing-extraction aliases) and G2's weapon-owner rule, measured before and after; 119 documented gaps now pass, every historical and current card is kept and no control gains a card. Orders T5R and G2B5B were built from the same tree and merged by the project manager the same day.
 - **The harness specification order (Codex, OpenAI, the ChatGPT desktop app on the operator's PC; the return reports GPT-6, exact model and setting not exposed).** 4 November 2026 on the tree of landing 18, in three attempts: a correct stop at a baseline gate the project manager had set wrong, a full build returned for three fixes, and the fixes. Built the machine-readable harness specification in the format of Gertler, Novelli and Floridi (Yale): the model pairing, eight components with evidence, five records, the audit-row v2 stamp, the hash-chained material change log, verified when it opens and then only for new events, with a full audit on request, and provenance headers on new results. The policy package is unchanged except the typo guard's word list. Landing fix by the project manager: a platform check in `event_log.py`, so the type checker skips the Windows-only branch on the CI's machines.
+- **The calibration measurement order (Codex, OpenAI, the ChatGPT desktop app on the operator's PC; the return reports GPT-6, exact model and setting not exposed).** 4 November 2026 on the tree of landing 19, in two attempts: a correct stop at its baseline gate on a Windows path limit, then the build. Built a measurement-only calibration instrument proven on a scripted fake client: questions as data, a lexicon pass that never loads the router, every label recorded with its authorship or marked as having none, and calibration metrics kept separate for every model. Landing fix by the project manager: the fake run's outputs are not committed.
 
 ## Reviewers, with doorway and tier where recorded
 
@@ -505,6 +506,15 @@ rewritten.
   operator's PC), is credited in the files and in the builders' section above,
   with the project manager's landing fix. The commit:
   1. "Push G, landing 19: the harness specification (ADR-0035)".
+
+- **2026-11-04** (night), push H, landing 20: the calibration measurement
+  instrument (ADR-0036), one commit through the operator's browser session on
+  GitHub's upload page, authored by the operator, the model Claude Opus 5.5, as
+  the operator's screen showed it (the operator's account), in the Claude desktop
+  app's Cowork mode; the builder, Codex (OpenAI; the ChatGPT desktop app on the
+  operator's PC), is credited in the files and in the builders' section above,
+  with the project manager's landing fix. The commit:
+  1. "Push H, landing 20: the calibration measurement instrument (ADR-0036)".
 
 ## What this note does not do
 

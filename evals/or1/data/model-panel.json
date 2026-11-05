@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "source": "Unverified display names from OR1_Kit_2026-11-03.txt; not provider identifiers.",
+  "endpoint": null,
+  "provider_route": null,
+  "spending_cap": null,
+  "models": [
+    {
+      "display_name": "Jev 1.13",
+      "model_id": null,
+      "verification": "unverified",
+      "fake_id": "fake:0"
+    },
+    {
+      "display_name": "GPT-6 Luna Decisions",
+      "model_id": null,
+      "verification": "unverified",
+      "fake_id": "fake:1"
+    },
+    {
+      "display_name": "Perplexity Decider V1.1 27B",
+      "model_id": null,
+      "verification": "unverified",
+      "fake_id": "fake:2"
+    },
+    {
+      "display_name": "Clef Flash",
+      "model_id": null,
+      "verification": "unverified",
+      "fake_id": "fake:3"
+    },
+    {
+      "display_name": "Mercury Decide",
+      "model_id": null,
+      "verification": "unverified",
+      "fake_id": "fake:4"
+    }
+  ],
+  "notice": "No availability, pricing, capability, license or routing claim is verified. Fake ids select local scripts only. The operator must check every model in their own account before any real run."
+}

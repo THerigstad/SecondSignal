@@ -565,6 +565,23 @@
         "src/secondsignal_harness/harness.py"
       ],
       "notes": "Harness records, 4 November 2026: the harness has a versioned JSON record, per-turn audit stamps, a chained material change log, sitting lifecycle records and required result headers. The component structure comes from Gertler, Novelli and Floridi at Yale. Runtime remains partial; the human-readable rendering and independent review remain future work."
+    },
+    {
+      "number": "0036",
+      "file": "0036-calibration-is-measurement-not-authority.md",
+      "title": "Calibration is measurement, not authority",
+      "decision": "Proposed",
+      "implementation": "built",
+      "evidence": [
+        "tests/test_or1_guards.py",
+        "tests/test_or1_runner.py"
+      ],
+      "modules": [
+        "evals/or1/provenance.py",
+        "evals/or1/runner.py",
+        "evals/or1_lexicon.py"
+      ],
+      "notes": "Calibration measurement, 4 November 2026: fixed questions, synthetic case provenance, separate model results and a scripted fake client are built. No real model has been run. Most questions need two human labellers. The instrument changes no decision, gate, latch or hold; the future abstention table is not active."
     }
   ],
   "reserved": [

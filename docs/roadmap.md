@@ -51,6 +51,15 @@ out (architecture phases, drawn from the
   written yet. Runtime remains partial, with no full transcript checkpoint
   or interrupted-call resume.
 
+## Calibration measurement — 4 November 2026
+
+The measurement instrument in ADR-0036 (Proposed) is built and tested with a
+scripted fake client. It records fixed questions, labels, lexicon verdicts and
+separate model results, with provenance and resume. It changes no decision,
+gate, latch or hold. Two human labellers, the operator's model checks and the
+first real run remain future work. No real model calibration or promotion
+is claimed. This measurement does not adopt the future abstention table.
+
 ## The next build blocks, in order (as of 2026-09-10)
 
 The list is drawn from the rulings of 8 and 10 September and from what the

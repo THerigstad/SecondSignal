@@ -8,3 +8,5 @@ dist/
 build/
 .DS_Store
 .coverage
+# OR1's local run outputs (the fake run is rebuilt by its command; published results live under evals/results/)
+evals/or1/results/

@@ -1,0 +1,2088 @@
+{
+  "schema_version": 1,
+  "operator_ruling": "The operator declares these case files synthetic public fixtures written for testing, not people's messages.",
+  "scope_note": "The instrument follows the existing single-case fixture scope. Deferred cases and trajectories are inventoried but not flattened into single messages.",
+  "authorship_note": "Model-written labels are never human labels. Unidentified authors and unidentified current edits remain unconfirmed. A full file has all authors resolved; partial files have source-specific exceptions or unresolved allocation.",
+  "files": [
+    {
+      "source_file": "evals/cases/deferred/dependency_and_impact_cases.json",
+      "sha256": "213c0cda35e2e087401c1cc7da9b2c96a8c3e588bc37f053e44c1750060365fe",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "deferred",
+      "case_count": 5,
+      "label_authorship": {
+        "kind": "model",
+        "role": "outside_reviewer_model",
+        "author": "Grok 4.6",
+        "model_authored": true,
+        "evidence": {
+          "field": "source",
+          "quote": "External red-team review by Grok 4.6"
+        }
+      },
+      "authorship_status": "full"
+    },
+    {
+      "source_file": "evals/cases/deferred/jr_harness_cases.json",
+      "sha256": "cc265daf5236c56bae11f257d23f64451ca477076fff7f2258d0d408e851518b",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "deferred",
+      "case_count": 7,
+      "label_authorship": {
+        "kind": "model",
+        "role": "outside_reviewer_model",
+        "author": "Grok 4.6",
+        "model_authored": true,
+        "evidence": {
+          "field": "source",
+          "quote": "External red-team review by Grok 4.6"
+        }
+      },
+      "authorship_status": "full"
+    },
+    {
+      "source_file": "evals/cases/deferred/jr_v0_cases.json",
+      "sha256": "ac91c1b5ee6998e27c845942400de8c098d3f4364b0cbfc09137457fc6dc86b2",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "deferred",
+      "case_count": 17,
+      "label_authorship": {
+        "kind": "unconfirmed",
+        "role": "unconfirmed",
+        "author": "unconfirmed",
+        "model_authored": null,
+        "evidence": {
+          "field": "source",
+          "quote": "Supplied reference unit-test gold, preserved for the future generation-and-harne"
+        }
+      },
+      "authorship_status": "unconfirmed"
+    },
+    {
+      "source_file": "evals/cases/deferred/l3_cultural_cases.json",
+      "sha256": "ba424f0bb69466c050b21946c15a45639be13929956b0df0043e140c69a541ce",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "deferred",
+      "case_count": 9,
+      "label_authorship": {
+        "kind": "model",
+        "role": "outside_reviewer_model",
+        "author": "Grok 4.6",
+        "model_authored": true,
+        "evidence": {
+          "field": "source",
+          "quote": "External red-team review by Grok 4.6"
+        }
+      },
+      "authorship_status": "full"
+    },
+    {
+      "source_file": "evals/cases/deferred/round2_orchestration_cases.json",
+      "sha256": "3401f5b04d31929113dd7ebc9f90e2de34ede71c0e74a6a9269f4fb90ccd30a9",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "deferred",
+      "case_count": 12,
+      "label_authorship": {
+        "kind": "model",
+        "role": "unconfirmed",
+        "author": "unconfirmed",
+        "model_authored": true,
+        "evidence": {
+          "field": "source",
+          "quote": "Every field is the reviewer's, verbatim; the reviewer is named on each case"
+        }
+      },
+      "authorship_status": "full",
+      "case_overrides": {
+        "rr2-intake-failure-withholds-seat": {
+          "label_authorship": {
+            "kind": "model",
+            "role": "outside_reviewer_model",
+            "author": "chatgpt",
+            "model_authored": true,
+            "evidence": {
+              "field": "reviewer",
+              "quote": "chatgpt"
+            }
+          }
+        },
+        "r2-card-intake-fault-001": {
+          "label_authorship": {
+            "kind": "model",
+            "role": "outside_reviewer_model",
+            "author": "chatgpt",
+            "model_authored": true,
+            "evidence": {
+              "field": "reviewer",
+              "quote": "chatgpt"
+            }
+          }
+        },
+        "r2-card-backend-miss-fault-001": {
+          "label_authorship": {
+            "kind": "model",
+            "role": "outside_reviewer_model",
+            "author": "chatgpt",
+            "model_authored": true,
+            "evidence": {
+              "field": "reviewer",
+              "quote": "chatgpt"
+            }
+          }
+        },
+        "r2-matrix-hit-hit-001": {
+          "label_authorship": {
+            "kind": "model",
+            "role": "outside_reviewer_model",
+            "author": "chatgpt",
+            "model_authored": true,
+            "evidence": {
+              "field": "reviewer",
+              "quote": "chatgpt"
+            }
+          }
+        },
+        "r2-matrix-miss-hit-001": {
+          "label_authorship": {
+            "kind": "model",
+            "role": "outside_reviewer_model",
+            "author": "chatgpt",
+            "model_authored": true,
+            "evidence": {
+              "field": "reviewer",
+              "quote": "chatgpt"
+            }
+          }
+        },
+        "r2-matrix-miss-miss-001": {
+          "label_authorship": {
+            "kind": "model",
+            "role": "outside_reviewer_model",
+            "author": "chatgpt",
+            "model_authored": true,
+            "evidence": {
+              "field": "reviewer",
+              "quote": "chatgpt"
+            }
+          }
+        },
+        "r2-matrix-inconclusive-preserved-001": {
+          "label_authorship": {
+            "kind": "model",
+            "role": "outside_reviewer_model",
+            "author": "chatgpt",
+            "model_authored": true,
+            "evidence": {
+              "field": "reviewer",
+              "quote": "chatgpt"
+            }
+          }
+        },
+        "r2-admitted-intake-failure-001": {
+          "label_authorship": {
+            "kind": "model",
+            "role": "outside_reviewer_model",
+            "author": "chatgpt",
+            "model_authored": true,
+            "evidence": {
+              "field": "reviewer",
+              "quote": "chatgpt"
+            }
+          }
+        },
+        "r2-gate-intake-crisis-001": {
+          "label_authorship": {
+            "kind": "model",
+            "role": "outside_reviewer_model",
+            "author": "grok",
+            "model_authored": true,
+            "evidence": {
+              "field": "reviewer",
+              "quote": "grok"
+            }
+          }
+        },
+        "r2-intake-timeout-grief-001": {
+          "label_authorship": {
+            "kind": "model",
+            "role": "outside_reviewer_model",
+            "author": "glm",
+            "model_authored": true,
+            "evidence": {
+              "field": "reviewer",
+              "quote": "glm"
+            }
+          }
+        },
+        "intake-failure-held-domain-abandoned-intake-timeout": {
+          "label_authorship": {
+            "kind": "model",
+            "role": "outside_reviewer_model",
+            "author": "nemotron",
+            "model_authored": true,
+            "evidence": {
+              "field": "reviewer",
+              "quote": "nemotron"
+            }
+          }
+        },
+        "intake-timeout-card-delay": {
+          "label_authorship": {
+            "kind": "model",
+            "role": "outside_reviewer_model",
+            "author": "sonar",
+            "model_authored": true,
+            "evidence": {
+              "field": "reviewer",
+              "quote": "sonar"
+            }
+          }
+        }
+      }
+    },
+    {
+      "source_file": "evals/cases/deferred/round2_persistence_cases.json",
+      "sha256": "4fa05a8251c79c4e1f6fa249ff53a1aae0396736d7667c33e6fd4325e0e5ebef",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "deferred",
+      "case_count": 6,
+      "label_authorship": {
+        "kind": "model",
+        "role": "unconfirmed",
+        "author": "unconfirmed",
+        "model_authored": true,
+        "evidence": {
+          "field": "source",
+          "quote": "Every field is the reviewer's, verbatim; the reviewer is named on each case"
+        }
+      },
+      "authorship_status": "full",
+      "case_overrides": {
+        "r2-ledger-scope-001": {
+          "label_authorship": {
+            "kind": "model",
+            "role": "outside_reviewer_model",
+            "author": "grok",
+            "model_authored": true,
+            "evidence": {
+              "field": "reviewer",
+              "quote": "grok"
+            }
+          }
+        },
+        "r2-ledger-cas-001": {
+          "label_authorship": {
+            "kind": "model",
+            "role": "outside_reviewer_model",
+            "author": "grok",
+            "model_authored": true,
+            "evidence": {
+              "field": "reviewer",
+              "quote": "grok"
+            }
+          }
+        },
+        "interlock-stale-head": {
+          "label_authorship": {
+            "kind": "model",
+            "role": "outside_reviewer_model",
+            "author": "sonar",
+            "model_authored": true,
+            "evidence": {
+              "field": "reviewer",
+              "quote": "sonar"
+            }
+          }
+        },
+        "pplx-r2-latch-session-001": {
+          "label_authorship": {
+            "kind": "model",
+            "role": "outside_reviewer_model",
+            "author": "kimi",
+            "model_authored": true,
+            "evidence": {
+              "field": "reviewer",
+              "quote": "kimi"
+            }
+          }
+        },
+        "r2-latch-survives-boundary-001": {
+          "label_authorship": {
+            "kind": "model",
+            "role": "outside_reviewer_model",
+            "author": "glm",
+            "model_authored": true,
+            "evidence": {
+              "field": "reviewer",
+              "quote": "glm"
+            }
+          }
+        },
+        "durable-hard-latch-persistence-2": {
+          "label_authorship": {
+            "kind": "model",
+            "role": "outside_reviewer_model",
+            "author": "nemotron",
+            "model_authored": true,
+            "evidence": {
+              "field": "reviewer",
+              "quote": "nemotron"
+            }
+          }
+        }
+      }
+    },
+    {
+      "source_file": "evals/cases/deferred/stall_recovery_cases.json",
+      "sha256": "bb2f7aa2010ad1346d8fd8a70f78840bde6cd15321d74823d34eb52a7f9bdb2f",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "deferred",
+      "case_count": 8,
+      "label_authorship": {
+        "kind": "model",
+        "role": "outside_reviewer_model",
+        "author": "ChatGPT-6 Astra (Ultra)",
+        "model_authored": true,
+        "evidence": {
+          "field": "source",
+          "quote": "ChatGPT-6 Astra (Ultra)"
+        }
+      },
+      "authorship_status": "full"
+    },
+    {
+      "source_file": "evals/cases/deferred/vendor_desync_cases.json",
+      "sha256": "3bdbab2d6e55a9b62d1846ef13aa0666e72f7a81cd7a78943462ca20275f78cd",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "deferred",
+      "case_count": 7,
+      "label_authorship": {
+        "kind": "model",
+        "role": "outside_reviewer_model",
+        "author": "Grok 4.6",
+        "model_authored": true,
+        "evidence": {
+          "field": "source",
+          "quote": "External red-team review by Grok 4.6"
+        }
+      },
+      "authorship_status": "full"
+    },
+    {
+      "source_file": "evals/cases/external_acceptance_grok_2026-09-03.json",
+      "sha256": "ba972feafc1f7c35874b23b4ad5aec373b2abc70549b1aa8430dc1d29f7bf4cd",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "single_case_policy",
+      "case_count": 26,
+      "label_authorship": {
+        "kind": "model",
+        "role": "outside_reviewer_model",
+        "author": "Grok",
+        "model_authored": true,
+        "evidence": {
+          "field": "reviewer",
+          "quote": "grok"
+        }
+      },
+      "authorship_status": "full"
+    },
+    {
+      "source_file": "evals/cases/external_review_grok_2026-09-01.json",
+      "sha256": "55be379b02ee461fdb5b2e4e28d9356a2efc5f9ae359548da3338ed586edc2cc",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "single_case_policy",
+      "case_count": 25,
+      "label_authorship": {
+        "kind": "model",
+        "role": "outside_reviewer_model",
+        "author": "Grok 4.6",
+        "model_authored": true,
+        "evidence": {
+          "field": "source",
+          "quote": "External red-team review by Grok 4.6, 2026-09-01. Original fixtures: evals/resul"
+        }
+      },
+      "authorship_status": "full"
+    },
+    {
+      "source_file": "evals/cases/fuzz_representative_2026-10-04.json",
+      "sha256": "a6197ee86f55a09443d9d14fb1c420732b95a9842e6d44bf7e6699624615fdea",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "single_case_policy",
+      "case_count": 72,
+      "label_authorship": {
+        "kind": "unconfirmed",
+        "role": "unconfirmed",
+        "author": "unconfirmed",
+        "model_authored": null,
+        "evidence": {
+          "field": "source",
+          "quote": "The representative set of the crisis-gate fuzz (ruling 4 of 3 October 2026): one"
+        }
+      },
+      "authorship_status": "unconfirmed"
+    },
+    {
+      "source_file": "evals/cases/g2_weapon_owner_2026-11-04.json",
+      "sha256": "385e8a88d5b42f9a7034b3b27a76ca8e27b9fa86cbc1236724a84ade122da262",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "single_case_policy",
+      "case_count": 10,
+      "label_authorship": {
+        "kind": "model",
+        "role": "build_helper_model",
+        "author": "Codex",
+        "model_authored": true,
+        "evidence": {
+          "field": "author",
+          "quote": "Codex"
+        }
+      },
+      "authorship_status": "full"
+    },
+    {
+      "source_file": "evals/cases/grading_find_t0_2026-11-04.json",
+      "sha256": "b413e91401097154df4778648ca8b1fa9230cd42c7bf36d5007bcb9bf85b1cee",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "single_case_policy",
+      "case_count": 1,
+      "label_authorship": {
+        "kind": "model",
+        "role": "project_manager",
+        "author": "Claude",
+        "model_authored": true,
+        "evidence": {
+          "field": "author",
+          "quote": "Claude"
+        }
+      },
+      "authorship_status": "full"
+    },
+    {
+      "source_file": "evals/cases/identity_pairs_grok_2026-09-30.json",
+      "sha256": "ba88f0b1b585707540a281268947bb730d1930d6ba2038d2acc654e9dcbe48e8",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "single_case_policy",
+      "case_count": 65,
+      "label_authorship": {
+        "kind": "unconfirmed",
+        "role": "unconfirmed",
+        "author": "unconfirmed",
+        "model_authored": null,
+        "evidence": {
+          "field": "source",
+          "quote": "Grok (grok.com, Expert), night order 10 of 30 September 2026, the neurodivergent"
+        }
+      },
+      "authorship_status": "unconfirmed"
+    },
+    {
+      "source_file": "evals/cases/known_gaps.json",
+      "sha256": "279fc47c99d9f0dd29454a051f0f02f2d0b1e88225f858ae36c2f24ce1726ec9",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "single_case_policy",
+      "case_count": 169,
+      "label_authorship": {
+        "kind": "unconfirmed",
+        "role": "unconfirmed",
+        "author": "unconfirmed",
+        "model_authored": null,
+        "evidence": {
+          "field": "source",
+          "quote": "Maintainer-authored after the external review (2026-09-02) and extended after th"
+        }
+      },
+      "authorship_status": "unconfirmed"
+    },
+    {
+      "source_file": "evals/cases/narrator_isolation.json",
+      "sha256": "24472ea697528acc7c5918ba005e8797bec0d28f3cc0d45400ad8cd06db415f1",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "single_case_policy",
+      "case_count": 12,
+      "label_authorship": {
+        "kind": "unconfirmed",
+        "role": "unconfirmed",
+        "author": "unconfirmed",
+        "model_authored": null,
+        "evidence": {
+          "field": "source",
+          "quote": "The narrator-isolation fixtures of 10 September 2026: the injection line put aga"
+        }
+      },
+      "authorship_status": "unconfirmed"
+    },
+    {
+      "source_file": "evals/cases/neurodivergent_grok_2026-09-30.json",
+      "sha256": "516b76714c3e176bef070ad2abeabfa9cfd461e40512e14860e16cb54760bf66",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "single_case_policy",
+      "case_count": 50,
+      "label_authorship": {
+        "kind": "unconfirmed",
+        "role": "unconfirmed",
+        "author": "unconfirmed",
+        "model_authored": null,
+        "evidence": {
+          "field": "source",
+          "quote": "Grok (grok.com, Expert), night order 10 of 30 September 2026, the neurodivergent"
+        }
+      },
+      "authorship_status": "unconfirmed"
+    },
+    {
+      "source_file": "evals/cases/operator_live_test_2026-09-11.json",
+      "sha256": "dfabff54d55598eaf7000bbbcfaeadcdd8bf6c57cc2ed29e8c91679a555dc4b0",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "single_case_policy",
+      "case_count": 5,
+      "label_authorship": {
+        "kind": "unconfirmed",
+        "role": "unconfirmed",
+        "author": "unconfirmed",
+        "model_authored": null,
+        "evidence": {
+          "field": "source",
+          "quote": "The operator's first live test of the demonstration page, 11 September 2026. He "
+        }
+      },
+      "authorship_status": "unconfirmed"
+    },
+    {
+      "source_file": "evals/cases/p0_lane_2026-09-10.json",
+      "sha256": "28e635e60e7b526e8eee5cc60626e0b2ac850ed4c5cbe5a2a95fe6c4f2a37793",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "single_case_policy",
+      "case_count": 20,
+      "label_authorship": {
+        "kind": "unconfirmed",
+        "role": "unconfirmed",
+        "author": "unconfirmed",
+        "model_authored": null,
+        "evidence": {
+          "field": "source",
+          "quote": "The P0 lane, built 10 September 2026 from the rulings of 8 September (C2 the dan"
+        }
+      },
+      "authorship_status": "unconfirmed"
+    },
+    {
+      "source_file": "evals/cases/p2_v1_round2_asks_2026-10-13.json",
+      "sha256": "8e1e9d7f00829371e4c1619d684c69449d2a03c55cd4209598b51aa331b2370f",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "single_case_policy",
+      "case_count": 15,
+      "label_authorship": {
+        "kind": "model",
+        "role": "outside_reviewer_model",
+        "author": "Named outside reviewer models",
+        "model_authored": true,
+        "evidence": {
+          "field": "reviewer",
+          "quote": "nemotron, kimi, glm, vibe, grok laptop and perplexity deep research"
+        }
+      },
+      "authorship_status": "full",
+      "case_overrides": {
+        "R2-P1-001": {
+          "label_authorship": {
+            "kind": "model",
+            "role": "outside_reviewer_model",
+            "author": "Nemotron",
+            "model_authored": true,
+            "evidence": {
+              "field": "source",
+              "quote": "Nemotron, R2 purpose research, October 2026"
+            }
+          }
+        },
+        "R2-P2-001": {
+          "label_authorship": {
+            "kind": "model",
+            "role": "outside_reviewer_model",
+            "author": "Nemotron",
+            "model_authored": true,
+            "evidence": {
+              "field": "source",
+              "quote": "Nemotron, R2 purpose research, October 2026"
+            }
+          }
+        },
+        "purpose-ask-001": {
+          "label_authorship": {
+            "kind": "model",
+            "role": "outside_reviewer_model",
+            "author": "Kimi",
+            "model_authored": true,
+            "evidence": {
+              "field": "source",
+              "quote": "Kimi, R2 purpose research, October 2026"
+            }
+          }
+        },
+        "purpose-ask-003": {
+          "label_authorship": {
+            "kind": "model",
+            "role": "outside_reviewer_model",
+            "author": "Kimi",
+            "model_authored": true,
+            "evidence": {
+              "field": "source",
+              "quote": "Kimi, R2 purpose research, October 2026"
+            }
+          }
+        },
+        "GLM-R2-ask-safety-003": {
+          "label_authorship": {
+            "kind": "model",
+            "role": "outside_reviewer_model",
+            "author": "GLM",
+            "model_authored": true,
+            "evidence": {
+              "field": "source",
+              "quote": "GLM, R2 purpose research, October 2026"
+            }
+          }
+        },
+        "GLM-R2-ask-anchor-001": {
+          "label_authorship": {
+            "kind": "model",
+            "role": "outside_reviewer_model",
+            "author": "GLM",
+            "model_authored": true,
+            "evidence": {
+              "field": "source",
+              "quote": "GLM, R2 purpose research, October 2026"
+            }
+          }
+        },
+        "GLM-R2-ask-notopic-005": {
+          "label_authorship": {
+            "kind": "model",
+            "role": "outside_reviewer_model",
+            "author": "GLM",
+            "model_authored": true,
+            "evidence": {
+              "field": "source",
+              "quote": "GLM, R2 purpose research, October 2026"
+            }
+          }
+        },
+        "GLM-R2-ask-eligibility-004": {
+          "label_authorship": {
+            "kind": "model",
+            "role": "outside_reviewer_model",
+            "author": "GLM",
+            "model_authored": true,
+            "evidence": {
+              "field": "source",
+              "quote": "GLM, R2 purpose research, October 2026"
+            }
+          }
+        },
+        "GLM-R2-ask-competence-002": {
+          "label_authorship": {
+            "kind": "model",
+            "role": "outside_reviewer_model",
+            "author": "GLM",
+            "model_authored": true,
+            "evidence": {
+              "field": "source",
+              "quote": "GLM, R2 purpose research, October 2026"
+            }
+          }
+        },
+        "R2V-askseat-001": {
+          "label_authorship": {
+            "kind": "model",
+            "role": "outside_reviewer_model",
+            "author": "Vibe",
+            "model_authored": true,
+            "evidence": {
+              "field": "source",
+              "quote": "Vibe, R2 purpose research, October 2026"
+            }
+          }
+        },
+        "R2V-askseat-002": {
+          "label_authorship": {
+            "kind": "model",
+            "role": "outside_reviewer_model",
+            "author": "Vibe",
+            "model_authored": true,
+            "evidence": {
+              "field": "source",
+              "quote": "Vibe, R2 purpose research, October 2026"
+            }
+          }
+        },
+        "GROK-R2-askseat-001": {
+          "label_authorship": {
+            "kind": "model",
+            "role": "outside_reviewer_model",
+            "author": "Grok laptop",
+            "model_authored": true,
+            "evidence": {
+              "field": "source",
+              "quote": "Grok laptop, R2 purpose research, October 2026"
+            }
+          }
+        },
+        "GROK-R2-askseat-002": {
+          "label_authorship": {
+            "kind": "model",
+            "role": "outside_reviewer_model",
+            "author": "Grok laptop",
+            "model_authored": true,
+            "evidence": {
+              "field": "source",
+              "quote": "Grok laptop, R2 purpose research, October 2026"
+            }
+          }
+        },
+        "PURPOSE-VETO-001": {
+          "label_authorship": {
+            "kind": "model",
+            "role": "outside_reviewer_model",
+            "author": "Perplexity Deep Research",
+            "model_authored": true,
+            "evidence": {
+              "field": "source",
+              "quote": "Perplexity Deep Research, R2 purpose research, October 2026"
+            }
+          }
+        },
+        "PURPOSE-VETO-002": {
+          "label_authorship": {
+            "kind": "model",
+            "role": "outside_reviewer_model",
+            "author": "Perplexity Deep Research",
+            "model_authored": true,
+            "evidence": {
+              "field": "source",
+              "quote": "Perplexity Deep Research, R2 purpose research, October 2026"
+            }
+          }
+        }
+      }
+    },
+    {
+      "source_file": "evals/cases/pending_native_review_es419.json",
+      "sha256": "42daf1b90fd4148ce3646f46a450c3ac42a627717a7d34c9f2fe977f04f91670",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "single_case_policy",
+      "case_count": 13,
+      "label_authorship": {
+        "kind": "unconfirmed",
+        "role": "unconfirmed",
+        "author": "unconfirmed",
+        "model_authored": null,
+        "evidence": {
+          "field": "source",
+          "quote": "Synthetic B6 hyperbole fixtures recorded for native review; no new masks were au"
+        }
+      },
+      "authorship_status": "unconfirmed"
+    },
+    {
+      "source_file": "evals/cases/review_round3b_tense_2026-09-28.json",
+      "sha256": "b7c260c9f818c3e7e2ab0027903f2bc097f585377cd4abe7464c1df2a62c2c09",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "single_case_policy",
+      "case_count": 13,
+      "label_authorship": {
+        "kind": "unconfirmed",
+        "role": "unconfirmed",
+        "author": "unconfirmed",
+        "model_authored": null,
+        "evidence": {
+          "field": "source",
+          "quote": "Review round 3B, found 28 September 2026 while the triage ran the reviewers' own"
+        }
+      },
+      "authorship_status": "unconfirmed"
+    },
+    {
+      "source_file": "evals/cases/round1_2026-09-02/chatgpt.json",
+      "sha256": "27fd308a73be31d72f6a5e90d13ad9e0095d5880db79f1e3507a561145cffb5c",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "single_case_policy",
+      "case_count": 15,
+      "label_authorship": {
+        "kind": "model",
+        "role": "outside_reviewer_model",
+        "author": "chatgpt",
+        "model_authored": true,
+        "evidence": {
+          "field": "reviewer",
+          "quote": "chatgpt"
+        }
+      },
+      "authorship_status": "partial",
+      "case_overrides": {
+        "gpt-d4-grief-hold": {
+          "label_authorship": {
+            "kind": "unconfirmed",
+            "role": "unconfirmed",
+            "author": "unconfirmed",
+            "model_authored": null,
+            "evidence": {
+              "field": "contract_adjusted",
+              "quote": true
+            }
+          },
+          "original_label_authorship": {
+            "kind": "model",
+            "role": "outside_reviewer_model",
+            "author": "chatgpt",
+            "model_authored": true,
+            "evidence": {
+              "field": "reviewer",
+              "quote": "chatgpt"
+            }
+          },
+          "note": "The reviewer authored the original expectation; the current adjustment does not identify its author."
+        }
+      }
+    },
+    {
+      "source_file": "evals/cases/round1_2026-09-02/deepseek.json",
+      "sha256": "8cbba6240a0f0b282b050de3683306e4011a9f17ce076f702385ce7a09be2158",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "single_case_policy",
+      "case_count": 14,
+      "label_authorship": {
+        "kind": "model",
+        "role": "outside_reviewer_model",
+        "author": "deepseek",
+        "model_authored": true,
+        "evidence": {
+          "field": "reviewer",
+          "quote": "deepseek"
+        }
+      },
+      "authorship_status": "partial",
+      "case_overrides": {
+        "ds-seat-003": {
+          "label_authorship": {
+            "kind": "unconfirmed",
+            "role": "unconfirmed",
+            "author": "unconfirmed",
+            "model_authored": null,
+            "evidence": {
+              "field": "contract_adjusted",
+              "quote": true
+            }
+          },
+          "original_label_authorship": {
+            "kind": "model",
+            "role": "outside_reviewer_model",
+            "author": "deepseek",
+            "model_authored": true,
+            "evidence": {
+              "field": "reviewer",
+              "quote": "deepseek"
+            }
+          },
+          "note": "The reviewer authored the original expectation; the current adjustment does not identify its author."
+        },
+        "ds-hold-002": {
+          "label_authorship": {
+            "kind": "unconfirmed",
+            "role": "unconfirmed",
+            "author": "unconfirmed",
+            "model_authored": null,
+            "evidence": {
+              "field": "contract_adjusted",
+              "quote": true
+            }
+          },
+          "original_label_authorship": {
+            "kind": "model",
+            "role": "outside_reviewer_model",
+            "author": "deepseek",
+            "model_authored": true,
+            "evidence": {
+              "field": "reviewer",
+              "quote": "deepseek"
+            }
+          },
+          "note": "The reviewer authored the original expectation; the current adjustment does not identify its author."
+        }
+      }
+    },
+    {
+      "source_file": "evals/cases/round1_2026-09-02/grok.json",
+      "sha256": "5ec8be1132f8718c04f14798ef2579afeea14e4714c12c49e7f10a271c78130e",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "single_case_policy",
+      "case_count": 45,
+      "label_authorship": {
+        "kind": "model",
+        "role": "outside_reviewer_model",
+        "author": "grok",
+        "model_authored": true,
+        "evidence": {
+          "field": "reviewer",
+          "quote": "grok"
+        }
+      },
+      "authorship_status": "partial",
+      "case_overrides": {
+        "grok-frust-002": {
+          "label_authorship": {
+            "kind": "unconfirmed",
+            "role": "unconfirmed",
+            "author": "unconfirmed",
+            "model_authored": null,
+            "evidence": {
+              "field": "contract_adjusted",
+              "quote": true
+            }
+          },
+          "original_label_authorship": {
+            "kind": "model",
+            "role": "outside_reviewer_model",
+            "author": "grok",
+            "model_authored": true,
+            "evidence": {
+              "field": "reviewer",
+              "quote": "grok"
+            }
+          },
+          "note": "The reviewer authored the original expectation; the current adjustment does not identify its author."
+        },
+        "grok-lang-001": {
+          "label_authorship": {
+            "kind": "unconfirmed",
+            "role": "unconfirmed",
+            "author": "unconfirmed",
+            "model_authored": null,
+            "evidence": {
+              "field": "contract_adjusted",
+              "quote": true
+            }
+          },
+          "original_label_authorship": {
+            "kind": "model",
+            "role": "outside_reviewer_model",
+            "author": "grok",
+            "model_authored": true,
+            "evidence": {
+              "field": "reviewer",
+              "quote": "grok"
+            }
+          },
+          "note": "The reviewer authored the original expectation; the current adjustment does not identify its author."
+        },
+        "grok-es-003-v0": {
+          "label_authorship": {
+            "kind": "unconfirmed",
+            "role": "unconfirmed",
+            "author": "unconfirmed",
+            "model_authored": null,
+            "evidence": {
+              "field": "contract_adjusted",
+              "quote": true
+            }
+          },
+          "original_label_authorship": {
+            "kind": "model",
+            "role": "outside_reviewer_model",
+            "author": "grok",
+            "model_authored": true,
+            "evidence": {
+              "field": "reviewer",
+              "quote": "grok"
+            }
+          },
+          "note": "The reviewer authored the original expectation; the current adjustment does not identify its author."
+        }
+      }
+    },
+    {
+      "source_file": "evals/cases/round1_2026-09-02/qwen.json",
+      "sha256": "16a52ec401d4948e59e231be17fd603a155d91c6b789edf772ea3512734a0889",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "single_case_policy",
+      "case_count": 15,
+      "label_authorship": {
+        "kind": "model",
+        "role": "outside_reviewer_model",
+        "author": "qwen",
+        "model_authored": true,
+        "evidence": {
+          "field": "reviewer",
+          "quote": "qwen"
+        }
+      },
+      "authorship_status": "partial",
+      "case_overrides": {
+        "qwn-d1-minor-noclear-001": {
+          "label_authorship": {
+            "kind": "unconfirmed",
+            "role": "unconfirmed",
+            "author": "unconfirmed",
+            "model_authored": null,
+            "evidence": {
+              "field": "contract_adjusted",
+              "quote": true
+            }
+          },
+          "original_label_authorship": {
+            "kind": "model",
+            "role": "outside_reviewer_model",
+            "author": "qwen",
+            "model_authored": true,
+            "evidence": {
+              "field": "reviewer",
+              "quote": "qwen"
+            }
+          },
+          "note": "The reviewer authored the original expectation; the current adjustment does not identify its author."
+        },
+        "qwn-d3-nonsubstance-relapse-001": {
+          "label_authorship": {
+            "kind": "unconfirmed",
+            "role": "unconfirmed",
+            "author": "unconfirmed",
+            "model_authored": null,
+            "evidence": {
+              "field": "contract_adjusted",
+              "quote": true
+            }
+          },
+          "original_label_authorship": {
+            "kind": "model",
+            "role": "outside_reviewer_model",
+            "author": "qwen",
+            "model_authored": true,
+            "evidence": {
+              "field": "reviewer",
+              "quote": "qwen"
+            }
+          },
+          "note": "The reviewer authored the original expectation; the current adjustment does not identify its author."
+        },
+        "qwn-d4-assist-leak-001": {
+          "label_authorship": {
+            "kind": "unconfirmed",
+            "role": "unconfirmed",
+            "author": "unconfirmed",
+            "model_authored": null,
+            "evidence": {
+              "field": "contract_adjusted",
+              "quote": true
+            }
+          },
+          "original_label_authorship": {
+            "kind": "model",
+            "role": "outside_reviewer_model",
+            "author": "qwen",
+            "model_authored": true,
+            "evidence": {
+              "field": "reviewer",
+              "quote": "qwen"
+            }
+          },
+          "note": "The reviewer authored the original expectation; the current adjustment does not identify its author."
+        }
+      }
+    },
+    {
+      "source_file": "evals/cases/round1_2026-09-02/vibe.json",
+      "sha256": "c9dd8f7d392a867b0da81a90865323f48c77c62c1c6e8074d206f30ede309c13",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "single_case_policy",
+      "case_count": 14,
+      "label_authorship": {
+        "kind": "model",
+        "role": "outside_reviewer_model",
+        "author": "vibe",
+        "model_authored": true,
+        "evidence": {
+          "field": "reviewer",
+          "quote": "vibe"
+        }
+      },
+      "authorship_status": "partial",
+      "case_overrides": {
+        "vibe-d1-bypass-001": {
+          "label_authorship": {
+            "kind": "unconfirmed",
+            "role": "unconfirmed",
+            "author": "unconfirmed",
+            "model_authored": null,
+            "evidence": {
+              "field": "contract_adjusted",
+              "quote": true
+            }
+          },
+          "original_label_authorship": {
+            "kind": "model",
+            "role": "outside_reviewer_model",
+            "author": "vibe",
+            "model_authored": true,
+            "evidence": {
+              "field": "reviewer",
+              "quote": "vibe"
+            }
+          },
+          "note": "The reviewer authored the original expectation; the current adjustment does not identify its author."
+        },
+        "vibe-d2-register-001": {
+          "label_authorship": {
+            "kind": "unconfirmed",
+            "role": "unconfirmed",
+            "author": "unconfirmed",
+            "model_authored": null,
+            "evidence": {
+              "field": "contract_adjusted",
+              "quote": true
+            }
+          },
+          "original_label_authorship": {
+            "kind": "model",
+            "role": "outside_reviewer_model",
+            "author": "vibe",
+            "model_authored": true,
+            "evidence": {
+              "field": "reviewer",
+              "quote": "vibe"
+            }
+          },
+          "note": "The reviewer authored the original expectation; the current adjustment does not identify its author."
+        },
+        "vibe-d3-false-positive-001": {
+          "label_authorship": {
+            "kind": "unconfirmed",
+            "role": "unconfirmed",
+            "author": "unconfirmed",
+            "model_authored": null,
+            "evidence": {
+              "field": "contract_adjusted",
+              "quote": true
+            }
+          },
+          "original_label_authorship": {
+            "kind": "model",
+            "role": "outside_reviewer_model",
+            "author": "vibe",
+            "model_authored": true,
+            "evidence": {
+              "field": "reviewer",
+              "quote": "vibe"
+            }
+          },
+          "note": "The reviewer authored the original expectation; the current adjustment does not identify its author."
+        },
+        "vibe-d4-assist-contra-001": {
+          "label_authorship": {
+            "kind": "unconfirmed",
+            "role": "unconfirmed",
+            "author": "unconfirmed",
+            "model_authored": null,
+            "evidence": {
+              "field": "contract_adjusted",
+              "quote": true
+            }
+          },
+          "original_label_authorship": {
+            "kind": "model",
+            "role": "outside_reviewer_model",
+            "author": "vibe",
+            "model_authored": true,
+            "evidence": {
+              "field": "reviewer",
+              "quote": "vibe"
+            }
+          },
+          "note": "The reviewer authored the original expectation; the current adjustment does not identify its author."
+        },
+        "vibe-d6-unscreened-001": {
+          "label_authorship": {
+            "kind": "unconfirmed",
+            "role": "unconfirmed",
+            "author": "unconfirmed",
+            "model_authored": null,
+            "evidence": {
+              "field": "contract_adjusted",
+              "quote": true
+            }
+          },
+          "original_label_authorship": {
+            "kind": "model",
+            "role": "outside_reviewer_model",
+            "author": "vibe",
+            "model_authored": true,
+            "evidence": {
+              "field": "reviewer",
+              "quote": "vibe"
+            }
+          },
+          "note": "The reviewer authored the original expectation; the current adjustment does not identify its author."
+        }
+      }
+    },
+    {
+      "source_file": "evals/cases/round2_2026-09-08/chatgpt.json",
+      "sha256": "07b13937828fa29ebbc4e86bacbf301a849b4c8965691d59995eb0e6848eb0d4",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "single_case_policy",
+      "case_count": 19,
+      "label_authorship": {
+        "kind": "model",
+        "role": "outside_reviewer_model",
+        "author": "chatgpt",
+        "model_authored": true,
+        "evidence": {
+          "field": "reviewer",
+          "quote": "chatgpt"
+        }
+      },
+      "authorship_status": "full"
+    },
+    {
+      "source_file": "evals/cases/round2_2026-09-08/deepseek.json",
+      "sha256": "76fb10850cb2b0ca38372b085c21437ac471ab67976aa355ffa9977f330c2242",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "single_case_policy",
+      "case_count": 2,
+      "label_authorship": {
+        "kind": "model",
+        "role": "outside_reviewer_model",
+        "author": "deepseek",
+        "model_authored": true,
+        "evidence": {
+          "field": "reviewer",
+          "quote": "deepseek"
+        }
+      },
+      "authorship_status": "partial",
+      "case_overrides": {
+        "ss-rt2-hard-latch-lifetime-001": {
+          "label_authorship": {
+            "kind": "unconfirmed",
+            "role": "unconfirmed",
+            "author": "unconfirmed",
+            "model_authored": null,
+            "evidence": {
+              "field": "contract_adjusted",
+              "quote": true
+            }
+          },
+          "original_label_authorship": {
+            "kind": "model",
+            "role": "outside_reviewer_model",
+            "author": "deepseek",
+            "model_authored": true,
+            "evidence": {
+              "field": "reviewer",
+              "quote": "deepseek"
+            }
+          },
+          "note": "The reviewer authored the original expectation; the current adjustment does not identify its author."
+        }
+      }
+    },
+    {
+      "source_file": "evals/cases/round2_2026-09-08/gemini.json",
+      "sha256": "3de550d1f50fc9732f6106b1f2efff97242cfb99763b471c5bc626c5ad4afd8a",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "single_case_policy",
+      "case_count": 3,
+      "label_authorship": {
+        "kind": "model",
+        "role": "outside_reviewer_model",
+        "author": "gemini",
+        "model_authored": true,
+        "evidence": {
+          "field": "reviewer",
+          "quote": "gemini"
+        }
+      },
+      "authorship_status": "full"
+    },
+    {
+      "source_file": "evals/cases/round2_2026-09-08/glm.json",
+      "sha256": "13c1501ea210c12184b75ca82ef14cd7caf69af8759ec3aa9679bb073220279e",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "single_case_policy",
+      "case_count": 1,
+      "label_authorship": {
+        "kind": "model",
+        "role": "outside_reviewer_model",
+        "author": "glm",
+        "model_authored": true,
+        "evidence": {
+          "field": "reviewer",
+          "quote": "glm"
+        }
+      },
+      "authorship_status": "full"
+    },
+    {
+      "source_file": "evals/cases/round2_2026-09-08/grok.json",
+      "sha256": "d3a70ab4bbdef7c526eda7d6e8c7f897562ac117c5a7f2814986c7c011b1ed03",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "single_case_policy",
+      "case_count": 3,
+      "label_authorship": {
+        "kind": "model",
+        "role": "outside_reviewer_model",
+        "author": "grok",
+        "model_authored": true,
+        "evidence": {
+          "field": "reviewer",
+          "quote": "grok"
+        }
+      },
+      "authorship_status": "partial",
+      "case_overrides": {
+        "r2-0025-hold-assist-leak-001": {
+          "label_authorship": {
+            "kind": "unconfirmed",
+            "role": "unconfirmed",
+            "author": "unconfirmed",
+            "model_authored": null,
+            "evidence": {
+              "field": "contract_adjusted",
+              "quote": true
+            }
+          },
+          "original_label_authorship": {
+            "kind": "model",
+            "role": "outside_reviewer_model",
+            "author": "grok",
+            "model_authored": true,
+            "evidence": {
+              "field": "reviewer",
+              "quote": "grok"
+            }
+          },
+          "note": "The reviewer authored the original expectation; the current adjustment does not identify its author."
+        }
+      }
+    },
+    {
+      "source_file": "evals/cases/round2_2026-09-08/kimi.json",
+      "sha256": "94702c8aff651d522c654d9147bfc687de180816fcc2e8915f164bcf4bf80ccc",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "single_case_policy",
+      "case_count": 4,
+      "label_authorship": {
+        "kind": "model",
+        "role": "outside_reviewer_model",
+        "author": "kimi",
+        "model_authored": true,
+        "evidence": {
+          "field": "reviewer",
+          "quote": "kimi"
+        }
+      },
+      "authorship_status": "full"
+    },
+    {
+      "source_file": "evals/cases/round2_2026-09-08/nemotron.json",
+      "sha256": "04b9cd1c6859a45fce073db9ffe3566cb3c0d677d9815d9909ee07a72e9fa2fc",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "single_case_policy",
+      "case_count": 2,
+      "label_authorship": {
+        "kind": "model",
+        "role": "outside_reviewer_model",
+        "author": "nemotron",
+        "model_authored": true,
+        "evidence": {
+          "field": "reviewer",
+          "quote": "nemotron"
+        }
+      },
+      "authorship_status": "partial",
+      "case_overrides": {
+        "durable-hard-latch-persistence": {
+          "label_authorship": {
+            "kind": "unconfirmed",
+            "role": "unconfirmed",
+            "author": "unconfirmed",
+            "model_authored": null,
+            "evidence": {
+              "field": "contract_adjusted",
+              "quote": true
+            }
+          },
+          "original_label_authorship": {
+            "kind": "model",
+            "role": "outside_reviewer_model",
+            "author": "nemotron",
+            "model_authored": true,
+            "evidence": {
+              "field": "reviewer",
+              "quote": "nemotron"
+            }
+          },
+          "note": "The reviewer authored the original expectation; the current adjustment does not identify its author."
+        },
+        "intake-failure-held-domain-abandoned": {
+          "label_authorship": {
+            "kind": "unconfirmed",
+            "role": "unconfirmed",
+            "author": "unconfirmed",
+            "model_authored": null,
+            "evidence": {
+              "field": "contract_adjusted",
+              "quote": true
+            }
+          },
+          "original_label_authorship": {
+            "kind": "model",
+            "role": "outside_reviewer_model",
+            "author": "nemotron",
+            "model_authored": true,
+            "evidence": {
+              "field": "reviewer",
+              "quote": "nemotron"
+            }
+          },
+          "note": "The reviewer authored the original expectation; the current adjustment does not identify its author."
+        }
+      }
+    },
+    {
+      "source_file": "evals/cases/round2_2026-09-08/qwen.json",
+      "sha256": "4165fd4a25d7e3bff82808a081bbbab18ac2bf4fda43a3d4403c2980d0424b72",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "single_case_policy",
+      "case_count": 1,
+      "label_authorship": {
+        "kind": "model",
+        "role": "outside_reviewer_model",
+        "author": "qwen",
+        "model_authored": true,
+        "evidence": {
+          "field": "reviewer",
+          "quote": "qwen"
+        }
+      },
+      "authorship_status": "full"
+    },
+    {
+      "source_file": "evals/cases/round2_2026-09-08/sonar.json",
+      "sha256": "21c2b7ba76de5f98a4321d5e0a82ba22638fc55dbb86d78cd7ff70b7e3c5a55c",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "single_case_policy",
+      "case_count": 1,
+      "label_authorship": {
+        "kind": "model",
+        "role": "outside_reviewer_model",
+        "author": "sonar",
+        "model_authored": true,
+        "evidence": {
+          "field": "reviewer",
+          "quote": "sonar"
+        }
+      },
+      "authorship_status": "full"
+    },
+    {
+      "source_file": "evals/cases/round3_codex_requested_2026-10-04.json",
+      "sha256": "9c8465f732975c1278e6f44f4cb88df36caa009dc61cc0ffbd7f08e027baac0d",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "single_case_policy",
+      "case_count": 4,
+      "label_authorship": {
+        "kind": "model",
+        "role": "outside_reviewer_model",
+        "author": "Grok and Kimi via Perplexity",
+        "model_authored": true,
+        "evidence": {
+          "field": "reviewer",
+          "quote": "grok and kimi via perplexity"
+        }
+      },
+      "authorship_status": "full"
+    },
+    {
+      "source_file": "evals/cases/round3_pins_2026-10-04.json",
+      "sha256": "ec3f006468b3b3ce96cabdefe97a0a53819ba78d54f8d8364853e3b2b63a0487",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "single_case_policy",
+      "case_count": 1,
+      "label_authorship": {
+        "kind": "model",
+        "role": "outside_reviewer_model",
+        "author": "ChatGPT-6 Pro",
+        "model_authored": true,
+        "evidence": {
+          "field": "source",
+          "quote": "ChatGPT (ChatGPT-6 Pro), review round 3, item 5.5 (decision 9 of 28 September 20"
+        }
+      },
+      "authorship_status": "full"
+    },
+    {
+      "source_file": "evals/cases/round3_rulings_2026-09-28.json",
+      "sha256": "397769387c232dd35f01befaa00dbb5d5cf8a465e26ae07f9850a23e9830850d",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "single_case_policy",
+      "case_count": 7,
+      "label_authorship": {
+        "kind": "model",
+        "role": "build_helper_model",
+        "author": "Codex",
+        "model_authored": true,
+        "evidence": {
+          "field": "source",
+          "quote": "every field is as Codex wrote it."
+        }
+      },
+      "authorship_status": "full"
+    },
+    {
+      "source_file": "evals/cases/routing.json",
+      "sha256": "b777e5501ce576d645baa037f5068eb9cd858cdad29b9e414cfbbfac220888c4",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "single_case_policy",
+      "case_count": 6,
+      "label_authorship": {
+        "kind": "unconfirmed",
+        "role": "unconfirmed",
+        "author": "unconfirmed",
+        "model_authored": null,
+        "evidence": "No field identifies the current label author."
+      },
+      "authorship_status": "unconfirmed"
+    },
+    {
+      "source_file": "evals/cases/routing_invariants.json",
+      "sha256": "d24076d546238ff33314a69318aedbb89be1755b4539c178fab5aca54f8aec73",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "single_case_policy",
+      "case_count": 4,
+      "label_authorship": {
+        "kind": "unconfirmed",
+        "role": "unconfirmed",
+        "author": "unconfirmed",
+        "model_authored": null,
+        "evidence": "No field identifies the current label author."
+      },
+      "authorship_status": "unconfirmed"
+    },
+    {
+      "source_file": "evals/cases/safety_gate.json",
+      "sha256": "cccbee5318f05ca13e02ac1aaad6ccf362acfba0055f011b6397938f270210b8",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "single_case_policy",
+      "case_count": 6,
+      "label_authorship": {
+        "kind": "unconfirmed",
+        "role": "unconfirmed",
+        "author": "unconfirmed",
+        "model_authored": null,
+        "evidence": "No field identifies the current label author."
+      },
+      "authorship_status": "unconfirmed"
+    },
+    {
+      "source_file": "evals/cases/trajectories/chatgpt-traj-r3b-twenty-turn-terminal-guard.json",
+      "sha256": "584abe6215c13df5903aa45c2e2d14573158ba853f942b875fb18e3a921911cc",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "trajectory",
+      "case_count": 0,
+      "label_authorship": {
+        "kind": "model",
+        "role": "outside_reviewer_model",
+        "author": "ChatGPT, review round 3B, returned 26 September 2026",
+        "model_authored": true,
+        "evidence": {
+          "field": "provenance.author",
+          "quote": "ChatGPT, review round 3B, returned 26 September 2026"
+        }
+      },
+      "authorship_status": "full",
+      "turn_count": 21
+    },
+    {
+      "source_file": "evals/cases/trajectories/chatgpt-traj-understood-filler-aftermath-001.json",
+      "sha256": "73bc842478ecacb99bc88264dcaab142ea190f770b86d4b7c3031c94ed8af831",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "trajectory",
+      "case_count": 0,
+      "label_authorship": {
+        "kind": "model",
+        "role": "outside_reviewer_model",
+        "author": "ChatGPT, review round 3B, returned 26 September 2026",
+        "model_authored": true,
+        "evidence": {
+          "field": "provenance.author",
+          "quote": "ChatGPT, review round 3B, returned 26 September 2026"
+        }
+      },
+      "authorship_status": "full",
+      "turn_count": 7
+    },
+    {
+      "source_file": "evals/cases/trajectories/chatgpt-traj-understood-filler-soft-latch-001.json",
+      "sha256": "f91c05b70344eafc0cd757e3f2434a7d6f33ca3e7c9363dc29ddcd9d1bd80a53",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "trajectory",
+      "case_count": 0,
+      "label_authorship": {
+        "kind": "model",
+        "role": "outside_reviewer_model",
+        "author": "ChatGPT, review round 3B, returned 26 September 2026",
+        "model_authored": true,
+        "evidence": {
+          "field": "provenance.author",
+          "quote": "ChatGPT, review round 3B, returned 26 September 2026"
+        }
+      },
+      "authorship_status": "full",
+      "turn_count": 6
+    },
+    {
+      "source_file": "evals/cases/trajectories/deepseek-traj-aftermath-first-turn-001.json",
+      "sha256": "cccf6f2c7a98b4e42a9281f361480fc8c6667691a05b7fc6375c97ec47fcc6d5",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "trajectory",
+      "case_count": 0,
+      "label_authorship": {
+        "kind": "model",
+        "role": "outside_reviewer_model",
+        "author": "DeepSeek, review round 3B rerun, returned 27 September 2026",
+        "model_authored": true,
+        "evidence": {
+          "field": "provenance.author",
+          "quote": "DeepSeek, review round 3B rerun, returned 27 September 2026"
+        }
+      },
+      "authorship_status": "full",
+      "turn_count": 5
+    },
+    {
+      "source_file": "evals/cases/trajectories/deepseek-traj-hold-obligations-late-001.json",
+      "sha256": "bf18a1008052df8f633f6fd4cc241949a30f31d6c2147307f0b5184adeb1739f",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "trajectory",
+      "case_count": 0,
+      "label_authorship": {
+        "kind": "model",
+        "role": "outside_reviewer_model",
+        "author": "DeepSeek, review round 3B rerun, returned 27 September 2026",
+        "model_authored": true,
+        "evidence": {
+          "field": "provenance.author",
+          "quote": "DeepSeek, review round 3B rerun, returned 27 September 2026"
+        }
+      },
+      "authorship_status": "full",
+      "turn_count": 8
+    },
+    {
+      "source_file": "evals/cases/trajectories/deepseek-traj-soft-decay-substance-001.json",
+      "sha256": "7e1a17493c236e9a03bc39ced19231c15e75dbb735f32f95a9e4209a3b76ba53",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "trajectory",
+      "case_count": 0,
+      "label_authorship": {
+        "kind": "model",
+        "role": "outside_reviewer_model",
+        "author": "DeepSeek, review round 3B rerun, returned 27 September 2026",
+        "model_authored": true,
+        "evidence": {
+          "field": "provenance.author",
+          "quote": "DeepSeek, review round 3B rerun, returned 27 September 2026"
+        }
+      },
+      "authorship_status": "full",
+      "turn_count": 7
+    },
+    {
+      "source_file": "evals/cases/trajectories/gemini-traj-aftermath-substantive-followup.json",
+      "sha256": "ecc344aacd5dd21c298f4b20c854ffd71d304cecf06638f3674cc3b7f69313d9",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "trajectory",
+      "case_count": 0,
+      "label_authorship": {
+        "kind": "model",
+        "role": "outside_reviewer_model",
+        "author": "Gemini, review round 3B rerun, returned 27 September 2026",
+        "model_authored": true,
+        "evidence": {
+          "field": "provenance.author",
+          "quote": "Gemini, review round 3B rerun, returned 27 September 2026"
+        }
+      },
+      "authorship_status": "full",
+      "turn_count": 3
+    },
+    {
+      "source_file": "evals/cases/trajectories/glm-and-kimi-via-perplexity-traj-resource-line-once-001.json",
+      "sha256": "09277e1b0f8af87b612a0f96b54c7a889d93c1672cddb7c9b81526325762f623",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "trajectory",
+      "case_count": 0,
+      "label_authorship": {
+        "kind": "model",
+        "role": "unconfirmed",
+        "author": "unconfirmed",
+        "model_authored": true,
+        "evidence": {
+          "field": "provenance.expectations_by",
+          "quote": "model"
+        }
+      },
+      "authorship_status": "partial",
+      "turn_count": 9
+    },
+    {
+      "source_file": "evals/cases/trajectories/grok-traj-hold-vanishes-when-words-leave-001.json",
+      "sha256": "0d2b37d60acd40f5cd5ecd0036de34ab104d4df8b1791e99e27010a0860cffaf",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "trajectory",
+      "case_count": 0,
+      "label_authorship": {
+        "kind": "model",
+        "role": "outside_reviewer_model",
+        "author": "Grok, review round 3B, returned 26 September 2026",
+        "model_authored": true,
+        "evidence": {
+          "field": "provenance.author",
+          "quote": "Grok, review round 3B, returned 26 September 2026"
+        }
+      },
+      "authorship_status": "full",
+      "turn_count": 3
+    },
+    {
+      "source_file": "evals/cases/trajectories/grok-traj-roast-after-zero-001.json",
+      "sha256": "bd11162825e7a41ee2674f47dd2a599788b763f660d6544320e87eb4793a8ba8",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "trajectory",
+      "case_count": 0,
+      "label_authorship": {
+        "kind": "model",
+        "role": "outside_reviewer_model",
+        "author": "Grok, review round 3B, returned 26 September 2026",
+        "model_authored": true,
+        "evidence": {
+          "field": "provenance.author",
+          "quote": "Grok, review round 3B, returned 26 September 2026"
+        }
+      },
+      "authorship_status": "full",
+      "turn_count": 7
+    },
+    {
+      "source_file": "evals/cases/trajectories/grok-traj-vague-slope-001.json",
+      "sha256": "96651c91fe5fcb867a168b4c0a7b2da27a01eea3a9870cf5632b5c0fdcd3898c",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "trajectory",
+      "case_count": 0,
+      "label_authorship": {
+        "kind": "model",
+        "role": "unconfirmed",
+        "author": "unconfirmed",
+        "model_authored": true,
+        "evidence": {
+          "field": "provenance.expectations_by",
+          "quote": "model"
+        }
+      },
+      "authorship_status": "partial",
+      "turn_count": 4
+    },
+    {
+      "source_file": "evals/cases/trajectories/grok-traj-vague-slope-002.json",
+      "sha256": "6f8c4fce0bc9464477a06f04be02f478c66d60f8105e581cd79dd34558918861",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "trajectory",
+      "case_count": 0,
+      "label_authorship": {
+        "kind": "model",
+        "role": "unconfirmed",
+        "author": "unconfirmed",
+        "model_authored": true,
+        "evidence": {
+          "field": "provenance.expectations_by",
+          "quote": "model"
+        }
+      },
+      "authorship_status": "partial",
+      "turn_count": 4
+    },
+    {
+      "source_file": "evals/cases/trajectories/grok-traj-vague-slope-003.json",
+      "sha256": "e542ff550b1f69db39c41fd7c632f581ae76f91aae6fa97ed2b190e9f1ff7457",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "trajectory",
+      "case_count": 0,
+      "label_authorship": {
+        "kind": "model",
+        "role": "unconfirmed",
+        "author": "unconfirmed",
+        "model_authored": true,
+        "evidence": {
+          "field": "provenance.expectations_by",
+          "quote": "model"
+        }
+      },
+      "authorship_status": "partial",
+      "turn_count": 4
+    },
+    {
+      "source_file": "evals/cases/trajectories/grok-traj-vague-slope-004.json",
+      "sha256": "6e07a6734ebf63bf1f3eec796be8068b92b283e50cde46da586b5b44dccb6871",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "trajectory",
+      "case_count": 0,
+      "label_authorship": {
+        "kind": "model",
+        "role": "unconfirmed",
+        "author": "unconfirmed",
+        "model_authored": true,
+        "evidence": {
+          "field": "provenance.expectations_by",
+          "quote": "model"
+        }
+      },
+      "authorship_status": "partial",
+      "turn_count": 4
+    },
+    {
+      "source_file": "evals/cases/trajectories/grok-traj-vague-slope-005.json",
+      "sha256": "60e92727feb53b1b5be2dd8573e8619a18f65ee91023d7527255dee18a4781b6",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "trajectory",
+      "case_count": 0,
+      "label_authorship": {
+        "kind": "model",
+        "role": "unconfirmed",
+        "author": "unconfirmed",
+        "model_authored": true,
+        "evidence": {
+          "field": "provenance.expectations_by",
+          "quote": "model"
+        }
+      },
+      "authorship_status": "partial",
+      "turn_count": 4
+    },
+    {
+      "source_file": "evals/cases/trajectories/kimi-k3-traj-filler-today-was-a-day-001.json",
+      "sha256": "5f1cd9497c625598a87a641192048808e348da549da5a4ecc28a54738982ed28",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "trajectory",
+      "case_count": 0,
+      "label_authorship": {
+        "kind": "model",
+        "role": "outside_reviewer_model",
+        "author": "Kimi K3, review round 3B, returned 27 September 2026",
+        "model_authored": true,
+        "evidence": {
+          "field": "provenance.author",
+          "quote": "Kimi K3, review round 3B, returned 27 September 2026"
+        }
+      },
+      "authorship_status": "full",
+      "turn_count": 7
+    },
+    {
+      "source_file": "evals/cases/trajectories/nemotron-traj-substantive-heuristic-001.json",
+      "sha256": "39eb4d8e97f71ad61c0e28dc4c9607856ac2bcd219ed79d6d77908e411fe27a4",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "trajectory",
+      "case_count": 0,
+      "label_authorship": {
+        "kind": "model",
+        "role": "outside_reviewer_model",
+        "author": "Nemotron, review round 3B rerun, returned 27 September 2026",
+        "model_authored": true,
+        "evidence": {
+          "field": "provenance.author",
+          "quote": "Nemotron, review round 3B rerun, returned 27 September 2026"
+        }
+      },
+      "authorship_status": "full",
+      "turn_count": 6
+    },
+    {
+      "source_file": "evals/cases/trajectories/qwen-traj-humor-after-expiry-004.json",
+      "sha256": "9c8527f344fc8ce1c481b4d0c2764e06a9c92ba42d6eec5e07f29e5570773649",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "trajectory",
+      "case_count": 0,
+      "label_authorship": {
+        "kind": "model",
+        "role": "outside_reviewer_model",
+        "author": "Qwen, review round 3B rerun, returned 27 September 2026",
+        "model_authored": true,
+        "evidence": {
+          "field": "provenance.author",
+          "quote": "Qwen, review round 3B rerun, returned 27 September 2026"
+        }
+      },
+      "authorship_status": "full",
+      "turn_count": 5
+    },
+    {
+      "source_file": "evals/cases/trajectories/qwen-traj-substantive-spam-001.json",
+      "sha256": "e8a9034217125940a5d172aaf14a69bdfd6adbb18528d51c6369386e5b1b1552",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "trajectory",
+      "case_count": 0,
+      "label_authorship": {
+        "kind": "model",
+        "role": "outside_reviewer_model",
+        "author": "Qwen, review round 3B rerun, returned 27 September 2026",
+        "model_authored": true,
+        "evidence": {
+          "field": "provenance.author",
+          "quote": "Qwen, review round 3B rerun, returned 27 September 2026"
+        }
+      },
+      "authorship_status": "full",
+      "turn_count": 4
+    },
+    {
+      "source_file": "evals/cases/trajectories/slow-slope-001.json",
+      "sha256": "17953b001a6829d0caf64d408d46e9c12e547cb8182924a88ae020886d961180",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "trajectory",
+      "case_count": 0,
+      "label_authorship": {
+        "kind": "model",
+        "role": "project_manager",
+        "author": "Claude",
+        "model_authored": true,
+        "evidence": {
+          "field": "provenance.author",
+          "quote": "the Primary Design Agent (Claude Fable 5.1), drafted 2026-09-14 for the operator's review; expectations on turns 7 and 8 corrected 2026-09-17 after the first run against the tree"
+        }
+      },
+      "authorship_status": "full",
+      "turn_count": 9
+    },
+    {
+      "source_file": "evals/cases/trajectories/vibe-traj-context-collapse-001.json",
+      "sha256": "92e6638ce2fcd85126841c1e0266ff2ef575f6bebf7494bf7c1cfea077b736d6",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "trajectory",
+      "case_count": 0,
+      "label_authorship": {
+        "kind": "model",
+        "role": "outside_reviewer_model",
+        "author": "Vibe, review round 3B, returned 27 September 2026",
+        "model_authored": true,
+        "evidence": {
+          "field": "provenance.author",
+          "quote": "Vibe, review round 3B, returned 27 September 2026"
+        }
+      },
+      "authorship_status": "full",
+      "turn_count": 7
+    },
+    {
+      "source_file": "evals/cases/trajectories/vibe-traj-refusal-decay-001.json",
+      "sha256": "196c1fbba516ed94e47f09e47ae562588c199c31891ef9a6729f6d835aa8bc5d",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "trajectory",
+      "case_count": 0,
+      "label_authorship": {
+        "kind": "model",
+        "role": "outside_reviewer_model",
+        "author": "Vibe, review round 3B, returned 27 September 2026",
+        "model_authored": true,
+        "evidence": {
+          "field": "provenance.author",
+          "quote": "Vibe, review round 3B, returned 27 September 2026"
+        }
+      },
+      "authorship_status": "full",
+      "turn_count": 8
+    },
+    {
+      "source_file": "evals/cases/vague_openers_2026-09-30.json",
+      "sha256": "e41fbc0b93e37fcff65c649b822abb87c81e0a6a17394684726ae499df70bdf9",
+      "synthetic": true,
+      "collection_origin": "Written for testing; not collected from people.",
+      "scope": "single_case_policy",
+      "case_count": 30,
+      "label_authorship": {
+        "kind": "unconfirmed",
+        "role": "unconfirmed",
+        "author": "unconfirmed",
+        "model_authored": null,
+        "evidence": {
+          "field": "source",
+          "quote": "Grok (grok.com, Expert), night order 5 of 30 September 2026, the vague-message e"
+        }
+      },
+      "authorship_status": "unconfirmed"
+    }
+  ]
+}
