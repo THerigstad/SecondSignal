@@ -4,6 +4,13 @@ All notable changes to SecondSignal are documented here.
 
 ## [Unreleased]
 
+### Added — 2026-11-05, the harness specification page (landing 21)
+
+- `examples/harness-five-turn.md` writes down the recorded five-turn sitting in plain words, in the format of Gertler, Novelli and Floridi: the model pairing, the eight components with their status, reasons and evidence, the five records, the stamp on every turn, what the record does not claim, and how to check it. The eight-component picture comes in a light and a dark version (`examples/harness-five-turn-light.svg`, `examples/harness-five-turn-dark.svg`), and the page shows the one that matches the reader's theme.
+- All three files are written by `evals/render_harness_spec.py` from `examples/harness-five-turn.json`, with ADR-0035's decision word read from the register. `tests/test_harness_spec_page.py` fails when any of them differs from what the record renders, so the page cannot drift from its record: the rendering ADR-0035 said a later order would generate.
+- Written by the project manager. The page sits beside its record, outside `docs/`, so the typo guard's word list does not change and no hash or pin moves. ADR-0035's status line, its register note, `docs/known-limitations.md` and `docs/roadmap.md` now say the rendering exists; the README gains one design note that links it.
+- Public numbers: 4,205 to 4,206 tests; 67 expected failures (50 documented gaps, 17 recorded dissents).
+
 ### Added — 2026-11-04, order OR1 (landing 20; the calibration measurement instrument, ADR-0036)
 
 - `evals/or1/` is a measurement-only instrument. For each labelled case it would ask several decision models the same fixed questions and record, side by side, the case's labels, the lexicon's own verdict and each model's probability. It then computes calibration: the Brier score, ten-bin calibration curves, expected calibration error, the six EACL set measures, Cohen's kappa and Gwet's AC1. Nothing it produces reaches a decision until ADR-0030's abstention table is adopted, and no function averages or votes across models (ADR-0009).

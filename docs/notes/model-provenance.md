@@ -516,6 +516,13 @@ rewritten.
   with the project manager's landing fix. The commit:
   1. "Push H, landing 20: the calibration measurement instrument (ADR-0036)".
 
+- **2026-11-05**, push I, landing 21: the harness specification page,
+  generated from its record, one commit through the operator's browser session
+  on GitHub's upload page, authored by the operator, the model Claude Opus 5.5,
+  as the operator's screen showed it (the operator's account), in the Claude
+  desktop app's Cowork mode; written by the project manager. The commit:
+  1. "Push I, landing 21: the harness specification page, generated from its record".
+
 ## What this note does not do
 
 It does not rank the families and it does not count agreements. Where two

@@ -46,9 +46,9 @@ out (architecture phases, drawn from the
 - **M5, harness records — 4 November 2026.** The harness is recorded as a versioned
   part of the system (ADR-0035, Proposed), with configuration by component,
   model pairing, audit stamps and append-only material changes. The Table
-  records sitting start and end, including quiet expiry. The later
-  human-readable specification will be generated from this JSON; it is not
-  written yet. Runtime remains partial, with no full transcript checkpoint
+  records sitting start and end, including quiet expiry. Since 5 November
+  2026 the human-readable specification is generated from this JSON
+  (`examples/harness-five-turn.md`). Runtime remains partial, with no full transcript checkpoint
   or interrupted-call resume.
 
 ## Calibration measurement — 4 November 2026

@@ -1,6 +1,6 @@
 # ADR-0035: The harness is a versioned part of the system
 
-- **Status:** Proposed — built; the record, audit stamps, material change chain and lifecycle integration are implemented; independent review and a human-readable rendering remain future work
+- **Status:** Proposed — built; the record, audit stamps, material change chain and lifecycle integration are implemented; the human-readable rendering is generated from the record; independent review remains future work
 - **Date:** 2026-11-04
 - **Evidence:** the four regression modules listed below.
 
@@ -67,6 +67,11 @@ to change the gate, latch, holds, predicates, guidance or version strings.
 The source record is JSON. This ADR explains the decision; it is not the
 human-readable specification. A later order will generate that document
 from JSON so that two separately maintained descriptions cannot drift.
+
+Update, 5 November 2026: that rendering is `examples/harness-five-turn.md`,
+written by `evals/render_harness_spec.py` from `examples/harness-five-turn.json`,
+and `tests/test_harness_spec_page.py` fails when the page and its record
+disagree.
 
 The program that writes the event log can still rewrite the files. The chain
 is tamper-evident, not tamper-proof, and a coordinated rewrite of both the

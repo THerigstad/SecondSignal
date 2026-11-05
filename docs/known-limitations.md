@@ -51,8 +51,9 @@ so a slow disk does not delay the card; a crash before that queue drains can
 leave a row without its durable specification, and a failed write is
 reported rather than treated as success.
 
-The human-readable specification is not written yet. A later order will
-generate it from the machine-readable JSON. Requested and host-reported
+The human-readable specification is generated from the machine-readable
+JSON: `examples/harness-five-turn.md` renders the recorded five-turn sitting,
+and a test fails if the page and its record disagree. Requested and host-reported
 model identities are separate; an unknown host identity remains null.
 New results with an explicit absent specification hash are labelled
 not-reproducible. These records provide evidence, not new model authority.

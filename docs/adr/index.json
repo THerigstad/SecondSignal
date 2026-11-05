@@ -564,7 +564,7 @@
         "src/secondsignal_harness/results.py",
         "src/secondsignal_harness/harness.py"
       ],
-      "notes": "Harness records, 4 November 2026: the harness has a versioned JSON record, per-turn audit stamps, a chained material change log, sitting lifecycle records and required result headers. The component structure comes from Gertler, Novelli and Floridi at Yale. Runtime remains partial; the human-readable rendering and independent review remain future work."
+      "notes": "Harness records, 4 November 2026: the harness has a versioned JSON record, per-turn audit stamps, a chained material change log, sitting lifecycle records and required result headers. The component structure comes from Gertler, Novelli and Floridi at Yale. Runtime remains partial. Since 5 November 2026 the human-readable rendering is generated from the record (examples/harness-five-turn.md); independent review remains future work."
     },
     {
       "number": "0036",

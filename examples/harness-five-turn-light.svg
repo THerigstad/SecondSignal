@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 584" width="760" height="584" role="img" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif">
+<title>Four of eight implemented, two partial, two declared not implemented</title>
+<rect width="760" height="584" rx="12" fill="#ffffff"/>
+<text x="24" y="32" font-size="15" font-weight="600" fill="#1f2328">Four of eight implemented, two partial, two declared not implemented</text>
+<text x="24" y="54" font-size="11.5" font-weight="400" fill="#59636e">The paper's three bands, each component's status as recorded in 30a6afd7c224</text>
+<rect x="24" y="76" width="226" height="456" rx="8" fill="#f6f8fa"/>
+<text x="36" y="100" font-size="13" font-weight="600" fill="#1f2328">What it can do</text>
+<text x="36" y="116" font-size="11.5" font-weight="400" fill="#59636e">Cognitive band</text>
+<rect x="34" y="132" width="206" height="88" rx="8" fill="#1a7f37" fill-opacity="0.12" stroke="#1a7f37" stroke-width="1.5"/>
+<text x="46" y="156" font-size="13" font-weight="600" fill="#1f2328">Orchestration</text>
+<text x="46" y="172" font-size="13" font-weight="600" fill="#1f2328">and planning</text>
+<text x="46" y="190" font-size="11.5" font-weight="400" fill="#59636e">Implemented</text>
+<text x="46" y="206" font-size="11.5" font-weight="400" fill="#1f2328">Router picks who speaks</text>
+<rect x="34" y="232" width="206" height="88" rx="8" fill="#9a6700" fill-opacity="0.12" stroke="#9a6700" stroke-width="1.5"/>
+<text x="46" y="256" font-size="13" font-weight="600" fill="#1f2328">Context</text>
+<text x="46" y="272" font-size="13" font-weight="600" fill="#1f2328">and memory</text>
+<text x="46" y="290" font-size="11.5" font-weight="400" fill="#59636e">Partial</text>
+<text x="46" y="306" font-size="11.5" font-weight="400" fill="#1f2328">One sitting, 12 prior turns</text>
+<rect x="34" y="332" width="206" height="88" rx="8" fill="none" stroke="#818b98" stroke-width="1.25" stroke-dasharray="4 4"/>
+<text x="46" y="356" font-size="13" font-weight="600" fill="#1f2328">Tool and action</text>
+<text x="46" y="372" font-size="13" font-weight="600" fill="#1f2328">interfaces</text>
+<text x="46" y="390" font-size="11.5" font-weight="400" fill="#59636e">Not implemented</text>
+<text x="46" y="406" font-size="11.5" font-weight="400" fill="#1f2328">Text in, text out, no tools</text>
+<rect x="34" y="432" width="206" height="88" rx="8" fill="#1a7f37" fill-opacity="0.12" stroke="#1a7f37" stroke-width="1.5"/>
+<text x="46" y="456" font-size="13" font-weight="600" fill="#1f2328">Operational</text>
+<text x="46" y="472" font-size="13" font-weight="600" fill="#1f2328">knowledge</text>
+<text x="46" y="490" font-size="11.5" font-weight="400" fill="#59636e">Implemented</text>
+<text x="46" y="506" font-size="11.5" font-weight="400" fill="#1f2328">Codexes and the house block</text>
+<rect x="266" y="76" width="226" height="256" rx="8" fill="#f6f8fa"/>
+<text x="278" y="100" font-size="13" font-weight="600" fill="#1f2328">What it is allowed to do</text>
+<text x="278" y="116" font-size="11.5" font-weight="400" fill="#59636e">Control band</text>
+<rect x="276" y="132" width="206" height="88" rx="8" fill="none" stroke="#818b98" stroke-width="1.25" stroke-dasharray="4 4"/>
+<text x="288" y="156" font-size="13" font-weight="600" fill="#1f2328">Sandboxing</text>
+<text x="288" y="190" font-size="11.5" font-weight="400" fill="#59636e">Not implemented</text>
+<text x="288" y="206" font-size="11.5" font-weight="400" fill="#1f2328">No agent-run code to contain</text>
+<rect x="276" y="232" width="206" height="88" rx="8" fill="#1a7f37" fill-opacity="0.12" stroke="#1a7f37" stroke-width="1.5"/>
+<text x="288" y="256" font-size="13" font-weight="600" fill="#1f2328">Permission</text>
+<text x="288" y="272" font-size="13" font-weight="600" fill="#1f2328">model</text>
+<text x="288" y="290" font-size="11.5" font-weight="400" fill="#59636e">Implemented</text>
+<text x="288" y="306" font-size="11.5" font-weight="400" fill="#1f2328">Gate, latch, holds in code</text>
+<rect x="508" y="76" width="226" height="256" rx="8" fill="#f6f8fa"/>
+<text x="520" y="100" font-size="13" font-weight="600" fill="#1f2328">What checks it</text>
+<text x="520" y="116" font-size="11.5" font-weight="400" fill="#59636e">Assurance band</text>
+<rect x="518" y="132" width="206" height="88" rx="8" fill="#1a7f37" fill-opacity="0.12" stroke="#1a7f37" stroke-width="1.5"/>
+<text x="530" y="156" font-size="13" font-weight="600" fill="#1f2328">Verification, evaluation</text>
+<text x="530" y="172" font-size="13" font-weight="600" fill="#1f2328">and observability</text>
+<text x="530" y="190" font-size="11.5" font-weight="400" fill="#59636e">Implemented</text>
+<text x="530" y="206" font-size="11.5" font-weight="400" fill="#1f2328">Audit row on every turn</text>
+<rect x="518" y="232" width="206" height="88" rx="8" fill="#9a6700" fill-opacity="0.12" stroke="#9a6700" stroke-width="1.5"/>
+<text x="530" y="256" font-size="13" font-weight="600" fill="#1f2328">Execution runtime and</text>
+<text x="530" y="272" font-size="13" font-weight="600" fill="#1f2328">lifecycle management</text>
+<text x="530" y="290" font-size="11.5" font-weight="400" fill="#59636e">Partial</text>
+<text x="530" y="306" font-size="11.5" font-weight="400" fill="#1f2328">No checkpoint or resume</text>
+<rect x="24" y="550" width="16" height="12" rx="3" fill="#1a7f37" fill-opacity="0.12" stroke="#1a7f37" stroke-width="1.25"/>
+<text x="46" y="560" font-size="11.5" font-weight="400" fill="#1f2328">Implemented</text>
+<rect x="134" y="550" width="16" height="12" rx="3" fill="#9a6700" fill-opacity="0.12" stroke="#9a6700" stroke-width="1.25"/>
+<text x="156" y="560" font-size="11.5" font-weight="400" fill="#1f2328">Partial</text>
+<rect x="219" y="550" width="16" height="12" rx="3" fill="none" stroke="#818b98" stroke-width="1.25" stroke-dasharray="3 3"/>
+<text x="241" y="560" font-size="11.5" font-weight="400" fill="#1f2328">Not implemented, with its reason in the record</text>
+</svg>
