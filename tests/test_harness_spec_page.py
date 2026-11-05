@@ -11,7 +11,9 @@ holds the chain:
 * the page and both pictures on disk are exactly what the record renders;
 * the page states the record's active and closing hashes in full, and every
   component's status and evidence paths, so a hand edit to the record that the
-  page does not show fails here.
+  page does not show fails here;
+* the reading copy the page links, a designed PDF snapshot, is there and is a
+  PDF. Its contents are not checked; the page is the one held to the record.
 """
 
 from __future__ import annotations
@@ -39,3 +41,5 @@ def test_the_page_and_its_pictures_are_what_the_record_renders():
         assert all(f"`{path}`" in page for path in component["evidence"])
         if component["reason"]:
             assert component["reason"] in page
+    assert f"]({render.READING_COPY.name})" in page
+    assert render.READING_COPY.read_bytes()[:5] == b"%PDF-"

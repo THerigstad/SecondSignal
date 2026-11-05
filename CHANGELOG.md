@@ -4,6 +4,13 @@ All notable changes to SecondSignal are documented here.
 
 ## [Unreleased]
 
+### Added — 2026-11-05, the harness specification's reading copy (landing 22)
+
+- `examples/harness-specification-reading-copy.pdf` is the harness specification as a designed PDF, written for reading and dated 5 November 2026: six Letter pages in the repository's dark look, with the eight-parts picture on its cover. The generated page links it under "Check it yourself" and says it is a snapshot of commit 931bff2, not printed from the record.
+- The page's "What it does not claim" gains one line, not an endorsement: the format is Gertler, Novelli and Floridi's, its use here is SecondSignal's, and the paper's authors have not reviewed it. The reading copy carries the same line.
+- `tests/test_harness_spec_page.py` also checks that the reading copy the page links is there and is a PDF. Its contents are not checked; the page stays the one held to the record. No test is added, so the public numbers do not move: 4,206 tests; 67 expected failures (50 documented gaps, 17 recorded dissents).
+- Written by the project manager. The PDF sits beside the page, outside `docs/`, so the typo guard's word list does not change and no hash or pin moves.
+
 ### Added — 2026-11-05, the harness specification page (landing 21)
 
 - `examples/harness-five-turn.md` writes down the recorded five-turn sitting in plain words, in the format of Gertler, Novelli and Floridi: the model pairing, the eight components with their status, reasons and evidence, the five records, the stamp on every turn, what the record does not claim, and how to check it. The eight-component picture comes in a light and a dark version (`examples/harness-five-turn-light.svg`, `examples/harness-five-turn-dark.svg`), and the page shows the one that matches the reader's theme.

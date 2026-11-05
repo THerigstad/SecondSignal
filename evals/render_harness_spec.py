@@ -19,6 +19,12 @@ reason of their own. The page lives beside its record, outside ``docs/``, so
 the typo guard's word list (built from the README and ``docs/``) does not
 change and no hash moves.
 
+The page also links its reading copy,
+``examples/harness-specification-reading-copy.pdf``: the same specification as
+a designed PDF, dated 5 November 2026. It is a snapshot, not written by this
+script, so the test checks only that it is there and is a PDF; the page is the
+one held to the record.
+
 Like the public-number refreshers, it never writes by default. It prints what
 is stale and exits non-zero, and writes only when asked:
 
@@ -43,6 +49,7 @@ PICTURES = {
     "light": ROOT / "examples" / "harness-five-turn-light.svg",
     "dark": ROOT / "examples" / "harness-five-turn-dark.svg",
 }
+READING_COPY = ROOT / "examples" / "harness-specification-reading-copy.pdf"
 PAPER = "https://arxiv.org/abs/2610.40917"
 ADR_NUMBER = "0035"
 ADR_FILE = f"{ADR_NUMBER}-the-harness-is-a-versioned-part-of-the-system.md"
@@ -367,6 +374,8 @@ def render_page(record: dict[str, Any], decision: str) -> str:
               if decision == "Proposed" else "the decision recorded in the register")
     add(f"- **{decision}.** The decision record, [{ADR_LABEL}](../docs/adr/{ADR_FILE}), is "
         f"{decision}: {review}.")
+    add("- **Not an endorsement.** The format is Gertler, Novelli and Floridi's, and its use here "
+        "is SecondSignal's. The paper's authors have not reviewed it.")
     add("")
     add("## Check it yourself")
     add("")
@@ -382,6 +391,10 @@ def render_page(record: dict[str, Any], decision: str) -> str:
         "pictures still match the record, and "
         "[`tests/test_harness_spec_page.py`](../tests/test_harness_spec_page.py) runs that check "
         "with the rest of the suite.")
+    add(f"- **The reading copy:** [`{READING_COPY.name}`]({READING_COPY.name}) is this "
+        "specification as a designed PDF, written for reading and dated 5 November 2026. It is "
+        "a snapshot of commit 931bff2 and is not printed from the record, so the test checks "
+        "this page, not the PDF.")
     add("")
     add("## Sources")
     add("")

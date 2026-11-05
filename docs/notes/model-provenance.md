@@ -523,6 +523,13 @@ rewritten.
   desktop app's Cowork mode; written by the project manager. The commit:
   1. "Push I, landing 21: the harness specification page, generated from its record".
 
+- **2026-11-05**, push J, landing 22: the harness specification's reading
+  copy, one commit through the operator's browser session on GitHub's upload
+  page, authored by the operator, the model Claude Opus 5.5, as the operator's
+  screen showed it (the operator's account), in the Claude desktop app's
+  Cowork mode; written by the project manager. The commit:
+  1. "Push J, landing 22: the harness specification's reading copy".
+
 ## What this note does not do
 
 It does not rank the families and it does not count agreements. Where two

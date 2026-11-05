@@ -62,6 +62,7 @@ The specification hash is SHA-256 over the record's sorted JSON, leaving out onl
 - **Not self-enforcing.** The code and its tests enforce the controls. The record says which controls were in force.
 - **Runtime is partial,** as the execution runtime component above says.
 - **Proposed.** The decision record, [ADR-0035](../docs/adr/0035-the-harness-is-a-versioned-part-of-the-system.md), is Proposed: built and tested, and not yet independently reviewed.
+- **Not an endorsement.** The format is Gertler, Novelli and Floridi's, and its use here is SecondSignal's. The paper's authors have not reviewed it.
 
 ## Check it yourself
 
@@ -69,6 +70,7 @@ The specification hash is SHA-256 over the record's sorted JSON, leaving out onl
 - **The code:** [`spec.py`](../src/secondsignal_harness/spec.py) builds and validates the record, and [`event_log.py`](../src/secondsignal_harness/event_log.py) keeps the chained change log.
 - **The hashes:** in full, the active hash is `30a6afd7c22494981a747305dca7733e34a90ef1d291bc2fbefd920fcd698c8c` and the closing hash is `ccf4c60c358eb4ba3c3685e034b47f694be58bc8ee13b41f854697bc5f15fa86`. `validate_specification` in spec.py recomputes each from the record's contents and raises if they differ.
 - **This page:** `python evals/render_harness_spec.py` reports whether the page and its pictures still match the record, and [`tests/test_harness_spec_page.py`](../tests/test_harness_spec_page.py) runs that check with the rest of the suite.
+- **The reading copy:** [`harness-specification-reading-copy.pdf`](harness-specification-reading-copy.pdf) is this specification as a designed PDF, written for reading and dated 5 November 2026. It is a snapshot of commit 931bff2 and is not printed from the record, so the test checks this page, not the PDF.
 
 ## Sources
 
