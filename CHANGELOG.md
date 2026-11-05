@@ -4,6 +4,11 @@ All notable changes to SecondSignal are documented here.
 
 ## [Unreleased]
 
+### Fixed — 2026-11-05, the reading copy in five pages (landing 23)
+
+- `examples/harness-specification-reading-copy.pdf` is rebuilt with the same words in five pages instead of six. The edition started "The eight parts" on a fresh page, which left page two about 60% empty; the section now follows straight on, and its picture is drawn at 70% of the page width so it fits there. The cover keeps the full-size picture. Every word and all 12 links are unchanged.
+- Written by the project manager. No test changes, so the public numbers do not move: 4,206 tests; 67 expected failures (50 documented gaps, 17 recorded dissents).
+
 ### Added — 2026-11-05, the harness specification's reading copy (landing 22)
 
 - `examples/harness-specification-reading-copy.pdf` is the harness specification as a designed PDF, written for reading and dated 5 November 2026: six Letter pages in the repository's dark look, with the eight-parts picture on its cover. The generated page links it under "Check it yourself" and says it is a snapshot of commit 931bff2, not printed from the record.
