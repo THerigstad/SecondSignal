@@ -19,6 +19,11 @@ from typing import Any
 from secondsignal import load_roster, route
 from secondsignal.normalize import collapse_spacing
 from secondsignal.safety import CRISIS_CLASSES
+from secondsignal_harness.results import (
+    ABSENT_SPECIFICATION,
+    result_document,
+    write_json_result,
+)
 
 from .run import _ROOT, _load_single_cases, _prior_text, _session, crisis_lines
 from .transforms import TRANSFORMS
@@ -44,8 +49,7 @@ WORD = re.compile(r"[^\W\d_]+")
 
 
 def write_json(path: Path, data: Any) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    write_json_result(path, result_document(data, specification_hash=ABSENT_SPECIFICATION))
 
 
 def control_sets() -> tuple[list[dict], list[dict]]:

@@ -29,6 +29,11 @@ sys.path.insert(0, str(ROOT / "src"))
 from secondsignal.lexicon import PACKS, apply_masks, screen_packs  # noqa: E402
 from secondsignal.normalize import analyze, screen_fold  # noqa: E402
 from secondsignal.safety import crisis_screen  # noqa: E402
+from secondsignal_harness.results import (  # noqa: E402
+    ABSENT_SPECIFICATION,
+    result_document,
+    write_json_result,
+)
 
 HERE = ROOT / "evals/vocabulary"
 INPUT = HERE / "vocabulary_2026-10-06.json"
@@ -323,11 +328,10 @@ def main(argv=None):
 
     with patch.object(socket.socket, "connect", no_network), patch.object(socket.socket, "connect_ex", no_network), patch.object(socket, "create_connection", no_network):
         report = run_report(rows)
-    payload = json.dumps(report, ensure_ascii=False, indent=2) + "\n"
-    if len(payload.encode("utf-8")) >= 2_000_000:
-        raise ValueError("Report exceeds the order's file-size limit")
-    destination.parent.mkdir(parents=True, exist_ok=True)
-    destination.write_text(payload, encoding="utf-8")
+    write_json_result(
+        destination, result_document(report, specification_hash=ABSENT_SPECIFICATION),
+        max_bytes=1_999_999,
+    )
     print_summary(report)
     return 0
 

@@ -12,22 +12,30 @@ from __future__ import annotations
 
 import hashlib
 import time
+from collections import Counter
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field
 from typing import Any
 
 from secondsignal.jr import AuditRequest, audit, payload_hash
-from secondsignal.profiles import AgentProfile
+from secondsignal.profiles import AgentProfile, roster_hash
 from secondsignal.router import route
 from secondsignal.safety import HOUSE_LINES_EN, SessionState
 
 from .adapters import AdapterReply, Message, ModelAdapter
 from .audit_log import AuditLog
 from .codex import CodexStore
-from .configuration import configuration, prompt_sha256, safe_identifier
+from .configuration import (
+    adapter_identity,
+    configuration,
+    presentation_configuration,
+    prompt_sha256,
+    safe_identifier,
+)
 from .lines import HARNESS_LINES_EN
 from .prompt import ChosenNames, Presentation, applied_preferences, build_prompt, build_turn_block
 from .release_checks import release_checks
+from .spec import HarnessSpecification, SpecificationStampError
 from .table_extras import ask_acknowledgement
 from .view import audit_view
 
@@ -123,8 +131,75 @@ class Harness:
         self.clock = clock
         self.transcript: list[Message] = []
         self.turns: list[Turn] = []
+        self.specification: HarnessSpecification | None = None
+        self.specification_runtime: dict[str, Any] = {}
+        self._specification_base: dict[str, Any] | None = None
+        self.specification_initial_state: dict[str, Any] = _json_safe(self.session.__dict__)
+        self._sitting_origin = int(self.session.turn_count)
 
     # ------------------------------------------------------------------ helpers
+
+    @property
+    def sitting_turn_ordinal(self) -> int:
+        """Accepted turn number relative to this sitting, independent of restored state."""
+        return int(self.session.turn_count) - self._sitting_origin
+
+    def specification_configuration(
+        self, template: Mapping[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        """Build on H1; a quiet boundary reuses already loaded release metadata."""
+        if template is not None:
+            self._specification_base = _json_safe(dict(template))
+        if self._specification_base is None:
+            self._specification_base = configuration(
+                adapter=self.adapter, reply=None, prompt_hash=None,
+                record={"roster_hash": roster_hash(self.roster)},
+                roster=self.roster, codexes=self.codexes, presentation=self.presentation,
+                chosen_names=self.chosen_names, max_turns=self.max_turns,
+                max_tokens=self.max_tokens, retries=self.retries,
+            )
+        current = _json_safe(self._specification_base)
+        current.update(adapter_identity(self.adapter, None))
+        current.update({
+            "prompt_sha256": None,
+            "roster_hash": roster_hash(self.roster),
+            "presentation": presentation_configuration(
+                self.roster, self.presentation, self.chosen_names),
+            "generation": {"max_turns": self.max_turns, "max_tokens": self.max_tokens,
+                           "retries": self.retries},
+        })
+        current["harness_controls"] = {
+            "operator_circle": self.operator_circle,
+            "locale": self.session.locale,
+            "declared_preferences": dict(self.declared_preferences),
+            "humour_grief": self.humour_grief,
+            "language_style": self.language_style,
+            "room": self.room,
+        }
+        return current
+
+    def ensure_specification(self) -> HarnessSpecification:
+        """Capture a sitting once; the Table can supply its restored initial state."""
+        if self.specification is None:
+            self.specification = HarnessSpecification(
+                self.specification_configuration(), adapter=self.adapter,
+                roster=self.roster, codexes=self.codexes,
+                runtime=self.specification_runtime,
+                initial_state=self.specification_initial_state,
+                audit_path=getattr(self.audit_log, "path", None),
+            )
+        return self.specification
+
+    def close_specification(self, reason: str) -> HarnessSpecification:
+        """Stage the end record. A surface owns persistence and its shutdown boundary."""
+        candidate = self.ensure_specification().fork()
+        candidate.end({
+            "reason": reason,
+            "accepted_turns": self.sitting_turn_ordinal,
+            "release_counts": dict(sorted(Counter(t.release_reason for t in self.turns).items())),
+        }, ordinal=max(0, self.sitting_turn_ordinal))
+        self.specification = candidate
+        return candidate
 
     def _row(
         self, user_text: str, *, configuration_record: Mapping[str, Any] | None = None,
@@ -134,7 +209,7 @@ class Harness:
         """One row per turn. It carries the person's words, because a log the
         operator cannot read the conversation from is not an audit log."""
         row: dict[str, Any] = {
-            "schema": "secondsignal_harness.audit_row.v1",
+            "schema": "secondsignal_harness.audit_row.v2",  # HM2: audit_row.v1 -> audit_row.v2; policy schema unchanged.
             "at": float(self.clock()),
             "turn_index": int(self.session.turn_count),
             "operator_circle": self.operator_circle,
@@ -150,7 +225,22 @@ class Harness:
             chosen_names=self.chosen_names, max_turns=self.max_turns,
             max_tokens=self.max_tokens, retries=self.retries,
         )
-        return self.audit_log.append(row)
+        if self._specification_base is None:
+            # The actual row already read H1 metadata; do not read the same files twice.
+            self._specification_base = _json_safe(row["configuration"])
+        candidate = self.ensure_specification().fork()
+        ordinal = self.sitting_turn_ordinal
+        candidate.change(
+            self.specification_configuration(), runtime=self.specification_runtime,
+            adapter=self.adapter, actor="embedding_application",
+            authorization="harness configuration supplied by caller", ordinal=ordinal,
+        )
+        if configuration_reply is not None:
+            candidate.observe_model(configuration_reply, ordinal=ordinal)
+        candidate.stamp(row, ordinal=ordinal)
+        row_id = self.audit_log.append_specification(row, candidate)
+        self.specification = candidate
+        return row_id
 
     def _remember(self, text: str, *, spoken_by_house: bool) -> None:
         content = (HOUSE_PREFIX + text) if spoken_by_house else text
@@ -216,6 +306,9 @@ class Harness:
                     house_lines=list(house_lines), released=False, release_reason=RELEASE_GATE,
                     decision=_json_safe(record),
                 )
+            except SpecificationStampError:
+                # A counterfeit specification stamp is a contract failure, not an I/O warning.
+                raise
             except Exception as exc:  # the log must never stand between a person and the card
                 row_id = ""
                 audit_error = f"audit write failed: {type(exc).__name__}"
@@ -226,6 +319,8 @@ class Harness:
                         release_reason=RELEASE_GATE, audit_error=audit_error,
                         configuration_record=record,
                     )
+                except SpecificationStampError:
+                    raise
                 except Exception:
                     pass
             self._remember(out, spoken_by_house=True)

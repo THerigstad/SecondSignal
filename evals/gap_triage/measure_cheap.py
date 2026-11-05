@@ -28,6 +28,11 @@ import test_eval_cases as case_runner  # noqa: E402
 
 from secondsignal import load_roster, safety  # noqa: E402
 from secondsignal.normalize import collapse_spacing, normalize  # noqa: E402
+from secondsignal_harness.results import (  # noqa: E402
+    ABSENT_SPECIFICATION,
+    result_document,
+    write_json_result,
+)
 
 HERE = ROOT / "evals" / "gap_triage"
 LOOKALIKES = {"0": "o", "1": "il", "3": "e", "4": "a", "5": "s", "7": "t", "8": "b", "@": "a", "$": "s", "!": "i"}
@@ -444,8 +449,9 @@ def main(argv=None) -> int:
     parser.add_argument("--output", type=Path, default=HERE / "measurements" / "cheap_2026-10-05.json")
     args = parser.parse_args(argv)
     report = run_report()
-    args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    write_json_result(
+        args.output, result_document(report, specification_hash=ABSENT_SPECIFICATION),
+    )
     for name, result in report["candidates"].items():
         counts = "; ".join(f"{kind}={data['candidate_false_alarms']}/{data['total']} (+{data['new_false_alarms']} new)" for kind, data in result["controls"].items())
         print(f"{name}: {result['gaps_failing_today']} fail today; {result['recovered']} recovered; {counts}")

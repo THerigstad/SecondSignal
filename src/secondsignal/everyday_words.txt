@@ -491,6 +491,7 @@ authenticity
 author
 authored
 authoring
+authorisation
 authoritative
 authorities
 authority
@@ -827,6 +828,7 @@ campaign
 can
 canaries
 canary
+canceled
 cancellable
 cancellation
 cancelled
@@ -2543,6 +2545,7 @@ floods
 floor
 floorboards
 floors
+floridi
 flow
 flowing
 fluorescent
@@ -2707,6 +2710,7 @@ genuine
 genuinely
 geometric
 geometry
+gertler
 get
 gets
 getting
@@ -3919,6 +3923,7 @@ misinformation
 mislabel
 misleading
 mismatch
+mismatched
 mismatches
 misquoted
 misread
@@ -4171,6 +4176,7 @@ noticing
 notifications
 notopic
 noun
+novelli
 novelty
 november
 now
@@ -4302,6 +4308,7 @@ order
 ordered
 ordering
 orders
+ordinal
 ordinary
 org
 organization
@@ -5192,6 +5199,7 @@ relies
 relished
 reload
 reloading
+reloads
 rely
 remain
 remainder
@@ -5272,6 +5280,7 @@ reproduction
 requalification
 request
 requested
+requester
 requesting
 requests
 requestsignals
@@ -5392,10 +5401,12 @@ revealed
 reveals
 revenge
 reverence
+reversal
 reverse
 reversed
 reversibility
 reversible
+reversing
 revert
 reverted
 review
@@ -6475,6 +6486,7 @@ tiles
 time
 timeline
 timeout
+timeouts
 timer
 times
 timescale
@@ -6725,6 +6737,7 @@ unflinching
 unfolded
 unfurls
 ungated
+unhashed
 unhealthy
 unhurried
 unicode
@@ -6733,6 +6746,7 @@ uniformly
 unilateral
 unit
 universal
+university
 unknowable
 unknown
 unlabelled
@@ -7148,6 +7162,7 @@ xrc
 xx
 y
 ya
+yale
 yaml
 year
 years

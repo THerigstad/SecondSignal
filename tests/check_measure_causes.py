@@ -88,7 +88,7 @@ def test_full_report_on_three_lines_writes_six_causes_and_verifiable_map(tmp_pat
     report = run_measurement(lines=crisis_lines()[:3], output_dir=tmp_path,
                              fold_map=subset, include_replays=False)
     saved = json.loads((tmp_path / "causes_2026-10-04.json").read_text(encoding="utf-8"))
-    assert saved == report
+    assert saved == {"header": {"specification_hash": "absent", "reproducibility": "not-reproducible"}, **report}  # HM2: report -> provenance header plus unchanged report.
     assert len(report["causes"]) == 6
     assert report["scope"] == "limited test run"
     assert report["confusables"]["map"]["size"] == 5

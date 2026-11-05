@@ -260,8 +260,10 @@ def test_the_json_form_carries_the_whole_scorecard(capsys) -> None:
     status = RT.main(["--json", str(TRAJECTORIES / "gemini-traj-aftermath-substantive-followup.json")])
     assert status == 0
     document = json.loads(capsys.readouterr().out)
-    assert document[0]["id"] == "gemini-traj-aftermath-substantive-followup"
-    assert {"first_divergent_turn", "card_divergences", "weakenings", "turn_classes", "recovery", "verdict"} <= set(document[0])
+    assert set(document) == {"header", "results"}
+    assert document["header"] == {"specification_hash": "absent", "reproducibility": "not-reproducible"}
+    assert document["results"][0]["id"] == "gemini-traj-aftermath-substantive-followup"  # HM2: document[0] -> document["results"][0].
+    assert {"first_divergent_turn", "card_divergences", "weakenings", "turn_classes", "recovery", "verdict"} <= set(document["results"][0])  # HM2: document[0] -> document["results"][0].
 
 
 # --- repeated runs are identical for a deterministic layer (brief 6) -------------------------------

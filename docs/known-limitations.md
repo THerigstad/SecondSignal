@@ -13,6 +13,31 @@ with the rulings of 3 October on review rounds 3 and 3B (the character
 write-ups are fixed; the survivor fixtures are ported). Amended 10 October
 2026 by order P3: holds now last the sitting.
 
+## Harness records — 4 November 2026
+
+The material change log is tamper-evident, not tamper-proof. Each event binds
+the event before it, and read verification checks the chain and its retained
+head receipt. The program writing the log could still rewrite the file.
+A coordinated rewrite of the log and its local receipts cannot be detected
+without an independently retained anchor. Nothing in this record makes it
+self-enforcing (ADR-0035, Proposed).
+
+The runtime component remains partial. A sitting survives page reloads while
+the server runs and ends after eight quiet hours. The latch and its soft
+state survive restarts; holds last only the sitting. Model calls have
+transport timeouts, bounded retries and a bounded Table worker pool, but
+there is no durable full transcript or checkpoint and resume of an
+interrupted call. On the crisis path, specification persistence is queued
+so a slow disk does not delay the card; a crash before that queue drains can
+leave a row without its durable specification, and a failed write is
+reported rather than treated as success.
+
+The human-readable specification is not written yet. A later order will
+generate it from the machine-readable JSON. Requested and host-reported
+model identities are separate; an unknown host identity remains null.
+New results with an explicit absent specification hash are labelled
+not-reproducible. These records provide evidence, not new model authority.
+
 ## A hold lasts the sitting — order P3
 
 10 October 2026. The policy half of ruling 13 is built

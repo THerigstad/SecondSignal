@@ -22,6 +22,11 @@ import test_eval_cases as cases  # noqa: E402
 from secondsignal import load_roster, route  # noqa: E402
 from secondsignal.profiles import canonicalize_expectation, roster_hash  # noqa: E402
 from secondsignal.router import no_signal_seat  # noqa: E402
+from secondsignal_harness.results import (  # noqa: E402
+    ABSENT_SPECIFICATION,
+    result_document,
+    write_json_result,
+)
 
 HERE = ROOT / "evals" / "near_tie"
 MARGINS = (5, 10, 15)
@@ -268,12 +273,11 @@ def main(argv=None):
     parser.add_argument("--output", type=Path, default=HERE / "measurements/near_tie_2026-10-05.json")
     args = parser.parse_args(argv)
     report = run_report()
-    args.output.parent.mkdir(parents=True, exist_ok=True)
-    # Compact rows retain all observations within the 2 MB delivery limit.
-    payload = json.dumps(report, ensure_ascii=False, separators=(",", ":")) + "\n"
-    if len(payload.encode("utf-8")) > 2_000_000:
-        raise ValueError("Report exceeds the order's 2 MB per-file limit")
-    args.output.write_text(payload, encoding="utf-8")
+    # Include the provenance header within the existing 2 MB delivery limit.
+    write_json_result(
+        args.output, result_document(report, specification_hash=ABSENT_SPECIFICATION),
+        compact=True, max_bytes=2_000_000,
+    )
     for margin in report["margins"]:
         print(margin["plain_sentence"])
     print(json.dumps(report["inventory"], sort_keys=True))

@@ -29,7 +29,7 @@ from .harness import HARNESS_LINES_EN, Harness, Turn
 from .prompt import build_prompt, build_turn_block
 from .view import audit_view
 
-__version__ = "0.0.1"
+__version__ = "0.0.2"  # HM2: 0.0.1 -> 0.0.2; versioned harness records and audit v2.
 
 __all__ = [
     "AdapterReply",

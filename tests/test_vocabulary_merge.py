@@ -208,6 +208,7 @@ def test_measurement_matches_saved_report_without_source_writes(measured):
                    variant["alone"], *variant["carriers"]):
         assert screen["folds"] == []
         screen["folds"] = ["wider_quotes"]  # Order G2B5B Part 4: [] -> ["wider_quotes"] for exactly eight spectrum screen receipts.
+    expected = {"header": {"specification_hash": "absent", "reproducibility": "not-reproducible"}, **expected}  # HM2: expected -> exact required provenance header plus unchanged expected report.
     assert report == expected  # Order G2B5B Parts 2/4/6: October report -> exact 17 measured receipt/count migrations; every other field retains full equality.
 
 

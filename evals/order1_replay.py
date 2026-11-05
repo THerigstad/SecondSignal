@@ -17,6 +17,11 @@ def main():
     sys.path.insert(0, str(args.root))
     from evals.run_fixtures import run_case
     from secondsignal import load_roster
+    from secondsignal_harness.results import (
+        ABSENT_SPECIFICATION,
+        result_document,
+        write_json_result,
+    )
     case_dir = args.cases_dir or args.root / 'evals' / 'cases'
     roster = load_roster()
     rows = []
@@ -40,8 +45,9 @@ def main():
                 'card': decision.safety.card, 'latch': session.latch,
                 'preferences': session.preferences,
             })
-    args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(json.dumps(rows, ensure_ascii=False, indent=2)+'\n', encoding='utf-8')
+    write_json_result(
+        args.output, result_document(rows, specification_hash=ABSENT_SPECIFICATION),
+    )
     print(f'Replayed {len(rows)} runnable single-turn cases -> {args.output}')
 
 

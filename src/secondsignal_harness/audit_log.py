@@ -12,7 +12,10 @@ from __future__ import annotations
 import hashlib
 import json
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from .spec import HarnessSpecification
 
 _JSON_NATIVE = (str, int, float, bool, type(None))
 
@@ -46,13 +49,31 @@ class AuditLog:
     def __init__(self, path: Path | str | None = None) -> None:
         self.path = Path(path) if path is not None else None
         self._rows: list[dict[str, Any]] = []
+        self._active_specification: HarnessSpecification | None = None
         if self.path is not None and self.path.exists():
             for line in self.path.read_text(encoding="utf-8").splitlines():
                 if line.strip():
                     self._rows.append(json.loads(line))
 
+    def bind_specification(self, row: dict[str, Any], specification: HarnessSpecification) -> None:
+        """Validate in memory; the Table owns deferred persistence on its crisis branch."""
+        specification.assert_row(row)
+        self._active_specification = specification
+
+    def append_specification(self, row: dict[str, Any], specification: HarnessSpecification) -> str:
+        """Bind the active record before writing; overridden append proofs remain in force."""
+        self.bind_specification(row, specification)
+        specification.commit()
+        return self.append(row)
+
     def append(self, row: dict[str, Any]) -> str:
         """Write one row and return its id only after the write can be read back."""
+        if row.get("schema") == "secondsignal_harness.audit_row.v2":
+            from .spec import SpecificationError
+
+            if self._active_specification is None:
+                raise SpecificationError("a v2 harness row requires an active specification")
+            self._active_specification.assert_row(row)
         body = dict(row)
         body.pop("row_id", None)
         row_id = hashlib.sha256(canonical_row(body).encode("utf-8")).hexdigest()
@@ -60,7 +81,7 @@ class AuditLog:
         line = canonical_row(body)
         if self.path is not None:
             self.path.parent.mkdir(parents=True, exist_ok=True)
-            with self.path.open("a", encoding="utf-8") as handle:
+            with self.path.open("a", encoding="utf-8", newline="\n") as handle:
                 start = handle.tell()
                 handle.write(line + "\n")
                 handle.flush()

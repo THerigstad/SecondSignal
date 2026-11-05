@@ -23,6 +23,7 @@ def test_demo_site_manifest_and_copied_files(tmp_path: Path) -> None:
     listed_paths = [entry["path"] for entry in entries]
     assert len(listed_paths) == len(set(listed_paths)), "duplicate manifest paths"
     assert set(listed_paths) == {path.as_posix() for path in runtime_files()}
+    assert not any(path.startswith("src/secondsignal_harness/") for path in listed_paths)
 
     for entry in entries:
         relative_path = entry["path"]
@@ -47,15 +48,17 @@ def test_demo_site_manifest_and_copied_files(tmp_path: Path) -> None:
 
     # The page writes exactly the manifest's files into the browser's file system and imports
     # the package from there. Do the same in a clean interpreter: with only the listed files,
-    # the gate and the router must import, so a data file left off the list fails here first.
+    # the gate, router and fixture runner must import without the harness package.
     browser = tmp_path / "browser"
     for relative_path in listed_paths:
         target = browser / relative_path
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(out / relative_path, target)
     probe = (
-        "import sys; sys.path.insert(0, 'src'); "
-        "import secondsignal.safety, secondsignal.router; "
+        "import sys; sys.path[:0] = ['.', 'src']; "
+        "import secondsignal.safety, secondsignal.router, evals.run_fixtures; "
+        "assert not any(name == 'secondsignal_harness' or name.startswith('secondsignal_harness.') "
+        "for name in sys.modules); "
         "print(secondsignal.safety.__file__)"
     )
     done = subprocess.run([sys.executable, "-I", "-S", "-c", probe], cwd=browser,

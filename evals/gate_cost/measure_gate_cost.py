@@ -36,6 +36,11 @@ from secondsignal import SessionState, load_roster, route  # noqa: E402
 from secondsignal.safety import crisis_screen  # noqa: E402
 from secondsignal_harness.adapters import FakeAdapter  # noqa: E402
 from secondsignal_harness.audit_log import AuditLog, canonical_row  # noqa: E402
+from secondsignal_harness.results import (  # noqa: E402
+    ABSENT_SPECIFICATION,
+    result_document,
+    write_json_result,
+)
 
 HERE = ROOT / "evals/gate_cost"
 EVERYDAY = (
@@ -352,6 +357,13 @@ def audit_week(directory, turns_per_day, repeats):
 
         first_open = measure(lambda: AuditLog(app.audit_path), 1, correct_length)
         loaded = AuditLog(app.audit_path)
+        specification = app.harness.ensure_specification()
+        require({row["specification_hash"] for row in templates}
+                == {specification.snapshot()["specification_hash"]},
+                "Audit templates must share the measured specification")
+        # Bind outside the timed append; the unchanged H1 proof measures the
+        # audit append/readback itself, using already recorded HM2 evidence.
+        loaded.bind_specification(templates[0], specification)
         measurements = {
             "auditlog_open_parse": measure(lambda: AuditLog(app.audit_path), repeats, correct_length),
             "table_build_harness_reopen": measure(app._build_harness, repeats, lambda h: correct_length(h.audit_log)),
@@ -535,8 +547,9 @@ def main(argv=None):
     parser.add_argument("--output", type=Path, default=HERE / "measurements/gate_cost_2026-10-06_h1.json")
     args = parser.parse_args(argv)
     report = run_report()
-    args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    write_json_result(
+        args.output, result_document(report, specification_hash=ABSENT_SPECIFICATION),
+    )
     print(report["machine"]["line"])
     for condition in ("idle", "all_slots_occupied"):
         for row in report["gate"][condition]:

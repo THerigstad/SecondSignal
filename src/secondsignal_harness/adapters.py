@@ -31,12 +31,17 @@ DEFAULT_TIMEOUT_SECONDS = 60.0
 
 @dataclass(frozen=True)
 class AdapterReply:
-    """One reply. ``model_id`` is what the vendor said answered, not what was asked for."""
+    """One reply, including whether its model identity was actually reported.
+
+    ``model_id`` retains the legacy requested-model fallback for old callers.
+    A false ``model_id_reported`` means that fallback is not host evidence.
+    """
 
     text: str
     model_id: str
     usage: dict[str, int] = field(default_factory=dict)
     model_version: str | None = None
+    model_id_reported: bool = True
 
 
 class AdapterError(RuntimeError):
@@ -150,7 +155,11 @@ class AnthropicAdapter:
         blocks = parsed.get("content") or []
         text = "".join(str(b.get("text", "")) for b in blocks if isinstance(b, dict))
         usage = {k: int(v) for k, v in (parsed.get("usage") or {}).items() if isinstance(v, int)}
-        return AdapterReply(text=text, model_id=str(parsed.get("model") or self.model), usage=usage)
+        reported = parsed.get("model")
+        return AdapterReply(
+            text=text, model_id=str(reported or self.model), usage=usage,
+            model_id_reported=isinstance(reported, str) and bool(reported.strip()),
+        )
 
 
 class OpenAICompatibleAdapter:
@@ -223,7 +232,11 @@ class OpenAICompatibleAdapter:
         if choices and isinstance(choices[0], dict):
             text = str(((choices[0].get("message") or {}).get("content")) or "")
         usage = {k: int(v) for k, v in (parsed.get("usage") or {}).items() if isinstance(v, int)}
-        return AdapterReply(text=text, model_id=str(parsed.get("model") or self.model), usage=usage)
+        reported = parsed.get("model")
+        return AdapterReply(
+            text=text, model_id=str(reported or self.model), usage=usage,
+            model_id_reported=isinstance(reported, str) and bool(reported.strip()),
+        )
 
 
 class OpenAIAdapter(OpenAICompatibleAdapter):

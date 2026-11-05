@@ -23,6 +23,11 @@ from evals.fuzz.run import _session  # noqa: E402
 from secondsignal import load_roster, route, safety  # noqa: E402
 from secondsignal.lexicon import PACKS, apply_masks, tokenize  # noqa: E402
 from secondsignal.normalize import analyze, screen_fold  # noqa: E402
+from secondsignal_harness.results import (  # noqa: E402
+    ABSENT_SPECIFICATION,
+    result_document,
+    write_json_result,
+)
 
 MEASUREMENT = Path(__file__).with_name("measurements") / "splice_2026-10-10.json"
 SPLICES = tuple(("suffix", phrase) for phrase in (
@@ -171,8 +176,9 @@ def main():
     args = parser.parse_args()
     if args.write:
         result = measure()
-        MEASUREMENT.parent.mkdir(parents=True, exist_ok=True)
-        MEASUREMENT.write_text(json.dumps(result, ensure_ascii=False, indent=2)+"\n", encoding="utf-8")
+        write_json_result(
+            MEASUREMENT, result_document(result, specification_hash=ABSENT_SPECIFICATION),
+        )
         selected = "before" if args.before else "after"
         print(f"G1 splice: {result[selected]['eligible_count']} eligible cases ({selected})")
         for row in result["splices"]:

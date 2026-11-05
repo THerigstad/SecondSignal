@@ -62,6 +62,11 @@ from secondsignal import Action, Outcome, load_roster, route  # noqa: E402
 from secondsignal.lexicon import apply_masks  # noqa: E402
 from secondsignal.normalize import analyze  # noqa: E402
 from secondsignal.safety import AFTERMATH_TURNS, crisis_screen, is_substantive  # noqa: E402
+from secondsignal_harness.results import (  # noqa: E402
+    ABSENT_SPECIFICATION,
+    encode_json_result,
+    result_document,
+)
 
 
 def _validator() -> ModuleType:
@@ -749,7 +754,10 @@ def main(argv: list[str] | None = None) -> int:
     roster = load_roster()
     cards = [run(path, roster) for path in trajectory_files(args.files)]
     if args.json:
-        print(json.dumps([card.to_dict() for card in cards], ensure_ascii=False, indent=1))
+        document = result_document(
+            [card.to_dict() for card in cards], specification_hash=ABSENT_SPECIFICATION,
+        )
+        print(encode_json_result(document, indent=1), end="")
     else:
         for card in cards:
             print(render(card))

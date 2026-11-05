@@ -110,6 +110,23 @@ def adapter_identity(adapter: ModelAdapter, reply: AdapterReply | None) -> dict[
     return {"model_id": None, "model_version": None}
 
 
+def presentation_configuration(
+    roster: Mapping[str, AgentProfile], presentation: Mapping[str, str],
+    chosen_names: Mapping[str, str],
+) -> dict[str, Any]:
+    """The H1 presentation projection, computed only from already loaded state."""
+    settings = []
+    for agent_id, profile in sorted(roster.items()):
+        setting = presentation.get(agent_id, "as_written")
+        if setting not in PRESENTATION_WORDS:
+            setting = "as_written"
+        name, pronoun = profile.name_for(setting, chosen_names.get(agent_id))
+        forms = (profile.display_name, profile.plate[0][0], profile.plate[1][0])
+        settings.append({"setting": setting, "name_form": forms.index(name),
+                         "pronoun": pronoun if pronoun in {"she", "he", "they", ""} else None})
+    return {"order": "sorted_roster_ids", "slots": settings}
+
+
 def configuration(
     *, adapter: ModelAdapter, reply: AdapterReply | None, prompt_hash: str | None,
     record: Mapping[str, Any], roster: Mapping[str, AgentProfile], codexes: CodexStore,
@@ -129,15 +146,6 @@ def configuration(
         house_hash = lock.get("sha256")
         if not isinstance(house_hash, str) or not re.fullmatch(r"[0-9a-f]{64}", house_hash):
             raise ValueError("house-block lock has no SHA-256")
-    settings = []
-    for agent_id, profile in sorted(roster.items()):
-        setting = presentation.get(agent_id, "as_written")
-        if setting not in PRESENTATION_WORDS:
-            setting = "as_written"
-        name, pronoun = profile.name_for(setting, chosen_names.get(agent_id))
-        forms = (profile.display_name, profile.plate[0][0], profile.plate[1][0])
-        settings.append({"setting": setting, "name_form": forms.index(name),
-                         "pronoun": pronoun if pronoun in {"she", "he", "they", ""} else None})
     return {
         **adapter_identity(adapter, reply),
         "prompt_sha256": prompt_hash,
@@ -146,6 +154,6 @@ def configuration(
         "pack_versions": dict(_pack_versions()),
         "roster_hash": safe_identifier(record.get("roster_hash")),
         "house_block_sha256": house_hash,
-        "presentation": {"order": "sorted_roster_ids", "slots": settings},
+        "presentation": presentation_configuration(roster, presentation, chosen_names),
         "generation": {"max_turns": max_turns, "max_tokens": max_tokens, "retries": retries},
     }

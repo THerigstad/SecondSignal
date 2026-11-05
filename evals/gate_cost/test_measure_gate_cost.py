@@ -32,7 +32,7 @@ def test_gate_cost_report_shape_and_real_table_slots():
         assert gate[name]["actual_fake_calls"] == 0
     week = report["audit_week"]
     assert week["turns"] == 14 and week["file_bytes"] > 0
-    assert week["template_schema"] == "secondsignal_harness.audit_row.v1"
+    assert week["template_schema"] == "secondsignal_harness.audit_row.v2"  # HM2: secondsignal_harness.audit_row.v1 -> secondsignal_harness.audit_row.v2.
     assert not week["temporary_file_retained"]
     assert set(week["measurements"]) == {"auditlog_open_parse", "table_build_harness_reopen",
                                          "read_first", "read_last", "read_missing", "rows_in_memory_copy"}

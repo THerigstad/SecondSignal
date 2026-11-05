@@ -123,22 +123,25 @@ def main(argv: list[str] | None = None) -> int:
         max_tokens=args.max_tokens,
     )
 
-    if args.session == "-":
-        return _run(harness, sys.stdin, trace=args.trace)
-    if args.session:
-        with open(args.session, encoding="utf-8") as source:
-            return _run(harness, source, trace=args.trace)
-
-    print("Talk to the house. Empty line to leave.")
     try:
-        while True:
-            text = input("> ").strip()
-            if not text:
-                return 0
-            _run(harness, [text], trace=args.trace)
-    except (EOFError, KeyboardInterrupt):
-        print()
-        return 0
+        if args.session == "-":
+            return _run(harness, sys.stdin, trace=args.trace)
+        if args.session:
+            with open(args.session, encoding="utf-8") as source:
+                return _run(harness, source, trace=args.trace)
+
+        print("Talk to the house. Empty line to leave.")
+        try:
+            while True:
+                text = input("> ").strip()
+                if not text:
+                    return 0
+                _run(harness, [text], trace=args.trace)
+        except (EOFError, KeyboardInterrupt):
+            print()
+            return 0
+    finally:
+        harness.close_specification("cli_closed").commit()
 
 
 if __name__ == "__main__":

@@ -505,7 +505,7 @@ class TableFeatures:
         token_ready = self.operator_token_available()
         with self.correction_lock:
             with self.lock:
-                self.token_ready = token_ready
+                self._observe_operator_token(token_ready)
                 if self._latch_requires_token and not token_ready:
                     raise self.input_error("Clearing this latch needs the operator's token on this computer.")
                 before = self.correction_state()
@@ -527,6 +527,14 @@ class TableFeatures:
                     self.state.update(self._mode_state())
                     self._publish()
                 after = self.correction_state()
+                if applied:
+                    specification_write = self._record_specification_control(
+                        "permission model.latch_clearance", before, after,
+                        authorization={"control": "clear_careful_read", "scope": "computer",
+                                       "operator_token": token_ready,
+                                       "token_required": self._latch_requires_token,
+                                       "reason": reason, "request_row_id": request_id,
+                                       "evidence": "apps/talking_table/t3.py:TableFeatures.clear_careful_read"})
             # The request is durable before clearing; the result distinguishes races.
             self._correction_row({**row, "kind": "operator_latch_clear" if applied else
                                   "operator_latch_review_superseded", "at": time.time(),
@@ -534,6 +542,7 @@ class TableFeatures:
             if not applied:
                 raise self.input_error("The sitting changed during review; nothing was cleared.")
             persisted.wait()
+            self._wait_specification(specification_write)
             if persisted.failed:
                 raise self.input_error("The latch was cleared in memory, but its file could not be removed.")
             return after

@@ -805,12 +805,18 @@ def write_report(
     case_dir: Path = CASE_DIR,
     roster: Roster | None = None,
     report: str = DEFAULT_REPORT,
+    *,
+    specification_hash: str = "absent",
 ) -> FixtureSummary:
-    """Run fixtures, write the deterministic report, and return its summary."""
+    """Run fixtures and write their body with an explicit provenance header."""
+    # The policy-only browser demo imports this runner without the harness.
+    from secondsignal_harness.results import result_header, write_markdown_result
+
     summary = run_fixtures(case_dir=case_dir, roster=roster, report=report)
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    with output_path.open("w", encoding="utf-8", newline="\n") as handle:
-        handle.write(render_markdown(summary, report=report))
+    write_markdown_result(
+        output_path, render_markdown(summary, report=report),
+        header=result_header(specification_hash),
+    )
     return summary
 
 

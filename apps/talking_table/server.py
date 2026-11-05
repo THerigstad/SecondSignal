@@ -58,6 +58,7 @@ COOKIE = "ss_table_pair"
 MAX_BODY = 65536
 MAX_REPLY = 3500
 MODEL_TIMEOUT = 15.0
+MODEL_CONCURRENCY_LIMIT = 4
 # ADR-0022 (Proposed), provisional boundary; operator ruling of 9 October 2026.
 SITTING_QUIET_LIMIT_SECONDS = 8 * 60 * 60
 # No reply is lost to a limit (Night Builds Review of 30 September 2026, required
@@ -376,6 +377,11 @@ class _TurnJob:
         self.harness.session = copy.deepcopy(app.harness.session)
         self.harness.transcript = copy.deepcopy(app.harness.transcript)
         self.harness.turns = []
+        # A superseded worker cannot change the live sitting specification.
+        with app._specification_lock:
+            self.base_specification = app.harness.ensure_specification()
+            self.harness.specification = self.base_specification.fork()
+            self.harness.specification_runtime = copy.deepcopy(app.harness.specification_runtime)
         self.harness.room = app.settings["room"] or None
         self.harness.object_text = app.object_text
         self.harness.draft_tag = tag
@@ -468,6 +474,12 @@ class _TableAudit:
         self.job, self.sink = job, sink
 
     def append(self, row):
+        return self._append(row)
+
+    def append_specification(self, row, specification):
+        return self._append(row, specification)
+
+    def _append(self, row, specification=None):
         job, app = self.job, self.job.app
         gate = row.get("action") == "HUMAN_ESCALATION"
         job.boundary(gate=gate)
@@ -496,7 +508,31 @@ class _TableAudit:
         try:
             if job.cancelled.is_set():
                 raise _Cancelled()
-            row_id = self.sink.append(safe)
+            if specification is None:
+                row_id = self.sink.append(safe)
+            elif gate:
+                # Binding is memory-only. The card must not wait for a prior
+                # settings/run-end write; its specification is queued locally.
+                self.sink.bind_specification(safe, specification)
+                app._queue_specification(specification)
+                row_id = self.sink.append(safe)
+            else:
+                row_id = self.sink.append_specification(safe, specification)
+            if specification is not None:
+                # Pairing can change while this accepted turn waits for its
+                # model. Its next-turn controls must survive the older reply.
+                with app._specification_lock:
+                    if (not job.cancelled.is_set() and job.session_id == app.session_id
+                            and job.revision == app.revision):
+                        current = app.harness.ensure_specification()
+                        if current is job.base_specification:
+                            app.harness.specification = specification
+                        else:
+                            merged = current.fork()
+                            merged.merge_model_observation(
+                                specification, ordinal=job.harness.sitting_turn_ordinal)
+                            app.harness.specification = merged
+                            app._queue_specification(merged)
             job.audit_row_id = row_id
         finally:
             app.audit_lock.release()
@@ -535,7 +571,7 @@ class TableApp(TableFeatures):
         self.lock = threading.RLock()
         self.audit_lock = threading.Lock()
         self.receipt_lock = threading.Lock()
-        self.model_slots = threading.BoundedSemaphore(4)
+        self.model_slots = threading.BoundedSemaphore(MODEL_CONCURRENCY_LIMIT)
         self.speech_slots = threading.BoundedSemaphore(2)
         self.speech_transport = speech_transport or self._voice_transport
         self.speech_tokens = {}
@@ -590,6 +626,140 @@ class TableApp(TableFeatures):
         self.state = self._idle_state()
         self._init_features()
         self._init_latch()
+        self._specification_lock = threading.RLock()
+        self._specification_pending = queue.Queue()
+        self._specification_error = None
+        self._closed_specifications = []
+        self._specification_thread = threading.Thread(
+            target=self._specification_writer, daemon=True, name="table-specification")
+        self._specification_thread.start()
+        self._begin_specification()
+
+    def _specification_runtime(self):
+        """Effective non-secret Table controls, independent of policy turn state."""
+        return {
+            "surface": "talking_table",
+            "latch_persistence": bool(self._latch_owned),
+            "permissions": {
+                "computer_scope": self.computer["scope"],
+                "phone_scope": "phone" if self.paired else None,
+                "operator_token_available": bool(self.token_ready),
+                "table_owned_latch_requires_token": bool(self._latch_owned),
+                "injected_session_clearance_authority": not self._latch_owned,
+            },
+            "quiet_limit_seconds": SITTING_QUIET_LIMIT_SECONDS,
+            "model_wait_seconds": MODEL_TIMEOUT,
+            "model_concurrency_limit": MODEL_CONCURRENCY_LIMIT,
+            "settings": copy.deepcopy(self.settings),
+            "credential_slots": {"model": bool(self.key), "voice": bool(self.voice_key),
+                                 "lights": bool(self.lights_key)},
+            "operator_token_available": bool(self.token_ready),
+            "pairing": {"network_enabled": self.phone_server is not None,
+                        "computer_scope": self.computer["scope"],
+                        "phone_scope": "phone" if self.paired else None,
+                        "paired_devices": len(self.paired)},
+        }
+
+    def _begin_specification(self, previous=None):
+        with self._specification_lock:
+            return self._begin_specification_locked(previous)
+
+    def _begin_specification_locked(self, previous=None):
+        self.harness._sitting_origin = int(self.harness.session.turn_count)
+        self.harness.specification_runtime = self._specification_runtime()
+        self.harness.specification_initial_state = {
+            "latch": self._latch_fields(), "accepted_turns": 0,
+        }
+        if previous is None or previous.audit_path != getattr(self.harness.audit_log, "path", None):
+            self.harness.specification = None
+            candidate = self.harness.ensure_specification()
+        else:
+            candidate = previous.new_run(
+                self.harness.specification_configuration(template=previous.configuration),
+                adapter=self.harness.adapter, roster=self.harness.roster, codexes=self.harness.codexes,
+                runtime=self.harness.specification_runtime,
+                initial_state=self.harness.specification_initial_state)
+            self.harness.specification = candidate
+        return self._queue_specification(candidate)
+
+    def _queue_specification(self, candidate):
+        """Queue only: quiet expiry and a crisis never wait for specification I/O."""
+        completed = threading.Event()
+        completed.error = None
+        self._specification_pending.put_nowait((candidate, completed))
+        return completed
+
+    def _specification_writer(self):
+        while True:
+            item = self._specification_pending.get()
+            try:
+                if item is None:
+                    return
+                candidate, completed = item
+                try:
+                    candidate.commit()
+                except Exception as error:
+                    # Retain only a type, not an arbitrary exception carrying input.
+                    completed.error = type(error).__name__
+                    self._specification_error = completed.error
+                finally:
+                    completed.set()
+            finally:
+                self._specification_pending.task_done()
+
+    def _wait_specification(self, completed):
+        completed.wait()
+        if completed.error is not None:
+            raise RuntimeError("The harness specification could not be recorded.")
+
+    def flush_specifications(self):
+        """Explicit verification boundary for an operator or test, never a card."""
+        self._specification_pending.join()
+        if self._specification_error is not None:
+            raise RuntimeError("The harness specification could not be recorded.")
+
+    def _refresh_specification(self, *, actor, authorization):
+        with self._specification_lock:
+            return self._refresh_specification_locked(actor=actor, authorization=authorization)
+
+    def _refresh_specification_locked(self, *, actor, authorization):
+        self.harness.specification_runtime = self._specification_runtime()
+        candidate = self.harness.ensure_specification().fork()
+        candidate.change(
+            self.harness.specification_configuration(),
+            runtime=self.harness.specification_runtime, adapter=self.harness.adapter,
+            actor=actor, authorization=authorization,
+            ordinal=self.harness.sitting_turn_ordinal + 1)
+        self.harness.specification = candidate
+        return self._queue_specification(candidate)
+
+    def _record_specification_control(self, field, old, new, *, authorization):
+        with self._specification_lock:
+            return self._record_specification_control_locked(field, old, new, authorization=authorization)
+
+    def _record_specification_control_locked(self, field, old, new, *, authorization):
+        candidate = self.harness.ensure_specification().fork()
+        candidate.record_change(field, old, new, actor="operator", authorization=authorization,
+                                ordinal=self.harness.sitting_turn_ordinal + 1)
+        self.harness.specification = candidate
+        return self._queue_specification(candidate)
+
+    def _end_specification(self, reason):
+        with self._specification_lock:
+            ended = self.harness.close_specification(reason)
+            self._closed_specifications.append(ended)
+            self._queue_specification(ended)
+            return ended
+
+    def _observe_operator_token(self, token_ready):
+        """Record a change found by an existing token check; never read a token here."""
+        changed = bool(token_ready) != bool(self.token_ready)
+        self.token_ready = token_ready
+        if changed and hasattr(self, "_specification_pending") and not self.closed:
+            self._refresh_specification(
+                actor="runtime", authorization={"control": "operator_token_observation",
+                "authority": "existing local token validation",
+                "evidence": "apps/talking_table/t3.py:TableFeatures.operator_token_available"})
 
     def _idle_state(self):
         return {"seated": None, "assist": None, "state": "idle",
@@ -1088,8 +1258,9 @@ class TableApp(TableFeatures):
                        operator_circle=setting["operator_circle"])
 
     def config(self, local=True):
-        self.token_ready = self.operator_token_available()
+        token_ready = self.operator_token_available()
         with self.lock:
+            self._observe_operator_token(token_ready)
             settings = copy.deepcopy(self.settings)
             settings["operator_circle"] = bool(self.harness.operator_circle)
             settings["key_set"] = bool(self.key)
@@ -1226,6 +1397,15 @@ class TableApp(TableFeatures):
                 self.harness.session.locale = settings["locale"] or None
                 self.harness.transcript = previous.transcript
                 self.harness.turns = previous.turns
+                self.harness._sitting_origin = previous._sitting_origin
+                self.harness.specification = previous.ensure_specification()
+                self.harness.specification_configuration(template=self.harness.specification.configuration)
+                self.token_ready = token_ready
+                specification_write = self._refresh_specification(
+                    actor="operator", authorization={
+                        "control": "update_settings", "scope": "computer",
+                        "operator_token": token_ready,
+                        "evidence": "apps/talking_table/server.py:Handler._authorize"})
                 self.mode_revision += 1
                 self.state["presentation"] = settings["presentation"]
                 if self.state["state"] != "card":
@@ -1233,6 +1413,7 @@ class TableApp(TableFeatures):
                 self.state.update(self._mode_state())
                 self.pending_turn = None
                 self._publish()
+            self._wait_specification(specification_write)
             return self.config()
 
     def _persist_settings(self, settings_payload, preferences_payload, terms_payload=None):
@@ -1270,6 +1451,7 @@ class TableApp(TableFeatures):
         """The common in-memory boundary; caller owns the sitting lock."""
         carry = self._latch_fields() if self._latch_owned and harness is None else None
         self._cancel_jobs()
+        ended = self._end_specification("quiet_expiry" if quiet else "reset")
         self.session_id = secrets.token_hex(12)
         self.revision = 0
         self.last_turn_at = None
@@ -1300,6 +1482,7 @@ class TableApp(TableFeatures):
         self.mode_revision += 1
         self.state = self._idle_state()
         self._reset_features()
+        self._begin_specification(previous=ended)
         self.lights.submit(None, "idle")
         return self._queue_latch()
 
@@ -1641,7 +1824,7 @@ class TableApp(TableFeatures):
                 raise InputError(VOICE_ERROR)
         return raw
 
-    def set_network(self, enabled):
+    def set_network(self, enabled, *, requester="operator", authorization=None):
         with self.lock:
             if not isinstance(enabled, bool):
                 raise InputError("The phone switch must be on or off.")
@@ -1661,8 +1844,13 @@ class TableApp(TableFeatures):
                 # Shutdown may wait for a poll; keep that out of the request lock.
                 threading.Thread(target=lambda: (server.shutdown(), server.server_close()),
                                  daemon=True).start()
+            specification_write = self._refresh_specification(
+                actor=requester, authorization=authorization or {
+                    "control": "set_network", "scope": "computer",
+                    "evidence": "apps/talking_table/server.py:Handler._authorize"})
             self._publish()
-            return self.config()
+        self._wait_specification(specification_write)
+        return self.config()
 
     def pair(self, code, address):
         with self.lock:
@@ -1679,14 +1867,27 @@ class TableApp(TableFeatures):
             token = secrets.token_urlsafe(32)
             self.paired.add(token)
             self.pairing_records[token] = {"scope": "phone"}
-            return token
+            specification_write = self._refresh_specification(
+                actor="paired_device", authorization={"control": "pair", "scope": "phone",
+                "pairing_code_verified": True,
+                "evidence": "apps/talking_table/server.py:TableApp.pair"})
+        self._wait_specification(specification_write)
+        return token
 
     def close(self):
         with self.lock:
+            if self.closed:
+                return
             self.closed = True
             self._publish()
             self._cancel_jobs()
-        self.set_network(False)
+        self.set_network(False, requester="runtime", authorization={
+            "control": "shutdown", "authority": "server lifecycle"})
+        with self.lock:
+            self._end_specification("shutdown")
+        self.flush_specifications()
+        self._specification_pending.put_nowait(None)
+        self._specification_pending.join()
         if self._latch_thread.is_alive():
             self._latch_pending.put_nowait(None)
             self._latch_pending.join()
@@ -1911,7 +2112,7 @@ class Handler(BaseHTTPRequestHandler):
                 if path == "/api/operator/state":
                     token_ready = app.operator_token_available()
                     with app.lock:
-                        app.token_ready = token_ready
+                        app._observe_operator_token(token_ready)
                         value = app.correction_state()
                 elif path == "/api/replay":
                     query = urllib.parse.parse_qs(urllib.parse.urlsplit(self.path).query)

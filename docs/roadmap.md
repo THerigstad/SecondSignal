@@ -43,6 +43,14 @@ out (architecture phases, drawn from the
   six ADR-0020 corrections are open, and the audit's cultural layer withholds
   every reply outside operator-circle mode until two humans lock a rubric.
 
+- **M5, harness records — 4 November 2026.** The harness is recorded as a versioned
+  part of the system (ADR-0035, Proposed), with configuration by component,
+  model pairing, audit stamps and append-only material changes. The Table
+  records sitting start and end, including quiet expiry. The later
+  human-readable specification will be generated from this JSON; it is not
+  written yet. Runtime remains partial, with no full transcript checkpoint
+  or interrupted-call resume.
+
 ## The next build blocks, in order (as of 2026-09-10)
 
 The list is drawn from the rulings of 8 and 10 September and from what the

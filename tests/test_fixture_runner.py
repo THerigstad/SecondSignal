@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from evals.run_fixtures import render_markdown, write_report
+from secondsignal_harness.results import read_markdown_result, render_result_header
 
 
 def test_round1_fixture_report_is_reproducible(tmp_path: Path) -> None:
@@ -62,7 +63,9 @@ def test_round1_fixture_report_is_reproducible(tmp_path: Path) -> None:
     assert gap_result.status == "known gap"
     assert gap_result.expectation_source == "reviewer original"
 
-    report = output.read_text(encoding="utf-8")
+    header, report = read_markdown_result(output)  # HM2: whole file -> validated header plus unchanged report body.
+    assert header == {"specification_hash": "absent", "reproducibility": "not-reproducible"}
+    assert output.read_text(encoding="utf-8") == render_result_header(header) + report
     assert report == render_markdown(summary)
     assert report.count("\n- `") == 103
     assert "| **Total** | **103** | **79** | **13** | **10** | **1** |" in report
@@ -114,7 +117,9 @@ def test_round2_fixture_report_is_reproducible(tmp_path: Path) -> None:
     gap = next(r for r in summary.results if r.fixture.case_id == "sec-intake-backend-disagree-failclosed-002")
     assert gap.status == "known gap"
 
-    report = output.read_text(encoding="utf-8")
+    header, report = read_markdown_result(output)  # HM2: whole file -> validated header plus unchanged report body.
+    assert header == {"specification_hash": "absent", "reproducibility": "not-reproducible"}
+    assert output.read_text(encoding="utf-8") == render_result_header(header) + report
     assert report == render_markdown(summary, report="round2-2026-09-08")
     assert report.count("\n- `") == 36
     assert "| **Total** | **36** | **30** | **4** | **1** | **1** |" in report

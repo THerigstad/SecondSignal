@@ -33,6 +33,11 @@ from evals.fuzz.transforms import TRANSFORMS  # noqa: E402
 from evals.gap_triage import measure_cheap as cheap  # noqa: E402
 from secondsignal import load_roster  # noqa: E402
 from secondsignal.normalize import SKELETON  # noqa: E402
+from secondsignal_harness.results import (  # noqa: E402
+    ABSENT_SPECIFICATION,
+    result_document,
+    write_json_result,
+)
 
 HERE = ROOT / "evals/gap_triage"
 CARD = "HUMAN_ESCALATION"
@@ -713,8 +718,9 @@ def main(argv=None):
     parser.add_argument("--source-limit", type=int)
     args = parser.parse_args(argv)
     report = run_report(args.case_id, args.control_limit, args.variant_line_limit, args.source_limit)
-    args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
+    write_json_result(
+        args.output, result_document(report, specification_hash=ABSENT_SPECIFICATION),
+    )
     for name, result in report["candidates"].items():
         print(result["line"])
         print(result["plain_sentence"])

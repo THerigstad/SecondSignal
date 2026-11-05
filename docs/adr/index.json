@@ -545,6 +545,26 @@
       "amends": [
         "0031"
       ]
+    },
+    {
+      "number": "0035",
+      "file": "0035-the-harness-is-a-versioned-part-of-the-system.md",
+      "title": "The harness is a versioned part of the system",
+      "decision": "Proposed",
+      "implementation": "built",
+      "evidence": [
+        "tests/test_hm2_spec.py",
+        "tests/test_hm2_harness.py",
+        "tests/test_hm2_table.py",
+        "tests/test_hm2_results.py"
+      ],
+      "modules": [
+        "src/secondsignal_harness/spec.py",
+        "src/secondsignal_harness/event_log.py",
+        "src/secondsignal_harness/results.py",
+        "src/secondsignal_harness/harness.py"
+      ],
+      "notes": "Harness records, 4 November 2026: the harness has a versioned JSON record, per-turn audit stamps, a chained material change log, sitting lifecycle records and required result headers. The component structure comes from Gertler, Novelli and Floridi at Yale. Runtime remains partial; the human-readable rendering and independent review remain future work."
     }
   ],
   "reserved": [
