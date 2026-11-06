@@ -537,6 +537,14 @@ rewritten.
   Cowork mode; written by the project manager. The commit:
   1. "Push K, landing 23: the reading copy in five pages".
 
+- **2026-11-05**, push L, landing 24: the profile sentences and two stale
+  README lines, one commit through the operator's browser session on GitHub's
+  upload page, authored by the operator, the model Claude Opus 5.5, as the
+  operator's screen showed it (the operator's account), in a Claude cloud
+  session linked to the operator's PC; written by the project manager. The
+  commit:
+  1. "Push L, landing 24: the profile sentences and two stale README lines".
+
 ## What this note does not do
 
 It does not rank the families and it does not count agreements. Where two

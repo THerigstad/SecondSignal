@@ -4,6 +4,12 @@ All notable changes to SecondSignal are documented here.
 
 ## [Unreleased]
 
+### Fixed — 2026-11-05, the profile sentences and two stale README lines (landing 24)
+
+- `evals/refresh_public_sentences.py` renders the operator's new LinkedIn wording with the exact numbers: the headline, the About paragraph that begins "Public since" and the Featured repository card. The invitation in both now asks for synthetic test cases (no real names, no real situations) filed as issues, instead of transcripts, so nobody posts a real crisis in public. A sixth place joins the five: the description of the SecondSignal project under Projects, which states the test and case counts. `tests/test_public_sentences.py` expects six sentences; `evals/public-sentences.md`, the two READMEs and the evaluation page say six.
+- README: the opening said the audit harness was "not wired yet"; it was wired in on 2026-09-19, as the Status list already said, and the sentence now says so and points to what it still lacks. The scope table's "Not built" column listed "Response generation of any kind" while the Working column describes the voice; it now lists response generation inside the policy layer, which is absent by design. Two outside reviewers caught both on 5 November.
+- Written by the project manager. No test is added, so the public numbers do not move: 4,206 tests; 67 expected failures (50 documented gaps, 17 recorded dissents).
+
 ### Fixed — 2026-11-05, the reading copy in five pages (landing 23)
 
 - `examples/harness-specification-reading-copy.pdf` is rebuilt with the same words in five pages instead of six. The edition started "The eight parts" on a fresh page, which left page two about 60% empty; the section now follows straight on, and its picture is drawn at 70% of the page width so it fits there. The cover keeps the full-size picture. Every word and all 12 links are unchanged.

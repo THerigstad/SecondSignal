@@ -367,12 +367,12 @@ collection, the case manifest and the case tree, and
 sources. The dated Numbers paragraphs on this page are history and keep the
 numbers that were true on their dates.
 
-**The sentences that leave the repository.** The five places on the operator's
+**The sentences that leave the repository.** The six places on the operator's
 LinkedIn profile that state these numbers are rendered from the same snapshot by
 `evals/refresh_public_sentences.py` into `evals/public-sentences.md`, dated, and
 `tests/test_public_sentences.py` fails when that file disagrees with the
 snapshot. Nothing in the tree reaches LinkedIn: after a landing that moves the
-numbers, a person pastes the five sentences from the file, whole.
+numbers, a person pastes the six sentences from the file, whole.
 
 **Numbers, 2026-10-04.** The push of the rulings of 28 September and 3 October
 2026 and the night builds of 30 September. On the tree before it (28 September,

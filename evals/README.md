@@ -128,7 +128,7 @@ tree by `refresh_public_numbers.py`, kept in `public-numbers.json`, and written
 from there onto the README and the evaluation page; run it after any change
 that moves them, and `--write` to adopt. `tests/test_public_numbers.py` fails
 when a page or the snapshot is stale.
-The five sentences the project states outside this tree, on the operator's
+The six sentences the project states outside this tree, on the operator's
 LinkedIn profile, are rendered from the same snapshot by
 `refresh_public_sentences.py` into `public-sentences.md` (`--write --as-of
 <date>` to adopt); `tests/test_public_sentences.py` fails when that file

@@ -66,7 +66,7 @@ def test_the_file_is_what_the_snapshot_renders(snapshot: sentences.Numbers, as_o
 def test_every_sentence_carries_the_snapshot_numbers(snapshot: sentences.Numbers, as_of: str) -> None:
     text = sentences.SENTENCES_PATH.read_text(encoding="utf-8")
     found = sentences.sections(text)
-    assert sorted(found) == [1, 2, 3, 4, 5]
+    assert sorted(found) == [1, 2, 3, 4, 5, 6]
     tests = f"{snapshot['tests']:,} tests"
     for number, sentence in found.items():
         assert tests in sentence, f"sentence {number} does not say {tests!r}"
@@ -118,7 +118,7 @@ def test_moved_numbers_make_the_file_stale(as_of: str, tree_copy: Path) -> None:
     moved["tests"] += 1
     current, rendered = sentences.compare(moved, as_of, tree_copy)
     stale = [n for n, s in sentences.sections(current).items() if s != sentences.sections(rendered)[n]]
-    assert stale == [1, 2, 3, 4, 5]
+    assert stale == [1, 2, 3, 4, 5, 6]
 
 
 def test_a_file_without_a_date_stops_the_script_instead_of_being_guessed(tree_copy: Path) -> None:

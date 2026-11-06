@@ -3,14 +3,14 @@
 The project's public pages state their numbers from one file,
 ``evals/public-numbers.json``, written from the tree by
 ``evals/refresh_public_numbers.py``. The same numbers are also stated outside
-the repository: five places on the operator's LinkedIn profile carry the test
-count, and one of them carries the passing count, the documented gaps, the
-recorded dissents, the case count and the external-fixture count as well.
-Until 7 October 2026 those five were retyped by hand after a landing, and three
+the repository: six places on the operator's LinkedIn profile carry the test
+count; one of them also carries the passing count, the documented gaps, the
+recorded dissents and the external-fixture count, and two carry the case count.
+Until 7 October 2026 these sentences were retyped by hand after a landing, and three
 times they fell behind the tree by a push or more (``docs/confessions.md``,
 C-35, "What changed").
 
-This script removes the typing. It renders the five sentences from the
+This script removes the typing. It renders the six sentences from the
 snapshot into ``evals/public-sentences.md``, with the date the numbers were
 written, and ``tests/test_public_sentences.py`` fails when that file disagrees
 with the snapshot. The file is what a person pastes over the profile after a
@@ -60,7 +60,7 @@ def long_date(day: dt.date) -> str:
     return f"{day.day} {day.strftime('%B %Y')}"
 
 
-# --- the five sentences ----------------------------------------------------------------------
+# --- the six sentences -----------------------------------------------------------------------
 
 
 @dataclass(frozen=True)
@@ -74,9 +74,9 @@ class Sentence:
 
 def _headline(n: Numbers, _: str) -> str:
     return (
-        "I build AI systems that help people get through hard things · Creator of "
-        f"SecondSignal (public on GitHub: {n['tests']:,} tests, two external review rounds) · "
-        "AI systems design, persona architecture, evaluation."
+        "AI Evaluation · Red Teaming · Audio Annotation | Creator of SecondSignal, a public "
+        f"AI-safety gate ({n['tests']:,} tests) | 6 yrs 9 mos on confidential cases for the "
+        "State of Oregon"
     )
 
 
@@ -84,8 +84,8 @@ def _about(n: Numbers, _: str) -> str:
     return (
         "Public since 10 September 2026: github.com/THerigstad/SecondSignal. Architecture, "
         f"decision records, review rounds, {n['tests']:,} tests, and an invitation: try to get a "
-        "crisis sentence past the gate and file the transcript. I'd rather it break there than "
-        "fail with a human on the other end."
+        "synthetic test case past the gate and file it as an issue, no real people. I'd rather "
+        "it break there than fail with a human on the other end."
     )
 
 
@@ -117,7 +117,16 @@ def _featured(n: Numbers, _: str) -> str:
         "The policy layer of a seven-voice companion system, public: routing, a fail-closed "
         f"crisis gate, {n['tests']:,} tests, two external review rounds kept verbatim, every "
         "design decision on a machine-checked register, and a failures ledger. Try to break it "
-        "and file the transcript."
+        "with synthetic test cases (no real names, no real situations) and file it as an issue."
+    )
+
+
+def _project(n: Numbers, _: str) -> str:
+    return (
+        "A safety layer for AI companions that screens every message for crisis signals before "
+        f"any character answers, with {n['tests']:,} tests, {n['cases']} "
+        "evaluation cases, outside review rounds across nine AI model families, and every gap "
+        "and disagreement on the public record."
     )
 
 
@@ -127,6 +136,7 @@ SENTENCES: tuple[Sentence, ...] = (
     Sentence(3, "Experience, SecondSignal, the paragraph that begins \"On the record\"", _record),
     Sentence(4, "Experience, SecondSignal, the description of the attached GitHub link", _link),
     Sentence(5, "Featured, the repository card's description", _featured),
+    Sentence(6, "Projects, SecondSignal, the project's description", _project),
 )
 
 PREAMBLE = """\
@@ -134,7 +144,7 @@ PREAMBLE = """\
 
 Written by `evals/refresh_public_sentences.py` from `evals/public-numbers.json`;
 `tests/test_public_sentences.py` fails when this file disagrees with that
-snapshot. These are the five places on the operator's LinkedIn profile that
+snapshot. These are the six places on the operator's LinkedIn profile that
 state the tree's numbers. After a landing that moves the numbers, run the
 script with `--write --as-of <date>` and paste each sentence over the one on
 the profile, whole. Nothing here reaches LinkedIn by itself. "Two external
@@ -224,7 +234,7 @@ def main() -> int:
             print(f"           should: {should[sentence.number]!r}")
     if args.write:
         write(numbers, as_of)
-        print("\nwritten. Paste the five sentences onto the profile, then commit the diff.")
+        print("\nwritten. Paste the six sentences onto the profile, then commit the diff.")
         return 0
     print("\nnot written. Re-run with --write --as-of YYYY-MM-DD once every line above is intended.")
     return 1
